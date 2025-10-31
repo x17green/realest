@@ -13,13 +13,15 @@ interface Property {
   price: number;
   address: string;
   city: string;
-  bedrooms: number;
-  bathrooms: number;
-  square_feet: number;
   listing_type: string;
   property_type: string;
   latitude: number | null;
   longitude: number | null;
+  property_details: {
+    bedrooms: number | null;
+    bathrooms: number | null;
+    square_feet: number | null;
+  }[];
 }
 
 export default function SearchPage() {
@@ -94,7 +96,7 @@ export default function SearchPage() {
       const { data, error } = await query;
 
       if (!error && data) {
-        setProperties(data as Property[]);
+        setProperties(data as unknown as Property[]);
       }
       setIsLoading(false);
     };
@@ -113,14 +115,16 @@ export default function SearchPage() {
 
         {/* Search Bar */}
         <div className="flex gap-2 mb-6">
-          <Input
-            type="text"
-            placeholder="Search by location, address, or keyword"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-1"
-            startContent={<Search className="w-4 h-4" />}
-          />
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Input
+              type="text"
+              placeholder="Search by location, address, or keyword"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
           <Button variant="primary">Search</Button>
         </div>
 
@@ -196,7 +200,7 @@ export default function SearchPage() {
             <Link key={property.id} href={`/property/${property.id}`}>
               <Card.Root className="h-full hover:shadow-lg transition-shadow cursor-pointer">
                 <div className="relative h-48 bg-muted rounded-t-lg overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-slate-400 to-slate-600" />
+                  <div className="absolute inset-0 bg-linear-to-br from-slate-400 to-slate-600" />
                   <Chip
                     type="success"
                     variant="primary"
@@ -217,26 +221,30 @@ export default function SearchPage() {
                     <span className="line-clamp-1">{property.address}</span>
                   </div>
                   <div className="flex gap-4 text-sm text-muted-foreground">
-                    {property.bedrooms > 0 && (
-                      <div className="flex items-center gap-1">
-                        <Bed className="w-4 h-4" />
-                        <span>{property.bedrooms}</span>
-                      </div>
-                    )}
-                    {property.bathrooms > 0 && (
-                      <div className="flex items-center gap-1">
-                        <Bath className="w-4 h-4" />
-                        <span>{property.bathrooms}</span>
-                      </div>
-                    )}
-                    {property.square_feet > 0 && (
-                      <div className="flex items-center gap-1">
-                        <Ruler className="w-4 h-4" />
-                        <span>
-                          {property.square_feet.toLocaleString()} sqft
-                        </span>
-                      </div>
-                    )}
+                    {property.property_details?.[0]?.bedrooms &&
+                      property.property_details[0].bedrooms > 0 && (
+                        <div className="flex items-center gap-1">
+                          <Bed className="w-4 h-4" />
+                          <span>{property.property_details[0].bedrooms}</span>
+                        </div>
+                      )}
+                    {property.property_details?.[0]?.bathrooms &&
+                      property.property_details[0].bathrooms > 0 && (
+                        <div className="flex items-center gap-1">
+                          <Bath className="w-4 h-4" />
+                          <span>{property.property_details[0].bathrooms}</span>
+                        </div>
+                      )}
+                    {property.property_details?.[0]?.square_feet &&
+                      property.property_details[0].square_feet > 0 && (
+                        <div className="flex items-center gap-1">
+                          <Ruler className="w-4 h-4" />
+                          <span>
+                            {property.property_details[0].square_feet.toLocaleString()}{" "}
+                            sqft
+                          </span>
+                        </div>
+                      )}
                   </div>
                 </Card.Content>
               </Card.Root>
