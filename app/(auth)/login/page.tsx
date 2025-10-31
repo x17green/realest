@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Button, Input, Card, Link as HeroLink } from "@heroui/react";
+import { Button, Input, Card } from "@heroui/react";
 import { createClient } from "@/lib/supabase/client";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 
@@ -18,7 +18,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
     if (error) setError("");
   };
 
@@ -29,10 +29,12 @@ export default function LoginPage() {
 
     try {
       const supabase = createClient();
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
-        email: formData.email,
-        password: formData.password,
-      });
+      const { data, error: authError } = await supabase.auth.signInWithPassword(
+        {
+          email: formData.email,
+          password: formData.password,
+        },
+      );
 
       if (authError) {
         setError(authError.message);
@@ -68,9 +70,7 @@ export default function LoginPage() {
       <Card.Root className="w-full max-w-md">
         <Card.Header className="text-center">
           <Card.Title className="text-2xl font-bold">Welcome Back</Card.Title>
-          <Card.Description>
-            Sign in to your RealProof account
-          </Card.Description>
+          <Card.Description>Sign in to your RealProof account</Card.Description>
         </Card.Header>
 
         <Card.Content className="space-y-6">
@@ -104,7 +104,9 @@ export default function LoginPage() {
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
                   value={formData.password}
-                  onChange={(e) => handleInputChange("password", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("password", e.target.value)
+                  }
                   className="pl-10 pr-10"
                   required
                 />
@@ -146,9 +148,9 @@ export default function LoginPage() {
             </div>
             <div className="text-sm">
               Don't have an account?{" "}
-              <HeroLink as={Link} href="/auth/sign-up" className="font-medium">
+              <Link href="/auth/sign-up" className="font-medium">
                 Sign up
-              </HeroLink>
+              </Link>
             </div>
           </div>
         </Card.Content>

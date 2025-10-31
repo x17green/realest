@@ -11,7 +11,7 @@ export default async function AdminDashboardPage() {
   } = await supabase.auth.getUser()
 
   if (!user) {
-    redirect("/auth/login")
+    redirect("/login")
   }
 
   // Check if user is an admin

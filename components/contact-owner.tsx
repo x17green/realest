@@ -127,7 +127,7 @@ export default function ContactOwner({ property, owner, currentUser }: ContactOw
           {!currentUser ? (
             <div className="text-center py-6">
               <p className="text-muted-foreground mb-4">Please log in to send an inquiry</p>
-              <Link href="/auth/login">
+              <Link href="/login">
                 <Button className="w-full">Log In</Button>
               </Link>
             </div>

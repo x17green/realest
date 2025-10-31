@@ -23,7 +23,7 @@ export default async function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen w-full bg-background">
       <Header user={user} />
       <HeroSection />
       <FeaturedProperties />

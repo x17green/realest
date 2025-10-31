@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Button, Input, Card, Link as HeroLink, RadioGroup, Radio } from "@heroui/react";
+import { Button, Input, Card, RadioGroup, Radio } from "@heroui/react";
 import { createClient } from "@/lib/supabase/client";
 import { Eye, EyeOff, Mail, Lock, User, Building, Users } from "lucide-react";
 
@@ -22,12 +22,12 @@ export default function SignUpPage() {
   const [error, setError] = useState("");
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
     if (error) setError("");
   };
 
   const handleRoleSelect = (userType: string) => {
-    setFormData(prev => ({ ...prev, userType }));
+    setFormData((prev) => ({ ...prev, userType }));
     setStep(2);
   };
 
@@ -75,7 +75,9 @@ export default function SignUpPage() {
       <div className="min-h-screen flex items-center justify-center bg-background px-4">
         <Card.Root className="w-full max-w-md">
           <Card.Header className="text-center">
-            <Card.Title className="text-2xl font-bold">Join RealProof</Card.Title>
+            <Card.Title className="text-2xl font-bold">
+              Join RealProof
+            </Card.Title>
             <Card.Description>
               Choose your account type to get started
             </Card.Description>
@@ -117,9 +119,9 @@ export default function SignUpPage() {
             <div className="text-center">
               <div className="text-sm">
                 Already have an account?{" "}
-                <HeroLink as={Link} href="/auth/login" className="font-medium">
+                <Link href="/login" className="font-medium">
                   Sign in
-                </HeroLink>
+                </Link>
               </div>
             </div>
           </Card.Content>
@@ -151,7 +153,9 @@ export default function SignUpPage() {
                   type="text"
                   placeholder="Enter your full name"
                   value={formData.fullName}
-                  onChange={(e) => handleInputChange("fullName", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("fullName", e.target.value)
+                  }
                   className="pl-10"
                   required
                 />
@@ -187,7 +191,9 @@ export default function SignUpPage() {
                   type={showPassword ? "text" : "password"}
                   placeholder="Create a password"
                   value={formData.password}
-                  onChange={(e) => handleInputChange("password", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("password", e.target.value)
+                  }
                   className="pl-10 pr-10"
                   required
                 />
@@ -216,7 +222,9 @@ export default function SignUpPage() {
                   type="password"
                   placeholder="Confirm your password"
                   value={formData.confirmPassword}
-                  onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("confirmPassword", e.target.value)
+                  }
                   className="pl-10"
                   required
                 />
@@ -252,9 +260,9 @@ export default function SignUpPage() {
           <div className="text-center">
             <div className="text-sm">
               Already have an account?{" "}
-              <HeroLink as={Link} href="/auth/login" className="font-medium">
+              <Link href="/login" className="font-medium">
                 Sign in
-              </HeroLink>
+              </Link>
             </div>
           </div>
         </Card.Content>

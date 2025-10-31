@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Button, Card, Link as HeroLink } from "@heroui/react";
+import { Button, Card } from "@heroui/react";
 import { CheckCircle, Mail } from "lucide-react";
 
 export default function SignUpSuccessPage() {
@@ -38,19 +38,14 @@ export default function SignUpSuccessPage() {
           </div>
 
           <div className="space-y-3">
-            <Button
-              as={Link}
-              href="/auth/login"
-              variant="primary"
-              className="w-full"
-            >
-              Go to Sign In
+            <Button asChild variant="primary" className="w-full">
+              <Link href="/login">Go to Sign In</Link>
             </Button>
 
             <div className="text-center">
-              <HeroLink as={Link} href="/" className="text-sm">
+              <Link href="/" className="text-sm">
                 Back to Homepage
-              </HeroLink>
+              </Link>
             </div>
           </div>
         </Card.Content>

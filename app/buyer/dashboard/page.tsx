@@ -3,17 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import {
-  Card,
-  Button,
-  Chip,
-  Avatar,
-  Separator,
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@heroui/react";
+import { Card, Button, Chip, Avatar, Separator, Tabs } from "@heroui/react";
 import {
   Heart,
   Search,
@@ -81,7 +71,9 @@ export default function BuyerDashboardPage() {
       const supabase = createClient();
 
       // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return;
 
       // Mock data for now - in real app, these would come from database
@@ -145,7 +137,8 @@ export default function BuyerDashboardPage() {
           id: "1",
           property_title: "Luxury Penthouse",
           property_id: "prop1",
-          message: "I'm interested in viewing this property. Could we schedule a viewing for next week?",
+          message:
+            "I'm interested in viewing this property. Could we schedule a viewing for next week?",
           status: "pending",
           sent_at: new Date().toISOString(),
         },
@@ -153,10 +146,12 @@ export default function BuyerDashboardPage() {
           id: "2",
           property_title: "Garden Apartment",
           property_id: "prop2",
-          message: "Is this property still available? I'd like to make an offer.",
+          message:
+            "Is this property still available? I'd like to make an offer.",
           status: "responded",
           sent_at: new Date(Date.now() - 86400000).toISOString(),
-          owner_response: "Yes, it's still available. Would you like to schedule a viewing?",
+          owner_response:
+            "Yes, it's still available. Would you like to schedule a viewing?",
         },
       ]);
 
@@ -198,9 +193,11 @@ export default function BuyerDashboardPage() {
               Track your property searches and saved listings.
             </p>
           </div>
-          <Button as={Link} href="/search" variant="primary">
-            <Search className="w-4 h-4 mr-2" />
-            Search Properties
+          <Button asChild variant="primary">
+            <Link href="/search">
+              <Search className="w-4 h-4 mr-2" />
+              Search Properties
+            </Link>
           </Button>
         </div>
 
@@ -210,8 +207,12 @@ export default function BuyerDashboardPage() {
             <Card.Content className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Saved Properties</p>
-                  <p className="text-2xl font-bold">{stats?.savedProperties || 0}</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Saved Properties
+                  </p>
+                  <p className="text-2xl font-bold">
+                    {stats?.savedProperties || 0}
+                  </p>
                 </div>
                 <Heart className="w-8 h-8 text-danger" />
               </div>
@@ -222,8 +223,12 @@ export default function BuyerDashboardPage() {
             <Card.Content className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Active Searches</p>
-                  <p className="text-2xl font-bold">{stats?.activeSearches || 0}</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Active Searches
+                  </p>
+                  <p className="text-2xl font-bold">
+                    {stats?.activeSearches || 0}
+                  </p>
                 </div>
                 <Search className="w-8 h-8 text-primary" />
               </div>
@@ -234,8 +239,12 @@ export default function BuyerDashboardPage() {
             <Card.Content className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Sent Inquiries</p>
-                  <p className="text-2xl font-bold">{stats?.sentInquiries || 0}</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Sent Inquiries
+                  </p>
+                  <p className="text-2xl font-bold">
+                    {stats?.sentInquiries || 0}
+                  </p>
                 </div>
                 <MessageSquare className="w-8 h-8 text-warning" />
               </div>
@@ -246,8 +255,12 @@ export default function BuyerDashboardPage() {
             <Card.Content className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Properties Viewed</p>
-                  <p className="text-2xl font-bold">{stats?.viewedProperties || 0}</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Properties Viewed
+                  </p>
+                  <p className="text-2xl font-bold">
+                    {stats?.viewedProperties || 0}
+                  </p>
                 </div>
                 <Eye className="w-8 h-8 text-info" />
               </div>
@@ -256,15 +269,20 @@ export default function BuyerDashboardPage() {
         </div>
 
         {/* Main Content */}
-        <Tabs defaultValue="saved" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="saved">Saved Properties</TabsTrigger>
-            <TabsTrigger value="searches">Recent Searches</TabsTrigger>
-            <TabsTrigger value="inquiries">My Inquiries</TabsTrigger>
-          </TabsList>
+        <Tabs.Root defaultSelectedKey="saved" className="space-y-6">
+          <Tabs.ListWrapper>
+            <Tabs.List
+              aria-label="Dashboard sections"
+              className="grid w-full grid-cols-3"
+            >
+              <Tabs.Tab id="saved">Saved Properties</Tabs.Tab>
+              <Tabs.Tab id="searches">Recent Searches</Tabs.Tab>
+              <Tabs.Tab id="inquiries">My Inquiries</Tabs.Tab>
+            </Tabs.List>
+          </Tabs.ListWrapper>
 
           {/* Saved Properties Tab */}
-          <TabsContent value="saved" className="space-y-6">
+          <Tabs.Panel id="saved" className="space-y-6">
             <Card.Root>
               <Card.Header>
                 <Card.Title className="flex items-center gap-2">
@@ -279,15 +297,20 @@ export default function BuyerDashboardPage() {
                 {savedProperties.length === 0 ? (
                   <div className="text-center py-8">
                     <Heart className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground mb-4">No saved properties yet</p>
-                    <Button as={Link} href="/search" variant="primary" size="sm">
-                      Start Searching
+                    <p className="text-muted-foreground mb-4">
+                      No saved properties yet
+                    </p>
+                    <Button asChild variant="primary" size="sm">
+                      <Link href="/search">Start Searching</Link>
                     </Button>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     {savedProperties.map((property) => (
-                      <div key={property.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div
+                        key={property.id}
+                        className="flex items-center justify-between p-4 border rounded-lg"
+                      >
                         <div className="flex items-center gap-4">
                           <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center">
                             <Home className="w-8 h-8 text-muted-foreground" />
@@ -296,10 +319,12 @@ export default function BuyerDashboardPage() {
                             <h3 className="font-medium">{property.title}</h3>
                             <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
                               <MapPin className="w-4 h-4" />
-                              <span>{property.address}, {property.city}</span>
+                              <span>
+                                {property.address}, {property.city}
+                              </span>
                             </div>
                             <div className="flex items-center gap-4 text-sm">
-                              <Chip variant="secondary" size="sm">
+                              <Chip variant="secondary">
                                 {property.property_type}
                               </Chip>
                               <span className="font-medium text-primary">
@@ -310,9 +335,11 @@ export default function BuyerDashboardPage() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Button as={Link} href={`/property/${property.id}`} variant="secondary" size="sm">
-                            <Eye className="w-4 h-4 mr-1" />
-                            View
+                          <Button asChild variant="secondary" size="sm">
+                            <Link href={`/property/${property.id}`}>
+                              <Eye className="w-4 h-4 mr-1" />
+                              View
+                            </Link>
                           </Button>
                           <Button variant="ghost" size="sm">
                             <Heart className="w-4 h-4" />
@@ -321,18 +348,20 @@ export default function BuyerDashboardPage() {
                       </div>
                     ))}
                     <div className="pt-4">
-                      <Button as={Link} href="/buyer/saved" variant="secondary" className="w-full">
-                        View All Saved Properties
+                      <Button asChild variant="secondary" className="w-full">
+                        <Link href="/buyer/saved">
+                          View All Saved Properties
+                        </Link>
                       </Button>
                     </div>
                   </div>
                 )}
               </Card.Content>
             </Card.Root>
-          </TabsContent>
+          </Tabs.Panel>
 
           {/* Recent Searches Tab */}
-          <TabsContent value="searches" className="space-y-6">
+          <Tabs.Panel id="searches" className="space-y-6">
             <Card.Root>
               <Card.Header>
                 <Card.Title className="flex items-center gap-2">
@@ -347,9 +376,11 @@ export default function BuyerDashboardPage() {
                 {recentSearches.length === 0 ? (
                   <div className="text-center py-8">
                     <Search className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground mb-4">No recent searches</p>
-                    <Button as={Link} href="/search" variant="primary" size="sm">
-                      Start Searching
+                    <p className="text-muted-foreground mb-4">
+                      No recent searches
+                    </p>
+                    <Button asChild variant="primary" size="sm">
+                      <Link href="/search">Start Searching</Link>
                     </Button>
                   </div>
                 ) : (
@@ -357,15 +388,19 @@ export default function BuyerDashboardPage() {
                     {recentSearches.map((search) => (
                       <div key={search.id} className="p-4 border rounded-lg">
                         <div className="flex items-center justify-between mb-2">
-                          <h3 className="font-medium">"{search.query}" in {search.location}</h3>
-                          <Chip variant="secondary" size="sm">
+                          <h3 className="font-medium">
+                            "{search.query}" in {search.location}
+                          </h3>
+                          <Chip variant="secondary">
                             {search.results_count} results
                           </Chip>
                         </div>
                         <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
                           <span>{search.property_type}</span>
                           <span>{search.price_range}</span>
-                          <span>{new Date(search.created_at).toLocaleDateString()}</span>
+                          <span>
+                            {new Date(search.created_at).toLocaleDateString()}
+                          </span>
                         </div>
                         <Button variant="secondary" size="sm">
                           <Search className="w-4 h-4 mr-1" />
@@ -377,10 +412,10 @@ export default function BuyerDashboardPage() {
                 )}
               </Card.Content>
             </Card.Root>
-          </TabsContent>
+          </Tabs.Panel>
 
           {/* Inquiries Tab */}
-          <TabsContent value="inquiries" className="space-y-6">
+          <Tabs.Panel id="inquiries" className="space-y-6">
             <Card.Root>
               <Card.Header>
                 <Card.Title className="flex items-center gap-2">
@@ -395,9 +430,12 @@ export default function BuyerDashboardPage() {
                 {sentInquiries.length === 0 ? (
                   <div className="text-center py-8">
                     <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">No inquiries sent yet</p>
+                    <p className="text-muted-foreground">
+                      No inquiries sent yet
+                    </p>
                     <p className="text-sm text-muted-foreground">
-                      Inquiries will appear here when you contact property owners
+                      Inquiries will appear here when you contact property
+                      owners
                     </p>
                   </div>
                 ) : (
@@ -406,15 +444,21 @@ export default function BuyerDashboardPage() {
                       <div key={inquiry.id} className="p-4 border rounded-lg">
                         <div className="flex items-start justify-between mb-3">
                           <div>
-                            <h3 className="font-medium mb-1">{inquiry.property_title}</h3>
+                            <h3 className="font-medium mb-1">
+                              {inquiry.property_title}
+                            </h3>
                             <p className="text-sm text-muted-foreground">
-                              Sent {new Date(inquiry.sent_at).toLocaleDateString()}
+                              Sent{" "}
+                              {new Date(inquiry.sent_at).toLocaleDateString()}
                             </p>
                           </div>
                           <Chip
-                            type={inquiry.status === "pending" ? "warning" : "success"}
+                            type={
+                              inquiry.status === "pending"
+                                ? "warning"
+                                : "success"
+                            }
                             variant="secondary"
-                            size="sm"
                           >
                             {inquiry.status}
                           </Chip>
@@ -424,13 +468,19 @@ export default function BuyerDashboardPage() {
                         </div>
                         {inquiry.owner_response && (
                           <div className="bg-primary-50 border border-primary-200 p-3 rounded-lg mb-3">
-                            <p className="text-sm font-medium text-primary-900 mb-1">Owner Response:</p>
-                            <p className="text-sm text-primary-800">"{inquiry.owner_response}"</p>
+                            <p className="text-sm font-medium text-primary-900 mb-1">
+                              Owner Response:
+                            </p>
+                            <p className="text-sm text-primary-800">
+                              "{inquiry.owner_response}"
+                            </p>
                           </div>
                         )}
                         <div className="flex gap-2">
-                          <Button as={Link} href={`/property/${inquiry.property_id}`} variant="secondary" size="sm">
-                            View Property
+                          <Button asChild variant="secondary" size="sm">
+                            <Link href={`/property/${inquiry.property_id}`}>
+                              View Property
+                            </Link>
                           </Button>
                           {inquiry.status === "responded" && (
                             <Button variant="primary" size="sm">
@@ -444,8 +494,8 @@ export default function BuyerDashboardPage() {
                 )}
               </Card.Content>
             </Card.Root>
-          </TabsContent>
-        </Tabs>
+          </Tabs.Panel>
+        </Tabs.Root>
 
         {/* Favorite Locations */}
         {stats?.favoriteLocations && stats.favoriteLocations.length > 0 && (
@@ -462,15 +512,13 @@ export default function BuyerDashboardPage() {
             <Card.Content>
               <div className="flex flex-wrap gap-2">
                 {stats.favoriteLocations.map((location, index) => (
-                  <Button
-                    key={index}
-                    as={Link}
-                    href={`/search?q=&location=${encodeURIComponent(location)}`}
-                    variant="secondary"
-                    size="sm"
-                  >
-                    <MapPin className="w-4 h-4 mr-1" />
-                    {location}
+                  <Button key={index} asChild variant="secondary" size="sm">
+                    <Link
+                      href={`/search?q=&location=${encodeURIComponent(location)}`}
+                    >
+                      <MapPin className="w-4 h-4 mr-1" />
+                      {location}
+                    </Link>
                   </Button>
                 ))}
               </div>

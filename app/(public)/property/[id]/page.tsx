@@ -96,7 +96,8 @@ export default function PropertyDetailsPage() {
 
       const { data, error } = await supabase
         .from("properties")
-        .select(`
+        .select(
+          `
           *,
           property_details (*),
           property_media (*),
@@ -107,7 +108,8 @@ export default function PropertyDetailsPage() {
             phone,
             avatar_url
           )
-        `)
+        `,
+        )
         .eq("id", propertyId)
         .eq("status", "active")
         .single();
@@ -177,8 +179,8 @@ export default function PropertyDetailsPage() {
             <p className="text-muted-foreground mb-4">
               The property you're looking for doesn't exist or has been removed.
             </p>
-            <Button as={Link} href="/" variant="primary">
-              Back to Homepage
+            <Button asChild variant="primary">
+              <Link href="/">Back to Homepage</Link>
             </Button>
           </Card.Content>
         </Card.Root>
@@ -186,9 +188,11 @@ export default function PropertyDetailsPage() {
     );
   }
 
-  const primaryImage = property.property_media.find((media) => media.is_primary);
+  const primaryImage = property.property_media.find(
+    (media) => media.is_primary,
+  );
   const galleryImages = property.property_media.filter(
-    (media) => media.media_type === "image"
+    (media) => media.media_type === "image",
   );
 
   return (
@@ -208,7 +212,11 @@ export default function PropertyDetailsPage() {
             />
             {property.verification_status === "verified" && (
               <div className="absolute top-4 left-4">
-                <Chip type="success" variant="primary" className="flex items-center gap-1">
+                <Chip
+                  type="success"
+                  variant="primary"
+                  className="flex items-center gap-1"
+                >
                   <CheckCircle className="w-4 h-4" />
                   Vetted Property
                 </Chip>
@@ -231,8 +239,10 @@ export default function PropertyDetailsPage() {
                 <button
                   key={image.id}
                   onClick={() => setSelectedImage(index)}
-                  className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 ${
-                    selectedImage === index ? "border-primary" : "border-transparent"
+                  className={`shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 ${
+                    selectedImage === index
+                      ? "border-primary"
+                      : "border-transparent"
                   }`}
                 >
                   <img
@@ -265,9 +275,7 @@ export default function PropertyDetailsPage() {
                     <Chip variant="secondary">
                       {property.property_type.replace("_", " ")}
                     </Chip>
-                    <Chip variant="secondary">
-                      For {property.listing_type}
-                    </Chip>
+                    <Chip variant="secondary">For {property.listing_type}</Chip>
                   </div>
                 </div>
                 <div className="text-right">
@@ -275,7 +283,9 @@ export default function PropertyDetailsPage() {
                     £{property.price.toLocaleString()}
                   </div>
                   {property.listing_type === "rent" && (
-                    <div className="text-sm text-muted-foreground">per month</div>
+                    <div className="text-sm text-muted-foreground">
+                      per month
+                    </div>
                   )}
                 </div>
               </div>
@@ -295,7 +305,9 @@ export default function PropertyDetailsPage() {
                         <div className="font-medium">
                           {property.property_details.bedrooms}
                         </div>
-                        <div className="text-sm text-muted-foreground">Bedrooms</div>
+                        <div className="text-sm text-muted-foreground">
+                          Bedrooms
+                        </div>
                       </div>
                     </div>
                   )}
@@ -306,7 +318,9 @@ export default function PropertyDetailsPage() {
                         <div className="font-medium">
                           {property.property_details.bathrooms}
                         </div>
-                        <div className="text-sm text-muted-foreground">Bathrooms</div>
+                        <div className="text-sm text-muted-foreground">
+                          Bathrooms
+                        </div>
                       </div>
                     </div>
                   )}
@@ -317,7 +331,9 @@ export default function PropertyDetailsPage() {
                         <div className="font-medium">
                           {property.property_details.square_feet.toLocaleString()}
                         </div>
-                        <div className="text-sm text-muted-foreground">Sq Ft</div>
+                        <div className="text-sm text-muted-foreground">
+                          Sq Ft
+                        </div>
                       </div>
                     </div>
                   )}
@@ -328,7 +344,9 @@ export default function PropertyDetailsPage() {
                         <div className="font-medium">
                           {property.property_details.parking_spaces}
                         </div>
-                        <div className="text-sm text-muted-foreground">Parking</div>
+                        <div className="text-sm text-muted-foreground">
+                          Parking
+                        </div>
                       </div>
                     </div>
                   )}
@@ -370,11 +388,13 @@ export default function PropertyDetailsPage() {
                   </Card.Header>
                   <Card.Content>
                     <div className="flex flex-wrap gap-2">
-                      {property.property_details.amenities.map((amenity, index) => (
-                        <Chip key={index} variant="secondary">
-                          {amenity}
-                        </Chip>
-                      ))}
+                      {property.property_details.amenities.map(
+                        (amenity, index) => (
+                          <Chip key={index} variant="secondary">
+                            {amenity}
+                          </Chip>
+                        ),
+                      )}
                     </div>
                   </Card.Content>
                 </Card.Root>
@@ -424,44 +444,76 @@ export default function PropertyDetailsPage() {
                   </div>
                 ) : (
                   <form onSubmit={handleInquirySubmit} className="space-y-4">
-                    <Input
-                      label="Your Name"
-                      placeholder="Enter your full name"
-                      value={inquiryForm.name}
-                      onChange={(e) =>
-                        setInquiryForm((prev) => ({ ...prev, name: e.target.value }))
-                      }
-                      required
-                    />
-                    <Input
-                      label="Email"
-                      type="email"
-                      placeholder="Enter your email"
-                      value={inquiryForm.email}
-                      onChange={(e) =>
-                        setInquiryForm((prev) => ({ ...prev, email: e.target.value }))
-                      }
-                      required
-                    />
-                    <Input
-                      label="Phone (Optional)"
-                      type="tel"
-                      placeholder="Enter your phone number"
-                      value={inquiryForm.phone}
-                      onChange={(e) =>
-                        setInquiryForm((prev) => ({ ...prev, phone: e.target.value }))
-                      }
-                    />
-                    <TextArea
-                      label="Message"
-                      placeholder="Tell the owner about your interest in this property..."
-                      value={inquiryForm.message}
-                      onChange={(e) =>
-                        setInquiryForm((prev) => ({ ...prev, message: e.target.value }))
-                      }
-                      required
-                      rows={4}
-                    />
+                    <div className="space-y-2">
+                      <label htmlFor="name" className="text-sm font-medium">
+                        Your Name
+                      </label>
+                      <Input
+                        id="name"
+                        placeholder="Enter your full name"
+                        value={inquiryForm.name}
+                        onChange={(e) =>
+                          setInquiryForm((prev) => ({
+                            ...prev,
+                            name: e.target.value,
+                          }))
+                        }
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label htmlFor="email" className="text-sm font-medium">
+                        Email
+                      </label>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="Enter your email"
+                        value={inquiryForm.email}
+                        onChange={(e) =>
+                          setInquiryForm((prev) => ({
+                            ...prev,
+                            email: e.target.value,
+                          }))
+                        }
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label htmlFor="phone" className="text-sm font-medium">
+                        Phone (Optional)
+                      </label>
+                      <Input
+                        id="phone"
+                        type="tel"
+                        placeholder="Enter your phone number"
+                        value={inquiryForm.phone}
+                        onChange={(e) =>
+                          setInquiryForm((prev) => ({
+                            ...prev,
+                            phone: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label htmlFor="message" className="text-sm font-medium">
+                        Message
+                      </label>
+                      <TextArea
+                        id="message"
+                        placeholder="Tell the owner about your interest in this property..."
+                        value={inquiryForm.message}
+                        onChange={(e) =>
+                          setInquiryForm((prev) => ({
+                            ...prev,
+                            message: e.target.value,
+                          }))
+                        }
+                        required
+                        rows={4}
+                      />
+                    </div>
                     <Button
                       type="submit"
                       variant="primary"
@@ -482,14 +534,21 @@ export default function PropertyDetailsPage() {
               </Card.Header>
               <Card.Content>
                 <div className="flex items-center gap-3 mb-4">
-                  <Avatar
-                    src={property.owner.avatar_url || undefined}
-                    name={property.owner.full_name}
-                    size="lg"
-                  />
+                  <Avatar.Root size="lg">
+                    <Avatar.Image
+                      src={property.owner.avatar_url || undefined}
+                    />
+                    <Avatar.Fallback>
+                      {property.owner.full_name.charAt(0)}
+                    </Avatar.Fallback>
+                  </Avatar.Root>
                   <div>
-                    <div className="font-medium">{property.owner.full_name}</div>
-                    <div className="text-sm text-muted-foreground">Property Owner</div>
+                    <div className="font-medium">
+                      {property.owner.full_name}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      Property Owner
+                    </div>
                   </div>
                 </div>
 
@@ -525,27 +584,32 @@ export default function PropertyDetailsPage() {
               <Card.Content>
                 <div className="space-y-3">
                   <div className="flex justify-between">
-                    <span className="text-sm text-muted-foreground">Listed</span>
+                    <span className="text-sm text-muted-foreground">
+                      Listed
+                    </span>
                     <span className="text-sm">
                       {new Date(property.created_at).toLocaleDateString()}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-sm text-muted-foreground">Property Type</span>
+                    <span className="text-sm text-muted-foreground">
+                      Property Type
+                    </span>
                     <span className="text-sm">{property.property_type}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-sm text-muted-foreground">Status</span>
+                    <span className="text-sm text-muted-foreground">
+                      Status
+                    </span>
                     <Chip
                       type={
                         property.verification_status === "verified"
                           ? "success"
                           : property.verification_status === "rejected"
-                          ? "danger"
-                          : "warning"
+                            ? "danger"
+                            : "warning"
                       }
                       variant="secondary"
-                      size="sm"
                     >
                       {property.verification_status}
                     </Chip>

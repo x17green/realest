@@ -9,7 +9,6 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] })
 export const metadata = {
   title: "RealProof - Verified Real Estate Marketplace",
   description: "No Duplicates, Only Verified Listings",
-  generator: "v0.app",
 }
 
 export default function RootLayout({

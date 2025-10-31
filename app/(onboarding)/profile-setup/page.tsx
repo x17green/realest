@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import {
@@ -9,7 +10,6 @@ import {
   Input,
   TextArea,
   Avatar,
-  Link as HeroLink,
   RadioGroup,
   Radio,
 } from "@heroui/react";
@@ -181,11 +181,13 @@ export default function ProfileSetupPage() {
             {currentStep === 1 && (
               <div className="space-y-6">
                 <div className="text-center mb-6">
-                  <Avatar
-                    name={formData.fullName || user?.email}
-                    size="lg"
-                    className="mx-auto mb-4"
-                  />
+                  <Avatar.Root size="lg" className="mx-auto mb-4">
+                    <Avatar.Fallback>
+                      {formData.fullName?.charAt(0) ||
+                        user?.email?.charAt(0) ||
+                        "U"}
+                    </Avatar.Fallback>
+                  </Avatar.Root>
                   <p className="text-sm text-muted-foreground">
                     This is how you'll appear on RealProof
                   </p>
@@ -284,34 +286,34 @@ export default function ProfileSetupPage() {
                   className="space-y-4"
                 >
                   <div className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
-                    <Radio value="buyer" className="mb-2">
+                    <Radio.Root value="buyer" className="mb-2">
                       <div className="font-medium">
                         I'm looking to buy or rent
                       </div>
                       <div className="text-sm text-muted-foreground">
                         Find verified properties and connect with owners
                       </div>
-                    </Radio>
+                    </Radio.Root>
                   </div>
 
                   <div className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
-                    <Radio value="property_owner" className="mb-2">
+                    <Radio.Root value="property_owner" className="mb-2">
                       <div className="font-medium">I'm a property owner</div>
                       <div className="text-sm text-muted-foreground">
                         List properties and manage inquiries from potential
                         buyers
                       </div>
-                    </Radio>
+                    </Radio.Root>
                   </div>
 
                   {user?.email?.includes("admin") && (
                     <div className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
-                      <Radio value="admin" className="mb-2">
+                      <Radio.Root value="admin" className="mb-2">
                         <div className="font-medium">I'm an administrator</div>
                         <div className="text-sm text-muted-foreground">
                           Manage platform operations and verify properties
                         </div>
-                      </Radio>
+                      </Radio.Root>
                     </div>
                   )}
                 </RadioGroup>
@@ -438,9 +440,9 @@ export default function ProfileSetupPage() {
             </div>
 
             <div className="text-center mt-4">
-              <HeroLink href="/" className="text-sm text-muted-foreground">
+              <Link href="/" className="text-sm text-muted-foreground">
                 Skip for now
-              </HeroLink>
+              </Link>
             </div>
           </Card.Content>
         </Card.Root>
