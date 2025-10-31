@@ -1,27 +1,27 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import type { User } from "@supabase/supabase-js"
-import { createClient } from "@/lib/supabase/client"
-import { useRouter } from "next/navigation"
-import { useState } from "react"
+import Link from "next/link";
+import { Button } from "@heroui/react";
+import type { User } from "@supabase/supabase-js";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 interface HeaderProps {
-  user: User | null
+  user: User | null;
 }
 
 export default function Header({ user }: HeaderProps) {
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogout = async () => {
-    setIsLoading(true)
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    router.push("/")
-    router.refresh()
-  }
+    setIsLoading(true);
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/");
+    router.refresh();
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -49,18 +49,23 @@ export default function Header({ user }: HeaderProps) {
           {user ? (
             <>
               <Link href="/owner/dashboard">
-                <Button variant="outline" size="sm">
+                <Button variant="tertiary" size="sm">
                   Dashboard
                 </Button>
               </Link>
-              <Button variant="ghost" size="sm" onClick={handleLogout} disabled={isLoading}>
+              <Button
+                variant="ghost"
+                size="sm"
+                onPress={handleLogout}
+                isDisabled={isLoading}
+              >
                 {isLoading ? "Logging out..." : "Logout"}
               </Button>
             </>
           ) : (
             <>
               <Link href="/auth/login">
-                <Button variant="outline" size="sm">
+                <Button variant="tertiary" size="sm">
                   Log In
                 </Button>
               </Link>
@@ -72,5 +77,5 @@ export default function Header({ user }: HeaderProps) {
         </div>
       </div>
     </header>
-  )
+  );
 }

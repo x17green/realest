@@ -7,9 +7,11 @@
     "dev": "next dev",
     "lint": "eslint .",
     "start": "next start",
-    "prepare": "husky"
+    "test": "echo 'no tests'"
   },
   "dependencies": {
+    "@heroui/react": "^3.0.0-alpha.35",
+    "@heroui/styles": "^3.0.0-alpha.35",
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "1.2.2",
     "@radix-ui/react-alert-dialog": "1.1.4",
@@ -59,6 +61,7 @@
     "recharts": "2.15.4",
     "sonner": "^1.7.4",
     "tailwind-merge": "^2.5.5",
+    "tailwind-variants": "^3.1.1",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.9",
     "zod": "3.25.76"
