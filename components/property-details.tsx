@@ -1,34 +1,48 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { MapPin, Bed, Bath, Ruler, Calendar, DollarSign, CheckCircle } from "lucide-react"
+import { Card, Chip } from "@heroui/react";
+import {
+  MapPin,
+  Bed,
+  Bath,
+  Ruler,
+  Calendar,
+  DollarSign,
+  CheckCircle,
+} from "lucide-react";
 
 interface Property {
-  id: string
-  title: string
-  description: string
-  price: number
-  address: string
-  city: string
-  state: string
-  postal_code: string
-  bedrooms: number
-  bathrooms: number
-  square_feet: number
-  year_built: number
-  property_type: string
-  listing_type: string
-  verification_status: string
-  created_at: string
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  address: string;
+  city: string;
+  state: string;
+  postal_code: string;
+  bedrooms: number;
+  bathrooms: number;
+  square_feet: number;
+  year_built: number;
+  property_type: string;
+  listing_type: string;
+  verification_status: string;
+  created_at: string;
 }
 
 interface PropertyDetailsProps {
-  property: Property
-  details: any
+  property: Property;
+  details: any;
 }
 
-export default function PropertyDetails({ property, details }: PropertyDetailsProps) {
-  const listingTypeLabel = property.listing_type.replace("_", " ").toUpperCase()
-  const propertyTypeLabel = property.property_type.replace("_", " ").toUpperCase()
+export default function PropertyDetails({
+  property,
+  details,
+}: PropertyDetailsProps) {
+  const listingTypeLabel = property.listing_type
+    .replace("_", " ")
+    .toUpperCase();
+  const propertyTypeLabel = property.property_type
+    .replace("_", " ")
+    .toUpperCase();
 
   return (
     <div className="space-y-6">
@@ -40,13 +54,18 @@ export default function PropertyDetails({ property, details }: PropertyDetailsPr
             <div className="flex items-center gap-2 text-muted-foreground mb-4">
               <MapPin className="w-5 h-5" />
               <span>
-                {property.address}, {property.city}, {property.state} {property.postal_code}
+                {property.address}, {property.city}, {property.state}{" "}
+                {property.postal_code}
               </span>
             </div>
           </div>
           <div className="text-right">
-            <div className="text-4xl font-bold text-primary mb-2">£{property.price.toLocaleString()}</div>
-            <Badge className="bg-green-600">{listingTypeLabel}</Badge>
+            <div className="text-4xl font-bold text-primary mb-2">
+              £{property.price.toLocaleString()}
+            </div>
+            <Chip variant="primary" className="bg-green-600 text-white">
+              {listingTypeLabel}
+            </Chip>
           </div>
         </div>
 
@@ -59,21 +78,23 @@ export default function PropertyDetails({ property, details }: PropertyDetailsPr
       </div>
 
       {/* Overview */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Overview</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground leading-relaxed">{property.description}</p>
-        </CardContent>
-      </Card>
+      <Card.Root className="bg-background/80 backdrop-blur-lg border border-border/50">
+        <Card.Header>
+          <Card.Title>Overview</Card.Title>
+        </Card.Header>
+        <Card.Content>
+          <p className="text-muted-foreground leading-relaxed">
+            {property.description}
+          </p>
+        </Card.Content>
+      </Card.Root>
 
       {/* Key Details */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Key Details</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <Card.Root className="bg-background/80 backdrop-blur-lg border border-border/50">
+        <Card.Header>
+          <Card.Title>Key Details</Card.Title>
+        </Card.Header>
+        <Card.Content>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
             {property.bedrooms > 0 && (
               <div>
@@ -99,7 +120,9 @@ export default function PropertyDetails({ property, details }: PropertyDetailsPr
                   <Ruler className="w-5 h-5" />
                   <span className="text-sm">Square Feet</span>
                 </div>
-                <p className="text-2xl font-bold">{property.square_feet.toLocaleString()}</p>
+                <p className="text-2xl font-bold">
+                  {property.square_feet.toLocaleString()}
+                </p>
               </div>
             )}
             <div>
@@ -117,26 +140,30 @@ export default function PropertyDetails({ property, details }: PropertyDetailsPr
               <p className="text-lg font-semibold">{propertyTypeLabel}</p>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </Card.Content>
+      </Card.Root>
 
       {/* Amenities */}
       {details?.amenities && details.amenities.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Amenities</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <Card.Root className="bg-background/80 backdrop-blur-lg border border-border/50">
+          <Card.Header>
+            <Card.Title>Amenities</Card.Title>
+          </Card.Header>
+          <Card.Content>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {details.amenities.map((amenity: string, index: number) => (
-                <Badge key={index} variant="outline" className="justify-center py-2">
+                <Chip
+                  key={index}
+                  variant="secondary"
+                  className="justify-center py-2"
+                >
                   {amenity}
-                </Badge>
+                </Chip>
               ))}
             </div>
-          </CardContent>
-        </Card>
+          </Card.Content>
+        </Card.Root>
       )}
     </div>
-  )
+  );
 }

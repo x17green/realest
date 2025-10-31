@@ -23,8 +23,8 @@ export default function HeroSection() {
   return (
     <section className="relative w-full min-h-[600px] overflow-hidden">
       {/* Animated Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-primary/10 to-secondary/20" />
-      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
+      <div className="absolute inset-0 bg-linear-to-br from-primary/20 via-primary/10 to-secondary/20" />
+      <div className="absolute inset-0 bg-linear-to-t from-background via-background/50 to-transparent" />
 
       {/* Floating Elements */}
       <div className="absolute top-20 left-10 w-20 h-20 bg-primary/10 rounded-full blur-xl animate-pulse" />
@@ -43,7 +43,7 @@ export default function HeroSection() {
           </div>
 
           {/* Main Heading */}
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-foreground via-foreground to-primary bg-clip-text text-transparent leading-tight">
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-linear-to-r from-foreground via-foreground to-primary bg-clip-text text-transparent leading-tight">
             Find Your
             <br />
             <span className="text-primary">Dream Property</span>
@@ -84,7 +84,7 @@ export default function HeroSection() {
               {popularSearches.map((search) => (
                 <Chip
                   key={search.label}
-                  variant="bordered"
+                  variant="secondary"
                   className="cursor-pointer hover:bg-primary/10 hover:border-primary/30 transition-colors gap-2"
                   onClick={() => setSearchQuery(search.label)}
                 >

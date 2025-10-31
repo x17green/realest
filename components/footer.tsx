@@ -92,7 +92,7 @@ export default function Footer() {
               <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center group-hover:bg-primary/90 transition-colors">
                 <Shield className="w-5 h-5 text-primary-foreground" />
               </div>
-              <div className="font-bold text-xl bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+              <div className="font-bold text-xl bg-linear-to-r from-primary to-primary/70 bg-clip-text text-transparent">
                 RealProof
               </div>
             </Link>
