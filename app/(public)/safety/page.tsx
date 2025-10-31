@@ -2,6 +2,8 @@
 
 import { Card, Button, Chip } from "@heroui/react";
 import Link from "next/link";
+import Header from "@/components/header";
+import Footer from "@/components/footer";
 import {
   Shield,
   AlertTriangle,
@@ -147,6 +149,7 @@ export default function SafetyPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Header user={null} />
       {/* Hero Section */}
       <section className="relative py-20 overflow-hidden">
         {/* Animated Background */}
@@ -431,6 +434,8 @@ export default function SafetyPage() {
           </Card.Root>
         </div>
       </section>
+
+      <Footer />
     </div>
   );
 }

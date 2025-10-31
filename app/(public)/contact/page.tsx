@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { Card, Button, Input, TextArea } from "@heroui/react";
+import Header from "@/components/header";
+import Footer from "@/components/footer";
 import {
   Mail,
   Phone,
@@ -80,6 +82,7 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Header user={null} />
       {/* Hero Section */}
       <section className="relative py-20 overflow-hidden">
         {/* Animated Background */}
@@ -384,6 +387,8 @@ export default function ContactPage() {
           </div>
         </div>
       </section>
+
+      <Footer />
     </div>
   );
 }

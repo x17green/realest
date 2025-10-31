@@ -2,6 +2,8 @@
 
 import { Card, Button, Chip } from "@heroui/react";
 import Link from "next/link";
+import Header from "@/components/header";
+import Footer from "@/components/footer";
 import {
   Shield,
   CheckCircle,
@@ -139,6 +141,7 @@ export default function VerificationPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Header user={null} />
       {/* Hero Section */}
       <section className="relative py-20 overflow-hidden">
         {/* Animated Background */}
@@ -429,6 +432,8 @@ export default function VerificationPage() {
           </Card.Root>
         </div>
       </section>
+
+      <Footer />
     </div>
   );
 }

@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Card, Chip, Button, Input } from "@heroui/react";
 import Link from "next/link";
+import Header from "@/components/header";
+import Footer from "@/components/footer";
 import {
   MapPin,
   Users,
@@ -63,6 +65,7 @@ export default function EventsPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Header user={null} />
       {/* Hero Section */}
       <section className="relative py-20 overflow-hidden">
         {/* Animated Background */}
@@ -315,6 +318,8 @@ export default function EventsPage() {
           </div>
         </div>
       </section>
+
+      <Footer />
     </div>
   );
 }

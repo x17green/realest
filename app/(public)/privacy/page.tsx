@@ -2,6 +2,8 @@
 
 import { Card, Button, Chip } from "@heroui/react";
 import Link from "next/link";
+import Header from "@/components/header";
+import Footer from "@/components/footer";
 import {
   Shield,
   Eye,
@@ -108,17 +110,20 @@ export default function PrivacyPage() {
   const rights = [
     {
       title: "Access Your Data",
-      description: "Request a copy of the personal information we hold about you.",
+      description:
+        "Request a copy of the personal information we hold about you.",
       icon: Eye,
     },
     {
       title: "Correct Your Data",
-      description: "Request correction of inaccurate or incomplete personal information.",
+      description:
+        "Request correction of inaccurate or incomplete personal information.",
       icon: CheckCircle,
     },
     {
       title: "Delete Your Data",
-      description: "Request deletion of your personal information under certain circumstances.",
+      description:
+        "Request deletion of your personal information under certain circumstances.",
       icon: AlertTriangle,
     },
     {
@@ -130,6 +135,7 @@ export default function PrivacyPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Header user={null} />
       {/* Hero Section */}
       <section className="relative py-20 overflow-hidden">
         {/* Animated Background */}
@@ -180,16 +186,17 @@ export default function PrivacyPage() {
               <Card.Content className="space-y-4">
                 <h2 className="text-2xl font-bold">Introduction</h2>
                 <p className="text-muted-foreground leading-relaxed">
-                  This Privacy Policy explains how RealProof ("we," "us," or "our")
-                  collects, uses, discloses, and safeguards your information when
-                  you visit our website, use our services, or interact with our
-                  platform. We respect your privacy and are committed to
-                  protecting your personal information.
+                  This Privacy Policy explains how RealProof ("we," "us," or
+                  "our") collects, uses, discloses, and safeguards your
+                  information when you visit our website, use our services, or
+                  interact with our platform. We respect your privacy and are
+                  committed to protecting your personal information.
                 </p>
                 <p className="text-muted-foreground leading-relaxed">
                   By using our services, you agree to the collection and use of
-                  information in accordance with this policy. If you do not agree
-                  with our policies and practices, please do not use our services.
+                  information in accordance with this policy. If you do not
+                  agree with our policies and practices, please do not use our
+                  services.
                 </p>
               </Card.Content>
             </Card.Root>
@@ -229,9 +236,9 @@ export default function PrivacyPage() {
               <Card.Content className="space-y-6">
                 <h2 className="text-2xl font-bold">Your Rights</h2>
                 <p className="text-muted-foreground leading-relaxed">
-                  You have certain rights regarding your personal information. You
-                  can exercise these rights by contacting us using the information
-                  provided below.
+                  You have certain rights regarding your personal information.
+                  You can exercise these rights by contacting us using the
+                  information provided below.
                 </p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -262,9 +269,9 @@ export default function PrivacyPage() {
               <Card.Content className="space-y-6">
                 <h2 className="text-2xl font-bold">Cookies and Tracking</h2>
                 <p className="text-muted-foreground leading-relaxed">
-                  We use cookies and similar tracking technologies to enhance your
-                  experience on our platform. You can control cookie preferences
-                  through your browser settings.
+                  We use cookies and similar tracking technologies to enhance
+                  your experience on our platform. You can control cookie
+                  preferences through your browser settings.
                 </p>
                 <div className="space-y-4">
                   <div>
@@ -280,7 +287,8 @@ export default function PrivacyPage() {
                       Analytics Cookies
                     </h3>
                     <p className="text-muted-foreground">
-                      Help us understand how you use our platform to improve our services.
+                      Help us understand how you use our platform to improve our
+                      services.
                     </p>
                   </div>
                   <div>
@@ -288,7 +296,8 @@ export default function PrivacyPage() {
                       Marketing Cookies
                     </h3>
                     <p className="text-muted-foreground">
-                      Used to deliver relevant advertisements and track campaign effectiveness.
+                      Used to deliver relevant advertisements and track campaign
+                      effectiveness.
                     </p>
                   </div>
                 </div>
@@ -300,8 +309,8 @@ export default function PrivacyPage() {
               <Card.Content className="space-y-6">
                 <h2 className="text-2xl font-bold">Contact Us</h2>
                 <p className="text-muted-foreground leading-relaxed">
-                  If you have any questions about this Privacy Policy or our data
-                  practices, please contact us:
+                  If you have any questions about this Privacy Policy or our
+                  data practices, please contact us:
                 </p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -310,14 +319,18 @@ export default function PrivacyPage() {
                       <Mail className="w-5 h-5 text-primary" />
                       <div>
                         <p className="font-semibold">Email</p>
-                        <p className="text-muted-foreground">privacy@realproof.com</p>
+                        <p className="text-muted-foreground">
+                          privacy@realproof.com
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
                       <FileText className="w-5 h-5 text-primary" />
                       <div>
                         <p className="font-semibold">Data Protection Officer</p>
-                        <p className="text-muted-foreground">dpo@realproof.com</p>
+                        <p className="text-muted-foreground">
+                          dpo@realproof.com
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -327,7 +340,8 @@ export default function PrivacyPage() {
                       <div>
                         <p className="font-semibold">Address</p>
                         <p className="text-muted-foreground">
-                          123 Property Street<br />
+                          123 Property Street
+                          <br />
                           Real Estate City, RC 12345
                         </p>
                       </div>
@@ -391,6 +405,8 @@ export default function PrivacyPage() {
           </Card.Root>
         </div>
       </section>
+
+      <Footer />
     </div>
   );
 }
