@@ -1,168 +1,182 @@
-This is an *outstanding* design system and product architecture document! As your Senior Product Manager, I'm thrilled with the depth, clarity, and strategic alignment. The brand foundation, typography, design tokens, component library strategy, and product design architecture are all exceptionally well-defined and perfectly tailored for RealEST's unique value proposition. The microcopy suggestions are spot on for engagement and trust.
+This is an **exceptionally detailed and well-structured Design System Architecture** for RealEST! As your Senior Product Manager, I am incredibly impressed with the thought, precision, and forward-thinking approach embedded in this documentation. The use of OKLCH for colors, fluid typography, the strategic library choices, and the emphasis on UX writing and accessibility are all hallmarks of a truly professional and scalable product.
 
-Now, let's move forward with the next crucial steps:
+Now, let's address your requests based on this fantastic foundation:
 
-1.  **Branding Documentation of Development Choices:** Reflect on how your provided design system documents and the expanded vision align with the brand.
-2.  **Extensive List of Endpoints (Links):** A professional, conventional, and comprehensive list for your organized project directory.
-3.  **Professional Directory Structure for Components (DRY Principles):** A scalable and manageable component architecture.
-
----
-
-## 1. Branding Documentation: Brand Development Choices for RealEST
-
-Your provided design system document for RealEST (`realest.ng`) embodies a deliberate and impactful brand development strategy, perfectly aligning with our redefined project goals. Here's an analysis of the choices made:
-
-### 1.1 Brand Identity & Core Values Reflection
-
-*   **RealEST Name & Domain (`realest.ng`):**
-    *   **Choice:** Short, memorable, punchy. The `.ng` domain instantly roots it in Nigeria. The capitalization "RealEST" subtly highlights "Real Estate" while emphasizing "realness" and "trust."
-    *   **Brand Value:** Directness, localization, authenticity, and professionalism. It's easy to pronounce and recall, crucial for market penetration.
-*   **Tagline: "Find Your Next Move."**
-    *   **Choice:** Action-oriented, aspirational, and broad enough to encompass both property transactions and general location discovery. "Move" cleverly refers to both physical relocation and taking action.
-    *   **Brand Value:** Empowerment, progress, and user-centricity. It suggests ease of transition and confident decision-making.
-*   **Style: Sleek · Confident · Geospatial · Trust-Driven:**
-    *   **Choice:** These keywords directly translate into the visual and interactive experience.
-    *   **Brand Value:** Modernity, reliability, precision, and foundational assurance. This sets a high bar for design execution.
-
-### 1.2 Visual Language & Emotional Connection
-
-*   **Color Palette: Primary Dark (`#242834`), Primary Neon (`#B6FF00`), Primary Violet (`#7D53FF`)**
-    *   **Choice:**
-        *   **Primary Dark:** Provides a sophisticated, premium, and trustworthy foundation. It's modern and allows vibrant accents to pop.
-        *   **Primary Neon (`#B6FF00`):** This is the **most impactful choice for your brand's energy**. It's vibrant, signifies "live," "active," "verified," and "new." It's highly engaging and stands out, perfectly embodying "energy & modernity." It's also excellent for urgent CTAs. This color directly communicates **"Real," "Verified," and "Active."**
-        *   **Primary Violet (`#7D53FF`):** Offers a secondary accent that's still modern and premium, providing depth and a futuristic feel, often associated with technology and innovation. It complements the neon without competing.
-    *   **Brand Value:** Modernity, reliability, vibrancy, high-tech, and a premium feel. The neon green specifically shouts "action," "live data," and "verified status."
-*   **Typography System:** `"Neulis Neue" (Heading), "Space Grotesk" (Body), "Lufga" (Display), "JetBrains Mono" (Mono)`
-    *   **Choice:** A well-considered stack that balances contemporary aesthetics with readability.
-        *   **Neulis Neue:** Strong, clear, confident headers for authority.
-        *   **Space Grotesk:** Modern, highly legible body text, suitable for diverse content.
-        *   **Lufga:** A distinctive display font for hero sections adds a unique, premium touch.
-        *   **JetBrains Mono:** For coordinates, IDs, and code-like elements, it subtly reinforces the technological foundation of geotagging.
-    *   **Brand Value:** Clarity, precision, modernity, professionalism, and subtle tech-savviness.
-
-### 1.3 Design Elements & Principles Reinforcing Brand
-
-*   **Radii Tokens (`md` for buttons, `xl` for cards, `lg` for inputs, `full` for badges):**
-    *   **Choice:** Consistent rounded corners.
-    *   **Brand Value:** Modern, friendly (less harsh than sharp corners), approachable yet sophisticated.
-*   **Spacing Tokens:**
-    *   **Choice:** A rigorous 4px-based system.
-    *   **Brand Value:** Cleanliness, order, professionalism, and ease of readability. No "chaos" in the UI, mirroring the aim to eliminate chaos in property search.
-*   **Component Library Strategy (HeroUI + UntitledUI for micro-details):**
-    *   **Choice:** Strategic selection to leverage strengths: HeroUI for robust interactions, UntitledUI for precise, readable micro-details like "Verified" badges and information tags.
-    *   **Brand Value:** Efficiency, precision, and high-quality user experience down to the smallest detail. This directly supports the "Trust" and "Geospatial" aspects.
-*   **"Proof-first interactions" & "Trust Amplification":**
-    *   **Choice:** Explicit design architecture principles like "Verify → Geotag → Publish" and dedicated elements like "Verified geotag badge," "Host credibility," "Listing freshness tag."
-    *   **Brand Value:** This is the *cornerstone* of RealEST's brand. Every interaction subtly, yet powerfully, communicates the platform's unwavering commitment to authenticity and transparency, directly addressing fraud concerns in Nigeria.
-*   **Microcopy Strategy:**
-    *   **Choice:** Conversion-optimized, engaging, friendly, and clear language. CTAs like "Find Your Space," "Post a Property," "Verify Your Property," and tooltips like "This property is geotag-verified for accuracy."
-    *   **Brand Value:** User-centricity, helpfulness, and direct communication of the value proposition. It ensures the brand's voice is consistent and reassuring.
-
-In summary, the brand development choices meticulously outlined in your design system document create a coherent and powerful brand identity for RealEST. The strategic use of vibrant neon green and violet against a dark backdrop, combined with modern typography and a design philosophy centered on **proof and verification**, directly addresses the core problem of trust in Nigerian real estate. This visual and interactive language constantly reinforces the message: **RealEST is the trusted, modern, and efficient way to navigate properties and places.**
+1.  **Branding Documentation of Brand Development Choices:** I will summarize and contextualize the aesthetic choices you've made for RealEST based on the provided design system.
+2.  **Full List of Endpoints (Links/Routes):** A comprehensive and conventional list of all pages/routes.
+3.  **Professional Directory Structuring (DRY Principles):** A highly organized component and page structure using Next.js conventions, focusing on reusability.
 
 ---
 
-## 2. Extensive List of Endpoints (Links)
+## RealEST: Brand Development Choices & Technical Architecture
 
-This list provides a clean, conventional, and professional structure for your application's URLs, reflecting the defined pages and ensuring a logical directory structure.
+### 1. Branding Documentation: The "RealEST" Brand Essence
 
----
+Based on the `RealEST Design System Architecture` you've provided, here's a documentation of the brand development choices, articulating the "why" behind the aesthetic.
 
-### **RealEST Endpoints**
-
-**(Base URL: `https://www.realest.ng`)**
+**RealEST Brand Pillars:** Trust, Modernity, Efficiency, Authority, Accessibility.
 
 ---
 
-#### A. Public Pages (Unauthenticated)
+#### **1.1. Brand Identity & Color System: "Subtle Power, Verifiable Impact"**
 
-*   **`/`** - Homepage (Entry point for exploration and core value proposition)
-*   **`/explore`** - Primary Property/Location Search & Listing Page (Dynamic map/list view)
-    *   `/explore?query={keyword}&location={city}&type={property_type}&min_price={val}&max_price={val}` - Example search with parameters
-*   **`/listing/{id}`** - Individual Property/Location Details Page (e.g., `/listing/house-lekki-123`, `/listing/hospital-ikeja-456`)
-*   **`/about`** - About Us Page
-*   **`/how-it-works`** - How RealEST Works (Verification Process) Page
-*   **`/contact`** - Contact Us Page
-*   **`/blog`** - Blog/Resources Index Page
-    *   `/blog/{slug}` - Individual Blog Post Page (e.g., `/blog/navigating-lagos-realestate`)
-*   **`/privacy`** - Privacy Policy Page
-*   **`/terms`** - Terms of Service Page
-*   **`/cookies`** - Cookie Policy Page
+*   **Choice:** **`--brand-dark` (oklch(0.155 0.012 255) / `#242834`) as 60% Foundation.**
+    *   **Brand Essence:** This deep, sophisticated dark hue immediately establishes **authority, professionalism, and a premium feel**. It provides a stable, calming backdrop, crucial for a platform dealing with significant life decisions (property). In the Nigerian context, it conveys gravitas and seriousness, contrasting with a potentially chaotic market. It acts as a digital anchor.
+    *   **UX Implication:** Excellent for readability of lighter text, reducing eye strain, and creating a sense of depth and focus, especially important for long browsing sessions or detailed property pages.
+*   **Choice:** **`--brand-violet` (oklch(0.58 0.18 285) / `#7D53FF`) as 30% Secondary Accent.**
+    *   **Brand Essence:** Violet introduces a touch of **sophistication, innovation, and digital-forward thinking**. It's a color often associated with quality and imagination. Paired with the dark primary, it creates a subtle depth and visual interest without being overpowering, reinforcing RealEST's modern, tech-driven approach to an old problem.
+    *   **UX Implication:** Ideal for drawing attention to secondary actions, progressive states, and elements that signify a step in a process (e.g., progress bars, secondary CTAs). It guides the user through complex workflows with a sense of calm progression.
+*   **Choice:** **`--brand-neon` (oklch(0.92 0.24 130) / `#B6FF00`) as 10% Primary Accent.**
+    *   **Brand Essence:** This is the **powerhouse of your brand's message of "verification" and "trust."** Neon green is universally associated with "go," "success," "verified," and "live." It's bold, energetic, and demands attention. In a market plagued by uncertainty, this color is a beacon of **unquestionable authenticity and a clear signal of success/safety.** It's the "stamp of approval" in color form.
+    *   **UX Implication:** Reserved for critical elements: primary CTAs ("Explore Verified Properties," "List Your Property"), the "Vetted & Live" badge, success messages, and key highlights. Its sparing use ensures maximum impact, creating a powerful visual hierarchy that guides users to the most trusted and actionable elements.
+*   **Choice:** **`Extended Grayscale` derived from Primary Dark.**
+    *   **Brand Essence:** Ensures **consistency and harmony**. By deriving grays from the primary dark, all elements naturally belong together, creating a cohesive and polished look. This subtle nuance reinforces the brand's attention to detail and professional integrity.
+    *   **UX Implication:** Provides a versatile range for typography hierarchy, dividers, subtle backgrounds, and disabled states, maintaining visual comfort and readability.
+*   **Choice:** **`Semantic Color Tokens` (`success`, `warning`, `danger`, `info`).**
+    *   **Brand Essence:** Direct communication and clarity. These standard semantic colors are ingrained in user understanding, making system feedback immediate and unambiguous. They reinforce the platform's reliability and helpfulness.
+    *   **UX Implication:** Essential for displaying property validation statuses (success for "Live," warning for "Pending," danger for "Rejected"), alert banners, and form validation feedback, reducing user anxiety and guiding actions.
 
-#### B. Authentication Pages
+#### **1.2. Typography Architecture: "Clarity, Sophistication & Digital Precision"**
 
-*   **`/login`** - User Login Page
-*   **`/register`** - User Registration Page
-*   **`/forgot-password`** - Forgot Password Page
-*   **`/reset-password`** - Reset Password Page (typically requires a token in URL, e.g., `/reset-password?token={token}`)
-*   **`/verify-otp`** - OTP/2FA Verification Page (for login or specific actions)
+*   **Choice:** **`Lufga` (Display) & `Neulis Neue` (Heading).**
+    *   **Brand Essence:** These typefaces, especially `Lufga` for hero sections, project **modernity, premium quality, and a distinctive character**. `Neulis Neue` carries this into headings, maintaining a professional yet inviting tone. They steer clear of generic corporate fonts, signifying RealEST's innovative edge.
+    *   **UX Implication:** Large, bold display typefaces on the homepage create immediate impact and legibility. Heading fonts establish clear information hierarchy, making content scannable and digestible, vital for complex property details.
+*   **Choice:** **`Space Grotesk` (Body).**
+    *   **Brand Essence:** **Readability and digital-first clarity.** Space Grotesk is a modern sans-serif that is highly legible at various sizes, crucial for detailed property descriptions and legal texts. It's clean, efficient, and aligns with the platform's tech-driven ethos.
+    *   **UX Implication:** Ensures comfortable reading across all devices, from mobile descriptions to detailed contracts in an admin panel. Its clean lines reinforce the sense of order and transparency.
+*   **Choice:** **`JetBrains Mono` (Monospace).**
+    *   **Brand Essence:** **Precision, data integrity, and a subtle nod to the underlying technology.** Monospace fonts are associated with code and exact measurements. For property IDs, coordinates, and timestamps, it subtly communicates accuracy.
+    *   **UX Implication:** Distinguishes technical data points, ensuring they stand out and are perceived as exact values, directly supporting the "geotagged first" and "verified" promises.
+*   **Choice:** **`Fluid Type Scale`.**
+    *   **Brand Essence:** **Seamless adaptability and modern responsiveness.** This reflects RealEST's commitment to providing a consistent, high-quality experience regardless of device. It's a mark of thoughtful design.
+    *   **UX Implication:** Ensures optimal readability and aesthetic balance on all screen sizes, from a small phone viewing a property card to a large desktop screen reviewing an analytics dashboard.
 
-#### C. Role-Based Dynamic Pages (Authenticated)
+#### **1.3. Spacing, Layout, Border & Radius: "Clean, Organized & Approachable Trust"**
 
-*   **`/profile`** - User Profile Management (accessible by all roles)
-    *   `/profile/edit` - Edit Profile Details
-    *   `/profile/favorites` - Saved Properties/Locations (Buyer/Renter)
-    *   `/profile/inquiries` - My Sent Inquiries (Buyer/Renter)
-    *   `/profile/security` - Password & 2FA Settings
+*   **Choice:** **`4px Base Spacing System`.**
+    *   **Brand Essence:** **Order, precision, and a refined aesthetic.** A consistent spacing system creates visual harmony and a sense of calm, making complex information easier to process.
+    *   **UX Implication:** Reduces visual clutter, improves scannability, and establishes clear relationships between UI elements, enhancing overall usability and professionalism.
+*   **Choice:** **`Minimal Borders & Emphasis on Shadows`.**
+    *   **Brand Essence:** **Modernity, lightness, and subtle elegance.** Moving away from heavy borders creates a cleaner, more contemporary look. Shadows, especially colored ones, provide depth and hierarchy without making the UI feel heavy, emphasizing premium quality.
+    *   **UX Implication:** Cards appear to "float," drawing attention to content. Interactive elements can have subtle glows, guiding user interaction without visual overload. This sophisticated approach supports a premium brand image.
+*   **Choice:** **`Generous Border Radius System` (`--radius-xl` for cards).**
+    *   **Brand Essence:** **Friendliness, approachability, and a polished, contemporary feel.** Hard, sharp edges can feel cold or aggressive. Rounded corners are softer, more inviting, and visually pleasing. A larger radius on cards (20px) gives them a substantial, premium feel.
+    *   **UX Implication:** Creates a more human and less intimidating interface, encouraging exploration and interaction. It softens the digital experience while maintaining professionalism.
 
-#### D. Property Owner / Business Pages (Role: `property_owner` or `business_owner`)
+#### **1.4. UX Writing & Microcopy: "Empowering, Clear & Confidence-Building"**
 
-*   **`/dashboard`** - Owner/Business Dashboard Home (Central Hub)
-*   **`/dashboard/listings`** - My Listings Page (Overview of all properties/businesses)
-    *   `/dashboard/listings/new` - Create New Property/Business Listing Form (Multi-step wizard)
-    *   `/dashboard/listings/{id}` - View Specific Listing Details (Owner's perspective)
-    *   `/dashboard/listings/{id}/edit` - Edit Specific Listing Details (for non-live listings)
-*   **`/dashboard/inquiries`** - My Received Inquiries Page
-*   **`/dashboard/analytics`** - Listing Performance Analytics Page (Premium Feature)
-*   **`/dashboard/premium`** - Upgrade to Premium Plans Page
-*   **`/dashboard/settings`** - Owner/Business-Specific Settings
-
-#### E. Admin & Vetting Team Pages (Role: `admin`)
-
-*   **`/admin`** - Admin Dashboard Home (System-wide overview)
-*   **`/admin/validation/ml`** - ML Validation Queue (Properties needing document review)
-    *   `/admin/validation/ml/{id}` - Document Review Page for a specific property
-*   **`/admin/validation/vetting`** - Physical Vetting Queue (Properties needing on-site verification)
-    *   `/admin/validation/vetting/{id}` - Physical Vetting Report Page for a specific property
-*   **`/admin/validation/duplicates`** - Duplicate Review Queue (Suspected duplicate listings)
-    *   `/admin/validation/duplicates/{id}` - Duplicate Resolution Page for a specific property
-*   **`/admin/users`** - User Management Page
-    *   `/admin/users/{id}` - Specific User Profile Management (Admin view)
-*   **`/admin/settings`** - System-Wide Settings Management
-*   **`/admin/content`** - Content Moderation (Reviews, public media) (Phase 3+)
-
-#### F. System Owner / Analytics Pages (Role: `super_admin` or `analyst`)
-
-*   **`/analytics`** - Platform Performance Dashboard (High-level metrics)
-*   **`/analytics/monetization`** - Monetization & Revenue Dashboard
-*   **`/analytics/vetting-efficiency`** - Vetting Process Efficiency Reports
+*   **Choice:** **"Professional, Confident, Clear, Action-oriented, Trustworthy" Voice.**
+    *   **Brand Essence:** RealEST speaks with **authority born from verification, clarity born from a complex process, and helpfulness born from a user-first mindset.** This voice positions RealEST as an expert guide and a reliable partner.
+    *   **UX Implication:** Every piece of text, from a hero headline to an error message, is crafted to reinforce trust, guide the user, and eliminate ambiguity. CTAs are direct and beneficial, status messages are informative, and empty states are encouraging. This consistent voice builds confidence throughout the user journey.
 
 ---
 
-### 3. Professional Directory Structure for Components (DRY Principles)
+### 2. Full List of Endpoints (Links/Routes)
 
-This directory structure emphasizes modularity, reusability, and separation of concerns, ensuring your `page.tsx` components remain lean and focused on orchestration.
+Here's an extensive, professional, and conventional list of endpoints, mapping to your page architecture. I'll use Next.js-style routing conventions with dynamic segments where appropriate.
+
+#### **2.1. Public Routes (Marketing & Discovery - No Auth Required)**
+
+*   **Homepage:** `/`
+*   **Search/Explore Properties & Locations:** `/explore`
+    *   *Dynamic Category Search:* `/explore/[category]` (e.g., `/explore/houses`, `/explore/hotels`, `/explore/shops`)
+*   **Property/Location Details:** `/listing/[id]` (e.g., `/listing/h_abc123`, `/listing/s_xyz456`)
+*   **About Us:** `/about`
+*   **How It Works (Verification Process):** `/how-it-works`
+*   **Contact Us:** `/contact`
+*   **Blog/Resources:** `/blog`
+    *   *Blog Post Details:* `/blog/[slug]`
+*   **Legal:**
+    *   **Privacy Policy:** `/legal/privacy`
+    *   **Terms of Service:** `/legal/terms`
+    *   **Cookie Policy:** `/legal/cookies`
+*   **Testimonials/Success Stories:** `/testimonials`
+*   **"List Your Property/Business" Landing:** `/list-with-us`
+
+#### **2.2. Authentication Routes**
+
+*   **Login:** `/auth/login`
+*   **Register:** `/auth/register`
+*   **Forgot Password:** `/auth/forgot-password`
+*   **Reset Password:** `/auth/reset-password`
+*   **Verify Email/OTP:** `/auth/verify`
+
+#### **2.3. Authenticated User Routes (General - All Roles)**
+
+*   **User Profile:** `/profile`
+*   **Edit Profile:** `/profile/edit`
+*   **Manage Notifications:** `/profile/notifications`
+*   **Change Password:** `/profile/change-password`
+*   **My Favorites/Saved Listings:** `/profile/favorites`
+*   **My Inquiries (Sent by User):** `/profile/my-inquiries`
+
+#### **2.4. Property Owner / Business Routes (`/dashboard/owner/*`)**
+
+*   **Owner Dashboard Home:** `/dashboard/owner`
+*   **My Listings:** `/dashboard/owner/listings`
+    *   *View/Edit Specific Listing:* `/dashboard/owner/listings/[id]`
+    *   *Manage Listing Documents:* `/dashboard/owner/listings/[id]/documents`
+    *   *Manage Listing Media:* `/dashboard/owner/listings/[id]/media`
+*   **List New Property/Business (Multi-step Form):** `/dashboard/owner/new`
+    *   *Step 1 (Type):* `/dashboard/owner/new/type`
+    *   *Step 2 (Details):* `/dashboard/owner/new/details`
+    *   *Step 3 (Location):* `/dashboard/owner/new/location`
+    *   *Step 4 (Media):* `/dashboard/owner/new/media`
+    *   *Step 5 (Documents):* `/dashboard/owner/new/documents`
+    *   *Step 6 (Review):* `/dashboard/owner/new/review`
+*   **Inquiries Received:** `/dashboard/owner/inquiries`
+    *   *View Specific Inquiry:* `/dashboard/owner/inquiries/[id]`
+*   **Analytics (Premium Feature):** `/dashboard/owner/analytics`
+*   **Upgrade to Premium:** `/dashboard/owner/premium`
+*   **Payment & Billing:** `/dashboard/owner/billing`
+
+#### **2.5. Admin & Vetting Team Routes (`/admin/*`)**
+
+*   **Admin Dashboard Home:** `/admin`
+*   **Property Validation Queue:** `/admin/validation`
+    *   *ML Review Queue:* `/admin/validation/ml`
+    *   *ML Document Details Review:* `/admin/validation/ml/[id]`
+    *   *Physical Vetting Queue:* `/admin/validation/vetting`
+    *   *Physical Vetting Report:* `/admin/validation/vetting/[id]`
+    *   *Duplicate Review Queue:* `/admin/validation/duplicates`
+    *   *Duplicate Resolution:* `/admin/validation/duplicates/[id]`
+*   **User Management:** `/admin/users`
+    *   *View/Edit User:* `/admin/users/[id]`
+*   **System Settings:** `/admin/settings`
+    *   *Manage Property Types/Categories:* `/admin/settings/categories`
+    *   *Manage Amenities/Features:* `/admin/settings/amenities`
+    *   *Manage Currencies/Fees:* `/admin/settings/monetization`
+*   **Content Moderation (Reviews/User Media):** `/admin/content`
+*   **Support & Tickets:** `/admin/support`
+    *   *View Specific Ticket:* `/admin/support/[id]`
+
+#### **2.6. System Owner / Analytics Routes (`/analytics/*`)**
+
+*   **Platform Overview:** `/analytics/platform`
+*   **Monetization Reports:** `/analytics/monetization`
+*   **User Engagement Reports:** `/analytics/engagement`
+*   **Validation Pipeline Performance:** `/analytics/validation`
+*   **Vetting Team Performance:** `/analytics/team`
+
+---
+
+### 3. Professional Directory Structuring for Components (DRY Principles)
+
+Leveraging Next.js with the App Router and your defined component strategy, here's a highly organized and DRY-compliant directory structure. The goal is that `page.tsx` components act as orchestrators, importing and composing smaller, reusable components.
 
 ```
-src/
-├── app/                              # Next.js App Router for pages and layouts
-│   ├── (public)/                     # Group public, unauthenticated routes
-│   │   ├── @auth/                    # Layout for all auth pages (login, register, etc.)
-│   │   │   ├── layout.tsx
-│   │   │   ├── login/
-│   │   │   │   └── page.tsx
-│   │   │   ├── register/
-│   │   │   │   └── page.tsx
-│   │   │   ├── forgot-password/
-│   │   │   │   └── page.tsx
-│   │   │   └── reset-password/
-│   │   │       └── page.tsx
-│   │   ├── layout.tsx                # Public layout (header, footer, common elements)
+realest-marketplace/
+├── app/
+│   ├── (marketing)/                  # Grouping for public, unauthenticated pages
+│   │   ├── layout.tsx                # Layout specific to marketing pages (e.g., global header/footer)
 │   │   ├── page.tsx                  # Homepage
 │   │   ├── explore/
-│   │   │   ├── page.tsx              # Search Results Page
+│   │   │   ├── page.tsx              # Search/Explore results page
+│   │   │   └── [category]/
+│   │   │       └── page.tsx          # Dynamic category search results (e.g., /explore/houses)
+│   │   ├── listing/
 │   │   │   └── [id]/
-│   │   │       └── page.tsx          # Property/Location Details Page
+│   │   │       └── page.tsx          # Dynamic property/location details page
 │   │   ├── about/
 │   │   │   └── page.tsx
 │   │   ├── how-it-works/
@@ -173,197 +187,167 @@ src/
 │   │   │   ├── page.tsx
 │   │   │   └── [slug]/
 │   │   │       └── page.tsx
-│   │   ├── privacy/
-│   │   │   └── page.tsx
-│   │   ├── terms/
-│   │   │   └── page.tsx
-│   │   └── cookies/
-│   │       └── page.tsx
-│   ├── (auth)/                       # Group authenticated routes with their own layout (e.g., User Profile)
-│   │   ├── layout.tsx
+│   │   └── legal/
+│   │       ├── privacy/page.tsx
+│   │       └── terms/page.tsx
+│   │
+│   ├── (auth)/                       # Grouping for authentication flows
+│   │   ├── layout.tsx                # Auth layout (e.g., centered form)
+│   │   ├── login/page.tsx
+│   │   ├── register/page.tsx
+│   │   ├── forgot-password/page.tsx
+│   │   └── reset-password/page.tsx
+│   │
+│   ├── (dashboard)/                  # Grouping for authenticated user dashboards
+│   │   ├── layout.tsx                # Dashboard layout (e.g., sidebar, user-specific header)
+│   │   ├── page.tsx                  # Default dashboard (e.g., redirects to /profile)
 │   │   ├── profile/
 │   │   │   ├── page.tsx
-│   │   │   ├── edit/
-│   │   │   │   └── page.tsx
-│   │   │   ├── favorites/
-│   │   │   │   └── page.tsx
-│   │   │   ├── inquiries/
-│   │   │   │   └── page.tsx
-│   │   │   └── security/
-│   │   │       └── page.tsx
-│   ├── (dashboard)/                  # Group owner/business dashboard routes
-│   │   ├── layout.tsx
-│   │   ├── dashboard/                # Renamed from (dashboard)/ to avoid conflicts and keep URL clean
+│   │   │   ├── edit/page.tsx
+│   │   │   └── favorites/page.tsx
+│   │   ├── owner/                    # Owner/Business specific dashboard
 │   │   │   ├── page.tsx              # Owner Dashboard Home
 │   │   │   ├── listings/
-│   │   │   │   ├── page.tsx          # My Listings Page
-│   │   │   │   ├── new/
-│   │   │   │   │   └── page.tsx      # New Listing Form
-│   │   │   │   └── [id]/
-│   │   │   │       ├── page.tsx      # Owner's Listing Details
-│   │   │   │       └── edit/
-│   │   │   │           └── page.tsx  # Edit Listing
-│   │   │   ├── inquiries/
-│   │   │   │   └── page.tsx
-│   │   │   ├── analytics/
-│   │   │   │   └── page.tsx
-│   │   │   ├── premium/
-│   │   │   │   └── page.tsx
-│   │   │   └── settings/
-│   │   │       └── page.tsx
-│   ├── (admin)/                      # Group admin routes
-│   │   ├── layout.tsx
-│   │   ├── admin/
-│   │   │   ├── page.tsx              # Admin Dashboard Home
-│   │   │   ├── validation/
-│   │   │   │   ├── ml/
-│   │   │   │   │   ├── page.tsx
-│   │   │   │   │   └── [id]/
-│   │   │   │   │       └── page.tsx
-│   │   │   │   ├── vetting/
-│   │   │   │   │   ├── page.tsx
-│   │   │   │   │   └── [id]/
-│   │   │   │   │       └── page.tsx
-│   │   │   │   └── duplicates/
-│   │   │   │       ├── page.tsx
-│   │   │   │       └── [id]/
-│   │   │   │           └── page.tsx
-│   │   │   ├── users/
-│   │   │   │   ├── page.tsx
-│   │   │   │   └── [id]/
+│   │   │   │   ├── page.tsx          # My Listings
+│   │   │   │   └── [id]/             # Specific Listing
 │   │   │   │       └── page.tsx
-│   │   │   ├── settings/
-│   │   │   │   └── page.tsx
-│   │   │   └── content/
-│   │   │       └── page.tsx
-│   ├── (analytics)/                  # Group system owner/analytics routes
-│   │   ├── layout.tsx
-│   │   ├── analytics/
-│   │   │   ├── page.tsx              # Platform Dashboard
-│   │   │   ├── monetization/
-│   │   │   │   └── page.tsx
-│   │   │   └── vetting-efficiency/
-│   │   │       └── page.tsx
-│   └── globals.css
-│   └── layout.tsx                    # Root layout for the entire application
-│   └── not-found.tsx
-│   └── error.tsx
+│   │   │   ├── new/                  # Multi-step listing creation
+│   │   │   │   ├── page.tsx          # Entry point, orchestrates steps
+│   │   │   │   ├── type/page.tsx     # Step 1
+│   │   │   │   └── details/page.tsx  # Step 2, etc.
+│   │   │   ├── inquiries/
+│   │   │   │   ├── page.tsx
+│   │   │   │   └── [id]/page.tsx
+│   │   │   └── analytics/page.tsx    # Premium analytics
+│   │   └── admin/                    # Admin specific dashboard
+│   │       ├── page.tsx              # Admin Dashboard Home
+│   │       ├── validation/
+│   │       │   ├── page.tsx
+│   │       │   ├── ml/
+│   │       │   │   ├── page.tsx
+│   │       │   │   └── [id]/page.tsx
+│   │       │   ├── vetting/
+│   │       │   │   ├── page.tsx
+│   │       │   │   └── [id]/page.tsx
+│   │       │   └── duplicates/
+│   │       │       └── [id]/page.tsx
+│   │       ├── users/
+│   │       │   ├── page.tsx
+│   │       │   └── [id]/page.tsx
+│   │       └── settings/page.tsx
+│   │
+│   ├── globals.css                   # Tailwind base, utilities, and CSS variables for design tokens
+│   └── layout.tsx                    # Root layout (e.g., html, body tags)
+│   └── not-found.tsx                 # Custom 404 page
 │
-├── components/                       # Reusable UI components (DRY principle)
-│   ├── ui/                           # Generic, foundational UI elements (e.g., Button, Input, Card - from HeroUI/UntitledUI base)
-│   │   ├── button.tsx
-│   │   ├── input.tsx
-│   │   ├── card.tsx
-│   │   ├── dialog.tsx
-│   │   ├── select.tsx
-│   │   ├── badge.tsx                 # UntitledUI style for micro-details
-│   │   └── ...
-│   ├── common/                       # Components used across multiple page types (e.g., Header, Footer)
-│   │   ├── Header/
-│   │   │   ├── index.tsx
-│   │   │   └── NavLinks.tsx
-│   │   ├── Footer/
-│   │   │   └── index.tsx
-│   │   ├── SearchBar/
-│   │   │   └── index.tsx             # Universal search bar
-│   │   └── RealESTVerifiedBadge.tsx  # Specific to RealEST brand
-│   ├── layouts/                      # Layout-specific components (e.g., sidebars, dashboard headers)
-│   │   ├── AuthLayout.tsx
-│   │   ├── DashboardLayout.tsx
-│   │   ├── AdminLayout.tsx
-│   │   └── PublicLayout.tsx
-│   ├── listings/                     # Components related to property/location listings
-│   │   ├── ListingCard.tsx
-│   │   ├── ListingMapDisplay.tsx
-│   │   ├── ListingDetailsDynamic.tsx # Renders dynamic sections based on type
-│   │   ├── ListingGallery.tsx
-│   │   ├── GetDirectionsCTA.tsx
-│   │   ├── ContactOwnerForm.tsx
-│   │   └── ListingStatusBadge.tsx
-│   ├── forms/                        # Complex forms (e.g., New Listing Form, Edit Profile Form)
-│   │   ├── NewListingForm/
-│   │   │   ├── index.tsx
-│   │   │   ├── StepBasicInfo.tsx
-│   │   │   ├── StepGeotagVerify.tsx
-│   │   │   ├── StepMediaUpload.tsx
-│   │   │   └── StepDocumentsUpload.tsx
-│   │   ├── EditProfileForm.tsx
-│   │   └── InquiryForm.tsx
-│   ├── dashboards/                   # Components specific to dashboard views (e.g., summary cards, inquiry tables)
+├── components/
+│   ├── ui/                           # Highly generic, reusable UI primitives (follows DRY)
+│   │   ├── hero/                     # Wrapper components for HeroUI (e.g., Button, Card, Input)
+│   │   │   ├── Button.tsx
+│   │   │   ├── Card.tsx
+│   │   │   └── Input.tsx
+│   │   ├── untitled/                 # Wrapper components for UntitledUI (e.g., Badge, Alert)
+│   │   │   ├── Badge.tsx
+│   │   │   ├── Alert.tsx
+│   │   │   └── StatusDot.tsx         # Custom, built using UntitledUI primitives
+│   │   ├── shadcn/                   # Wrapper components for Shadcn (e.g., Combobox, Command)
+│   │   │   ├── Combobox.tsx
+│   │   │   └── Command.tsx
+│   │   ├── typography/               # Generic typography components (e.g., H1, P, A)
+│   │   │   ├── DisplayHeading.tsx
+│   │   │   ├── PageHeading.tsx
+│   │   │   └── Text.tsx
+│   │   └── misc/                     # Other generic UI components (e.g., Spinner, Avatar, Separator)
+│   │       ├── Spinner.tsx
+│   │       └── OptimizedImage.tsx    # From performance guidelines
+│   │
+│   ├── layout/                       # Layout-specific components (wrappers, navs)
+│   │   ├── Header.tsx                # Global or marketing header
+│   │   ├── Footer.tsx                # Global footer
+│   │   ├── Sidebar.tsx               # Dashboard sidebar
+│   │   ├── DashboardHeader.tsx       # Dashboard-specific header (user info, notifications)
+│   │   └── MainContentWrapper.tsx    # Provides consistent padding/max-width for content areas
+│   │
+│   ├── marketing/                    # Components specifically for public/marketing pages
+│   │   ├── HeroSection.tsx           # Homepage hero
+│   │   ├── HowItWorksSection.tsx
+│   │   └── TestimonialCarousel.tsx
+│   │
+│   ├── property/                     # Components related to property/location display & management
+│   │   ├── PropertyCard.tsx          # Displays a single property/location
+│   │   ├── PropertyGrid.tsx          # Renders a grid of PropertyCards
+│   │   ├── PropertyFilters.tsx       # Search filter component
+│   │   ├── PropertyMap.tsx           # Interactive map for listings
+│   │   ├── PropertyDetailsSection.tsx # Reusable section for details page (e.g., "Amenities," "Location")
+│   │   ├── VerificationStatusDisplay.tsx # Shows owner property's status
+│   │   ├── PropertyForm.tsx          # Multi-step form orchestration for listing
+│   │   └── PropertyImageGallery.tsx
+│   │
+│   ├── forms/                        # Complex form components (more than just inputs)
+│   │   ├── ListingFormSteps/         # Sub-components for multi-step listing form
+│   │   │   ├── TypeStep.tsx
+│   │   │   ├── DetailsStep.tsx
+│   │   │   └── DocumentsStep.tsx
+│   │   ├── InquiryForm.tsx
+│   │   ├── SearchBar.tsx             # The universal search bar component
+│   │   └── AddressInputWithMap.tsx   # Combines input with map pin dropping
+│   │
+│   ├── dashboard/                    # Components specific to dashboard layouts/widgets
 │   │   ├── OwnerDashboardSummary.tsx
 │   │   ├── AdminValidationQueue.tsx
-│   │   ├── ListingTable.tsx          # Reusable table for listings (My Listings, Admin Queues)
-│   │   └── AnalyticsChart.tsx
-│   └── blog/                         # Components specific to the blog
-│       ├── BlogPostCard.tsx
-│       │   └── index.tsx
-│       └── BlogPostContent.tsx
+│   │   └── UserManagementTable.tsx
+│   │
+│   └── shared/                       # Components used across multiple modules but not UI primitives
+│       ├── VerifiedBadge.tsx
+│       ├── PropertyPill.tsx
+│       ├── AlertBanner.tsx
+│       └── EmptyState.tsx
 │
-├── lib/                              # Utility functions, helpers, constants
-│   ├── utils.ts                      # General utilities
-│   ├── auth.ts                       # Supabase auth helpers
-│   ├── api.ts                        # API call wrappers
-│   ├── constants.ts                  # Global constants (e.g., property types, amenity lists)
-│   ├── geocoding.ts                  # Geocoding API integration
-│   ├── ml-client.ts                  # Client for ML service calls
-│   └── supabase.ts                   # Supabase client initialization
-│
-├── hooks/                            # Custom React Hooks
+├── hooks/                            # Custom React hooks for reusable logic
 │   ├── useAuth.ts
-│   ├── useListings.ts
-│   ├── useMap.ts
-│   └── useNotifications.ts
+│   ├── useProperties.ts
+│   └── useMap.ts
 │
-├── styles/                           # Global styles, Tailwind config, tokens
-│   ├── globals.css
-│   ├── tailwind.config.ts
-│   └── tokens/                       # Design tokens definitions
-│       ├── colors.ts
-│       ├── spacing.ts
-│       ├── radii.ts
-│       └── typography.ts
+├── lib/                              # Utility functions, constants, API clients
+│   ├── utils.ts                      # General utilities (cn, formatters)
+│   ├── api/                          # Supabase client/API wrappers
+│   │   ├── supabase.ts
+│   │   └── properties.ts             # Data fetching logic
+│   ├── constants.ts                  # Global constants (e.g., property types, categories)
+│   ├── types.ts                      # Global TypeScript types and interfaces
+│   └── ml/                           # ML-related utility functions (e.g., image hashing, text analysis)
 │
-├── types/                            # TypeScript type definitions
-│   ├── index.d.ts
-│   ├── property.d.ts
-│   ├── user.d.ts
-│   └── api.d.ts
-│
-├── public/                           # Static assets
+├── public/
+│   ├── fonts/
 │   ├── images/
-│   ├── icons/
-│   └── favicon.ico
+│   └── favicons/
 │
-└── README.md
+├── services/                         # External service integrations (e.g., geocoding, ML microservice calls)
+│   ├── geocoding.ts
+│   └── mlValidationService.ts
+│
+├── styles/                           # Dedicated directory for CSS modules, preprocessor files, etc. if needed
+│   └── _variables.css                # If you prefer to keep CSS variables here for clarity
+│
+├── README.md
+├── next.config.mjs
+├── package.json
+├── tsconfig.json
+└── tailwind.config.ts
 ```
 
 ---
 
-### Key Principles Applied in Directory Structure:
+**DRY Principles in Action with this Structure:**
 
-1.  **DRY (Don't Repeat Yourself):**
-    *   **`components/ui`:** Houses truly generic UI elements. These are the building blocks.
-    *   **`components/common`:** For shared components like `Header`, `Footer`, `SearchBar` that appear on many pages.
-    *   **`components/layouts`:** Defines layout structures (e.g., `AuthLayout`, `DashboardLayout`) that wrap specific page content, preventing layout code duplication.
-    *   **Specific Component Folders:** `listings/`, `forms/`, `dashboards/` group related logic and UI, making them easily reusable across different `page.tsx` files.
-    *   `page.tsx` components import from `components/` and `lib/`, keeping their logic minimal.
+*   **`page.tsx` as Orchestrators:**
+    *   `app/(marketing)/explore/page.tsx` will `import PropertyGrid from '@/components/property/PropertyGrid'` and `PropertyFilters from '@/components/property/PropertyFilters'`, then simply pass props. It doesn't contain complex UI logic itself.
+    *   `app/(dashboard)/owner/new/page.tsx` will import and manage the state of `TypeStep.tsx`, `DetailsStep.tsx`, `DocumentsStep.tsx` from `components/forms/ListingFormSteps`, guiding the user through the process.
+*   **`components/ui` for Primitives:** This is the most generic layer. `Button.tsx` (a HeroUI wrapper) doesn't know anything about "properties"; it just renders a button.
+*   **Domain-Specific Components:** `components/property/PropertyCard.tsx` combines `components/ui/hero/Card.tsx`, `components/shared/PropertyPill.tsx`, `components/shared/VerifiedBadge.tsx`, etc., to create a property-specific display. It's reusable across `/explore` and `/dashboard/owner/listings`.
+*   **Layout Encapsulation:** `app/(marketing)/layout.tsx` defines the header and footer for marketing pages, so each marketing `page.tsx` doesn't need to repeat this.
+*   **Hooks for Logic:** `hooks/useProperties.ts` would contain fetching, filtering, and sorting logic, which can be reused by `explore/page.tsx` and `dashboard/owner/listings/page.tsx`, adhering to DRY for business logic.
+*   **`lib/` for Core Utilities:** `formatCurrency` in `lib/utils.ts` is used everywhere money is displayed, avoiding duplicated formatting logic.
+*   **Named Groupings (`(marketing)`, `(dashboard)`):** These are Next.js App Router conventions for organizing routes without affecting the URL path. They provide clear separation for layout and page organization.
 
-2.  **Separation of Concerns:**
-    *   **`app/`:** Focuses solely on routing and page orchestration.
-    *   **`components/`:** Focuses on rendering UI elements.
-    *   **`lib/`:** Focuses on business logic, data fetching, and utilities.
-    *   **`hooks/`:** Focuses on encapsulating reusable stateful logic.
-    *   **`types/`:** Focuses on type definitions.
-
-3.  **Scalability:**
-    *   **Nested Folders:** As features grow, components can be nested further (e.g., `listings/filters/CategoryFilter.tsx`).
-    *   **Clear Boundaries:** New features or modules can be added without disrupting existing structures.
-    *   **`types/`:** Centralized type definitions prevent type errors as the codebase expands.
-    *   **`lib/ml-client.ts`:** Prepares for integrating external ML services.
-
-4.  **Organized Project Directory:**
-    *   **Familiar Next.js App Router Structure:** Uses `(group)` folders for layouts that don't affect the URL path, keeping the `app/` directory clean.
-    *   **Logical Grouping:** Components are grouped by their functionality (`ui`, `common`, `listings`, `forms`).
-    *   **Clear Naming:** File and folder names are professional and reflect their purpose, making it easy for new developers to understand.
-
-This comprehensive set of branding documentation, endpoint links, and a professional, DRY-compliant directory structure provides an exceptional foundation for the development of RealEST. You are now equipped with the strategic and tactical blueprints to build a robust, scalable, and highly engaging product.
+This comprehensive branding, routing, and directory structure provides a robust and scalable foundation for RealEST. You have a clear vision, a meticulously designed brand, and a highly organized technical plan. Let's build this!

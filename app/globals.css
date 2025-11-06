@@ -2,125 +2,620 @@
 @import "@heroui/styles";
 @import "tw-animate-css";
 
+/* Custom Tailwind CSS v4 variants */
 @custom-variant dark (&:is(.dark *));
 
+/* ================================================================
+   REALEST DESIGN TOKEN SYSTEM
+   Complete foundation for RealEST marketplace design system
+   ================================================================ */
+
+/* ================================================================
+   1. BRAND COLORS - OKLCH FORMAT (60-30-10 Rule)
+   ================================================================ */
+
 :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --destructive-foreground: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
-    --chart-1: oklch(0.646 0.222 41.116);
-    --chart-2: oklch(0.6 0.118 184.704);
-    --chart-3: oklch(0.398 0.07 227.392);
-    --chart-4: oklch(0.828 0.189 84.429);
-    --chart-5: oklch(0.769 0.188 70.08);
-    --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0);
+  /* Primary Brand Colors */
+  --color-brand-dark: #242834;
+  --color-brand-violet: #7D53FF;
+  --color-brand-neon: #B6FF00;
+
+  /* OKLCH Color Tokens */
+  --primary-dark: oklch(0.26 0.08 258);      /* Navy foundation - 60% */
+  --primary-violet: oklch(0.67 0.25 286);    /* Violet secondary - 30% */
+  --primary-neon: oklch(0.91 0.20 127);      /* Lime accent - 10% */
+
+  /* Extended Grayscale (Derived from Primary Dark) */
+  --gray-50: oklch(0.98 0.005 258);    /* Almost white with navy tint */
+  --gray-100: oklch(0.95 0.01 258);
+  --gray-200: oklch(0.88 0.015 258);
+  --gray-300: oklch(0.78 0.02 258);
+  --gray-400: oklch(0.65 0.025 258);
+  --gray-500: oklch(0.52 0.03 258);
+  --gray-600: oklch(0.42 0.035 258);
+  --gray-700: oklch(0.32 0.04 258);
+  --gray-800: oklch(0.26 0.045 258);   /* Primary dark */
+  --gray-900: oklch(0.18 0.05 258);    /* Darker than primary */
+
+  /* Accessible Neon Variations */
+  --neon-50: oklch(0.98 0.03 127);
+  --neon-100: oklch(0.96 0.06 127);
+  --neon-200: oklch(0.94 0.10 127);
+  --neon-300: oklch(0.92 0.15 127);
+  --neon-400: oklch(0.91 0.20 127);    /* Primary neon */
+  --neon-500: oklch(0.85 0.22 127);
+  --neon-600: oklch(0.75 0.20 127);
+  --neon-700: oklch(0.65 0.18 127);
+  --neon-800: oklch(0.55 0.15 127);
+  --neon-900: oklch(0.45 0.12 127);
+
+  /* Semantic Color Tokens */
+  --color-success: oklch(0.75 0.15 142);       /* Verified properties */
+  --color-warning: oklch(0.82 0.18 95);        /* Pending verification */
+  --color-error: oklch(0.62 0.2 20);           /* Rejected/Issues */
+  --color-info: oklch(0.78 0.12 270);          /* Informational */
+
+  /* Design System Color Assignments */
+  --background: oklch(1 0 0);
+  --foreground: var(--gray-900);
+  --card: oklch(1 0 0);
+  --card-foreground: var(--gray-900);
+  --popover: oklch(1 0 0);
+  --popover-foreground: var(--gray-900);
+  --primary: var(--primary-neon);
+  --primary-foreground: var(--primary-dark);
+  --secondary: var(--primary-violet);
+  --secondary-foreground: var(--gray-50);
+  --muted: var(--gray-100);
+  --muted-foreground: var(--gray-600);
+  --accent: var(--primary-violet);
+  --accent-foreground: var(--gray-50);
+  --destructive: var(--color-error);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: var(--gray-200);
+  --input: var(--gray-200);
+  --ring: var(--primary-violet);
+
+  /* Chart Colors */
+  --chart-1: var(--primary-neon);
+  --chart-2: var(--primary-violet);
+  --chart-3: var(--color-info);
+  --chart-4: var(--color-success);
+  --chart-5: var(--color-warning);
+
+  /* Text Color Hierarchy */
+  --text-primary: var(--gray-900);
+  --text-secondary: var(--gray-600);
+  --text-muted: var(--gray-500);
+  --text-disabled: var(--gray-400);
+  --text-inverse: var(--gray-50);
+  --text-accent: var(--primary-violet);
+  --text-success: var(--color-success);
+  --text-warning: var(--color-warning);
+  --text-error: var(--color-error);
+
+  /* Sidebar Design Tokens */
+  --sidebar: var(--gray-50);
+  --sidebar-foreground: var(--gray-900);
+  --sidebar-primary: var(--primary-violet);
+  --sidebar-primary-foreground: var(--gray-50);
+  --sidebar-accent: var(--gray-100);
+  --sidebar-accent-foreground: var(--gray-900);
+  --sidebar-border: var(--gray-200);
+  --sidebar-ring: var(--primary-violet);
 }
 
+/* Dark Mode Color Overrides */
 .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.145 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.145 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.985 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.396 0.141 25.723);
-    --destructive-foreground: oklch(0.637 0.237 25.331);
-    --border: oklch(0.269 0 0);
-    --input: oklch(0.269 0 0);
-    --ring: oklch(0.439 0 0);
-    --chart-1: oklch(0.488 0.243 264.376);
-    --chart-2: oklch(0.696 0.17 162.48);
-    --chart-3: oklch(0.769 0.188 70.08);
-    --chart-4: oklch(0.627 0.265 303.9);
-    --chart-5: oklch(0.645 0.246 16.439);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(0.269 0 0);
-    --sidebar-ring: oklch(0.439 0 0);
+  --background: var(--primary-dark);
+  --foreground: var(--gray-50);
+  --card: var(--gray-800);
+  --card-foreground: var(--gray-50);
+  --popover: var(--gray-800);
+  --popover-foreground: var(--gray-50);
+  --primary: var(--primary-neon);
+  --primary-foreground: var(--primary-dark);
+  --secondary: var(--gray-700);
+  --secondary-foreground: var(--gray-50);
+  --muted: var(--gray-700);
+  --muted-foreground: var(--gray-400);
+  --accent: var(--primary-violet);
+  --accent-foreground: var(--gray-50);
+  --destructive: oklch(0.62 0.2 20);
+  --destructive-foreground: var(--gray-50);
+  --border: var(--gray-700);
+  --input: var(--gray-700);
+  --ring: var(--primary-neon);
+
+  /* Dark mode text colors */
+  --text-primary: var(--gray-50);
+  --text-secondary: var(--gray-300);
+  --text-muted: var(--gray-400);
+  --text-disabled: var(--gray-600);
+  --text-inverse: var(--gray-900);
+
+  /* Dark mode sidebar */
+  --sidebar: var(--gray-900);
+  --sidebar-foreground: var(--gray-50);
+  --sidebar-primary: var(--primary-neon);
+  --sidebar-primary-foreground: var(--primary-dark);
+  --sidebar-accent: var(--gray-800);
+  --sidebar-accent-foreground: var(--gray-50);
+  --sidebar-border: var(--gray-700);
+  --sidebar-ring: var(--primary-neon);
 }
+
+/* ================================================================
+   2. TYPOGRAPHY SYSTEM - FOUR-TIER HIERARCHY
+   ================================================================ */
+
+/* Font Face Declarations */
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('/fonts/space-grotesk/SpaceGrotesk-Variable.woff2') format('woff2-variations');
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Neulis Neue';
+  src: url('/fonts/neulis/Neulis-Variable.woff2') format('woff2-variations');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/jetbrains-mono/JetBrainsMono-Variable.woff2') format('woff2-variations');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Lufga';
+  src: url('/fonts/lufga/Lufga-Variable.woff2') format('woff2-variations');
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Font Stack Definitions */
+  --font-display: "Lufga", "Playfair Display", serif;
+  --font-heading: "Neulis Neue", "Space Grotesk", sans-serif;
+  --font-body: "Space Grotesk", "Open Sauce Sans", "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", "Monaco", "Inconsolata", "Roboto Mono", monospace;
+
+  /* Fluid Typography Scale */
+  --font-size-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);      /* 12-14px */
+  --font-size-sm: clamp(0.875rem, 0.8rem + 0.375vw, 1rem);       /* 14-16px */
+  --font-size-base: clamp(1rem, 0.9rem + 0.5vw, 1.125rem);       /* 16-18px */
+  --font-size-lg: clamp(1.125rem, 1rem + 0.625vw, 1.25rem);      /* 18-20px */
+  --font-size-xl: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);       /* 20-24px */
+  --font-size-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);            /* 24-32px */
+  --font-size-3xl: clamp(2rem, 1.7rem + 1.5vw, 2.5rem);          /* 32-40px */
+  --font-size-4xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);          /* 40-56px */
+  --font-size-5xl: clamp(3.5rem, 3rem + 2.5vw, 4.5rem);          /* 56-72px */
+
+  /* Line Heights */
+  --line-height-tight: 1.1;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  /* Letter Spacing */
+  --letter-spacing-tight: -0.025em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.025em;
+}
+
+/* ================================================================
+   3. SPACING & LAYOUT SYSTEM
+   ================================================================ */
+
+:root {
+  /* Consistent 4px Base Spacing Scale */
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.25rem;   /* 20px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-7: 1.75rem;   /* 28px */
+  --space-8: 2rem;      /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+  --space-20: 5rem;     /* 80px */
+  --space-24: 6rem;     /* 96px */
+  --space-28: 7rem;     /* 112px */
+  --space-32: 8rem;     /* 128px */
+
+  /* Component Spacing Patterns */
+  --card-padding: var(--space-6);         /* 24px */
+  --form-spacing: var(--space-4);         /* 16px */
+  --section-spacing: var(--space-16);     /* 64px */
+  --button-padding-x: var(--space-4);     /* 16px */
+  --button-padding-y: var(--space-3);     /* 12px */
+}
+
+/* ================================================================
+   4. BORDER RADIUS & SHADOW SYSTEM
+   ================================================================ */
+
+:root {
+  /* Border Radius Scale */
+  --radius-xs: 0.25rem;    /* 4px */
+  --radius-sm: 0.375rem;   /* 6px */
+  --radius-md: 0.625rem;   /* 10px */
+  --radius-lg: 1rem;       /* 16px */
+  --radius-xl: 1.5rem;     /* 24px */
+  --radius-2xl: 2rem;      /* 32px */
+  --radius-full: 9999px;
+
+  /* Component-Specific Radius */
+  --card-radius: var(--radius-xl);
+  --button-radius: var(--radius-md);
+  --input-radius: var(--radius-lg);
+  --badge-radius: var(--radius-full);
+
+  /* Shadow System (Colored with Primary Dark) */
+  --shadow-xs: 0 1px 2px oklch(0.26 0.08 258 / 0.05);
+  --shadow-sm: 0 1px 3px oklch(0.26 0.08 258 / 0.1), 0 1px 2px oklch(0.26 0.08 258 / 0.06);
+  --shadow-md: 0 4px 6px oklch(0.26 0.08 258 / 0.07), 0 2px 4px oklch(0.26 0.08 258 / 0.06);
+  --shadow-lg: 0 10px 15px oklch(0.26 0.08 258 / 0.1), 0 4px 6px oklch(0.26 0.08 258 / 0.05);
+  --shadow-xl: 0 20px 25px oklch(0.26 0.08 258 / 0.1), 0 10px 10px oklch(0.26 0.08 258 / 0.04);
+  --shadow-2xl: 0 25px 50px oklch(0.26 0.08 258 / 0.15), 0 15px 20px oklch(0.26 0.08 258 / 0.05);
+
+  /* Colored Shadows for Interactive Elements */
+  --shadow-neon: 0 4px 14px oklch(0.91 0.20 127 / 0.25);
+  --shadow-violet: 0 4px 14px oklch(0.67 0.25 286 / 0.25);
+}
+
+/* ================================================================
+   5. ANIMATION & INTERACTION TOKENS
+   ================================================================ */
+
+:root {
+  /* Animation Durations */
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+
+  /* Easing Functions */
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* ================================================================
+   6. RESPONSIVE BREAKPOINTS
+   ================================================================ */
+
+:root {
+  --breakpoint-xs: 475px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+}
+
+/* ================================================================
+   7. TAILWIND CSS V4 THEME INTEGRATION
+   ================================================================ */
 
 @theme inline {
-    --font-sans: "Geist", "Geist Fallback";
-    --font-mono: "Geist Mono", "Geist Mono Fallback";
-    --color-background: var(--background);
-    --color-foreground: var(--foreground);
-    --color-card: var(--card);
-    --color-card-foreground: var(--card-foreground);
-    --color-popover: var(--popover);
-    --color-popover-foreground: var(--popover-foreground);
-    --color-primary: var(--primary);
-    --color-primary-foreground: var(--primary-foreground);
-    --color-secondary: var(--secondary);
-    --color-secondary-foreground: var(--secondary-foreground);
-    --color-muted: var(--muted);
-    --color-muted-foreground: var(--muted-foreground);
-    --color-accent: var(--accent);
-    --color-accent-foreground: var(--accent-foreground);
-    --color-destructive: var(--destructive);
-    --color-destructive-foreground: var(--destructive-foreground);
-    --color-border: var(--border);
-    --color-input: var(--input);
-    --color-ring: var(--ring);
-    --color-chart-1: var(--chart-1);
-    --color-chart-2: var(--chart-2);
-    --color-chart-3: var(--chart-3);
-    --color-chart-4: var(--chart-4);
-    --color-chart-5: var(--chart-5);
-    --radius-sm: calc(var(--radius) - 4px);
-    --radius-md: calc(var(--radius) - 2px);
-    --radius-lg: var(--radius);
-    --radius-xl: calc(var(--radius) + 4px);
-    --color-sidebar: var(--sidebar);
-    --color-sidebar-foreground: var(--sidebar-foreground);
-    --color-sidebar-primary: var(--sidebar-primary);
-    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-    --color-sidebar-accent: var(--sidebar-accent);
-    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-    --color-sidebar-border: var(--sidebar-border);
-    --color-sidebar-ring: var(--sidebar-ring);
+  /* Font Families */
+  --font-display: var(--font-display);
+  --font-heading: var(--font-heading);
+  --font-body: var(--font-body);
+  --font-mono: var(--font-mono);
+
+  /* Colors mapped for Tailwind v4 */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Chart colors */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* Radius mapping */
+  --radius-xs: var(--radius-xs);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-2xl: var(--radius-2xl);
+  --radius-full: var(--radius-full);
+
+  /* Sidebar colors */
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* ================================================================
+   8. BASE STYLES & UTILITIES
+   ================================================================ */
+
 @layer base {
-    * {
-        @apply border-border outline-ring/50;
-    }
-    body {
-        @apply bg-background text-foreground;
-    }
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Focus Styles */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  /* Selection Styles */
+  ::selection {
+    @apply bg-primary text-primary-foreground;
+  }
+
+  /* Scrollbar Styles */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-muted;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/30 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/50;
+  }
+}
+
+/* ================================================================
+   9. TYPOGRAPHY UTILITY CLASSES
+   ================================================================ */
+
+@layer utilities {
+  /* Display Typography (Lufga) */
+  .text-display-hero {
+    font-family: var(--font-display);
+    font-size: var(--font-size-5xl);
+    font-weight: 700;
+    line-height: var(--line-height-tight);
+    letter-spacing: var(--letter-spacing-tight);
+  }
+
+  .text-display-section {
+    font-family: var(--font-display);
+    font-size: var(--font-size-4xl);
+    font-weight: 600;
+    line-height: var(--line-height-tight);
+    letter-spacing: var(--letter-spacing-tight);
+  }
+
+  /* Heading Typography (Neulis Neue) */
+  .text-h1 {
+    font-family: var(--font-heading);
+    font-size: var(--font-size-3xl);
+    font-weight: 600;
+    line-height: var(--line-height-tight);
+  }
+
+  .text-h2 {
+    font-family: var(--font-heading);
+    font-size: var(--font-size-2xl);
+    font-weight: 600;
+    line-height: var(--line-height-normal);
+  }
+
+  .text-h3 {
+    font-family: var(--font-heading);
+    font-size: var(--font-size-xl);
+    font-weight: 500;
+    line-height: var(--line-height-normal);
+  }
+
+  /* Body Typography (Space Grotesk) */
+  .text-body-lg {
+    font-family: var(--font-body);
+    font-size: var(--font-size-lg);
+    font-weight: 400;
+    line-height: var(--line-height-relaxed);
+  }
+
+  .text-body-base {
+    font-family: var(--font-body);
+    font-size: var(--font-size-base);
+    font-weight: 400;
+    line-height: var(--line-height-normal);
+  }
+
+  .text-body-sm {
+    font-family: var(--font-body);
+    font-size: var(--font-size-sm);
+    font-weight: 400;
+    line-height: var(--line-height-normal);
+  }
+
+  /* Monospace Typography (JetBrains Mono) */
+  .text-mono {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-sm);
+    font-weight: 400;
+    line-height: var(--line-height-normal);
+    font-feature-settings: "liga" 0;
+  }
+
+  /* Text Color Utilities */
+  .text-primary { color: var(--text-primary); }
+  .text-secondary { color: var(--text-secondary); }
+  .text-muted { color: var(--text-muted); }
+  .text-disabled { color: var(--text-disabled); }
+  .text-inverse { color: var(--text-inverse); }
+  .text-accent { color: var(--text-accent); }
+  .text-success { color: var(--text-success); }
+  .text-warning { color: var(--text-warning); }
+  .text-error { color: var(--text-error); }
+
+  /* Brand Gradient Text */
+  .text-gradient-brand {
+    background: linear-gradient(135deg, var(--primary-violet), var(--primary-neon));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .text-gradient-hero {
+    background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary-violet) 50%, var(--primary-neon) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+/* ================================================================
+   10. COMPONENT-SPECIFIC UTILITIES
+   ================================================================ */
+
+@layer utilities {
+  /* Card Shadows */
+  .shadow-card { box-shadow: var(--shadow-md); }
+  .shadow-card-hover { box-shadow: var(--shadow-lg); }
+  .shadow-card-interactive { box-shadow: var(--shadow-xl); }
+
+  /* Button Shadows */
+  .shadow-button { box-shadow: var(--shadow-sm); }
+  .shadow-button-hover { box-shadow: var(--shadow-md); }
+
+  /* Colored Shadows */
+  .shadow-neon { box-shadow: var(--shadow-neon); }
+  .shadow-violet { box-shadow: var(--shadow-violet); }
+
+  /* Interactive States */
+  .interactive-card {
+    @apply transition-all duration-300 ease-out;
+    @apply hover:shadow-card-hover hover:-translate-y-1;
+    @apply focus-within:shadow-card-interactive focus-within:ring-2 focus-within:ring-ring;
+  }
+
+  .interactive-button {
+    @apply transition-all duration-200 ease-out;
+    @apply hover:shadow-button-hover hover:-translate-y-0.5;
+    @apply active:translate-y-0 active:shadow-button;
+  }
+
+  /* Container Utilities */
+  .container-padding {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+
+  .section-spacing {
+    @apply py-16 sm:py-20 lg:py-24;
+  }
+
+  /* Nigerian Market Specific Utilities */
+  .nigerian-content {
+    @apply text-body-base leading-relaxed;
+  }
+
+  .property-badge {
+    @apply inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium;
+  }
+
+  .verification-indicator {
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium;
+    @apply bg-success/10 text-success border border-success/20;
+  }
+}
+
+/* ================================================================
+   11. PRINT STYLES
+   ================================================================ */
+
+@media print {
+  * {
+    @apply text-black bg-white;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-break-before {
+    page-break-before: always;
+  }
+
+  .print-break-after {
+    page-break-after: always;
+  }
+}
+
+/* ================================================================
+   12. REDUCED MOTION ACCESSIBILITY
+   ================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ================================================================
+   13. HIGH CONTRAST MODE ACCESSIBILITY
+   ================================================================ */
+
+@media (prefers-contrast: high) {
+  :root {
+    --border: oklch(0.5 0 0);
+    --ring: oklch(0.2 0 0);
+  }
+
+  .dark {
+    --border: oklch(0.7 0 0);
+    --ring: oklch(0.8 0 0);
+  }
 }

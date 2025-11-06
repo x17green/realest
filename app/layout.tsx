@@ -1,15 +1,63 @@
 import type React from "react";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
-
 export const metadata: Metadata = {
-  title: "RealProof - Verified Real Estate Marketplace",
-  description: "No Duplicates, Only Verified Listings",
+  title: "RealEST - Geo-Verified Property Marketplace",
+  description:
+    "Find Your Next Move. Discover geo-verified, authentic properties with RealEST's proof-first marketplace. No duplicates, only verified listings.",
+  keywords: [
+    "real estate",
+    "property marketplace",
+    "geo-verified properties",
+    "Nigeria properties",
+    "verified listings",
+    "property verification",
+    "real estate Nigeria",
+  ],
+  authors: [{ name: "RealEST Team" }],
+  creator: "RealEST",
+  publisher: "RealEST",
+  metadataBase: new URL("https://realest.ng"),
+  openGraph: {
+    title: "RealEST - Find Your Next Move",
+    description:
+      "Nigeria's first geo-verified property marketplace. Discover authentic properties with verified location data.",
+    url: "https://realest.ng",
+    siteName: "RealEST",
+    locale: "en_NG",
+    type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "RealEST - Geo-Verified Property Marketplace",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "RealEST - Find Your Next Move",
+    description:
+      "Discover geo-verified properties in Nigeria's most trusted marketplace",
+    images: ["/twitter-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    google: "your-google-verification-token",
+  },
 };
 
 export default function RootLayout({
@@ -18,8 +66,81 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`font-sans antialiased`}>
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Preload critical fonts for performance */}
+        <link
+          rel="preload"
+          href="/fonts/space-grotesk/SpaceGrotesk-Variable.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/fonts/neulis/Neulis-Variable.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/fonts/jetbrains-mono/JetBrainsMono-Variable.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+          media="(min-width: 768px)"
+        />
+        <link
+          rel="preload"
+          href="/fonts/lufga/Lufga-Variable.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+          media="(min-width: 768px)"
+        />
+
+        {/* DNS prefetch for external resources */}
+        <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="//api.mapbox.com" />
+
+        {/* Theme color for mobile browsers */}
+        <meta name="theme-color" content="#7D53FF" />
+        <meta name="color-scheme" content="light dark" />
+
+        {/* Viewport meta for responsive design */}
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, viewport-fit=cover"
+        />
+
+        {/* Apple specific meta tags */}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="RealEST" />
+
+        {/* Microsoft specific meta tags */}
+        <meta name="msapplication-TileColor" content="#7D53FF" />
+        <meta name="msapplication-config" content="/browserconfig.xml" />
+
+        {/* Favicon and app icons */}
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="manifest" href="/manifest.json" />
+      </head>
+      <body className="font-body antialiased bg-background text-foreground min-h-screen">
+        <noscript>
+          <div className="fixed inset-0 bg-background flex items-center justify-center z-50">
+            <div className="text-center p-8">
+              <h1 className="text-h1 mb-4">JavaScript Required</h1>
+              <p className="text-body-m text-muted-foreground">
+                RealEST requires JavaScript to function properly. Please enable
+                JavaScript in your browser.
+              </p>
+            </div>
+          </div>
+        </noscript>
         {children}
         <Analytics />
       </body>
