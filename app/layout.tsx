@@ -1,7 +1,7 @@
 import type React from "react";
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
-import "./globals.css";
+import "../styles/globals.css";
 
 export const metadata: Metadata = {
   title: "RealEST - Geo-Verified Property Marketplace",
@@ -68,40 +68,46 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Preload critical fonts for performance */}
+        {/* Preload critical RealEST fonts for performance */}
         <link
           rel="preload"
-          href="/fonts/space-grotesk/SpaceGrotesk-Variable.woff2"
+          href="/fonts/space-grotesk/SpaceGrotesk-Regular.ttf"
           as="font"
-          type="font/woff2"
+          type="font/ttf"
           crossOrigin="anonymous"
         />
         <link
           rel="preload"
-          href="/fonts/neulis/Neulis-Variable.woff2"
+          href="/fonts/space-grotesk/SpaceGrotesk-Medium.ttf"
           as="font"
-          type="font/woff2"
+          type="font/ttf"
           crossOrigin="anonymous"
         />
         <link
           rel="preload"
-          href="/fonts/jetbrains-mono/JetBrainsMono-Variable.woff2"
+          href="/fonts/neulis/Neulis_Neue_Regular.otf"
           as="font"
-          type="font/woff2"
+          type="font/otf"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/fonts/lufga/LufgaRegular.ttf"
+          as="font"
+          type="font/ttf"
           crossOrigin="anonymous"
           media="(min-width: 768px)"
         />
         <link
           rel="preload"
-          href="/fonts/lufga/Lufga-Variable.woff2"
+          href="/fonts/jetbrains-mono/JetBrainsMono-Regular.ttf"
           as="font"
-          type="font/woff2"
+          type="font/ttf"
           crossOrigin="anonymous"
           media="(min-width: 768px)"
         />
 
         {/* DNS prefetch for external resources */}
-        <link rel="dns-prefetch" href="//fonts.googleapis.com" />
         <link rel="dns-prefetch" href="//api.mapbox.com" />
 
         {/* Theme color for mobile browsers */}

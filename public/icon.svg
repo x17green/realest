@@ -1,0 +1,14 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle with brand violet -->
+  <circle cx="16" cy="16" r="16" fill="#7D53FF"/>
+
+  <!-- House shape in neon green -->
+  <path d="M16 6L24 12V25H20V18H12V25H8V12L16 6Z" fill="#B6FF00"/>
+
+  <!-- Verification checkmark overlay -->
+  <circle cx="22" cy="10" r="4" fill="#B6FF00"/>
+  <path d="M20 10L21.5 11.5L24 9" stroke="#242834" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Location pin at bottom -->
+  <circle cx="16" cy="22" r="2" fill="#242834"/>
+</svg>

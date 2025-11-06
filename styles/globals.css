@@ -1,110 +1,183 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
+@import './tokens/colors.css';
 
 @custom-variant dark (&:is(.dark *));
 
-:root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+/* ================================================================
+   REALEST FONT IMPORTS
+   Local font files with proper fallbacks
+   ================================================================ */
+
+@font-face {
+  font-family: 'Lufga';
+  src: url('/fonts/lufga/LufgaRegular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.269 0 0);
-  --sidebar-ring: oklch(0.439 0 0);
+@font-face {
+  font-family: 'Lufga';
+  src: url('/fonts/lufga/LufgaBold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
 }
+
+@font-face {
+  font-family: 'Neulis Neue';
+  src: url('/fonts/neulis/Neulis_Neue_Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Neulis Neue';
+  src: url('/fonts/neulis/Neulis_Neue_Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('/fonts/space-grotesk/SpaceGrotesk-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('/fonts/space-grotesk/SpaceGrotesk-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('/fonts/space-grotesk/SpaceGrotesk-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/jetbrains-mono/JetBrainsMono-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ================================================================
+   TAILWIND CSS THEME INTEGRATION
+   Integrating RealEST design tokens with Tailwind CSS
+   ================================================================ */
 
 @theme inline {
-  --font-sans: 'Geist', 'Geist Fallback';
-  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  /* Font Families */
+  --font-display: 'Lufga', 'Playfair Display', serif;
+  --font-heading: 'Neulis Neue', 'Space Grotesk', sans-serif;
+  --font-body: 'Space Grotesk', 'Open Sauce Sans', 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Monaco', monospace;
+
+  /* Core Color System (Using RealEST tokens) */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
+
+  /* Brand Colors */
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
+
+  /* UI Colors */
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+
+  /* Status Colors */
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+  --color-error: var(--color-error);
+  --color-info: var(--color-info);
+
+  /* Form Colors */
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
+  /* Chart Colors */
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --color-chart-6: var(--chart-6);
+  --color-chart-7: var(--chart-7);
+  --color-chart-8: var(--chart-8);
+
+  /* Border Radius (RealEST Design System) */
+  --radius-xs: 0.25rem;    /* 4px */
+  --radius-sm: 0.375rem;   /* 6px */
+  --radius-md: 0.625rem;   /* 10px */
+  --radius-lg: 1rem;       /* 16px */
+  --radius-xl: 1.5rem;     /* 24px */
+  --radius-2xl: 2rem;      /* 32px */
+  --radius-full: 9999px;
+
+  /* Component Specific Radii */
+  --radius: var(--radius-md);  /* Default radius */
+
+  /* Spacing System (4px base) */
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.25rem;   /* 20px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-7: 1.75rem;   /* 28px */
+  --space-8: 2rem;      /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+  --space-20: 5rem;     /* 80px */
+  --space-24: 6rem;     /* 96px */
+  --space-28: 7rem;     /* 112px */
+  --space-32: 8rem;     /* 128px */
+
+  /* Shadow System */
+  --shadow-xs: 0 1px 2px oklch(0.26 0.08 258 / 0.05);
+  --shadow-sm: 0 1px 3px oklch(0.26 0.08 258 / 0.1), 0 1px 2px oklch(0.26 0.08 258 / 0.06);
+  --shadow-md: 0 4px 6px oklch(0.26 0.08 258 / 0.07), 0 2px 4px oklch(0.26 0.08 258 / 0.06);
+  --shadow-lg: 0 10px 15px oklch(0.26 0.08 258 / 0.1), 0 4px 6px oklch(0.26 0.08 258 / 0.05);
+  --shadow-xl: 0 20px 25px oklch(0.26 0.08 258 / 0.1), 0 10px 10px oklch(0.26 0.08 258 / 0.04);
+  --shadow-2xl: 0 25px 50px oklch(0.26 0.08 258 / 0.15), 0 15px 20px oklch(0.26 0.08 258 / 0.05);
+  --shadow-neon: 0 4px 14px oklch(0.91 0.20 127 / 0.25);
+  --shadow-violet: 0 4px 14px oklch(0.67 0.25 286 / 0.25);
+
+  /* Animation Tokens */
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+  /* Sidebar Colors (for Shadcn components) */
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -115,11 +188,322 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* ================================================================
+   SIDEBAR THEME OVERRIDES (Dark Mode Support)
+   ================================================================ */
+
+.dark {
+  /* Sidebar specific overrides for dark mode */
+  --sidebar: var(--gray-800);
+  --sidebar-foreground: var(--gray-50);
+  --sidebar-primary: var(--primary-neon);
+  --sidebar-primary-foreground: var(--primary-dark);
+  --sidebar-accent: var(--gray-700);
+  --sidebar-accent-foreground: var(--gray-50);
+  --sidebar-border: var(--gray-700);
+  --sidebar-ring: var(--primary-neon);
+}
+
+/* ================================================================
+   BASE STYLES
+   Global base styles using RealEST design tokens
+   ================================================================ */
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    box-sizing: border-box;
   }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-body);
+    line-height: 1.5;
+    font-feature-settings: 'rlig' 1, 'calt' 1, 'ss01' 1;
+  }
+
+  /* Typography Hierarchy */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+  }
+
+  h1 {
+    font-size: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+    font-weight: 700;
+  }
+
+  h2 {
+    font-size: clamp(2rem, 1.7rem + 1.5vw, 2.5rem);
+  }
+
+  h3 {
+    font-size: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+  }
+
+  h4 {
+    font-size: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);
+  }
+
+  h5 {
+    font-size: clamp(1.125rem, 1rem + 0.625vw, 1.25rem);
+  }
+
+  h6 {
+    font-size: clamp(1rem, 0.9rem + 0.5vw, 1.125rem);
+  }
+
+  /* Display Typography */
+  .text-display {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+  }
+
+  /* Monospace Typography */
+  code, pre, .font-mono {
+    font-family: var(--font-mono);
+    font-feature-settings: 'zero' 1, 'ss01' 1;
+  }
+
+  /* Focus States */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  /* Selection Colors */
+  ::selection {
+    background-color: var(--primary-neon);
+    color: var(--primary-dark);
+  }
+
+  /* Scrollbar Styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--muted);
+    border-radius: var(--radius-sm);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--muted-foreground);
+    border-radius: var(--radius-sm);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--accent);
+  }
+}
+
+/* ================================================================
+   COMPONENT STYLES
+   Enhanced component styles using RealEST tokens
+   ================================================================ */
+
+@layer components {
+  /* Enhanced Card Styles */
+  .card-enhanced {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+    transition: all var(--duration-normal) var(--ease-out);
+  }
+
+  .card-enhanced:hover {
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-violet);
+  }
+
+  /* Status Indicators */
+  .status-verified {
+    background: var(--color-success);
+    color: white;
+  }
+
+  .status-pending {
+    background: var(--color-warning);
+    color: var(--primary-dark);
+  }
+
+  .status-error {
+    background: var(--color-error);
+    color: white;
+  }
+
+  /* Gradient Backgrounds */
+  .bg-gradient-brand {
+    background: linear-gradient(135deg, var(--primary-violet), var(--primary-neon));
+  }
+
+  .bg-gradient-hero {
+    background: linear-gradient(135deg, var(--gray-900) 0%, var(--primary-violet) 50%, var(--primary-neon) 100%);
+  }
+
+  /* Button Glow Effects */
+  .btn-glow-neon {
+    box-shadow: var(--shadow-neon);
+  }
+
+  .btn-glow-violet {
+    box-shadow: var(--shadow-violet);
+  }
+
+  /* Text Color Utilities */
+  .text-brand-neon {
+    color: var(--primary-neon);
+  }
+
+  .text-brand-violet {
+    color: var(--primary-violet);
+  }
+
+  .text-brand-dark {
+    color: var(--primary-dark);
+  }
+}
+
+/* ================================================================
+   UTILITY STYLES
+   Additional utility classes for RealEST design system
+   ================================================================ */
+
+@layer utilities {
+  /* Animation Classes */
+  .animate-fade-in {
+    animation: fadeIn var(--duration-normal) var(--ease-out);
+  }
+
+  .animate-slide-up {
+    animation: slideUp var(--duration-normal) var(--ease-out);
+  }
+
+  .animate-bounce-gentle {
+    animation: bounceGentle var(--duration-slow) var(--ease-bounce);
+  }
+
+  /* Transition Utilities */
+  .transition-all {
+    transition: all var(--duration-normal) var(--ease-out);
+  }
+
+  .transition-colors {
+    transition: color var(--duration-normal) var(--ease-out),
+                background-color var(--duration-normal) var(--ease-out);
+  }
+
+  .transition-transform {
+    transition: transform var(--duration-normal) var(--ease-out);
+  }
+}
+
+/* ================================================================
+   ANIMATIONS
+   Custom animations for the RealEST design system
+   ================================================================ */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounceGentle {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+/* ================================================================
+   RESPONSIVE DESIGN
+   Mobile-first responsive enhancements
+   ================================================================ */
+
+@media (max-width: 640px) {
+  body {
+    font-size: 14px;
+  }
+
+  .card-enhanced {
+    border-radius: var(--radius-lg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ================================================================
+   HIGH CONTRAST MODE SUPPORT
+   Enhanced accessibility for high contrast preferences
+   ================================================================ */
+
+@media (prefers-contrast: high) {
+  :root {
+    --border: oklch(0.3 0 0);
+    --ring: oklch(0.1 0 0);
+  }
+
+  .dark {
+    --border: oklch(0.8 0 0);
+    --ring: oklch(0.9 0 0);
+  }
+
+  .card-enhanced {
+    border-width: 2px;
+  }
+}
+
+/* ================================================================
+   PRINT STYLES
+   Optimized styles for print media
+   ================================================================ */
+
+@media print {
+  * {
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+  }
+
+  .no-print {
+    display: none !important;
   }
 }
