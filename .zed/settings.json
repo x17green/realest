@@ -1,0 +1,204 @@
+{
+  "assistant": {
+    "default_model": {
+      "provider": "zed.dev",
+      "model": "claude-3-5-sonnet-20241022"
+    },
+    "version": "2",
+    "button": true,
+    "dock": "right",
+    "default_width": 400,
+    "custom_instructions": "You are an expert full-stack developer working on the RealEST property marketplace project. Always reference the design system documentation in docs/zed-context-realest-design-system.md for design decisions, component implementations, and brand guidelines. Use HeroUI v3 as the primary component library and UntitledUI for status components. Follow the established color palette (#242834, #B6FF00, #7D53FF) and typography system. Ensure all code follows React 19, Next.js 16, and TypeScript best practices while maintaining Nigerian market cultural sensitivity."
+  },
+  "context_servers": {
+    "heroui": {
+      "command": "npx",
+      "args": ["-y","@heroui/mcp"],
+      "source": "custom"
+    },
+    "heroui-react": {
+      "command": "npx",
+      "args": ["-y","@heroui/react-mcp@latest"],
+      "env": {},
+      "source": "custom"
+    },
+    "supabase": {
+      "command": "npx",
+      "args": ["-y","mcp-remote","https://mcp.supabase.com/mcp?project_ref=evlkccjtirecdxksoqmq"],
+      "source": "custom"
+    }
+  },
+  "languages": {
+    "TypeScript": {
+      "format_on_save": {
+        "external": {
+          "command": "prettier",
+          "arguments": ["--stdin-filepath", "{buffer_path}"]
+        }
+      },
+      "language_servers": [
+        "typescript-language-server",
+        "tailwindcss-language-server"
+      ],
+      "tab_size": 2,
+      "hard_tabs": false
+    },
+    "TSX": {
+      "format_on_save": {
+        "external": {
+          "command": "prettier",
+          "arguments": ["--stdin-filepath", "{buffer_path}"]
+        }
+      },
+      "language_servers": [
+        "typescript-language-server",
+        "tailwindcss-language-server"
+      ],
+      "tab_size": 2,
+      "hard_tabs": false
+    },
+    "JavaScript": {
+      "format_on_save": {
+        "external": {
+          "command": "prettier",
+          "arguments": ["--stdin-filepath", "{buffer_path}"]
+        }
+      },
+      "language_servers": [
+        "typescript-language-server",
+        "tailwindcss-language-server"
+      ],
+      "tab_size": 2,
+      "hard_tabs": false
+    },
+    "CSS": {
+      "format_on_save": {
+        "external": {
+          "command": "prettier",
+          "arguments": ["--stdin-filepath", "{buffer_path}"]
+        }
+      },
+      "language_servers": [
+        "tailwindcss-language-server",
+        "css-language-server"
+      ],
+      "tab_size": 2,
+      "hard_tabs": false
+    },
+    "JSON": {
+      "format_on_save": {
+        "external": {
+          "command": "prettier",
+          "arguments": ["--stdin-filepath", "{buffer_path}"]
+        }
+      },
+      "tab_size": 2,
+      "hard_tabs": false
+    }
+  },
+  "lsp": {
+    "typescript-language-server": {
+      "initialization_options": {
+        "preferences": {
+          "includeInlayParameterNameHints": "all",
+          "includeInlayParameterNameHintsWhenArgumentMatchesName": true,
+          "includeInlayFunctionParameterTypeHints": true,
+          "includeInlayVariableTypeHints": false,
+          "includeInlayPropertyDeclarationTypeHints": true,
+          "includeInlayFunctionLikeReturnTypeHints": true
+        }
+      }
+    },
+    "tailwindcss-language-server": {
+      "settings": {
+        "tailwindCSS": {
+          "experimental": {
+            "classRegex": [
+              ["cn\\(([^)]*)\\)", "[\"'`]([^\"'`]*)[\"'`]"],
+              ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*)[\"'`]"],
+              ["className\\s*=\\s*[\"'`]([^\"'`]*)[\"'`]"],
+              ["class\\s*=\\s*[\"'`]([^\"'`]*)[\"'`]"]
+            ]
+          },
+          "includeLanguages": {
+            "typescript": "javascript",
+            "typescriptreact": "javascript"
+          }
+        }
+      }
+    }
+  },
+  "project_panel": {
+    "button": true,
+    "dock": "left",
+    "default_width": 240
+  },
+  "outline_panel": {
+    "button": true,
+    "dock": "right",
+    "default_width": 240
+  },
+  "collaboration_panel": {
+    "button": false
+  },
+  "terminal": {
+    "dock": "bottom",
+    "default_height": 320,
+    "button": true
+  },
+  "tabs": {
+    "close_position": "right",
+    "file_icons": true,
+    "git_status": true
+  },
+  "scrollbar": {
+    "show": "auto",
+    "cursors": false,
+    "git_diff": true,
+    "search_results": true,
+    "selected_symbol": true,
+    "diagnostics": true
+  },
+  "inlay_hints": {
+    "enabled": true,
+    "show_type_hints": true,
+    "show_parameter_hints": true,
+    "show_other_hints": true
+  },
+  "git": {
+    "git_gutter": "tracked_files",
+    "inline_blame": {
+      "enabled": true,
+      "delay_ms": 1000
+    }
+  },
+  "vim_mode": false,
+  "cursor_blink": false,
+  "relative_line_numbers": false,
+  "seed_search_query_from_cursor": "always",
+  "ui_font_size": 14,
+  "buffer_font_size": 14,
+  "buffer_font_family": ".ZedMono",
+  "theme": {
+    "mode": "system",
+    "light": "One Light",
+    "dark": "Ayu Dark"
+  },
+  "workspace": {
+    "restore_on_startup": "last_workspace",
+    "when_closing_with_no_tabs": "platform_default"
+  },
+  "diagnostics": {
+    "include_warnings": true
+  },
+  "file_scan_exclusions": [
+    "**/.git",
+    "**/node_modules",
+    "**/.next",
+    "**/dist",
+    "**/build",
+    "**/.supabase"
+  ],
+  "projects_online_by_default": false,
+  "auto_update": true
+}

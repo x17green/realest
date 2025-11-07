@@ -70,7 +70,7 @@ export default function LoginPage() {
       <Card.Root className="w-full max-w-md">
         <Card.Header className="text-center">
           <Card.Title className="text-2xl font-bold">Welcome Back</Card.Title>
-          <Card.Description>Sign in to your RealProof account</Card.Description>
+          <Card.Description>Sign in to your RealEST account</Card.Description>
         </Card.Header>
 
         <Card.Content className="space-y-6">

@@ -539,7 +539,7 @@ export default function PropertyDetailsPage() {
                       src={property.owner.avatar_url || undefined}
                     />
                     <Avatar.Fallback>
-                      {property.owner.full_name.charAt(0)}
+                      {property.owner?.full_name ? property.owner.full_name.charAt(0) : '?'}
                     </Avatar.Fallback>
                   </Avatar.Root>
                   <div>

@@ -1,0 +1,322 @@
+/* ================================================================
+   REALEST COLOR TOKENS
+   Complete color system following 60-30-10 design rule
+   ================================================================ */
+
+/* ================================================================
+   1. BRAND COLORS - PRIMARY PALETTE
+   ================================================================ */
+
+:root {
+  /* Primary Brand Colors (Hex Values) */
+  --color-brand-dark: #242834;      /* Navy foundation */
+  --color-brand-violet: #7D53FF;    /* Violet secondary */
+  --color-brand-neon: #B6FF00;      /* Lime accent */
+
+  /* Primary Palette (OKLCH Format) */
+  --primary-dark: oklch(0.26 0.08 258);      /* Navy foundation - 60% usage */
+  --primary-violet: oklch(0.67 0.25 286);    /* Violet secondary - 30% usage */
+  --primary-neon: oklch(0.91 0.20 127);      /* Lime accent - 10% usage */
+}
+
+/* ================================================================
+   2. EXTENDED GRAYSCALE SYSTEM
+   Derived from Primary Dark for visual harmony
+   ================================================================ */
+
+:root {
+  /* Grayscale Palette (Derived from #242834) */
+  --gray-50: oklch(0.98 0.005 258);    /* Almost white with subtle navy tint */
+  --gray-100: oklch(0.95 0.01 258);    /* Very light gray */
+  --gray-200: oklch(0.88 0.015 258);   /* Light gray */
+  --gray-300: oklch(0.78 0.02 258);    /* Medium light gray */
+  --gray-400: oklch(0.65 0.025 258);   /* Medium gray */
+  --gray-500: oklch(0.52 0.03 258);    /* True middle gray */
+  --gray-600: oklch(0.42 0.035 258);   /* Medium dark gray */
+  --gray-700: oklch(0.32 0.04 258);    /* Dark gray */
+  --gray-800: oklch(0.26 0.045 258);   /* Primary dark equivalent */
+  --gray-900: oklch(0.18 0.05 258);    /* Very dark gray */
+}
+
+/* ================================================================
+   3. ACCESSIBLE NEON VARIATIONS
+   Multiple shades of the brand neon for different use cases
+   ================================================================ */
+
+:root {
+  /* Neon Color Scale */
+  --neon-50: oklch(0.98 0.03 127);     /* Very light neon tint */
+  --neon-100: oklch(0.96 0.06 127);    /* Light neon tint */
+  --neon-200: oklch(0.94 0.10 127);    /* Subtle neon */
+  --neon-300: oklch(0.92 0.15 127);    /* Muted neon */
+  --neon-400: oklch(0.91 0.20 127);    /* Primary neon */
+  --neon-500: oklch(0.85 0.22 127);    /* Slightly darker neon */
+  --neon-600: oklch(0.75 0.20 127);    /* Medium neon */
+  --neon-700: oklch(0.65 0.18 127);    /* Dark neon */
+  --neon-800: oklch(0.55 0.15 127);    /* Very dark neon */
+  --neon-900: oklch(0.45 0.12 127);    /* Darkest neon */
+}
+
+/* ================================================================
+   4. VIOLET COLOR VARIATIONS
+   Extended violet palette for design flexibility
+   ================================================================ */
+
+:root {
+  /* Violet Color Scale */
+  --violet-50: oklch(0.96 0.05 286);   /* Very light violet */
+  --violet-100: oklch(0.92 0.08 286);  /* Light violet */
+  --violet-200: oklch(0.85 0.12 286);  /* Subtle violet */
+  --violet-300: oklch(0.78 0.16 286);  /* Muted violet */
+  --violet-400: oklch(0.72 0.20 286);  /* Medium light violet */
+  --violet-500: oklch(0.67 0.25 286);  /* Primary violet */
+  --violet-600: oklch(0.62 0.22 286);  /* Medium violet */
+  --violet-700: oklch(0.55 0.20 286);  /* Dark violet */
+  --violet-800: oklch(0.45 0.18 286);  /* Very dark violet */
+  --violet-900: oklch(0.35 0.15 286);  /* Darkest violet */
+}
+
+/* ================================================================
+   5. SEMANTIC COLOR TOKENS
+   Status and feedback colors
+   ================================================================ */
+
+:root {
+  /* Status Colors */
+  --color-success: oklch(0.75 0.15 142);       /* Verified properties, success states */
+  --color-success-light: oklch(0.85 0.10 142); /* Light success background */
+  --color-success-dark: oklch(0.65 0.18 142);  /* Dark success text */
+
+  --color-warning: oklch(0.82 0.18 95);        /* Pending verification, warnings */
+  --color-warning-light: oklch(0.92 0.12 95);  /* Light warning background */
+  --color-warning-dark: oklch(0.72 0.22 95);   /* Dark warning text */
+
+  --color-error: oklch(0.62 0.2 20);           /* Rejected/Issues, errors */
+  --color-error-light: oklch(0.75 0.15 20);    /* Light error background */
+  --color-error-dark: oklch(0.52 0.25 20);     /* Dark error text */
+
+  --color-info: oklch(0.78 0.12 270);          /* Informational messages */
+  --color-info-light: oklch(0.88 0.08 270);    /* Light info background */
+  --color-info-dark: oklch(0.68 0.16 270);     /* Dark info text */
+}
+
+/* ================================================================
+   6. DESIGN SYSTEM COLOR ASSIGNMENTS
+   Semantic mappings for consistent theming
+   ================================================================ */
+
+:root {
+  /* Core UI Colors (Light Mode) */
+  --background: oklch(1 0 0);                   /* Pure white */
+  --foreground: var(--gray-900);                /* Primary text */
+  --card: oklch(1 0 0);                         /* Card backgrounds */
+  --card-foreground: var(--gray-900);           /* Card text */
+  --popover: oklch(1 0 0);                      /* Popover backgrounds */
+  --popover-foreground: var(--gray-900);        /* Popover text */
+
+  /* Interactive Colors */
+  --primary: var(--primary-neon);               /* Primary buttons, links */
+  --primary-foreground: var(--primary-dark);    /* Text on primary */
+  --secondary: var(--primary-violet);           /* Secondary buttons */
+  --secondary-foreground: var(--gray-50);       /* Text on secondary */
+
+  /* Subtle UI Elements */
+  --muted: var(--gray-100);                     /* Muted backgrounds */
+  --muted-foreground: var(--gray-600);          /* Muted text */
+  --accent: var(--primary-violet);              /* Accent elements */
+  --accent-foreground: var(--gray-50);          /* Text on accent */
+
+  /* Feedback Colors */
+  --destructive: var(--color-error);            /* Destructive actions */
+  --destructive-foreground: oklch(0.985 0 0);   /* Text on destructive */
+
+  /* Form Elements */
+  --border: var(--gray-200);                    /* Default borders */
+  --input: var(--gray-200);                     /* Input borders */
+  --ring: var(--primary-violet);                /* Focus rings */
+}
+
+/* ================================================================
+   7. DARK MODE COLOR OVERRIDES
+   Complete dark theme implementation
+   ================================================================ */
+
+.dark {
+  /* Core UI Colors (Dark Mode) */
+  --background: var(--primary-dark);            /* Navy background */
+  --foreground: var(--gray-50);                 /* Light text */
+  --card: var(--gray-800);                      /* Card backgrounds */
+  --card-foreground: var(--gray-50);            /* Card text */
+  --popover: var(--gray-800);                   /* Popover backgrounds */
+  --popover-foreground: var(--gray-50);         /* Popover text */
+
+  /* Interactive Colors (Dark Mode) */
+  --primary: var(--primary-neon);               /* Neon green primary */
+  --primary-foreground: var(--primary-dark);    /* Dark text on neon */
+  --secondary: var(--gray-700);                 /* Muted secondary */
+  --secondary-foreground: var(--gray-50);       /* Light text on secondary */
+
+  /* Subtle UI Elements (Dark Mode) */
+  --muted: var(--gray-700);                     /* Muted backgrounds */
+  --muted-foreground: var(--gray-400);          /* Muted text */
+  --accent: var(--primary-violet);              /* Violet accent */
+  --accent-foreground: var(--gray-50);          /* Light text on accent */
+
+  /* Feedback Colors (Dark Mode) */
+  --destructive: oklch(0.62 0.2 20);            /* Adjusted for dark bg */
+  --destructive-foreground: var(--gray-50);     /* Light text on destructive */
+
+  /* Form Elements (Dark Mode) */
+  --border: var(--gray-700);                    /* Dark borders */
+  --input: var(--gray-700);                     /* Dark input borders */
+  --ring: var(--primary-neon);                  /* Neon focus rings */
+}
+
+/* ================================================================
+   8. TEXT COLOR HIERARCHY
+   Consistent text color system
+   ================================================================ */
+
+:root {
+  /* Text Color Tokens */
+  --text-primary: var(--gray-900);              /* Primary text color */
+  --text-secondary: var(--gray-600);            /* Secondary text color */
+  --text-muted: var(--gray-500);                /* Muted text color */
+  --text-disabled: var(--gray-400);             /* Disabled text color */
+  --text-inverse: var(--gray-50);               /* Inverse text (on dark) */
+  --text-accent: var(--primary-violet);         /* Accent text color */
+  --text-success: var(--color-success);         /* Success text color */
+  --text-warning: var(--color-warning);         /* Warning text color */
+  --text-error: var(--color-error);             /* Error text color */
+  --text-info: var(--color-info);               /* Info text color */
+}
+
+.dark {
+  /* Dark Mode Text Colors */
+  --text-primary: var(--gray-50);               /* Light primary text */
+  --text-secondary: var(--gray-300);            /* Light secondary text */
+  --text-muted: var(--gray-400);                /* Light muted text */
+  --text-disabled: var(--gray-600);             /* Light disabled text */
+  --text-inverse: var(--gray-900);              /* Dark text (on light) */
+  --text-accent: var(--primary-violet);         /* Violet accent text */
+  --text-success: var(--color-success-light);   /* Light success text */
+  --text-warning: var(--color-warning-light);   /* Light warning text */
+  --text-error: var(--color-error-light);       /* Light error text */
+  --text-info: var(--color-info-light);         /* Light info text */
+}
+
+/* ================================================================
+   9. CHART & DATA VISUALIZATION COLORS
+   Harmonious colors for charts and graphs
+   ================================================================ */
+
+:root {
+  /* Chart Color Palette */
+  --chart-1: var(--primary-neon);               /* Primary data series */
+  --chart-2: var(--primary-violet);             /* Secondary data series */
+  --chart-3: var(--color-info);                 /* Tertiary data series */
+  --chart-4: var(--color-success);              /* Quaternary data series */
+  --chart-5: var(--color-warning);              /* Quinary data series */
+  --chart-6: var(--gray-600);                   /* Additional series */
+  --chart-7: var(--violet-400);                 /* Additional series */
+  --chart-8: var(--neon-600);                   /* Additional series */
+}
+
+/* ================================================================
+   10. SPECIAL EFFECT COLORS
+   Colors for gradients, shadows, and special effects
+   ================================================================ */
+
+:root {
+  /* Gradient Colors */
+  --gradient-brand-start: var(--primary-violet); /* Brand gradient start */
+  --gradient-brand-end: var(--primary-neon);     /* Brand gradient end */
+  --gradient-hero-start: var(--gray-900);        /* Hero gradient start */
+  --gradient-hero-middle: var(--primary-violet); /* Hero gradient middle */
+  --gradient-hero-end: var(--primary-neon);      /* Hero gradient end */
+
+  /* Shadow Colors */
+  --shadow-color: oklch(0.26 0.08 258);          /* Base shadow color */
+  --shadow-neon: oklch(0.91 0.20 127 / 0.25);   /* Neon glow shadow */
+  --shadow-violet: oklch(0.67 0.25 286 / 0.25);  /* Violet glow shadow */
+
+  /* Overlay Colors */
+  --overlay-light: oklch(1 0 0 / 0.8);           /* Light overlay */
+  --overlay-dark: oklch(0.26 0.08 258 / 0.8);    /* Dark overlay */
+}
+
+/* ================================================================
+   11. NIGERIAN MARKET SPECIFIC COLORS
+   Colors that resonate with Nigerian culture and preferences
+   ================================================================ */
+
+:root {
+  /* Cultural Colors */
+  --color-nigerian-green: oklch(0.6 0.15 142);   /* Nigerian flag green */
+  --color-trust-blue: oklch(0.5 0.12 250);       /* Trust and reliability */
+  --color-prosperity-gold: oklch(0.8 0.15 85);   /* Prosperity and success */
+  --color-safety-orange: oklch(0.7 0.18 45);     /* Safety and attention */
+}
+
+/* ================================================================
+   12. ACCESSIBILITY ENHANCEMENTS
+   High contrast and accessible color variations
+   ================================================================ */
+
+@media (prefers-contrast: high) {
+  :root {
+    /* High Contrast Mode Adjustments */
+    --border: oklch(0.5 0 0);                     /* Stronger borders */
+    --ring: oklch(0.2 0 0);                       /* Stronger focus rings */
+    --text-muted: var(--gray-700);                /* Darker muted text */
+  }
+
+  .dark {
+    /* High Contrast Dark Mode */
+    --border: oklch(0.7 0 0);                     /* Lighter borders */
+    --ring: oklch(0.8 0 0);                       /* Lighter focus rings */
+    --text-muted: var(--gray-200);                /* Lighter muted text */
+  }
+}
+
+/* ================================================================
+   13. COLOR UTILITY CLASSES
+   Utility classes for direct color application
+   ================================================================ */
+
+@layer utilities {
+  /* Background Colors */
+  .bg-brand-dark { background-color: var(--color-brand-dark); }
+  .bg-brand-violet { background-color: var(--color-brand-violet); }
+  .bg-brand-neon { background-color: var(--color-brand-neon); }
+
+  /* Text Colors */
+  .text-brand-dark { color: var(--color-brand-dark); }
+  .text-brand-violet { color: var(--color-brand-violet); }
+  .text-brand-neon { color: var(--color-brand-neon); }
+
+  /* Status Colors */
+  .text-success { color: var(--color-success); }
+  .text-warning { color: var(--color-warning); }
+  .text-error { color: var(--color-error); }
+  .text-info { color: var(--color-info); }
+
+  .bg-success { background-color: var(--color-success); }
+  .bg-warning { background-color: var(--color-warning); }
+  .bg-error { background-color: var(--color-error); }
+  .bg-info { background-color: var(--color-info); }
+
+  /* Border Colors */
+  .border-brand-dark { border-color: var(--color-brand-dark); }
+  .border-brand-violet { border-color: var(--color-brand-violet); }
+  .border-brand-neon { border-color: var(--color-brand-neon); }
+
+  /* Gradient Backgrounds */
+  .bg-gradient-brand {
+    background: linear-gradient(135deg, var(--gradient-brand-start), var(--gradient-brand-end));
+  }
+
+  .bg-gradient-hero {
+    background: linear-gradient(135deg, var(--gradient-hero-start) 0%, var(--gradient-hero-middle) 50%, var(--gradient-hero-end) 100%);
+  }
+}

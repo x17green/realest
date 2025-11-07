@@ -54,8 +54,8 @@ export default function ContactPage() {
       icon: Mail,
       title: "Email Us",
       description: "Send us an email and we'll respond within 24 hours",
-      contact: "hello@realproof.com",
-      action: "mailto:hello@realproof.com",
+      contact: "hello@realest.ng",
+      action: "mailto:hello@realest.ng",
     },
     {
       icon: Phone,
@@ -76,7 +76,7 @@ export default function ContactPage() {
   const officeInfo = {
     address: "123 Property Street, Real Estate City, RC 12345",
     phone: "+1 (555) 123-4567",
-    email: "hello@realproof.com",
+    email: "hello@realest.ng",
     hours: "Monday - Friday: 9:00 AM - 6:00 PM EST",
   };
 
@@ -352,7 +352,7 @@ export default function ContactPage() {
               Frequently Asked Questions
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Quick answers to common questions about RealProof
+              Quick answers to common questions about RealEST
             </p>
           </div>
 

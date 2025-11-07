@@ -1,6 +1,6 @@
-# RealProof - Verified Real Estate Marketplace
+# RealEST - Vetted & Verified Property Marketplace
 
-A modern real estate marketplace that ensures data integrity through ML-powered document validation and physical vetting, eliminating duplicates and providing verified listings.
+Nigeria's premier property marketplace that revolutionizes real estate through geotag verification, ML-powered document validation, and physical vetting. Find Your Next Move with RealEST.
 
 ## Features
 
@@ -9,13 +9,15 @@ A modern real estate marketplace that ensures data integrity through ML-powered 
 - **Live Location Mapping**: Accurate geolocation for all properties
 - **Comprehensive Search**: Advanced filters and map-based search
 - **Role-Based Access**: Separate dashboards for property owners, buyers, and admins
-- **Scalable Architecture**: Built with Next.js 16, Supabase, and HeroUI v3
+- **Nigerian Market Focus**: Culturally-aware design with local property types and infrastructure
+- **Modern Design System**: Built with Next.js 16, Supabase, HeroUI v3, and RealEST design tokens
 
 ## Tech Stack
 
-- **Frontend**: Next.js 16, React 19, HeroUI v3, Tailwind CSS v4
+- **Frontend**: Next.js 16, React 19, HeroUI v3 (Primary), UntitledUI (Status), Tailwind CSS v4
 - **Backend**: Supabase (PostgreSQL, Auth, Storage, Realtime)
 - **Database**: PostgreSQL with PostGIS for geospatial data
+- **Design System**: RealEST OKLCH color system, 4-tier typography (Lufga, Neulis Neue, Space Grotesk, JetBrains Mono)
 - **Deployment**: Vercel (recommended)
 - **Version Control**: Git with Commitlint
 
@@ -32,7 +34,7 @@ A modern real estate marketplace that ensures data integrity through ML-powered 
 1. Clone the repository:
 ```bash
 git clone <repository-url>
-cd realproof-marketplace
+cd realest
 ```
 
 2. Install dependencies:
@@ -100,6 +102,34 @@ npm run dev
 
 2. Open [http://localhost:3000](http://localhost:3000) in your browser
 
+### Zed IDE Integration
+
+This project is optimized for Zed IDE with AI-powered development features:
+
+#### Context-Aware AI Assistant
+- **Design System Context**: Comprehensive design system documentation in `docs/zed-context-realest-design-system.md`
+- **Project Context**: Automatic context detection via `.zed_context` file
+- **MCP Servers**: Integrated HeroUI and Supabase documentation servers
+
+#### Available Tasks (Cmd+Shift+P → "task")
+- `dev` - Start development server
+- `build` - Build production version
+- `lint` - Run ESLint
+- `format` - Format code with Prettier
+- `type-check` - Run TypeScript validation
+- `supabase:start` - Start local Supabase
+- `supabase:generate-types` - Generate TypeScript types
+
+#### AI Assistant Features
+The Zed AI assistant automatically:
+- References RealEST design system guidelines
+- Suggests HeroUI v3 component implementations (70% usage)
+- Recommends UntitledUI for status components (25% usage)
+- Provides Supabase integration patterns
+- Maintains Nigerian market cultural sensitivity
+- Ensures brand color palette compliance (Navy #242834, Neon #B6FF00, Violet #7D53FF)
+- Applies 4-tier typography system (Display, Heading, Body, Mono)
+
 ### Building for Production
 
 ```bash
@@ -110,7 +140,7 @@ npm start
 ## Project Structure
 
 ```
-realproof-marketplace/
+realest/
 ├── app/                    # Next.js app directory
 │   ├── (auth)/            # Authentication routes
 │   ├── (dashboard)/       # Protected dashboard routes
@@ -167,11 +197,55 @@ npm run commit
 npm test
 ```
 
-3. Create a pull request with a clear description
+3. Reference design system guidelines in `docs/zed-context-realest-design-system.md`
+
+4. Use Zed AI assistant for context-aware development
+
+5. Create a pull request with a clear description
+
+### Design System Compliance
+
+All contributions must adhere to:
+- RealEST design system guidelines (docs/zed-context-realest-design-system.md)
+- Component library strategy: HeroUI (70%), UntitledUI (25%), Shadcn (5%)
+- OKLCH color system and 60-30-10 color usage rule
+- 4-tier typography hierarchy with proper font usage
+- Nigerian market cultural considerations
+- Accessibility standards (WCAG 2.1 AA)
+- Performance optimization guidelines
 
 ## License
 
 This project is licensed under the MIT License.
+
+## Design System
+
+RealEST uses a comprehensive design system built on:
+
+### Color System (OKLCH)
+- **Primary Dark**: #242834 (60% usage) - Navy foundation
+- **Primary Violet**: #7D53FF (30% usage) - Secondary accent  
+- **Primary Neon**: #B6FF00 (10% usage) - Primary accent/CTA
+
+### Typography Hierarchy
+- **Display**: Lufga - Hero sections and brand moments
+- **Heading**: Neulis Neue - Page titles and section headers
+- **Body**: Space Grotesk - Content, forms, and descriptions
+- **Mono**: JetBrains Mono - Data, coordinates, and technical info
+
+### Component Strategy
+- **HeroUI v3**: Primary components (buttons, cards, forms, navigation)
+- **UntitledUI**: Status components (badges, chips, alerts, progress)
+- **Shadcn/UI**: Complex patterns (data tables, specialized forms)
+
+### Nigerian Market Features
+- States and LGAs support
+- Boys Quarters (BQ) property type
+- Infrastructure indicators (power, water, internet)
+- Security features emphasis
+- Cultural sensitivity in messaging
+
+For complete design system documentation, see `docs/zed-context-realest-design-system.md`.
 
 ## Support
 
