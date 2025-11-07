@@ -474,7 +474,7 @@ function Phase2DemoContent() {
                 <div className="text-center">
                   <div className="text-3xl font-bold text-brand-neon">156</div>
                   <h4 className="font-semibold">Total Views</h4>
-                  <StatusDot status="success" />
+                  <StatusDot status="verified" />
                 </div>
               </div>
 
@@ -532,9 +532,9 @@ function Phase2DemoContent() {
             <div className="flex items-center justify-between">
               <div className="flex gap-2 flex-wrap">
                 <StatusBadge variant="info" interactive showIcon={false}>Gated Community</StatusBadge>
-                <StatusBadge variant="success" interactive showIcon={false}>NEPA</StatusBadge>
+                <StatusBadge variant="available" interactive showIcon={false}>NEPA</StatusBadge>
                 <StatusBadge variant="featured" interactive showIcon={false}>Water Supply</StatusBadge>
-                <StatusBadge variant="warning" interactive showIcon={false}>Good Roads</StatusBadge>
+                <StatusBadge variant="pending" interactive showIcon={false}>Good Roads</StatusBadge>
               </div>
               <div className="flex items-center gap-2">
                 <LoadingSpinner size="sm" color="violet" />
@@ -548,8 +548,8 @@ function Phase2DemoContent() {
         <footer className="text-center space-y-6 py-12 border-t border-border">
           <div className="flex items-center justify-center gap-4">
             <div className="font-display text-2xl font-bold text-brand-violet">RealEST</div>
-            <VerifiedBadge size="sm" />
-            <StatusBadge variant="success" size="sm">Phase 2 Complete</StatusBadge>
+            <VerifiedBadge size="sm">Verified</VerifiedBadge>
+            <StatusBadge variant="available" size="sm">Phase 2 Complete</StatusBadge>
           </div>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Phase 2 Component Library Integration successfully demonstrates the 70-25-5 strategy with

@@ -183,8 +183,8 @@ export default function DesignTestPage() {
             <div>
               <h3 className="text-h3 font-heading mb-4">Property Status</h3>
               <div className="flex flex-wrap gap-3">
-                <VerifiedBadge />
-                <PendingBadge />
+                <VerifiedBadge>Verified</VerifiedBadge>
+                <PendingBadge>Pending</PendingBadge>
                 <StatusBadge variant="rejected">Rejected</StatusBadge>
                 <StatusBadge variant="available">Available</StatusBadge>
                 <StatusBadge variant="rented">Rented</StatusBadge>
@@ -195,8 +195,8 @@ export default function DesignTestPage() {
             <div>
               <h3 className="text-h3 font-heading mb-4">Special Badges</h3>
               <div className="flex flex-wrap gap-3">
-                <NewBadge />
-                <FeaturedBadge />
+                <NewBadge>New</NewBadge>
+                <FeaturedBadge>Featured</FeaturedBadge>
                 <StatusBadge variant="info">Info</StatusBadge>
               </div>
             </div>
@@ -207,7 +207,7 @@ export default function DesignTestPage() {
                 <StatusBadge variant="available" showIcon={false}>BQ Available</StatusBadge>
                 <StatusBadge variant="info" showIcon={false}>Gated Community</StatusBadge>
                 <StatusBadge variant="featured" showIcon={false}>Power Included</StatusBadge>
-                <StatusBadge variant="success" showIcon={false}>Water Supply</StatusBadge>
+                <StatusBadge variant="info" showIcon={false}>Water Supply</StatusBadge>
               </div>
             </div>
           </div>
@@ -220,7 +220,7 @@ export default function DesignTestPage() {
             <div className="card-enhanced p-6 space-y-4">
               <div className="flex items-start justify-between">
                 <h3 className="text-h3 font-heading">Property Card</h3>
-                <VerifiedBadge size="sm" />
+                <VerifiedBadge size="sm">Verified</VerifiedBadge>
               </div>
               <p className="text-muted-foreground">
                 A beautiful 3-bedroom apartment in Lekki Phase 1 with modern amenities
@@ -234,7 +234,7 @@ export default function DesignTestPage() {
             <div className="bg-card border border-border rounded-xl p-6 space-y-4 hover:shadow-lg transition-all">
               <div className="flex items-start justify-between">
                 <h3 className="text-h3 font-heading">Standard Card</h3>
-                <FeaturedBadge size="sm" />
+                <FeaturedBadge size="sm">Featured</FeaturedBadge>
               </div>
               <p className="text-muted-foreground">
                 Standard card styling without enhanced hover effects
@@ -248,7 +248,7 @@ export default function DesignTestPage() {
             <div className="bg-gradient-brand p-6 rounded-xl text-white space-y-4">
               <div className="flex items-start justify-between">
                 <h3 className="text-h3 font-heading">Gradient Card</h3>
-                <NewBadge size="sm" />
+                <NewBadge size="sm">New</NewBadge>
               </div>
               <p className="text-white/90">
                 Card with brand gradient background for special promotions

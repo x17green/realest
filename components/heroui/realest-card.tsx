@@ -1,7 +1,6 @@
 'use client'
 
 import React from 'react'
-import { Card as HeroUICard } from '@heroui/react'
 import type { ComponentProps } from 'react'
 import { cn } from '@/lib/utils'
 import { RealEstButton } from './realest-button'
@@ -18,10 +17,12 @@ type RealEstCardVariant =
   | 'agent'         // Agent profile cards
   | 'listing'       // Property listing cards
 
-interface RealEstCardProps extends Omit<ComponentProps<typeof HeroUICard>, 'variant'> {
+interface RealEstCardProps extends ComponentProps<'div'> {
   variant?: RealEstCardVariant
   isInteractive?: boolean
   isHoverable?: boolean
+  children?: React.ReactNode
+  className?: string
 }
 
 const variantMap: Record<RealEstCardVariant, string> = {
@@ -46,12 +47,11 @@ export function RealEstCard({
   const mappedVariant = variantMap[variant] as any
 
   return (
-    <HeroUICard
-      variant={mappedVariant}
+    <div
       className={cn(
         // Base RealEST styling
         'font-body transition-all duration-300 ease-out',
-        'border border-border rounded-xl overflow-hidden',
+        'border border-border rounded-xl overflow-hidden bg-card',
 
         // Interactive states
         isHoverable && [
@@ -67,7 +67,7 @@ export function RealEstCard({
 
         // RealEST-specific variants
         variant === 'featured' && [
-          'border-brand-violet/30 bg-gradient-to-br from-brand-violet/5 to-brand-neon/5',
+          'border-brand-violet/30 bg-linear-to-br from-brand-violet/5 to-brand-neon/5',
           'shadow-md'
         ],
 
@@ -78,16 +78,20 @@ export function RealEstCard({
 
         variant === 'elevated' && [
           'shadow-lg border-brand-violet/20',
-          'bg-gradient-to-br from-card to-accent/10'
+          'bg-linear-to-br from-card to-accent/10'
         ],
 
         variant === 'property' && [
           'hover:shadow-xl hover:border-brand-violet/40',
-          'hover:bg-gradient-to-br hover:from-card hover:to-brand-violet/5'
+          'hover:bg-linear-to-br hover:from-card hover:to-brand-violet/5'
         ],
 
         variant === 'agent' && [
-          'border-brand-neon/20 bg-gradient-to-br from-card to-brand-neon/5'
+          'border-brand-neon/20 bg-linear-to-br from-card to-brand-neon/5'
+        ],
+
+        variant === 'transparent' && [
+          'bg-transparent border-transparent shadow-none'
         ],
 
         className
@@ -95,7 +99,7 @@ export function RealEstCard({
       {...props}
     >
       {children}
-    </HeroUICard>
+    </div>
   )
 }
 
@@ -145,7 +149,7 @@ export function PropertyCard({
       onClick={onView}
     >
       {/* Property Image */}
-      <div className="relative h-48 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800">
+      <div className="relative h-48 bg-linear-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800">
         {imageUrl ? (
           <img
             src={imageUrl}
@@ -160,8 +164,8 @@ export function PropertyCard({
 
         {/* Status Badges */}
         <div className="absolute top-4 left-4 flex flex-col gap-2">
-          {isVerified && <VerifiedBadge size="sm" />}
-          {isPending && <PendingBadge size="sm" />}
+          {isVerified && <VerifiedBadge size="sm">Verified</VerifiedBadge>}
+          {isPending && <PendingBadge size="sm">Pending</PendingBadge>}
           {badges.map((badge, index) => (
             <StatusBadge key={index} variant="info" size="sm" showIcon={false}>
               {badge}
@@ -197,16 +201,16 @@ export function PropertyCard({
       </div>
 
       {/* Property Details */}
-      <HeroUICard.Content className="p-6 space-y-4">
+      <div className="p-6 space-y-4">
         <div>
-          <HeroUICard.Header className="p-0 space-y-1">
-            <HeroUICard.Title className="text-lg font-heading font-semibold line-clamp-1">
+          <div className="p-0 space-y-1">
+            <h3 className="text-lg font-heading font-semibold line-clamp-1">
               {title}
-            </HeroUICard.Title>
-            <HeroUICard.Description className="text-sm text-muted-foreground">
+            </h3>
+            <p className="text-sm text-muted-foreground">
               📍 {location}
-            </HeroUICard.Description>
-          </HeroUICard.Header>
+            </p>
+          </div>
         </div>
 
         {/* Property Features */}
@@ -248,7 +252,7 @@ export function PropertyCard({
             )}
           </div>
         </div>
-      </HeroUICard.Content>
+      </div>
     </RealEstCard>
   )
 }
@@ -290,10 +294,10 @@ export function AgentCard({
       className={cn('max-w-sm w-full', className)}
       onClick={onViewProfile}
     >
-      <HeroUICard.Content className="p-6 text-center space-y-4">
+      <div className="p-6 text-center space-y-4">
         {/* Avatar */}
         <div className="relative inline-block">
-          <div className="w-20 h-20 mx-auto bg-gradient-to-br from-brand-violet to-brand-neon rounded-full flex items-center justify-center overflow-hidden">
+          <div className="w-20 h-20 mx-auto bg-linear-to-br from-brand-violet to-brand-neon rounded-full flex items-center justify-center overflow-hidden">
             {avatarUrl ? (
               <img
                 src={avatarUrl}
@@ -308,7 +312,7 @@ export function AgentCard({
           </div>
           {isVerified && (
             <div className="absolute -bottom-1 -right-1">
-              <VerifiedBadge size="sm" />
+              <VerifiedBadge size="sm">Verified</VerifiedBadge>
             </div>
           )}
         </div>
@@ -368,7 +372,7 @@ export function AgentCard({
             </RealEstButton>
           )}
         </div>
-      </HeroUICard.Content>
+      </div>
     </RealEstCard>
   )
 }
@@ -393,7 +397,7 @@ export function FeaturedPropertyCard({
       </div>
 
       {/* Property Image */}
-      <div className="relative h-48 bg-gradient-to-br from-brand-violet/20 to-brand-neon/20">
+      <div className="relative h-48 bg-linear-to-br from-brand-violet/20 to-brand-neon/20">
         {props.imageUrl ? (
           <img
             src={props.imageUrl}
@@ -408,7 +412,7 @@ export function FeaturedPropertyCard({
 
         {/* Verification Badges */}
         <div className="absolute top-4 left-4 flex flex-col gap-2">
-          <VerifiedBadge size="sm" />
+          <VerifiedBadge size="sm">Verified</VerifiedBadge>
           {props.badges?.map((badge, index) => (
             <StatusBadge key={index} variant="featured" size="sm" showIcon={false}>
               {badge}
@@ -434,16 +438,16 @@ export function FeaturedPropertyCard({
       </div>
 
       {/* Property Details with Premium Styling */}
-      <HeroUICard.Content className="p-6 space-y-4 bg-gradient-to-br from-card to-brand-violet/5">
+      <div className="p-6 space-y-4 bg-linear-to-br from-card to-brand-violet/5">
         <div>
-          <HeroUICard.Header className="p-0 space-y-1">
-            <HeroUICard.Title className="text-lg font-heading font-bold text-brand-violet line-clamp-1">
+          <div className="p-0 space-y-1">
+            <h3 className="text-lg font-heading font-bold text-brand-violet line-clamp-1">
               {props.title}
-            </HeroUICard.Title>
-            <HeroUICard.Description className="text-sm text-muted-foreground font-medium">
+            </h3>
+            <p className="text-sm text-muted-foreground font-medium">
               📍 {props.location}
-            </HeroUICard.Description>
-          </HeroUICard.Header>
+            </p>
+          </div>
         </div>
 
         {/* Property Features */}
@@ -478,7 +482,7 @@ export function FeaturedPropertyCard({
             )}
           </div>
         </div>
-      </HeroUICard.Content>
+      </div>
     </RealEstCard>
   )
 }

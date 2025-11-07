@@ -277,7 +277,7 @@ export function AlertBanner({
     <div className={cn(alertVariants({ variant }), className)} role="alert">
       <div className="flex items-start gap-3">
         {(icon || defaultIcon) && (
-          <span className="flex-shrink-0 text-base" aria-hidden="true">
+          <span className="shrink-0 text-base" aria-hidden="true">
             {icon || defaultIcon}
           </span>
         )}
@@ -290,7 +290,7 @@ export function AlertBanner({
         {dismissible && (
           <button
             onClick={onDismiss}
-            className="flex-shrink-0 text-lg opacity-70 hover:opacity-100 transition-opacity"
+            className="shrink-0 text-lg opacity-70 hover:opacity-100 transition-opacity"
             aria-label="Dismiss alert"
           >
             ×
@@ -339,7 +339,7 @@ export function VerificationProgress({
               <div className={cn(
                 'w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all',
                 isCompleted
-                  ? 'bg-success text-white'
+                  ? 'bg-color-success text-white'
                   : isCurrent
                     ? 'bg-brand-violet text-white animate-pulse'
                     : 'bg-muted text-muted-foreground'
@@ -348,7 +348,7 @@ export function VerificationProgress({
               </div>
               <span className={cn(
                 'text-sm font-medium',
-                isCompleted ? 'text-success' : isCurrent ? 'text-foreground' : 'text-muted-foreground'
+                isCompleted ? 'text-color-success' : isCurrent ? 'text-foreground' : 'text-muted-foreground'
               )}>
                 {stepName}
               </span>
@@ -359,7 +359,7 @@ export function VerificationProgress({
 
       <div className="w-full bg-muted rounded-full h-2">
         <div
-          className="bg-gradient-to-r from-brand-violet to-brand-neon h-2 rounded-full transition-all duration-500 ease-out"
+          className="bg-linear-to-r from-brand-violet to-brand-neon h-2 rounded-full transition-all duration-500 ease-out"
           style={{ width: `${(step / totalSteps) * 100}%` }}
         />
       </div>
@@ -381,17 +381,17 @@ export function AvailabilityIndicator({
 }: AvailabilityIndicatorProps) {
   const statusConfig = {
     available: {
-      color: 'success' as const,
+      color: 'verified' as const,
       label: 'Available Now',
       icon: '🟢'
     },
     pending: {
-      color: 'warning' as const,
+      color: 'pending' as const,
       label: 'Application Pending',
       icon: '🟡'
     },
     rented: {
-      color: 'default' as const,
+      color: 'offline' as const,
       label: 'Currently Rented',
       icon: '🔵'
     },
@@ -449,7 +449,7 @@ export function InfrastructureIndicator({
         {infrastructure.map((item) => (
           <div key={item.name} className="flex items-center gap-2">
             <StatusDot
-              status={item.available ? 'success' : 'offline'}
+              status={item.available ? 'verified' : 'offline'}
               size="xs"
             />
             <span className={cn(

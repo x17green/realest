@@ -228,8 +228,8 @@ export default function DesignShowcasePage() {
               <div className="card-enhanced p-6 space-y-4">
                 <h4 className="font-heading text-lg font-medium">Property Status</h4>
                 <div className="flex flex-wrap gap-2">
-                  <VerifiedBadge />
-                  <PendingBadge />
+                  <VerifiedBadge>Verified</VerifiedBadge>
+                  <PendingBadge>Pending</PendingBadge>
                   <StatusBadge variant="rejected">Rejected</StatusBadge>
                   <StatusBadge variant="available">Available</StatusBadge>
                   <StatusBadge variant="rented">Rented</StatusBadge>
@@ -241,8 +241,8 @@ export default function DesignShowcasePage() {
               <div className="card-enhanced p-6 space-y-4">
                 <h4 className="font-heading text-lg font-medium">Promotional</h4>
                 <div className="flex flex-wrap gap-2">
-                  <NewBadge />
-                  <FeaturedBadge />
+                  <NewBadge>New</NewBadge>
+                  <FeaturedBadge>Featured</FeaturedBadge>
                   <StatusBadge variant="info">Hot Deal</StatusBadge>
                   <StatusBadge variant="featured" className="animate-pulse">Premium</StatusBadge>
                 </div>
@@ -252,10 +252,10 @@ export default function DesignShowcasePage() {
               <div className="card-enhanced p-6 space-y-4">
                 <h4 className="font-heading text-lg font-medium">Nigerian Market</h4>
                 <div className="flex flex-wrap gap-2">
-                  <StatusBadge variant="success" showIcon={false}>BQ Available</StatusBadge>
+                  <StatusBadge variant="available" showIcon={false}>BQ Available</StatusBadge>
                   <StatusBadge variant="info" showIcon={false}>Gated Community</StatusBadge>
                   <StatusBadge variant="featured" showIcon={false}>Power Included</StatusBadge>
-                  <StatusBadge variant="success" showIcon={false}>Water Supply</StatusBadge>
+                  <StatusBadge variant="info" showIcon={false}>Water Supply</StatusBadge>
                 </div>
               </div>
             </div>
@@ -399,9 +399,9 @@ export default function DesignShowcasePage() {
               {/* Standard Property Card */}
               <div className="card-enhanced group cursor-pointer">
                 <div className="relative">
-                  <div className="bg-gradient-to-br from-gray-200 to-gray-300 h-48 rounded-t-xl"></div>
+                  <div className="bg-linear-to-br from-gray-200 to-gray-300 h-48 rounded-t-xl"></div>
                   <div className="absolute top-4 left-4">
-                    <VerifiedBadge size="sm" />
+                    <VerifiedBadge size="sm">Verified</VerifiedBadge>
                   </div>
                   <div className="absolute top-4 right-4">
                     <Button variant="ghost" size="icon-sm" className="bg-white/90 hover:bg-white">♥</Button>
@@ -435,7 +435,7 @@ export default function DesignShowcasePage() {
                 <div className="relative">
                   <div className="bg-white/20 h-48 rounded-t-xl"></div>
                   <div className="absolute top-4 left-4">
-                    <FeaturedBadge size="sm" />
+                    <FeaturedBadge size="sm">Featured</FeaturedBadge>
                   </div>
                   <div className="absolute top-4 right-4">
                     <Button variant="ghost" size="icon-sm" className="bg-white/10 hover:bg-white/20 text-white">♥</Button>
@@ -469,9 +469,9 @@ export default function DesignShowcasePage() {
               {/* Nigerian-Specific Property Card */}
               <div className="card-enhanced group cursor-pointer">
                 <div className="relative">
-                  <div className="bg-gradient-to-br from-green-200 to-green-300 h-48 rounded-t-xl"></div>
+                  <div className="bg-linear-to-br from-green-200 to-green-300 h-48 rounded-t-xl"></div>
                   <div className="absolute top-4 left-4">
-                    <PendingBadge size="sm" />
+                    <PendingBadge size="sm">Pending</PendingBadge>
                   </div>
                   <div className="absolute top-4 right-4">
                     <Button variant="ghost" size="icon-sm" className="bg-white/90 hover:bg-white">♥</Button>
@@ -480,7 +480,7 @@ export default function DesignShowcasePage() {
                     <StatusBadge variant="info" size="sm" showIcon={false}>Gated</StatusBadge>
                   </div>
                   <div className="absolute bottom-4 right-4">
-                    <StatusBadge variant="success" size="sm" showIcon={false}>Power</StatusBadge>
+                    <StatusBadge variant="available" size="sm" showIcon={false}>Power</StatusBadge>
                   </div>
                 </div>
                 <div className="p-6 space-y-4">
@@ -542,7 +542,7 @@ export default function DesignShowcasePage() {
               <div className="flex items-center justify-between mt-6">
                 <div className="flex gap-2">
                   <StatusBadge variant="info" interactive showIcon={false}>Gated Community</StatusBadge>
-                  <StatusBadge variant="success" interactive showIcon={false}>Power Included</StatusBadge>
+                  <StatusBadge variant="available" interactive showIcon={false}>Power Included</StatusBadge>
                   <StatusBadge variant="featured" interactive showIcon={false}>Water Supply</StatusBadge>
                 </div>
                 <div className="flex gap-3">
@@ -820,11 +820,11 @@ export default function DesignShowcasePage() {
                 </div>
                 <div className="flex items-center justify-center gap-8 mt-12 text-sm text-white/80">
                   <div className="flex items-center gap-2">
-                    <VerifiedBadge size="sm" />
+                    <VerifiedBadge size="sm">Verified</VerifiedBadge>
                     <span>Geo-Verified</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <StatusBadge variant="success" size="sm">10k+</StatusBadge>
+                    <StatusBadge variant="available" size="sm">10k+</StatusBadge>
                     <span>Properties</span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -919,11 +919,11 @@ export default function DesignShowcasePage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {Array.from({ length: 4 }, (_, i) => (
                     <div key={i} className="card-enhanced group cursor-pointer">
-                      <div className="bg-gradient-to-br from-gray-200 to-gray-300 h-40 rounded-t-xl"></div>
+                      <div className="bg-linear-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 h-40 rounded-t-xl"></div>
                       <div className="p-4 space-y-3">
                         <div className="flex items-start justify-between">
                           <h4 className="font-heading text-lg font-semibold">Property {i + 1}</h4>
-                          <VerifiedBadge size="sm" />
+                          <VerifiedBadge size="sm">Verified</VerifiedBadge>
                         </div>
                         <p className="text-sm text-muted-foreground">Location details</p>
                         <div className="flex items-center justify-between">
@@ -953,7 +953,7 @@ export default function DesignShowcasePage() {
           <div className="text-center space-y-6">
             <div className="flex items-center justify-center gap-4">
               <div className="font-display text-2xl font-bold text-brand-violet">RealEST</div>
-              <StatusBadge variant="success" size="sm">Design System v1.0</StatusBadge>
+              <StatusBadge variant="verified" size="sm">Design System v1.0</StatusBadge>
             </div>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               This showcase demonstrates the complete RealEST design system following the Conservative Professional Palette
