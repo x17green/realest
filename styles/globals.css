@@ -507,3 +507,123 @@
     display: none !important;
   }
 }
+
+/* ================================================================
+   SHOWCASE-SPECIFIC UTILITIES
+   Additional classes for the design system showcase page
+   ================================================================ */
+
+@layer utilities {
+  /* Text Gradient Utilities */
+  .text-gradient-brand {
+    background: linear-gradient(135deg, var(--primary-violet), var(--primary-neon));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .text-gradient-hero {
+    background: linear-gradient(135deg, var(--gray-900) 0%, var(--primary-violet) 50%, var(--primary-neon) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Card Hover Utilities */
+  .card-hover-lift {
+    transition: all var(--duration-normal) var(--ease-out);
+  }
+
+  .card-hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  /* Interactive Badge Utilities */
+  .badge-interactive {
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+
+  .badge-interactive:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* Backdrop Blur Utilities */
+  .backdrop-blur-light {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  /* Custom Focus Ring Colors */
+  .focus-neon:focus {
+    --ring: var(--primary-neon);
+  }
+
+  .focus-violet:focus {
+    --ring: var(--primary-violet);
+  }
+
+  /* Layout Grid Utilities */
+  .showcase-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-6);
+  }
+
+  .showcase-grid-dense {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: var(--space-4);
+  }
+
+  /* Content Width Utilities */
+  .content-narrow {
+    max-width: 65ch;
+  }
+
+  .content-wide {
+    max-width: 85ch;
+  }
+
+  /* Brand Color Background Utilities */
+  .bg-brand-gradient {
+    background: linear-gradient(135deg, var(--primary-violet), var(--primary-neon));
+  }
+
+  .bg-brand-gradient-subtle {
+    background: linear-gradient(135deg, var(--primary-violet)/10, var(--primary-neon)/10);
+  }
+
+  /* Animation Utilities */
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes glow {
+    from {
+      box-shadow: 0 0 5px var(--primary-neon)/50;
+    }
+    to {
+      box-shadow: 0 0 20px var(--primary-neon)/80, 0 0 30px var(--primary-neon)/40;
+    }
+  }
+
+  /* Responsive Text Utilities */
+  .text-responsive-sm {
+    font-size: clamp(0.875rem, 0.8rem + 0.375vw, 1rem);
+  }
+
+  .text-responsive-base {
+    font-size: clamp(1rem, 0.9rem + 0.5vw, 1.125rem);
+  }
+
+  .text-responsive-lg {
+    font-size: clamp(1.125rem, 1rem + 0.625vw, 1.25rem);
+  }
+
+  .text-responsive-xl {
+    font-size: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);
+  }
+}
