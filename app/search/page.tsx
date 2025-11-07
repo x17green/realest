@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { RealEstButton } from "@/components/heroui/realest-button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { AdvancedSearchForm } from "@/components/patterns/forms";
-import { Card, Input, Button, Chip, Progress } from "@heroui/react";
+import { Card, Input, Button, Chip } from "@heroui/react";
 import {
   MapPin,
   Bed,
@@ -48,7 +48,7 @@ interface Property {
   latitude: number | null;
   longitude: number | null;
   property_type: string;
-  listing_type: "sale" | "rent" | "lease";
+  listing_type: string;
   status: string;
   verification_status: "pending" | "verified" | "rejected";
   created_at: string;
@@ -147,7 +147,6 @@ function SearchPageContent() {
     const fetchProperties = async () => {
       setIsLoading(true);
       const supabase = createClient();
-
       let query = supabase
         .from("properties")
         .select(
@@ -326,7 +325,7 @@ function SearchPageContent() {
                     <Chip variant="secondary" className="text-xs">
                       For {property.listing_type}
                     </Chip>
-                    {property.days_listed < 7 && (
+                    {property.days_listed != 7 && (
                       <StatusBadge variant="new" size="sm">New</StatusBadge>
                     )}
                   </div>
@@ -445,7 +444,7 @@ function SearchPageContent() {
               {property.verification_status === 'verified' && <CheckCircle className="w-4 h-4" />}
               {property.verification_status === 'verified' ? 'Verified' : property.verification_status}
             </StatusBadge>
-            {property.days_listed < 7 && (
+            {property.days_listed != 7 && (
               <StatusBadge variant="new">New</StatusBadge>
             )}
           </div>
@@ -471,6 +470,7 @@ function SearchPageContent() {
               <div className="text-xs text-muted-foreground text-center">per month</div>
             )}
           </div>
+          <Button variant="primary">Search</Button>
         </div>
 
         {/* Content */}
@@ -503,7 +503,7 @@ function SearchPageContent() {
             {propertyDetails?.square_feet && (
               <div className="flex items-center gap-1">
                 <Ruler className="w-4 h-4" />
-                <span>{(propertyDetails.square_feet / 1000).toFixed(1)}k</span>
+                <span>{(propertyDetails.square_feet! / 1000).toFixed(1)}k</span>
               </div>
             )}
           </div>
@@ -544,7 +544,7 @@ function SearchPageContent() {
   return (
     <div className="min-h-screen bg-background">
       {/* Search Header */}
-      <div className="bg-gradient-to-r from-primary/5 to-accent/5 border-b border-border">
+      <div className="bg-linear-to-r from-primary/5 to-accent/5 border-b border-border">
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto">
             <h1 className="text-display-2 font-heading font-bold mb-6 text-center">
@@ -754,7 +754,7 @@ function SearchPageContent() {
               <div className="flex items-center justify-center gap-2 mt-12">
                 <RealEstButton
                   variant="outline"
-                  disabled={currentPage === 1}
+                  isDisabled={currentPage === 1}
                   onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                 >
                   Previous
@@ -781,7 +781,7 @@ function SearchPageContent() {
 
                 <RealEstButton
                   variant="outline"
-                  disabled={currentPage >= Math.ceil(totalCount / itemsPerPage)}
+                  isDisabled={currentPage >= Math.ceil(totalCount / itemsPerPage)}
                   onClick={() => setCurrentPage(prev => prev + 1)}
                 >
                   Next

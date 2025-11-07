@@ -33,7 +33,7 @@ import {
 } from '@/components/untitledui/status-components'
 import { StatusBadge, VerifiedBadge } from '@/components/ui/status-badge'
 
-function Phase2DemoContent() {
+export default function Phase2DemoContent() {
   const { theme, toggleTheme } = useRealEstTheme()
   const [toastVisible, setToastVisible] = useState(false)
   const [toastType, setToastType] = useState<'saved' | 'verified' | 'contact'>('saved')
@@ -575,13 +575,5 @@ function Phase2DemoContent() {
         </div>
       )}
     </div>
-  )
-}
-
-export default function Phase2DemoPage() {
-  return (
-    <RealEstThemeProvider defaultTheme="light">
-      <Phase2DemoContent />
-    </RealEstThemeProvider>
   )
 }
