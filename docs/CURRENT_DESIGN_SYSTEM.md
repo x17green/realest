@@ -10,7 +10,7 @@ The RealProof Marketplace represents a sophisticated real estate platform that h
 
 The project employs a unique **dual-library approach**:
 
-```realproof-marketplace/package.json#L15-17
+```realest/package.json#L15-17
 "@heroui/react": "^3.0.0-alpha.35",
 "@heroui/styles": "^3.0.0-alpha.35",
 ```
@@ -21,7 +21,7 @@ The project employs a unique **dual-library approach**:
 
 ### 2. **Technology Foundation**
 
-```realproof-marketplace/package.json#L45-47
+```realest/package.json#L45-47
 "next": "16.0.0",
 "react": "19.2.0",
 "tailwindcss": "^4.1.9",
@@ -37,7 +37,7 @@ The project employs a unique **dual-library approach**:
 
 ### 3. **Advanced Color Architecture**
 
-```realproof-marketplace/app/globals.css#L6-35
+```realest/app/globals.css#L6-35
 :root {
     --background: oklch(1 0 0);
     --foreground: oklch(0.145 0 0);
@@ -56,7 +56,7 @@ The project employs a unique **dual-library approach**:
 
 ### 4. **Three-Layer Design Token Structure**
 
-```realproof-marketplace/app/globals.css#L66-95
+```realest/app/globals.css#L66-95
 @theme inline {
     --font-sans: "Geist", "Geist Fallback";
     --color-background: var(--background);
@@ -75,7 +75,7 @@ The project employs a unique **dual-library approach**:
 
 ### 5. **Compound Component Pattern**
 
-```realproof-marketplace/components/ui/card.tsx#L32-67
+```realest/components/ui/card.tsx#L32-67
 function Card({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
@@ -98,7 +98,7 @@ function Card({ className, ...props }: React.ComponentProps<'div'>) {
 
 ### 6. **Variant-Driven Design**
 
-```realproof-marketplace/components/ui/button.tsx#L8-35
+```realest/components/ui/button.tsx#L8-35
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50...",
   {
@@ -129,7 +129,7 @@ const buttonVariants = cva(
 
 ### 7. **Modern CSS Architecture**
 
-```realproof-marketplace/app/globals.css#L1-4
+```realest/app/globals.css#L1-4
 @import "tailwindcss";
 @import "@heroui/styles";
 @import "tw-animate-css";
@@ -144,7 +144,7 @@ const buttonVariants = cva(
 
 ### 8. **Accessibility & Focus Management**
 
-```realproof-marketplace/components/ui/button.tsx#L8-10
+```realest/components/ui/button.tsx#L8-10
 "outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive"
 ```
 
@@ -158,7 +158,7 @@ const buttonVariants = cva(
 
 ### 9. **Visual Hierarchy & Brand Expression**
 
-```realproof-marketplace/components/hero-section.tsx#L48-52
+```realest/components/hero-section.tsx#L48-52
 <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-linear-to-r from-foreground via-foreground to-primary bg-clip-text text-transparent leading-tight">
   Find Your
   <br />
@@ -174,7 +174,7 @@ const buttonVariants = cva(
 
 ### 10. **Sophisticated Layout Systems**
 
-```realproof-marketplace/components/ui/card.tsx#L17-22
+```realest/components/ui/card.tsx#L17-22
 className={cn(
   '@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-2 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6',
   className,
@@ -191,7 +191,7 @@ className={cn(
 
 ### 11. **Optimization Strategy**
 
-```realproof-marketplace/lib/utils.ts#L1-5
+```realest/lib/utils.ts#L1-5
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 
@@ -208,7 +208,7 @@ export function cn(...inputs: ClassValue[]) {
 
 ### 12. **Component Configuration**
 
-```realproof-marketplace/components.json#L4-16
+```realest/components.json#L4-16
 {
   "style": "new-york",
   "rsc": true,
@@ -233,7 +233,7 @@ export function cn(...inputs: ClassValue[]) {
 
 ### 13. **Real-World Application Patterns**
 
-```realproof-marketplace/components/featured-properties.tsx#L88-105
+```realest/components/featured-properties.tsx#L88-105
 <Card.Root className="group h-full bg-background/80 backdrop-blur-lg border border-border/50 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer overflow-hidden">
   <div className="relative h-48 bg-muted rounded-t-2xl overflow-hidden">
     <div className="absolute inset-0 bg-linear-to-br from-slate-400 to-slate-600" />

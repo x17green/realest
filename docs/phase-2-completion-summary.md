@@ -151,7 +151,7 @@ A comprehensive demonstration showcasing:
 ## File Structure
 
 ```
-realproof-marketplace/
+realest/
 ├── components/
 │   ├── heroui/                    # 70% - Primary components
 │   │   ├── realest-button.tsx     # RealEST button system

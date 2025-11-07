@@ -163,7 +163,7 @@ A sophisticated single-page application demonstrating:
 ## Project Structure
 
 ```
-realproof-marketplace/
+realest/
 ├── app/
 │   ├── design-showcase/          # Comprehensive showcase page
 │   └── design-test/              # Simple test page

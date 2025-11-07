@@ -34,7 +34,7 @@ Nigeria's premier property marketplace that revolutionizes real estate through g
 1. Clone the repository:
 ```bash
 git clone <repository-url>
-cd realproof-marketplace
+cd realest
 ```
 
 2. Install dependencies:
@@ -140,7 +140,7 @@ npm start
 ## Project Structure
 
 ```
-realproof-marketplace/
+realest/
 ├── app/                    # Next.js app directory
 │   ├── (auth)/            # Authentication routes
 │   ├── (dashboard)/       # Protected dashboard routes

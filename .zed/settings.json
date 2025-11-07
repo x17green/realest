@@ -12,16 +12,20 @@
   },
   "context_servers": {
     "heroui": {
-      "type": "mcp",
-      "command": "heroui-mcp-server",
-      "args": [],
-      "description": "HeroUI v3 component documentation and examples"
+      "command": "npx",
+      "args": ["-y","@heroui/mcp"],
+      "source": "custom"
+    },
+    "heroui-react": {
+      "command": "npx",
+      "args": ["-y","@heroui/react-mcp@latest"],
+      "env": {},
+      "source": "custom"
     },
     "supabase": {
-      "type": "mcp",
-      "command": "supabase-mcp-server",
-      "args": [],
-      "description": "Supabase documentation and implementation patterns"
+      "command": "npx",
+      "args": ["-y","mcp-remote","https://mcp.supabase.com/mcp?project_ref=evlkccjtirecdxksoqmq"],
+      "source": "custom"
     }
   },
   "languages": {
@@ -174,7 +178,7 @@
   "seed_search_query_from_cursor": "always",
   "ui_font_size": 14,
   "buffer_font_size": 14,
-  "buffer_font_family": "JetBrains Mono",
+  "buffer_font_family": ".ZedMono",
   "theme": {
     "mode": "system",
     "light": "One Light",
