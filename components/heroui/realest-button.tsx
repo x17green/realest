@@ -10,6 +10,7 @@ type RealEstButtonVariant =
   | 'primary'      // Neon green - primary actions
   | 'secondary'    // Violet - secondary actions
   | 'tertiary'     // Outline - neutral actions
+  | 'outline'      // Alias for tertiary
   | 'ghost'        // Transparent - subtle actions
   | 'danger'       // Error red - destructive actions
   | 'neon'         // Custom neon variant
@@ -25,6 +26,7 @@ const variantMap: Record<RealEstButtonVariant, string> = {
   primary: 'primary',
   secondary: 'secondary',
   tertiary: 'tertiary',
+  outline: 'tertiary', // Alias for tertiary
   ghost: 'ghost',
   danger: 'danger',
   neon: 'primary',    // Maps to primary but with custom styling
@@ -66,7 +68,7 @@ export function RealEstButton({
           'disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none'
         ],
 
-        variant === 'tertiary' && [
+        (variant === 'tertiary' || variant === 'outline') && [
           'bg-transparent text-foreground border border-border',
           'hover:bg-accent hover:text-accent-foreground hover:border-brand-violet',
           'hover:shadow-sm hover:-translate-y-0.5',
