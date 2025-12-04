@@ -16,7 +16,7 @@ export default function SignUpSuccessPage() {
             Account Created!
           </Card.Title>
           <Card.Description>
-            Welcome to RealProof - where every property is verified
+            Welcome to RealEST - where every property is verified
           </Card.Description>
         </Card.Header>
 

@@ -129,7 +129,7 @@ export default function ProfileSetupPage() {
     {
       number: 2,
       title: "Account Type",
-      description: "How you'll use RealProof",
+      description: "How you'll use RealEST",
     },
     {
       number: 3,
@@ -189,7 +189,7 @@ export default function ProfileSetupPage() {
                     </Avatar.Fallback>
                   </Avatar.Root>
                   <p className="text-sm text-muted-foreground">
-                    This is how you'll appear on RealProof
+                    This is how you'll appear on RealEST
                   </p>
                 </div>
 
@@ -273,7 +273,7 @@ export default function ProfileSetupPage() {
               <div className="space-y-6">
                 <div className="text-center mb-6">
                   <h3 className="text-lg font-medium mb-2">
-                    How will you use RealProof?
+                    How will you use RealEST?
                   </h3>
                   <p className="text-muted-foreground">
                     Choose the option that best describes you

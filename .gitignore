@@ -28,3 +28,10 @@ next-env.d.ts
 
 # Backups
 /backups/*
+
+# Zed IDE - Include configuration files for team consistency
+# Include .zed/ directory for project configuration
+# Include .zed_context for AI assistant context
+# Exclude user-specific settings
+.zed/state.json
+.zed/recent_projects.json

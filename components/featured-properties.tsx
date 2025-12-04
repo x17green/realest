@@ -4,7 +4,16 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Card, Chip } from "@heroui/react";
 import Link from "next/link";
-import { MapPin, Bed, Bath, Ruler, Sparkles, TrendingUp } from "lucide-react";
+import {
+  MapPin,
+  Bed,
+  Bath,
+  Ruler,
+  Sparkles,
+  TrendingUp,
+  MapPinned,
+} from "lucide-react";
+import { VerificationBadge, PropertyStatusChip } from "@/components/realest";
 
 interface Property {
   id: string;
@@ -55,13 +64,13 @@ export default function FeaturedProperties() {
 
         <div className="relative z-10 container mx-auto px-4">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 bg-secondary/10 border border-secondary/20 rounded-full px-4 py-2 mb-6">
-              <Sparkles className="w-4 h-4 text-secondary" />
-              <span className="text-sm font-medium text-secondary">
-                Premium Properties
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20 rounded-full px-4 py-2 mb-6 backdrop-blur-sm">
+              <MapPinned className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                Geo-Verified Properties
               </span>
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-linear-to-r from-foreground via-foreground to-primary bg-clip-text text-transparent">
+            <h2 className="text-h1 font-bold mb-4 gradient-text-slanted">
               Featured Properties
             </h2>
           </div>
@@ -105,18 +114,21 @@ export default function FeaturedProperties() {
           </h2>
 
           {/* Subtitle */}
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Discover handpicked, verified properties that stand out from the
-            crowd.
+          <p className="text-body-l text-muted-foreground max-w-2xl mx-auto">
+            Discover handpicked, geo-verified properties with authentic location
+            data. No duplicates, only trusted listings.
           </p>
         </div>
 
         {properties.length === 0 ? (
           <div className="text-center py-12">
-            <div className="bg-background/80 backdrop-blur-lg border border-border/50 rounded-2xl p-8 max-w-md mx-auto">
-              <TrendingUp className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">
-                No verified properties available yet. Check back soon!
+            <div className="bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl p-8 max-w-md mx-auto shadow-lg">
+              <MapPinned className="w-12 h-12 text-primary mx-auto mb-4" />
+              <p className="text-body-m text-muted-foreground mb-2">
+                No geo-verified properties available yet.
+              </p>
+              <p className="text-body-s text-muted-foreground/80">
+                Check back soon for verified listings!
               </p>
             </div>
           </div>
@@ -124,42 +136,62 @@ export default function FeaturedProperties() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {properties.map((property) => (
               <Link key={property.id} href={`/property/${property.id}`}>
-                <Card.Root className="group h-full bg-background/80 backdrop-blur-lg border border-border/50 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer overflow-hidden">
+                <Card.Root className="property-card group h-full bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer overflow-hidden">
                   {/* Property Image */}
                   <div className="relative h-48 bg-muted rounded-t-2xl overflow-hidden">
-                    <div className="absolute inset-0 bg-linear-to-br from-slate-400 to-slate-600" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-accent/10 to-primary/30" />
                     {/* Overlay on hover */}
                     <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    {/* Badge */}
+
+                    {/* Verification Badge */}
+                    <div className="absolute top-3 left-3">
+                      <VerificationBadge
+                        status="geo-verified"
+                        size="sm"
+                        showTooltip={false}
+                      />
+                    </div>
+
+                    {/* Property Status */}
+                    <div className="absolute top-3 right-3">
+                      <PropertyStatusChip
+                        status="available"
+                        size="sm"
+                        showTooltip={false}
+                      />
+                    </div>
+
+                    {/* Listing Type Badge */}
                     <Chip
-                      variant="primary"
-                      className="absolute top-3 right-3 bg-primary text-primary-foreground font-semibold text-xs"
+                      variant="secondary"
+                      className="absolute bottom-3 left-3 bg-surface/90 backdrop-blur-sm border-border/50 text-xs"
                     >
                       {property.listing_type.replace("_", " ").toUpperCase()}
                     </Chip>
+
                     {/* Property Type Badge */}
                     <Chip
                       variant="secondary"
-                      className="absolute bottom-3 left-3 bg-background/90 backdrop-blur-sm border-border/50 text-xs"
+                      className="absolute bottom-3 right-3 bg-surface/90 backdrop-blur-sm border-border/50 text-xs"
                     >
                       {property.property_type}
                     </Chip>
                   </div>
 
                   <Card.Content className="p-6">
-                    <h3 className="font-bold text-lg line-clamp-2 mb-2 group-hover:text-primary transition-colors">
+                    <h3 className="text-h3 line-clamp-2 mb-2 group-hover:text-primary transition-colors">
                       {property.title}
                     </h3>
-                    <p className="text-2xl font-bold text-primary mb-3">
-                      £{property.price.toLocaleString()}
+                    <p className="text-h2 font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-3">
+                      ₦{property.price.toLocaleString()}
                     </p>
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground mb-4">
-                      <MapPin className="w-4 h-4 shrink-0" />
+                    <div className="flex items-center gap-1 text-body-s text-muted-foreground mb-4">
+                      <MapPin className="w-4 h-4 shrink-0 text-primary" />
                       <span className="line-clamp-1">
                         {property.address}, {property.city}
                       </span>
                     </div>
-                    <div className="flex gap-4 text-sm text-muted-foreground">
+                    <div className="flex gap-4 text-body-s text-muted-foreground">
                       {property.bedrooms > 0 && (
                         <div className="flex items-center gap-1">
                           <Bed className="w-4 h-4" />

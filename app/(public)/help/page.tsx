@@ -100,7 +100,7 @@ export default function HelpPage() {
         {
           question: "How do I contact customer support?",
           answer:
-            "You can reach us via email at support@realproof.com, through our contact form, or by phone during business hours.",
+            "You can reach us via email at support@realest.ng, through our contact form, or by phone during business hours.",
         },
       ],
     },
@@ -166,7 +166,7 @@ export default function HelpPage() {
             {/* Subtitle */}
             <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
               Find answers to common questions, get support, and learn how to
-              make the most of RealProof.
+              make the most of RealEST.
             </p>
 
             {/* Search */}
@@ -241,7 +241,7 @@ export default function HelpPage() {
               Frequently Asked Questions
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Find answers to the most common questions about RealProof
+              Find answers to the most common questions about RealEST
             </p>
           </div>
 

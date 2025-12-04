@@ -125,7 +125,7 @@ export default function SafetyPage() {
 
   const emergencyContacts = [
     {
-      title: "RealProof Support",
+      title: "RealEST Support",
       description: "24/7 emergency support for verified transactions",
       contact: "Emergency: +1 (555) 911-REAL",
       icon: Phone,
@@ -141,7 +141,7 @@ export default function SafetyPage() {
     {
       title: "General Support",
       description: "Regular customer support during business hours",
-      contact: "support@realproof.com",
+      contact: "support@realest.ng",
       icon: Mail,
       urgent: false,
     },

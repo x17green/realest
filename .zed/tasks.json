@@ -1,0 +1,347 @@
+[
+  {
+    "label": "dev",
+    "command": "npm",
+    "args": ["run", "dev"],
+    "group": "build",
+    "presentation": {
+      "echo": true,
+      "reveal": "always",
+      "focus": false,
+      "panel": "shared"
+    },
+    "options": {
+      "cwd": "${workspaceFolder}"
+    },
+    "detail": "Start Next.js development server",
+    "icon": "play",
+    "hide": false
+  },
+  {
+    "label": "build",
+    "command": "npm",
+    "args": ["run", "build"],
+    "group": "build",
+    "presentation": {
+      "echo": true,
+      "reveal": "always",
+      "focus": false,
+      "panel": "shared"
+    },
+    "options": {
+      "cwd": "${workspaceFolder}"
+    },
+    "detail": "Build production version of RealEST",
+    "icon": "package",
+    "hide": false
+  },
+  {
+    "label": "start",
+    "command": "npm",
+    "args": ["start"],
+    "group": "build",
+    "presentation": {
+      "echo": true,
+      "reveal": "always",
+      "focus": false,
+      "panel": "shared"
+    },
+    "options": {
+      "cwd": "${workspaceFolder}"
+    },
+    "detail": "Start production server",
+    "icon": "server",
+    "hide": false
+  },
+  {
+    "label": "lint",
+    "command": "npm",
+    "args": ["run", "lint"],
+    "group": "test",
+    "presentation": {
+      "echo": true,
+      "reveal": "always",
+      "focus": false,
+      "panel": "shared"
+    },
+    "options": {
+      "cwd": "${workspaceFolder}"
+    },
+    "detail": "Run ESLint on the codebase",
+    "icon": "check",
+    "hide": false
+  },
+  {
+    "label": "lint:fix",
+    "command": "npm",
+    "args": ["run", "lint", "--", "--fix"],
+    "group": "test",
+    "presentation": {
+      "echo": true,
+      "reveal": "always",
+      "focus": false,
+      "panel": "shared"
+    },
+    "options": {
+      "cwd": "${workspaceFolder}"
+    },
+    "detail": "Run ESLint with auto-fix",
+    "icon": "wrench",
+    "hide": false
+  },
+  {
+    "label": "type-check",
+    "command": "npx",
+    "args": ["tsc", "--noEmit"],
+    "group": "test",
+    "presentation": {
+      "echo": true,
+      "reveal": "always",
+      "focus": false,
+      "panel": "shared"
+    },
+    "options": {
+      "cwd": "${workspaceFolder}"
+    },
+    "detail": "Run TypeScript type checking",
+    "icon": "type",
+    "hide": false
+  },
+  {
+    "label": "format",
+    "command": "npx",
+    "args": ["prettier", "--write", "."],
+    "group": "test",
+    "presentation": {
+      "echo": true,
+      "reveal": "always",
+      "focus": false,
+      "panel": "shared"
+    },
+    "options": {
+      "cwd": "${workspaceFolder}"
+    },
+    "detail": "Format code with Prettier",
+    "icon": "paintbrush",
+    "hide": false
+  },
+  {
+    "label": "install",
+    "command": "npm",
+    "args": ["install"],
+    "group": "build",
+    "presentation": {
+      "echo": true,
+      "reveal": "always",
+      "focus": false,
+      "panel": "shared"
+    },
+    "options": {
+      "cwd": "${workspaceFolder}"
+    },
+    "detail": "Install npm dependencies",
+    "icon": "download",
+    "hide": false
+  },
+  {
+    "label": "clean",
+    "command": "rm",
+    "args": ["-rf", ".next", "node_modules/.cache"],
+    "group": "build",
+    "presentation": {
+      "echo": true,
+      "reveal": "always",
+      "focus": false,
+      "panel": "shared"
+    },
+    "options": {
+      "cwd": "${workspaceFolder}"
+    },
+    "detail": "Clean build cache and temporary files",
+    "icon": "trash",
+    "hide": false
+  },
+  {
+    "label": "supabase:start",
+    "command": "npx",
+    "args": ["supabase", "start"],
+    "group": "build",
+    "presentation": {
+      "echo": true,
+      "reveal": "always",
+      "focus": false,
+      "panel": "shared"
+    },
+    "options": {
+      "cwd": "${workspaceFolder}"
+    },
+    "detail": "Start local Supabase development server",
+    "icon": "database",
+    "hide": false
+  },
+  {
+    "label": "supabase:stop",
+    "command": "npx",
+    "args": ["supabase", "stop"],
+    "group": "build",
+    "presentation": {
+      "echo": true,
+      "reveal": "always",
+      "focus": false,
+      "panel": "shared"
+    },
+    "options": {
+      "cwd": "${workspaceFolder}"
+    },
+    "detail": "Stop local Supabase development server",
+    "icon": "stop",
+    "hide": false
+  },
+  {
+    "label": "supabase:reset",
+    "command": "npx",
+    "args": ["supabase", "db", "reset"],
+    "group": "build",
+    "presentation": {
+      "echo": true,
+      "reveal": "always",
+      "focus": false,
+      "panel": "shared"
+    },
+    "options": {
+      "cwd": "${workspaceFolder}"
+    },
+    "detail": "Reset local Supabase database",
+    "icon": "refresh",
+    "hide": false
+  },
+  {
+    "label": "supabase:generate-types",
+    "command": "sh",
+    "args": [
+      "-c",
+      "npx supabase gen types typescript --local > lib/supabase/types.ts"
+    ],
+    "group": "build",
+    "presentation": {
+      "echo": true,
+      "reveal": "always",
+      "focus": false,
+      "panel": "shared"
+    },
+    "options": {
+      "cwd": "${workspaceFolder}"
+    },
+    "detail": "Generate TypeScript types from Supabase schema",
+    "icon": "code",
+    "hide": false
+  },
+  {
+    "label": "db:migrate",
+    "command": "npx",
+    "args": ["supabase", "db", "push"],
+    "group": "build",
+    "presentation": {
+      "echo": true,
+      "reveal": "always",
+      "focus": false,
+      "panel": "shared"
+    },
+    "options": {
+      "cwd": "${workspaceFolder}"
+    },
+    "detail": "Apply database migrations to remote Supabase",
+    "icon": "upload",
+    "hide": false
+  },
+  {
+    "label": "deploy:vercel",
+    "command": "npx",
+    "args": ["vercel", "--prod"],
+    "group": "build",
+    "presentation": {
+      "echo": true,
+      "reveal": "always",
+      "focus": false,
+      "panel": "shared"
+    },
+    "options": {
+      "cwd": "${workspaceFolder}"
+    },
+    "detail": "Deploy to Vercel production",
+    "icon": "rocket",
+    "hide": false
+  },
+  {
+    "label": "commit",
+    "command": "npm",
+    "args": ["run", "commit"],
+    "group": "git",
+    "presentation": {
+      "echo": true,
+      "reveal": "always",
+      "focus": false,
+      "panel": "shared"
+    },
+    "options": {
+      "cwd": "${workspaceFolder}"
+    },
+    "detail": "Interactive commit with commitizen",
+    "icon": "git-commit",
+    "hide": false
+  },
+  {
+    "label": "analyze:bundle",
+    "command": "npx",
+    "args": ["@next/bundle-analyzer"],
+    "group": "test",
+    "presentation": {
+      "echo": true,
+      "reveal": "always",
+      "focus": false,
+      "panel": "shared"
+    },
+    "options": {
+      "cwd": "${workspaceFolder}"
+    },
+    "detail": "Analyze bundle size and dependencies",
+    "icon": "graph",
+    "hide": false
+  },
+  {
+    "label": "docs:serve",
+    "command": "npx",
+    "args": ["http-server", "docs", "-p", "3001"],
+    "group": "build",
+    "presentation": {
+      "echo": true,
+      "reveal": "always",
+      "focus": false,
+      "panel": "shared"
+    },
+    "options": {
+      "cwd": "${workspaceFolder}"
+    },
+    "detail": "Serve documentation locally",
+    "icon": "book",
+    "hide": false
+  },
+  {
+    "label": "realest:setup",
+    "command": "npm",
+    "args": ["install"],
+    "group": "build",
+    "presentation": {
+      "echo": true,
+      "reveal": "always",
+      "focus": false,
+      "panel": "shared"
+    },
+    "options": {
+      "cwd": "${workspaceFolder}"
+    },
+    "detail": "Setup RealEST project (install dependencies)",
+    "icon": "gear",
+    "hide": false
+  }
+]

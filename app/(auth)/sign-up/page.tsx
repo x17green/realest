@@ -61,7 +61,7 @@ export default function SignUpPage() {
       }
 
       if (data.user) {
-        router.push("/auth/sign-up-success");
+        router.push("/sign-up-success");
       }
     } catch (err) {
       setError("An unexpected error occurred");
@@ -76,7 +76,7 @@ export default function SignUpPage() {
         <Card.Root className="w-full max-w-md">
           <Card.Header className="text-center">
             <Card.Title className="text-2xl font-bold">
-              Join RealProof
+              Join RealEST
             </Card.Title>
             <Card.Description>
               Choose your account type to get started

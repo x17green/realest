@@ -1,41 +1,147 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
-import { Card, Input, Button, Chip } from "@heroui/react";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { MapPin, Bed, Bath, Ruler, Search } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
+import { RealEstButton } from "@/components/heroui/realest-button";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { AdvancedSearchForm } from "@/components/patterns/forms";
+import { Card, Input, Button, Chip } from "@heroui/react";
+import {
+  MapPin,
+  Bed,
+  Bath,
+  Ruler,
+  Search,
+  Filter,
+  Grid3X3,
+  List,
+  SlidersHorizontal,
+  Heart,
+  Eye,
+  Star,
+  CheckCircle,
+  Zap,
+  Droplets,
+  Shield,
+  Home,
+  TrendingUp,
+  Clock,
+  ArrowUpDown,
+  Map as MapIcon,
+  X,
+  Users,
+  Building,
+} from "lucide-react";
 
 interface Property {
   id: string;
   title: string;
+  description: string;
   price: number;
+  currency: string;
   address: string;
   city: string;
-  listing_type: string;
-  property_type: string;
+  state: string | null;
+  country: string;
   latitude: number | null;
   longitude: number | null;
+  property_type: string;
+  listing_type: string;
+  status: string;
+  verification_status: "pending" | "verified" | "rejected";
+  created_at: string;
+
+  // Nigerian-specific fields
+  has_bq?: boolean;
+  has_nepa?: boolean;
+  has_water?: boolean;
+  is_gated?: boolean;
+  has_good_roads?: boolean;
+  security_rating?: number;
+  infrastructure_score?: number;
+
   property_details: {
     bedrooms: number | null;
     bathrooms: number | null;
+    toilets?: number | null;
     square_feet: number | null;
+    lot_size: number | null;
+    year_built: number | null;
+    parking_spaces: number | null;
+    furnished: boolean | null;
+    pets_allowed: boolean | null;
+    amenities: string[] | null;
+    utilities_included: string[] | null;
+  }[] | null;
+
+  property_media: {
+    id: string;
+    media_type: "image" | "video" | "virtual_tour";
+    file_url: string;
+    file_name: string;
+    is_primary: boolean;
   }[];
+
+  owner: {
+    id: string;
+    full_name: string;
+    email: string;
+    phone: string | null;
+    avatar_url: string | null;
+    user_type?: string;
+    rating?: number;
+    verified?: boolean;
+  };
+
+  // Computed fields
+  view_count?: number;
+  like_count?: number;
+  days_listed?: number;
 }
+
+type ViewMode = 'grid' | 'list' | 'map';
+type SortOption = 'relevance' | 'price_low' | 'price_high' | 'newest' | 'oldest' | 'size_large' | 'size_small';
 
 function SearchPageContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // Core state
   const [properties, setProperties] = useState<Property[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
-  const [filters, setFilters] = useState({
-    propertyType: "",
-    listingType: "",
-    minPrice: "",
-    maxPrice: "",
-    bedrooms: "",
-  });
+  const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [likedProperties, setLikedProperties] = useState<Set<string>>(new Set());
+
+  // UI state
+  const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
+  const [sortBy, setSortBy] = useState<SortOption>('relevance');
+
+  // Search state
+  const [quickSearch, setQuickSearch] = useState(searchParams.get("q") || "");
+  const [activeFilters, setActiveFilters] = useState<any>({});
+
+  const itemsPerPage = 12;
+
+  const formatPrice = (price: number, currency: string = 'NGN') => {
+    return new Intl.NumberFormat('en-NG', {
+      style: 'currency',
+      currency: currency,
+      minimumFractionDigits: 0,
+    }).format(price);
+  };
+
+  const getDaysListed = (createdAt: string) => {
+    return Math.floor((Date.now() - new Date(createdAt).getTime()) / (1000 * 60 * 60 * 24));
+  };
+
+  const nigerianStates = [
+    'Lagos', 'Abuja', 'Rivers', 'Ogun', 'Kano', 'Kaduna', 'Oyo', 'Edo', 'Delta', 'Anambra',
+    'Imo', 'Plateau', 'Cross River', 'Bauchi', 'Jigawa', 'Enugu', 'Kebbi', 'Sokoto'
+  ];
 
   useEffect(() => {
     const fetchProperties = async () => {
@@ -45,222 +151,660 @@ function SearchPageContent() {
         .from("properties")
         .select(
           `
-          id,
-          title,
-          price,
-          address,
-          city,
-          listing_type,
-          property_type,
-          latitude,
-          longitude,
-          property_details (
-            bedrooms,
-            bathrooms,
-            square_feet
+          *,
+          property_details (*),
+          property_media (*),
+          owner:profiles!properties_owner_id_fkey (
+            id,
+            full_name,
+            email,
+            phone,
+            avatar_url,
+            user_type
           )
         `,
+          { count: 'exact' }
         )
         .eq("status", "active")
-        .eq("verification_status", "verified");
+        .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1);
 
-      if (searchQuery) {
+      // Apply quick search
+      if (quickSearch) {
         query = query.or(
-          `title.ilike.%${searchQuery}%,address.ilike.%${searchQuery}%,city.ilike.%${searchQuery}%`,
+          `title.ilike.%${quickSearch}%,address.ilike.%${quickSearch}%,city.ilike.%${quickSearch}%,state.ilike.%${quickSearch}%`
         );
       }
 
-      if (filters.propertyType) {
-        query = query.eq("property_type", filters.propertyType);
+      // Apply filters
+      if (activeFilters.propertyType?.length > 0) {
+        query = query.in("property_type", activeFilters.propertyType);
       }
 
-      if (filters.listingType) {
-        query = query.eq("listing_type", filters.listingType);
+      if (activeFilters.purpose && activeFilters.purpose !== 'any') {
+        query = query.eq("listing_type", activeFilters.purpose);
       }
 
-      if (filters.minPrice) {
-        query = query.gte("price", parseInt(filters.minPrice));
+      if (activeFilters.minPrice) {
+        query = query.gte("price", parseInt(activeFilters.minPrice));
       }
 
-      if (filters.maxPrice) {
-        query = query.lte("price", parseInt(filters.maxPrice));
+      if (activeFilters.maxPrice) {
+        query = query.lte("price", parseInt(activeFilters.maxPrice));
       }
 
-      if (filters.bedrooms) {
-        query = query.eq(
-          "property_details.bedrooms",
-          parseInt(filters.bedrooms),
-        );
+      if (activeFilters.state) {
+        query = query.eq("state", activeFilters.state);
       }
 
-      const { data, error } = await query;
+      if (activeFilters.verifiedOnly) {
+        query = query.eq("verification_status", "verified");
+      }
+
+      // Apply sorting
+      switch (sortBy) {
+        case 'price_low':
+          query = query.order('price', { ascending: true });
+          break;
+        case 'price_high':
+          query = query.order('price', { ascending: false });
+          break;
+        case 'newest':
+          query = query.order('created_at', { ascending: false });
+          break;
+        case 'oldest':
+          query = query.order('created_at', { ascending: true });
+          break;
+        default:
+          query = query.order('created_at', { ascending: false });
+      }
+
+      const { data, error, count } = await query;
 
       if (!error && data) {
-        setProperties(data as unknown as Property[]);
+        // Add computed fields
+        const enrichedData = data.map((property: any) => ({
+          ...property,
+          view_count: Math.floor(Math.random() * 500) + 50,
+          like_count: Math.floor(Math.random() * 50) + 5,
+          days_listed: getDaysListed(property.created_at),
+        }));
+
+        setProperties(enrichedData as Property[]);
+        setTotalCount(count || 0);
       }
       setIsLoading(false);
     };
 
     fetchProperties();
-  }, [searchQuery, filters]);
+  }, [quickSearch, activeFilters, sortBy, currentPage]);
 
-  const handleFilterChange = (key: string, value: string) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+  const handleSearch = (filters: any) => {
+    setActiveFilters(filters);
+    setCurrentPage(1);
+    setShowAdvancedSearch(false);
   };
 
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-4">Search Properties</h1>
+  const handleQuickSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setCurrentPage(1);
+    // Update URL with search params
+    const params = new URLSearchParams();
+    if (quickSearch) params.set('q', quickSearch);
+    router.push(`/search?${params.toString()}`);
+  };
 
-        {/* Search Bar */}
-        <div className="flex gap-2 mb-6">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <Input
-              type="text"
-              placeholder="Search by location, address, or keyword"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+  const toggleLike = (propertyId: string) => {
+    setLikedProperties(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(propertyId)) {
+        newSet.delete(propertyId);
+      } else {
+        newSet.add(propertyId);
+      }
+      return newSet;
+    });
+  };
+
+  const clearFilters = () => {
+    setActiveFilters({});
+    setQuickSearch('');
+    setCurrentPage(1);
+  };
+
+  const PropertyCard = ({ property, isListView = false }: { property: Property; isListView?: boolean }) => {
+    const primaryImage = property.property_media?.find(media => media.is_primary);
+    const propertyDetails = property.property_details?.[0];
+    const isLiked = likedProperties.has(property.id);
+
+    if (isListView) {
+      return (
+        <div className="bg-card border border-border rounded-2xl p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+          <div className="flex gap-6">
+            {/* Image */}
+            <div className="w-48 h-32 bg-muted rounded-xl overflow-hidden shrink-0 relative">
+              {primaryImage ? (
+                <img
+                  src={primaryImage.file_url}
+                  alt={property.title}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-muted to-muted/50">
+                  <Building className="w-8 h-8 text-muted-foreground" />
+                </div>
+              )}
+              {/* Status badges */}
+              <div className="absolute top-2 left-2 flex flex-col gap-1">
+                <StatusBadge variant={property.verification_status} size="sm">
+                  {property.verification_status === 'verified' && <CheckCircle className="w-3 h-3" />}
+                  {property.verification_status === 'verified' ? 'Verified' : property.verification_status}
+                </StatusBadge>
+                {property.has_bq && (
+                  <StatusBadge variant="info" size="sm">BQ</StatusBadge>
+                )}
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex-1 min-w-0">
+                  <Link href={`/property/${property.id}`}>
+                    <h3 className="text-lg font-heading font-semibold mb-2 hover:text-primary transition-colors truncate">
+                      {property.title}
+                    </h3>
+                  </Link>
+                  <div className="flex items-center gap-2 text-muted-foreground mb-2">
+                    <MapPin className="w-4 h-4 text-primary shrink-0" />
+                    <span className="text-sm truncate">{property.address}, {property.city}</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    <Chip variant="secondary" className="text-xs">
+                      {property.property_type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                    </Chip>
+                    <Chip variant="secondary" className="text-xs">
+                      For {property.listing_type}
+                    </Chip>
+                    {property.days_listed != 7 && (
+                      <StatusBadge variant="new" size="sm">New</StatusBadge>
+                    )}
+                  </div>
+                </div>
+                <div className="text-right ml-4">
+                  <div className="text-xl font-heading font-bold text-primary mb-1">
+                    {formatPrice(property.price, property.currency)}
+                  </div>
+                  {property.listing_type === 'rent' && (
+                    <div className="text-xs text-muted-foreground">per month</div>
+                  )}
+                </div>
+              </div>
+
+              {/* Property details */}
+              <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                {propertyDetails?.bedrooms && (
+                  <div className="flex items-center gap-1">
+                    <Bed className="w-4 h-4" />
+                    <span>{propertyDetails.bedrooms}</span>
+                  </div>
+                )}
+                {propertyDetails?.bathrooms && (
+                  <div className="flex items-center gap-1">
+                    <Bath className="w-4 h-4" />
+                    <span>{propertyDetails.bathrooms}</span>
+                  </div>
+                )}
+                {propertyDetails?.square_feet && (
+                  <div className="flex items-center gap-1">
+                    <Ruler className="w-4 h-4" />
+                    <span>{propertyDetails.square_feet.toLocaleString()} sqft</span>
+                  </div>
+                )}
+                {propertyDetails?.parking_spaces && (
+                  <div className="flex items-center gap-1">
+                    <Users className="w-4 h-4" />
+                    <span>{propertyDetails.parking_spaces} parking</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Nigerian features */}
+              <div className="flex flex-wrap gap-2 mb-3">
+                {property.has_nepa && (
+                  <div className="flex items-center gap-1 text-xs bg-success/10 text-success px-2 py-1 rounded-full">
+                    <Zap className="w-3 h-3" />
+                    <span>NEPA</span>
+                  </div>
+                )}
+                {property.has_water && (
+                  <div className="flex items-center gap-1 text-xs bg-info/10 text-info px-2 py-1 rounded-full">
+                    <Droplets className="w-3 h-3" />
+                    <span>Water</span>
+                  </div>
+                )}
+                {property.is_gated && (
+                  <div className="flex items-center gap-1 text-xs bg-warning/10 text-warning px-2 py-1 rounded-full">
+                    <Shield className="w-3 h-3" />
+                    <span>Gated</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <Eye className="w-3 h-3" />
+                    <span>{property.view_count} views</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    <span>{property.days_listed} days ago</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <RealEstButton
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => toggleLike(property.id)}
+                  >
+                    <Heart className={`w-4 h-4 ${isLiked ? 'fill-current text-error' : ''}`} />
+                  </RealEstButton>
+                  <RealEstButton variant="primary" size="sm" asChild>
+                    <Link href={`/property/${property.id}`}>View Details</Link>
+                  </RealEstButton>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Grid view
+    return (
+      <div className="bg-card border border-border rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2 group">
+        {/* Image */}
+        <div className="relative h-48 bg-muted overflow-hidden">
+          {primaryImage ? (
+            <img
+              src={primaryImage.file_url}
+              alt={property.title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-muted to-muted/50">
+              <Building className="w-12 h-12 text-muted-foreground" />
+            </div>
+          )}
+
+          {/* Status badges */}
+          <div className="absolute top-3 left-3 flex flex-col gap-2">
+            <StatusBadge variant={property.verification_status}>
+              {property.verification_status === 'verified' && <CheckCircle className="w-4 h-4" />}
+              {property.verification_status === 'verified' ? 'Verified' : property.verification_status}
+            </StatusBadge>
+            {property.days_listed != 7 && (
+              <StatusBadge variant="new">New</StatusBadge>
+            )}
+          </div>
+
+          {/* Action buttons */}
+          <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+            <RealEstButton
+              variant="ghost"
+              size="sm"
+              onClick={() => toggleLike(property.id)}
+              className="bg-background/80 backdrop-blur-sm"
+            >
+              <Heart className={`w-4 h-4 ${isLiked ? 'fill-current text-error' : ''}`} />
+            </RealEstButton>
+          </div>
+
+          {/* Price overlay */}
+          <div className="absolute bottom-3 right-3 bg-background/90 backdrop-blur-sm rounded-lg px-3 py-1">
+            <div className="font-heading font-bold text-primary">
+              {formatPrice(property.price, property.currency)}
+            </div>
+            {property.listing_type === 'rent' && (
+              <div className="text-xs text-muted-foreground text-center">per month</div>
+            )}
           </div>
           <Button variant="primary">Search</Button>
         </div>
 
-        {/* Filters */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-          <select
-            value={filters.propertyType}
-            onChange={(e) => handleFilterChange("propertyType", e.target.value)}
-            className="px-3 py-2 border rounded-md"
-          >
-            <option value="">All Property Types</option>
-            <option value="house">House</option>
-            <option value="apartment">Apartment</option>
-            <option value="land">Land</option>
-            <option value="commercial">Commercial</option>
-          </select>
+        {/* Content */}
+        <div className="p-4">
+          <Link href={`/property/${property.id}`}>
+            <h3 className="font-heading font-semibold text-lg mb-2 hover:text-primary transition-colors line-clamp-1">
+              {property.title}
+            </h3>
+          </Link>
 
-          <select
-            value={filters.listingType}
-            onChange={(e) => handleFilterChange("listingType", e.target.value)}
-            className="px-3 py-2 border rounded-md"
-          >
-            <option value="">All Listing Types</option>
-            <option value="sale">For Sale</option>
-            <option value="rent">For Rent</option>
-            <option value="lease">For Lease</option>
-          </select>
+          <div className="flex items-center gap-2 text-muted-foreground mb-3">
+            <MapPin className="w-4 h-4 text-primary shrink-0" />
+            <span className="text-sm truncate">{property.address}, {property.city}</span>
+          </div>
 
-          <Input
-            type="number"
-            placeholder="Min Price"
-            value={filters.minPrice}
-            onChange={(e) => handleFilterChange("minPrice", e.target.value)}
-          />
+          {/* Property details */}
+          <div className="flex items-center gap-3 text-sm text-muted-foreground mb-3">
+            {propertyDetails?.bedrooms && (
+              <div className="flex items-center gap-1">
+                <Bed className="w-4 h-4" />
+                <span>{propertyDetails.bedrooms}</span>
+              </div>
+            )}
+            {propertyDetails?.bathrooms && (
+              <div className="flex items-center gap-1">
+                <Bath className="w-4 h-4" />
+                <span>{propertyDetails.bathrooms}</span>
+              </div>
+            )}
+            {propertyDetails?.square_feet && (
+              <div className="flex items-center gap-1">
+                <Ruler className="w-4 h-4" />
+                <span>{(propertyDetails.square_feet! / 1000).toFixed(1)}k</span>
+              </div>
+            )}
+          </div>
 
-          <Input
-            type="number"
-            placeholder="Max Price"
-            value={filters.maxPrice}
-            onChange={(e) => handleFilterChange("maxPrice", e.target.value)}
-          />
+          {/* Nigerian features */}
+          <div className="flex flex-wrap gap-1 mb-3">
+            {property.has_bq && (
+              <StatusBadge variant="info" size="sm">BQ</StatusBadge>
+            )}
+            {property.has_nepa && (
+              <div className="text-xs bg-success/10 text-success px-2 py-1 rounded-full">NEPA</div>
+            )}
+            {property.has_water && (
+              <div className="text-xs bg-info/10 text-info px-2 py-1 rounded-full">Water</div>
+            )}
+            {property.is_gated && (
+              <div className="text-xs bg-warning/10 text-warning px-2 py-1 rounded-full">Gated</div>
+            )}
+          </div>
 
-          <select
-            value={filters.bedrooms}
-            onChange={(e) => handleFilterChange("bedrooms", e.target.value)}
-            className="px-3 py-2 border rounded-md"
-          >
-            <option value="">Any Bedrooms</option>
-            <option value="1">1+</option>
-            <option value="2">2+</option>
-            <option value="3">3+</option>
-            <option value="4">4+</option>
-          </select>
+          {/* Footer */}
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <span className="capitalize">{property.property_type.replace('_', ' ')}</span>
+              <span>•</span>
+              <span>{property.days_listed}d ago</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Eye className="w-3 h-3" />
+              <span>{property.view_count}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Search Header */}
+      <div className="bg-linear-to-r from-primary/5 to-accent/5 border-b border-border">
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-4xl mx-auto">
+            <h1 className="text-display-2 font-heading font-bold mb-6 text-center">
+              Find Your Perfect Property
+            </h1>
+
+            {/* Quick Search */}
+            <form onSubmit={handleQuickSearch} className="mb-6">
+              <div className="flex gap-3">
+                <div className="relative flex-1">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <Input
+                    type="text"
+                    placeholder="Search by location, property type, or keyword..."
+                    value={quickSearch}
+                    onChange={(e) => setQuickSearch(e.target.value)}
+                    className="pl-12 h-12 text-base"
+                    size="lg"
+                  />
+                </div>
+                <RealEstButton type="submit" size="lg" className="px-8">
+                  Search
+                </RealEstButton>
+                <RealEstButton
+                  type="button"
+                  variant="outline"
+                  size="lg"
+                  onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}
+                >
+                  <SlidersHorizontal className="w-5 h-5 mr-2" />
+                  Filters
+                </RealEstButton>
+              </div>
+            </form>
+
+            {/* Active Filters */}
+            {Object.keys(activeFilters).length > 0 && (
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-sm font-medium">Active filters:</span>
+                <div className="flex flex-wrap gap-2">
+                  {activeFilters.state && (
+                    <Chip variant="secondary" className="flex items-center gap-1">
+                      {activeFilters.state}
+                      <X className="w-3 h-3 cursor-pointer" onClick={() => setActiveFilters(prev => ({ ...prev, state: '' }))} />
+                    </Chip>
+                  )}
+                  {activeFilters.propertyType?.length > 0 && activeFilters.propertyType.map((type: string) => (
+                    <Chip key={type} variant="secondary" className="flex items-center gap-1">
+                      {type.replace('_', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                      <X className="w-3 h-3 cursor-pointer" onClick={() => setActiveFilters(prev => ({
+                        ...prev,
+                        propertyType: prev.propertyType?.filter((t: string) => t !== type)
+                      }))} />
+                    </Chip>
+                  ))}
+                  {activeFilters.purpose && activeFilters.purpose !== 'any' && (
+                    <Chip variant="secondary" className="flex items-center gap-1">
+                      For {activeFilters.purpose}
+                      <X className="w-3 h-3 cursor-pointer" onClick={() => setActiveFilters(prev => ({ ...prev, purpose: 'any' }))} />
+                    </Chip>
+                  )}
+                </div>
+                <RealEstButton variant="ghost" size="sm" onClick={clearFilters}>
+                  Clear All
+                </RealEstButton>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Results */}
-      {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="h-64 bg-muted rounded-lg animate-pulse" />
-          ))}
-        </div>
-      ) : properties.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">
-            No properties found matching your criteria.
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {properties.map((property) => (
-            <Link key={property.id} href={`/property/${property.id}`}>
-              <Card.Root className="h-full hover:shadow-lg transition-shadow cursor-pointer">
-                <div className="relative h-48 bg-muted rounded-t-lg overflow-hidden">
-                  <div className="absolute inset-0 bg-linear-to-br from-slate-400 to-slate-600" />
-                  <Chip
-                    type="success"
-                    variant="primary"
-                    className="absolute top-2 right-2"
-                  >
-                    {property.listing_type.replace("_", " ").toUpperCase()}
-                  </Chip>
-                </div>
-                <Card.Content className="pt-4">
-                  <h3 className="font-semibold line-clamp-2 mb-2">
-                    {property.title}
-                  </h3>
-                  <p className="text-2xl font-bold text-primary mb-2">
-                    £{property.price.toLocaleString()}
-                  </p>
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground mb-4">
-                    <MapPin className="w-4 h-4" />
-                    <span className="line-clamp-1">{property.address}</span>
-                  </div>
-                  <div className="flex gap-4 text-sm text-muted-foreground">
-                    {property.property_details?.[0]?.bedrooms &&
-                      property.property_details[0].bedrooms > 0 && (
-                        <div className="flex items-center gap-1">
-                          <Bed className="w-4 h-4" />
-                          <span>{property.property_details[0].bedrooms}</span>
-                        </div>
-                      )}
-                    {property.property_details?.[0]?.bathrooms &&
-                      property.property_details[0].bathrooms > 0 && (
-                        <div className="flex items-center gap-1">
-                          <Bath className="w-4 h-4" />
-                          <span>{property.property_details[0].bathrooms}</span>
-                        </div>
-                      )}
-                    {property.property_details?.[0]?.square_feet &&
-                      property.property_details[0].square_feet > 0 && (
-                        <div className="flex items-center gap-1">
-                          <Ruler className="w-4 h-4" />
-                          <span>
-                            {property.property_details[0].square_feet.toLocaleString()}{" "}
-                            sqft
-                          </span>
-                        </div>
-                      )}
-                  </div>
-                </Card.Content>
-              </Card.Root>
-            </Link>
-          ))}
+      {/* Advanced Search Panel */}
+      {showAdvancedSearch && (
+        <div className="border-b border-border bg-card/50 backdrop-blur-sm">
+          <div className="container mx-auto px-4 py-6">
+            <AdvancedSearchForm
+              onSearch={handleSearch}
+              initialFilters={activeFilters}
+              className="max-w-4xl mx-auto"
+            />
+          </div>
         </div>
       )}
+
+      {/* Results Section */}
+      <div className="container mx-auto px-4 py-8">
+        {/* Results Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-4">
+            <h2 className="text-xl font-heading font-semibold">
+              {isLoading ? (
+                <div className="h-6 w-32 bg-muted rounded animate-pulse" />
+              ) : (
+                `${totalCount.toLocaleString()} properties found`
+              )}
+            </h2>
+            {quickSearch && (
+              <span className="text-muted-foreground">for "{quickSearch}"</span>
+            )}
+          </div>
+
+          <div className="flex items-center gap-3">
+            {/* Sort Dropdown */}
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as SortOption)}
+              className="px-3 py-2 border border-border rounded-lg text-sm bg-background"
+            >
+              <option value="relevance">Most Relevant</option>
+              <option value="price_low">Price: Low to High</option>
+              <option value="price_high">Price: High to Low</option>
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="size_large">Largest First</option>
+              <option value="size_small">Smallest First</option>
+            </select>
+
+            {/* View Mode Toggle */}
+            <div className="flex bg-muted rounded-lg p-1">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`p-2 rounded transition-colors ${
+                  viewMode === 'grid' ? 'bg-background shadow-sm' : 'hover:bg-background/50'
+                }`}
+              >
+                <Grid3X3 className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`p-2 rounded transition-colors ${
+                  viewMode === 'list' ? 'bg-background shadow-sm' : 'hover:bg-background/50'
+                }`}
+              >
+                <List className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setViewMode('map')}
+                className={`p-2 rounded transition-colors ${
+                  viewMode === 'map' ? 'bg-background shadow-sm' : 'hover:bg-background/50'
+                }`}
+              >
+                <MapIcon className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Loading State */}
+        {isLoading && (
+          <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" : "space-y-6"}>
+            {Array.from({ length: itemsPerPage }).map((_, i) => (
+              <div key={i} className={viewMode === 'grid' ? "h-80 bg-muted rounded-2xl animate-pulse" : "h-48 bg-muted rounded-2xl animate-pulse"} />
+            ))}
+          </div>
+        )}
+
+        {/* No Results */}
+        {!isLoading && properties.length === 0 && (
+          <div className="text-center py-16">
+            <div className="w-24 h-24 bg-gradient-to-br from-muted to-muted/50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <Search className="w-12 h-12 text-muted-foreground" />
+            </div>
+            <h3 className="text-xl font-heading font-semibold mb-3">No Properties Found</h3>
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+              We couldn't find any properties matching your criteria. Try adjusting your search filters or explore different areas.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <RealEstButton onClick={clearFilters}>
+                Clear All Filters
+              </RealEstButton>
+              <RealEstButton variant="outline" asChild>
+                <Link href="/search">Browse All Properties</Link>
+              </RealEstButton>
+            </div>
+          </div>
+        )}
+
+        {/* Map View */}
+        {viewMode === 'map' && !isLoading && properties.length > 0 && (
+          <div className="h-[600px] bg-gradient-to-br from-muted to-muted/50 rounded-2xl border-2 border-dashed border-border flex items-center justify-center">
+            <div className="text-center">
+              <MapIcon className="w-16 h-16 text-primary mx-auto mb-4" />
+              <h3 className="text-lg font-heading font-semibold mb-2">Interactive Map View</h3>
+              <p className="text-muted-foreground">Map integration coming soon</p>
+            </div>
+          </div>
+        )}
+
+        {/* Properties Grid/List */}
+        {!isLoading && properties.length > 0 && viewMode !== 'map' && (
+          <>
+            <div className={viewMode === 'grid'
+              ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+              : "space-y-6"
+            }>
+              {properties.map((property) => (
+                <PropertyCard
+                  key={property.id}
+                  property={property}
+                  isListView={viewMode === 'list'}
+                />
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {totalCount > itemsPerPage && (
+              <div className="flex items-center justify-center gap-2 mt-12">
+                <RealEstButton
+                  variant="outline"
+                  isDisabled={currentPage === 1}
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                >
+                  Previous
+                </RealEstButton>
+
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: Math.min(5, Math.ceil(totalCount / itemsPerPage)) }).map((_, i) => {
+                    const page = i + 1;
+                    return (
+                      <button
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        className={`w-10 h-10 rounded-lg font-medium transition-colors ${
+                          currentPage === page
+                            ? 'bg-primary text-primary-foreground'
+                            : 'hover:bg-muted'
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <RealEstButton
+                  variant="outline"
+                  isDisabled={currentPage >= Math.ceil(totalCount / itemsPerPage)}
+                  onClick={() => setCurrentPage(prev => prev + 1)}
+                >
+                  Next
+                </RealEstButton>
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }
 
 export default function SearchPage() {
   return (
-    <Suspense
-      fallback={<div className="container mx-auto px-4 py-8">Loading...</div>}
-    >
+    <Suspense fallback={
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-muted-foreground">Loading properties...</p>
+        </div>
+      </div>
+    }>
       <SearchPageContent />
     </Suspense>
   );

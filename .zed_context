@@ -1,0 +1,66 @@
+# RealEST Project Context for Zed AI Assistant
+
+## Project Information
+Project: RealEST - Vetted & Verified Property Marketplace
+Domain: realest.ng
+Target Market: Nigeria (primary), Africa (expansion)
+Tech Stack: Next.js 16, React 19, HeroUI v3, UntitledUI, Tailwind CSS v4, Supabase
+
+## Design System Context
+Primary Context File: docs/zed-context-realest-design-system.md
+
+## Brand Colors (OKLCH)
+- Primary Dark: #07402F (oklch(0.30 0.06 165)) - 60% usage
+- Primary Accent: #ADF434 (oklch(0.89 0.24 128)) - 10% usage
+- Primary Neutral: #2E322E (oklch(0.26 0.01 155)) - 30% usage
+- Brand Light: #F8F9F7 (oklch(0.98 0.005 155)) - Light backgrounds
+
+## Typography
+- Display: Lufga (hero sections)
+- Heading: Neulis Neue (titles, headers)
+- Body: Space Grotesk (content, forms)
+- Mono: JetBrains Mono (data, coordinates)
+
+## Component Strategy
+- HeroUI v3: Primary components (70%) - buttons, cards, forms, navigation
+- UntitledUI: Status/state components (25%) - badges, chips, alerts
+- Shadcn/UI: Complex patterns only (5%) - data tables, specialized forms
+
+## Available MCPs
+- HeroUI MCP: Real-time HeroUI v3 documentation and examples
+- Supabase MCP: Current Supabase patterns and implementation guides
+
+## Key Principles
+1. Nigerian market cultural sensitivity
+2. Geotag verification focus
+3. Trust-building UI patterns
+4. Mobile-first responsive design
+5. Accessibility (WCAG 2.1 AA)
+6. Performance optimization
+
+## File Structure
+- /components/ui/heroui - Customized HeroUI components
+- /components/ui/untitledui - UntitledUI status components
+- /components/property - Property-specific components
+- /components/dashboard - Dashboard components
+- /lib/supabase - Supabase client and utilities
+- /styles/tokens - Design system tokens
+
+## Development Guidelines
+- Always reference design system context file
+- Use MCP servers for component documentation
+- Follow established spacing scale (4px base)
+- Implement proper TypeScript types
+- Ensure responsive design across all components
+- Include loading and error states
+- Follow brand voice: confident, supportive, Nigerian-aware
+
+## Nigerian Property Context
+- Support for States/LGAs
+- Boys Quarters (BQ) accommodation
+- Estate vs individual properties
+- Security-focused messaging
+- Infrastructure availability indicators
+- Local transportation references
+
+This context ensures Zed AI understands the project scope, design system, and cultural considerations for effective code assistance.

@@ -70,7 +70,7 @@ export default function LoginPage() {
       <Card.Root className="w-full max-w-md">
         <Card.Header className="text-center">
           <Card.Title className="text-2xl font-bold">Welcome Back</Card.Title>
-          <Card.Description>Sign in to your RealProof account</Card.Description>
+          <Card.Description>Sign in to your RealEST account</Card.Description>
         </Card.Header>
 
         <Card.Content className="space-y-6">
@@ -142,13 +142,13 @@ export default function LoginPage() {
 
           <div className="text-center space-y-2">
             <div className="text-sm text-muted-foreground">
-              <Link href="/auth/forgot-password" className="hover:underline">
+              <Link href="/forgot-password" className="hover:underline">
                 Forgot your password?
               </Link>
             </div>
             <div className="text-sm">
               Don't have an account?{" "}
-              <Link href="/auth/sign-up" className="font-medium">
+              <Link href="/sign-up" className="font-medium">
                 Sign up
               </Link>
             </div>

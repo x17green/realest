@@ -1,0 +1,65 @@
+{
+  "name": "RealEST - Find Your Next Move",
+  "short_name": "RealEST",
+  "description": "Nigeria's premier geo-verified property marketplace. Find verified properties with no duplicates.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#07402F",
+  "theme_color": "#ADF434",
+  "orientation": "portrait",
+  "scope": "/",
+  "lang": "en-NG",
+  "categories": ["business", "productivity", "lifestyle"],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Search Properties",
+      "short_name": "Search",
+      "description": "Find verified properties in Nigeria",
+      "url": "/search",
+      "icons": [
+        {
+          "src": "/icon-search.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "List Property",
+      "short_name": "List",
+      "description": "List your property for verification",
+      "url": "/dashboard/owner/new",
+      "icons": [
+        {
+          "src": "/icon-add.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "https://realest.ng"
+    }
+  ],
+  "prefer_related_applications": false
+}

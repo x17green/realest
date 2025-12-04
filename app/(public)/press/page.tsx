@@ -19,28 +19,28 @@ export default function PressPage() {
   const pressReleases = [
     {
       title:
-        "RealProof Raises £10M Series A to Revolutionize Property Verification",
+        "RealEST Raises £10M Series A to Revolutionize Property Verification",
       date: "December 15, 2024",
       excerpt:
         "Leading real estate platform secures funding to expand verification technology and eliminate property fraud.",
       category: "Funding",
     },
     {
-      title: "RealProof Launches Advanced AI-Powered Property Inspection Tools",
+      title: "RealEST Launches Advanced AI-Powered Property Inspection Tools",
       date: "November 28, 2024",
       excerpt:
         "New AI technology streamlines property verification process, reducing inspection time by 60%.",
       category: "Product",
     },
     {
-      title: "RealProof Reaches 50,000 Verified Property Listings Milestone",
+      title: "RealEST Reaches 50,000 Verified Property Listings Milestone",
       date: "October 10, 2024",
       excerpt:
         "Platform celebrates major milestone with zero reported fraud cases in verified listings.",
       category: "Milestone",
     },
     {
-      title: "RealProof Partners with Leading Real Estate Associations",
+      title: "RealEST Partners with Leading Real Estate Associations",
       date: "September 5, 2024",
       excerpt:
         "Strategic partnerships aim to standardize property verification across the UK real estate industry.",
@@ -107,7 +107,7 @@ export default function PressPage() {
 
             {/* Main Heading */}
             <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-linear-to-r from-foreground via-foreground to-primary bg-clip-text text-transparent leading-tight">
-              RealProof in the
+              RealEST in the
               <br />
               <span className="text-primary">News</span>
             </h1>
@@ -115,7 +115,7 @@ export default function PressPage() {
             {/* Subtitle */}
             <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
               Stay updated with the latest news, announcements, and insights
-              from the RealProof team.
+              from the RealEST team.
             </p>
           </div>
         </div>
@@ -264,7 +264,7 @@ export default function PressPage() {
                   <Mail className="w-5 h-5 text-primary" />
                   <div>
                     <p className="font-semibold">Email</p>
-                    <p className="text-muted-foreground">press@realproof.com</p>
+                    <p className="text-muted-foreground">press@realest.ng</p>
                   </div>
                 </div>
                 <div className="flex items-center justify-center gap-3">
@@ -299,7 +299,7 @@ export default function PressPage() {
                 Stay Updated
               </h2>
               <p className="text-lg text-muted-foreground mb-8">
-                Subscribe to our press releases and get the latest RealProof
+                Subscribe to our press releases and get the latest RealEST
                 news delivered to your inbox.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">

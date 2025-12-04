@@ -1,0 +1,171 @@
+{
+  "workspace": {
+    "name": "RealEST - Property Marketplace",
+    "description": "Vetted & Verified Property Marketplace for Nigeria (realest.ng)",
+    "icon": "🏠",
+    "color": "#ADF434"
+  },
+  "context_files": [
+    "docs/zed-context-realest-design-system.md",
+    ".zed_context",
+    "README.md",
+    "docs/README.md",
+    "docs/ROADMAP.md",
+    "docs/RealEST Branding.md",
+    "docs/realest-ng-new-design-architecture.md",
+    "docs/page-structure.md"
+  ],
+  "project_settings": {
+    "auto_save": "on_focus_change",
+    "tab_size": 2,
+    "soft_wrap": "editor_width",
+    "show_whitespace": "selection",
+    "enable_language_server": true,
+    "format_on_save": true
+  },
+  "file_associations": {
+    "*.tsx": "typescript",
+    "*.ts": "typescript",
+    "*.js": "javascript",
+    "*.jsx": "javascript",
+    "*.css": "css",
+    "*.json": "json",
+    "*.md": "markdown"
+  },
+  "folders": [
+    {
+      "name": "📁 Components",
+      "path": "components",
+      "expanded": true
+    },
+    {
+      "name": "🎨 UI Components",
+      "path": "components/ui",
+      "expanded": false
+    },
+    {
+      "name": "📄 Pages",
+      "path": "app",
+      "expanded": true
+    },
+    {
+      "name": "🔧 Utilities",
+      "path": "lib",
+      "expanded": false
+    },
+    {
+      "name": "🎭 Styles",
+      "path": "styles",
+      "expanded": false
+    },
+    {
+      "name": "📚 Documentation",
+      "path": "docs",
+      "expanded": false
+    },
+    {
+      "name": "🗄️ Database",
+      "path": "supabase",
+      "expanded": false
+    }
+  ],
+  "quick_actions": [
+    {
+      "name": "🚀 Start Development",
+      "command": "task dev",
+      "description": "Start Next.js development server"
+    },
+    {
+      "name": "🏗️ Build Project",
+      "command": "task build",
+      "description": "Build production version"
+    },
+    {
+      "name": "🗄️ Start Supabase",
+      "command": "task supabase:start",
+      "description": "Start local Supabase instance"
+    },
+    {
+      "name": "🎨 Format Code",
+      "command": "task format",
+      "description": "Format all files with Prettier"
+    },
+    {
+      "name": "🔍 Type Check",
+      "command": "task type-check",
+      "description": "Run TypeScript type checking"
+    },
+    {
+      "name": "📋 Generate Types",
+      "command": "task supabase:generate-types",
+      "description": "Generate Supabase TypeScript types"
+    }
+  ],
+  "terminal": {
+    "shell": {
+      "program": "/bin/bash",
+      "args": ["-l"]
+    },
+    "working_directory": "${workspace_root}",
+    "env": {
+      "NODE_ENV": "development"
+    }
+  },
+  "search": {
+    "include": [
+      "app/**/*",
+      "components/**/*",
+      "lib/**/*",
+      "styles/**/*",
+      "docs/**/*.md",
+      "*.json",
+      "*.ts",
+      "*.tsx",
+      "*.js",
+      "*.jsx",
+      "*.css"
+    ],
+    "exclude": [
+      ".next/**/*",
+      "node_modules/**/*",
+      ".git/**/*",
+      "**/*.log",
+      "dist/**/*",
+      ".supabase/**/*"
+    ]
+  },
+  "extensions": {
+    "recommended": ["typescript", "react", "tailwindcss", "prettier", "eslint"]
+  },
+  "ai_assistant": {
+    "context_awareness": "high",
+    "code_completion": true,
+    "design_system_enforcement": true,
+    "cultural_sensitivity": {
+      "region": "Nigeria",
+      "market": "Real Estate"
+    },
+    "brand_guidelines": {
+      "primary_color": "#07402F",
+      "accent_color": "#ADF434",
+      "secondary_color": "#2E322E",
+      "light_color": "#F8F9F7",
+      "typography": ["Space Grotesk", "Neulis Neue", "Lufga", "JetBrains Mono"]
+    }
+  },
+  "debugging": {
+    "configurations": [
+      {
+        "name": "Next.js",
+        "type": "node",
+        "request": "launch",
+        "program": "${workspaceFolder}/node_modules/next/dist/bin/next",
+        "args": ["dev"],
+        "console": "integratedTerminal",
+        "env": {
+          "NODE_ENV": "development"
+        }
+      }
+    ]
+  }
+}

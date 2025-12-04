@@ -35,46 +35,48 @@ export default function HeroSection() {
       <div className="relative z-10 container mx-auto px-4 py-20">
         <div className="max-w-4xl mx-auto text-center">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-2 mb-6">
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20 rounded-full px-4 py-2 mb-6 backdrop-blur-sm">
             <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium text-primary">
-              Verified Properties Only
+            <span className="text-sm font-medium bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              Geo-Verified Properties Only
             </span>
           </div>
 
           {/* Main Heading */}
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-linear-to-r from-foreground via-foreground to-primary bg-clip-text text-transparent leading-tight">
+          <h1 className="text-display-1 font-bold mb-6 gradient-text-slanted leading-tight animate-fade-in">
             Find Your
             <br />
-            <span className="text-primary">Dream Property</span>
+            <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+              Next Move
+            </span>
           </h1>
 
           {/* Subtitle */}
-          <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
-            Discover unique, verified properties with no duplicates. Your
-            perfect home or investment awaits.
+          <p className="text-body-l text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed animate-slide-up">
+            Discover geo-verified, authentic properties with RealEST's
+            proof-first marketplace. No duplicates, only verified listings.
           </p>
 
           {/* Enhanced Search */}
-          <div className="max-w-2xl mx-auto mb-8">
-            <div className="bg-background/80 backdrop-blur-lg border border-border/50 rounded-2xl p-2 shadow-2xl">
+          <div className="max-w-2xl mx-auto mb-8 animate-scale-in">
+            <div className="bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl p-2 shadow-2xl hover:shadow-3xl transition-all duration-300">
               <div className="flex gap-2">
                 <div className="flex-1 flex items-center gap-3 px-4 py-3">
-                  <MapPin className="w-5 h-5 text-muted-foreground" />
+                  <MapPin className="w-5 h-5 text-primary" />
                   <Input
                     type="text"
-                    placeholder="Search by location, property type, or keywords..."
+                    placeholder="Search by location, verify coordinates, or browse geo-tagged properties..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full border-none outline-none bg-transparent text-base placeholder:text-muted-foreground/70"
+                    className="w-full border-none outline-none bg-transparent text-base placeholder:text-muted-foreground/70 focus-visible:ring-0"
                   />
                 </div>
                 <Button
                   size="lg"
-                  className="bg-primary hover:bg-primary/90 px-8 rounded-xl font-semibold gap-2 shadow-lg"
+                  className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 px-8 rounded-xl font-semibold gap-2 shadow-lg hover:shadow-xl transition-all duration-200"
                 >
                   <Search className="w-5 h-5" />
-                  Search
+                  Explore Properties
                 </Button>
               </div>
             </div>
@@ -85,7 +87,7 @@ export default function HeroSection() {
                 <Chip
                   key={search.label}
                   variant="secondary"
-                  className="cursor-pointer hover:bg-primary/10 hover:border-primary/30 transition-colors gap-2"
+                  className="cursor-pointer hover:bg-primary/10 hover:border-primary/30 transition-all duration-200 gap-2 hover:scale-105"
                   onClick={() => setSearchQuery(search.label)}
                 >
                   <search.icon className="w-4 h-4" />
@@ -96,23 +98,29 @@ export default function HeroSection() {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-2xl mx-auto">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-primary mb-1">10K+</div>
-              <div className="text-sm text-muted-foreground">
-                Verified Properties
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-2xl mx-auto animate-fade-in">
+            <div className="text-center group hover:scale-105 transition-transform duration-200">
+              <div className="text-h2 font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-1">
+                10K+
+              </div>
+              <div className="text-body-s text-muted-foreground">
+                Geo-Verified Properties
               </div>
             </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-primary mb-1">50K+</div>
-              <div className="text-sm text-muted-foreground">
-                Happy Customers
+            <div className="text-center group hover:scale-105 transition-transform duration-200">
+              <div className="text-h2 font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-1">
+                50K+
+              </div>
+              <div className="text-body-s text-muted-foreground">
+                Trusted Users
               </div>
             </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-primary mb-1">99%</div>
-              <div className="text-sm text-muted-foreground">
-                Satisfaction Rate
+            <div className="text-center group hover:scale-105 transition-transform duration-200">
+              <div className="text-h2 font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-1">
+                99.9%
+              </div>
+              <div className="text-body-s text-muted-foreground">
+                Location Accuracy
               </div>
             </div>
           </div>
