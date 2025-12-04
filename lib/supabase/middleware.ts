@@ -12,9 +12,17 @@ export async function updateSession(request: NextRequest) {
 
   // Check if route is accessible in current app mode
   if (!isRouteAccessible(pathname)) {
-    const url = request.nextUrl.clone()
-    url.pathname = "/"
-    return NextResponse.redirect(url)
+    // In coming-soon mode, show 404 instead of redirecting to home for better security
+    if (appMode === 'coming-soon') {
+      const url = request.nextUrl.clone()
+      url.pathname = "/not-found"
+      return NextResponse.rewrite(url)
+    } else {
+      // For other modes, redirect to home
+      const url = request.nextUrl.clone()
+      url.pathname = "/"
+      return NextResponse.redirect(url)
+    }
   }
 
   // Skip authentication for coming-soon mode unless explicitly enabled

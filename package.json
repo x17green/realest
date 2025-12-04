@@ -15,7 +15,8 @@
     "switch:main": "bash scripts/switch-branch.sh main",
     "dev:coming-soon": "NEXT_PUBLIC_APP_MODE=coming-soon npm run dev",
     "dev:full-site": "NEXT_PUBLIC_APP_MODE=full-site npm run dev",
-    "dev:demo": "NEXT_PUBLIC_APP_MODE=development npm run dev"
+    "dev:demo": "NEXT_PUBLIC_APP_MODE=development npm run dev",
+    "test:lockdown": "node scripts/test-route-lockdown.js"
   },
   "dependencies": {
     "@heroui/react": "^3.0.0-alpha.35",

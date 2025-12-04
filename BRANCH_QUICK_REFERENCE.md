@@ -32,6 +32,9 @@ NEXT_PUBLIC_APP_MODE=full-site npm run dev
 
 # Test with countdown
 NEXT_PUBLIC_APP_MODE=coming-soon NEXT_PUBLIC_RELEASE_DATE=2025-12-31T23:59:59Z npm run dev
+
+# Test route lockdown (coming-soon mode only allows home route)
+npm run test:lockdown
 ```
 
 ### Deployment Workflow
@@ -76,11 +79,39 @@ NEXT_PUBLIC_APP_MODE=development
 NEXT_PUBLIC_APP_MODE=full-site
 ```
 
+## Route Protection (Coming Soon Mode)
+
+### Complete Lockdown
+In `coming-soon` mode, only these routes are accessible:
+- ✅ `/` - Shows coming soon page
+- ✅ `/not-found` - 404 page  
+- ✅ `/favicon.ico` - Browser favicon
+- ✅ Static assets (`/_next/`, images, CSS, etc.)
+
+### All Other Routes Blocked
+- ❌ `/about`, `/buy`, `/rent`, `/contact` - Shows 404
+- ❌ `/admin`, `/owner`, `/buyer` - Shows 404  
+- ❌ `/login`, `/sign-up` - Shows 404
+- ❌ Demo pages - Shows 404
+
+### Testing Route Protection
+```bash
+# Start coming soon mode
+npm run dev:coming-soon
+
+# Test route lockdown (in another terminal)
+npm run test:lockdown
+
+# Verbose testing
+VERBOSE=true npm run test:lockdown
+```
+
 ## Troubleshooting
 
 - **Wrong page showing?** → Check environment variables in Vercel
 - **Demo pages not accessible?** → Ensure `NEXT_PUBLIC_APP_MODE=development`
 - **Countdown not working?** → Verify `NEXT_PUBLIC_RELEASE_DATE` format
+- **Routes accessible in coming-soon?** → Run `npm run test:lockdown` to verify
 - **Build errors?** → Run `npm run build` locally to debug
 
 For detailed documentation, see `docs/BRANCH_MANAGEMENT.md`
