@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { shouldShowDemoPages } from "@/lib/app-mode";
+import ComingSoonHero from "@/components/coming-soon-hero";
 
 export default function DemoLayout({
   children,
@@ -8,7 +9,8 @@ export default function DemoLayout({
 }) {
   // Check if demo pages should be accessible in current app mode
   if (!shouldShowDemoPages()) {
-    notFound();
+    <ComingSoonHero />;
+    // notFound();
   }
 
   return (
