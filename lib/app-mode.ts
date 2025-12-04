@@ -71,14 +71,7 @@ export function getAppConfig(): AppModeConfig {
       showDemoPages: false,
       showFullSite: false,
       enableAuthentication: false,
-      restrictedRoutes: [
-        '/admin',
-        '/buyer',
-        '/owner',
-        '/demo',
-        '/list-property',
-        '/profile-setup'
-      ]
+      restrictedRoutes: [] // Complete lockdown handled in isRouteAccessible
     },
     'full-site': {
       mode: 'full-site',
@@ -117,7 +110,23 @@ export function isRouteAccessible(pathname: string): boolean {
     return true;
   }
 
-  // Check if route is in restricted list
+  // In coming-soon mode, implement complete lockdown
+  if (config.mode === 'coming-soon') {
+    // Only allow specific essential routes
+    const allowedRoutes = [
+      '/',           // Home page (coming soon)
+      '/not-found',  // 404 page
+      '/favicon.ico', // Browser favicon
+    ];
+
+    // Allow exact matches or static assets
+    return allowedRoutes.includes(pathname) ||
+           pathname.startsWith('/_next/') ||     // Next.js static assets
+           pathname.startsWith('/api/_') ||       // Next.js internal API routes
+           pathname.match(/\.(ico|png|jpg|jpeg|gif|svg|webp|css|js|woff|woff2|ttf|otf)$/); // Static files
+  }
+
+  // For other modes, check restricted routes list
   const isRestricted = config.restrictedRoutes.some(route =>
     pathname.startsWith(route)
   );
@@ -211,6 +220,27 @@ export function isComingSoonMode(): boolean {
   if (!releaseDate) return true;
 
   return new Date() < releaseDate;
+}
+
+/**
+ * Development utilities for testing different modes
+ */
+/**
+ * Check if a route is allowed in coming-soon mode (for testing)
+ */
+export function isComingSoonRouteAllowed(pathname: string): boolean {
+  if (getAppMode() !== 'coming-soon') return true;
+
+  const allowedRoutes = [
+    '/',
+    '/not-found',
+    '/favicon.ico',
+  ];
+
+  return allowedRoutes.includes(pathname) ||
+         pathname.startsWith('/_next/') ||
+         pathname.startsWith('/api/_') ||
+         pathname.match(/\.(ico|png|jpg|jpeg|gif|svg|webp|css|js|woff|woff2|ttf|otf)$/);
 }
 
 /**
