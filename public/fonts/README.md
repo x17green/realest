@@ -1,6 +1,6 @@
 # 🎨 Font Library Documentation
 
-A comprehensive collection of fonts available in the Bounsser application. All fonts are locally hosted for optimal performance, privacy, and reliability.
+A comprehensive collection of fonts available in the RealEST application. All fonts are locally hosted for optimal performance, privacy, and reliability.
 
 ## 📋 Available Font Families
 
@@ -154,7 +154,7 @@ The application's theme system uses these primary font assignments:
 import { HeroTitle, Heading, Body } from '@/lib/theme';
 
 // Theme components (recommended)
-<HeroTitle>Welcome to Bounsser</HeroTitle>
+<HeroTitle>Welcome to RealEST Marketplace</HeroTitle>
 <Heading size="2xl">Section Title</Heading>
 <Body>Regular paragraph text</Body>
 

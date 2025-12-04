@@ -329,7 +329,7 @@
   {
     "label": "realest:setup",
     "command": "npm",
-    "args": ["run", "install"],
+    "args": ["install"],
     "group": "build",
     "presentation": {
       "echo": true,
