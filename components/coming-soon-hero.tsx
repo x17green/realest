@@ -100,7 +100,7 @@ const ComingSoonHero = () => {
 
   return (
     <div className="min-h-screen w-full bg-background">
-      <Header user={null} />
+      {/*<Header user={null} />*/}
 
       <main className="relative w-full overflow-hidden">
         {/* Animated Background */}
@@ -289,7 +289,7 @@ const ComingSoonHero = () => {
         </div>
       </main>
 
-      <Footer />
+      {/*<Footer />*/}
     </div>
   );
 };
