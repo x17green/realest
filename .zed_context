@@ -10,9 +10,10 @@ Tech Stack: Next.js 16, React 19, HeroUI v3, UntitledUI, Tailwind CSS v4, Supaba
 Primary Context File: docs/zed-context-realest-design-system.md
 
 ## Brand Colors (OKLCH)
-- Primary Dark: #242834 (oklch(0.26 0.08 258)) - 60% usage
-- Primary Neon: #B6FF00 (oklch(0.91 0.20 127)) - 10% usage
-- Primary Violet: #7D53FF (oklch(0.67 0.25 286)) - 30% usage
+- Primary Dark: #07402F (oklch(0.30 0.06 165)) - 60% usage
+- Primary Accent: #ADF434 (oklch(0.89 0.24 128)) - 10% usage
+- Primary Neutral: #2E322E (oklch(0.26 0.01 155)) - 30% usage
+- Brand Light: #F8F9F7 (oklch(0.98 0.005 155)) - Light backgrounds
 
 ## Typography
 - Display: Lufga (hero sections)

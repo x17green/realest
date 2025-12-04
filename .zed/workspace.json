@@ -3,7 +3,7 @@
     "name": "RealEST - Property Marketplace",
     "description": "Vetted & Verified Property Marketplace for Nigeria (realest.ng)",
     "icon": "🏠",
-    "color": "#B6FF00"
+    "color": "#ADF434"
   },
   "context_files": [
     "docs/zed-context-realest-design-system.md",
@@ -135,13 +135,7 @@
     ]
   },
   "extensions": {
-    "recommended": [
-      "typescript",
-      "react",
-      "tailwindcss",
-      "prettier",
-      "eslint"
-    ]
+    "recommended": ["typescript", "react", "tailwindcss", "prettier", "eslint"]
   },
   "ai_assistant": {
     "context_awareness": "high",
@@ -152,9 +146,10 @@
       "market": "Real Estate"
     },
     "brand_guidelines": {
-      "primary_color": "#242834",
-      "accent_color": "#B6FF00",
-      "secondary_color": "#7D53FF",
+      "primary_color": "#07402F",
+      "accent_color": "#ADF434",
+      "secondary_color": "#2E322E",
+      "light_color": "#F8F9F7",
       "typography": ["Space Grotesk", "Neulis Neue", "Lufga", "JetBrains Mono"]
     }
   },

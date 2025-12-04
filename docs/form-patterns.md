@@ -32,9 +32,9 @@ The RealEST form system consists of 7 main form patterns designed to handle diff
 All forms follow the RealEST design system:
 
 - **Color System**: OKLCH-based with 60-30-10 rule
-  - Primary Dark (#242834) - 60% usage
-  - Primary Violet (#7D53FF) - 30% usage  
-  - Primary Neon (#B6FF00) - 10% usage
+  - Primary Dark (#07402F) - 60% usage
+  - Primary Neutral (#2E322E) - 30% usage  
+  - Primary Accent (#ADF434) - 10% usage
 - **Typography**: 4-tier system (Lufga, Neulis Neue, Space Grotesk, JetBrains Mono)
 - **Component Strategy**: HeroUI (70%), UntitledUI (25%), Shadcn (5%)
 
