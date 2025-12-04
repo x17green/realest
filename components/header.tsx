@@ -112,7 +112,7 @@ export default function Header({ user }: HeaderProps) {
                     Log In
                   </Button>
                 </Link>
-                <Link href="/auth/sign-up">
+                <Link href="/sign-up">
                   <Button
                     size="sm"
                     className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg"
@@ -205,7 +205,7 @@ export default function Header({ user }: HeaderProps) {
                       </Button>
                     </Link>
                     <Link
-                      href="/auth/sign-up"
+                      href="/sign-up"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       <Button className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70">

@@ -142,13 +142,13 @@ export default function LoginPage() {
 
           <div className="text-center space-y-2">
             <div className="text-sm text-muted-foreground">
-              <Link href="/auth/forgot-password" className="hover:underline">
+              <Link href="/forgot-password" className="hover:underline">
                 Forgot your password?
               </Link>
             </div>
             <div className="text-sm">
               Don't have an account?{" "}
-              <Link href="/auth/sign-up" className="font-medium">
+              <Link href="/sign-up" className="font-medium">
                 Sign up
               </Link>
             </div>
