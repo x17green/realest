@@ -127,7 +127,7 @@ The Zed AI assistant automatically:
 - Recommends UntitledUI for status components (25% usage)
 - Provides Supabase integration patterns
 - Maintains Nigerian market cultural sensitivity
-- Ensures brand color palette compliance (Navy #242834, Neon #B6FF00, Violet #7D53FF)
+- Ensures brand color palette compliance (Dark Green #07402F, Acid Green #ADF434, Deep Neutral #2E322E)
 - Applies 4-tier typography system (Display, Heading, Body, Mono)
 
 ### Building for Production
@@ -223,9 +223,9 @@ This project is licensed under the MIT License.
 RealEST uses a comprehensive design system built on:
 
 ### Color System (OKLCH)
-- **Primary Dark**: #242834 (60% usage) - Navy foundation
-- **Primary Violet**: #7D53FF (30% usage) - Secondary accent  
-- **Primary Neon**: #B6FF00 (10% usage) - Primary accent/CTA
+- **Primary Dark**: #07402F (60% usage) - Dark Green foundation
+- **Primary Neutral**: #2E322E (30% usage) - Deep Neutral secondary  
+- **Primary Accent**: #ADF434 (10% usage) - Acid Green primary accent/CTA
 
 ### Typography Hierarchy
 - **Display**: Lufga - Hero sections and brand moments

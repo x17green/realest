@@ -19,8 +19,10 @@ const buttonVariants = cva(
         ghost:
           'hover:bg-accent hover:text-accent-foreground hover:shadow-sm rounded-md',
         link: 'text-primary underline-offset-4 hover:underline font-medium',
-        violet: 'bg-brand-violet text-white shadow-sm hover:bg-brand-violet/90 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-sm',
-        neon: 'bg-brand-neon text-brand-dark shadow-sm hover:bg-brand-neon/90 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-sm font-semibold',
+        violet: 'bg-brand-dark text-brand-light shadow-sm hover:bg-brand-dark/90 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-sm',
+        neon: 'bg-brand-accent text-brand-dark shadow-sm hover:bg-brand-accent/90 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-sm font-semibold',
+        accent: 'bg-brand-accent text-brand-dark shadow-sm hover:bg-brand-accent/90 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-sm font-semibold',
+        dark: 'bg-brand-dark text-brand-light shadow-sm hover:bg-brand-dark/90 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-sm',
       },
       size: {
         default: 'h-10 px-4 py-2 has-[>svg]:px-3',

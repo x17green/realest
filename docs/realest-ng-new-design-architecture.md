@@ -27,21 +27,21 @@
 ```css
 :root {
   /* PRIMARY DARK (60% - Foundation) */
-  --brand-dark: oklch(0.155 0.012 255); /* #242834 */
-  --brand-dark-hover: oklch(0.185 0.012 255); /* Lighter hover state */
-  --brand-dark-pressed: oklch(0.125 0.012 255); /* Pressed state */
+  --brand-dark: oklch(0.30 0.06 165); /* #07402F */
+  --brand-dark-hover: oklch(0.35 0.06 165); /* Lighter hover state */
+  --brand-dark-pressed: oklch(0.25 0.06 165); /* Pressed state */
   
-  /* PRIMARY NEON (10% - Accent) */
-  --brand-neon: oklch(0.92 0.24 130); /* #B6FF00 */
-  --brand-neon-hover: oklch(0.88 0.24 130); /* Hover state */
-  --brand-neon-muted: oklch(0.92 0.24 130 / 0.15); /* Backgrounds */
-  --brand-neon-border: oklch(0.92 0.24 130 / 0.3); /* Borders */
+  /* PRIMARY ACCENT (10% - Acid Green) */
+  --brand-accent: oklch(0.89 0.24 128); /* #ADF434 */
+  --brand-accent-hover: oklch(0.85 0.24 128); /* Hover state */
+  --brand-accent-muted: oklch(0.89 0.24 128 / 0.15); /* Backgrounds */
+  --brand-accent-border: oklch(0.89 0.24 128 / 0.3); /* Borders */
   
-  /* PRIMARY VIOLET (30% - Secondary Accent) */
-  --brand-violet: oklch(0.58 0.18 285); /* #7D53FF */
-  --brand-violet-hover: oklch(0.62 0.18 285);
-  --brand-violet-muted: oklch(0.58 0.18 285 / 0.12);
-  --brand-violet-border: oklch(0.58 0.18 285 / 0.25);
+  /* PRIMARY NEUTRAL (30% - Deep Neutral) */
+  --brand-neutral: oklch(0.26 0.01 155); /* #2E322E */
+  --brand-neutral-hover: oklch(0.30 0.01 155);
+  --brand-neutral-muted: oklch(0.26 0.01 155 / 0.12);
+  --brand-neutral-border: oklch(0.26 0.01 155 / 0.25);
 }
 ```
 
@@ -49,18 +49,18 @@
 
 ```css
 :root {
-  /* GRAYSCALE DERIVED FROM #242834 */
-  --gray-50: oklch(0.975 0.004 255); /* Lightest backgrounds */
-  --gray-100: oklch(0.95 0.006 255);
-  --gray-200: oklch(0.88 0.008 255);
-  --gray-300: oklch(0.75 0.009 255); /* Borders, dividers */
-  --gray-400: oklch(0.62 0.01 255); /* Disabled text */
-  --gray-500: oklch(0.48 0.011 255); /* Secondary text */
-  --gray-600: oklch(0.38 0.011 255);
-  --gray-700: oklch(0.28 0.012 255); /* Active text */
-  --gray-800: oklch(0.20 0.012 255); /* Cards, elevated surfaces */
-  --gray-900: oklch(0.155 0.012 255); /* Primary Dark */
-  --gray-950: oklch(0.11 0.012 255); /* Deep backgrounds */
+  /* GRAYSCALE DERIVED FROM #07402F (Dark Green) */
+  --gray-50: oklch(0.98 0.005 155); /* Off-White with subtle green tint */
+  --gray-100: oklch(0.95 0.008 155); /* Very light gray-green */
+  --gray-200: oklch(0.88 0.012 155); /* Light gray-green */
+  --gray-300: oklch(0.78 0.015 155); /* Medium light gray */
+  --gray-400: oklch(0.65 0.018 155); /* Medium gray */
+  --gray-500: oklch(0.52 0.020 155); /* True middle gray */
+  --gray-600: oklch(0.42 0.022 155); /* Medium dark gray */
+  --gray-700: oklch(0.32 0.025 155); /* Dark gray */
+  --gray-800: oklch(0.26 0.015 155); /* Deep neutral equivalent */
+  --gray-900: oklch(0.18 0.020 155); /* Very dark gray */
+  --gray-950: oklch(0.15 0.025 155); /* Deepest backgrounds */
 }
 ```
 
@@ -68,19 +68,22 @@
 
 ```css
 :root {
-  /* NEON ACCESSIBILITY VARIANTS */
-  --neon-text-light: oklch(0.92 0.24 130); /* On dark backgrounds */
-  --neon-text-dark: oklch(0.45 0.20 130); /* On light backgrounds (WCAG AA) */
-  --neon-background: oklch(0.92 0.24 130 / 0.08); /* Subtle fills */
-  --neon-badge: oklch(0.92 0.24 130 / 0.18); /* Badge backgrounds */
+  /* ACID GREEN ACCESSIBILITY VARIANTS */
+  --accent-text-light: oklch(0.89 0.24 128); /* On dark backgrounds */
+  --accent-text-dark: oklch(0.45 0.20 128); /* On light backgrounds (WCAG AA) */
+  --accent-background: oklch(0.89 0.24 128 / 0.08); /* Subtle fills */
+  --accent-badge: oklch(0.89 0.24 128 / 0.18); /* Badge backgrounds */
   
-  /* NEON SHADES FOR DATA VISUALIZATION */
-  --neon-100: oklch(0.96 0.12 130);
-  --neon-200: oklch(0.94 0.18 130);
-  --neon-300: oklch(0.92 0.24 130); /* Primary */
-  --neon-400: oklch(0.85 0.24 130);
-  --neon-500: oklch(0.75 0.22 130);
-  --neon-600: oklch(0.65 0.20 130);
+  /* ACID GREEN SHADES FOR DATA VISUALIZATION */
+  --accent-100: oklch(0.96 0.12 128);
+  --accent-200: oklch(0.94 0.18 128);
+  --accent-300: oklch(0.92 0.20 128);
+  --accent-400: oklch(0.89 0.24 128); /* Primary */
+  --accent-500: oklch(0.82 0.22 128);
+  --accent-600: oklch(0.75 0.20 128);
+  --accent-700: oklch(0.68 0.18 128);
+  --accent-800: oklch(0.58 0.16 128);
+  --accent-900: oklch(0.48 0.14 128);
 }
 ```
 
@@ -350,16 +353,16 @@ export default {
         light: {
           colors: {
             primary: {
-              DEFAULT: "#B6FF00",
-              foreground: "#242834",
+              DEFAULT: "#ADF434",
+              foreground: "#07402F",
             },
             secondary: {
-              DEFAULT: "#7D53FF",
-              foreground: "#ffffff",
+              DEFAULT: "#2E322E",
+              foreground: "#F8F9F7",
             },
             default: {
-              DEFAULT: "#242834",
-              foreground: "#ffffff",
+              DEFAULT: "#07402F",
+              foreground: "#F8F9F7",
             },
           },
         },
@@ -2516,8 +2519,8 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
   --text-aa-dark-bg: var(--gray-100);      /* 7:1 contrast ratio */
   --heading-aa-dark-bg: oklch(0.99 0 0);   /* Maximum contrast */
   
-  /* Neon on dark (accessible variant) */
-  --neon-aa-dark: oklch(0.92 0.24 130);    /* 7:1 on #242834 */
+  /* Acid Green on dark (accessible variant) */
+  --accent-aa-dark: oklch(0.89 0.24 128);  /* 7:1 on #07402F */
   
   /* Neon on light (accessible variant) */
   --neon-aa-light: oklch(0.45 0.20 130);   /* 4.5:1 on white */

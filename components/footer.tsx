@@ -25,7 +25,7 @@ export default function Footer() {
 
   const footerLinks = {
     company: [
-      { href: "/about", label: "About RealProof" },
+      { href: "/about", label: "About RealEST" },
       { href: "/how-it-works", label: "How It Works" },
       { href: "/careers", label: "Careers" },
       { href: "/press", label: "Press & Media" },
@@ -226,7 +226,7 @@ export default function Footer() {
         {/* Copyright */}
         <div className="border-t border-border/50 mt-8 pt-8 text-center">
           <p className="text-sm text-muted-foreground">
-            © {currentYear} RealProof. All rights reserved. Built with ❤️ for
+            © {currentYear} RealEST. All rights reserved. Built with ❤️ for
             verified property listings.
           </p>
         </div>

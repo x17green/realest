@@ -16,6 +16,7 @@ import {
   User as UserIcon,
   LogOut,
 } from "lucide-react";
+import { ThemeToggleCompact } from "@/components/ui/theme-toggle-wrapper";
 
 interface HeaderProps {
   user: User | null;
@@ -76,6 +77,7 @@ export default function Header({ user }: HeaderProps) {
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center gap-3">
+            <ThemeToggleCompact />
             {user ? (
               <>
                 <Link href="/owner/dashboard">
@@ -110,7 +112,7 @@ export default function Header({ user }: HeaderProps) {
                     Log In
                   </Button>
                 </Link>
-                <Link href="/auth/sign-up">
+                <Link href="/sign-up">
                   <Button
                     size="sm"
                     className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg"
@@ -156,8 +158,12 @@ export default function Header({ user }: HeaderProps) {
                 ))}
               </nav>
 
-              {/* Mobile Auth Buttons */}
+              {/* Mobile Theme Toggle & Auth Buttons */}
               <div className="pt-4 border-t space-y-2">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-muted-foreground">Theme</span>
+                  <ThemeToggleCompact />
+                </div>
                 {user ? (
                   <>
                     <Link
@@ -199,7 +205,7 @@ export default function Header({ user }: HeaderProps) {
                       </Button>
                     </Link>
                     <Link
-                      href="/auth/sign-up"
+                      href="/sign-up"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       <Button className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70">

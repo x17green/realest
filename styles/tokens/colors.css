@@ -1,6 +1,7 @@
 /* ================================================================
    REALEST COLOR TOKENS
    Complete color system following 60-30-10 design rule
+   New Brand Palette: Off-White, Acid Green, Dark Green, Deep Neutral
    ================================================================ */
 
 /* ================================================================
@@ -9,71 +10,103 @@
 
 :root {
   /* Primary Brand Colors (Hex Values) */
-  --color-brand-dark: #242834;      /* Navy foundation */
-  --color-brand-violet: #7D53FF;    /* Violet secondary */
-  --color-brand-neon: #B6FF00;      /* Lime accent */
+  --color-brand-light: #F8F9F7;     /* Off-White - light backgrounds */
+  --color-brand-accent: #ADF434;    /* Acid Green - primary accent */
+  --color-brand-dark: #07402F;      /* Dark Green - foundation */
+  --color-brand-neutral: #2E322E;   /* Deep Neutral - secondary */
 
   /* Primary Palette (OKLCH Format) */
-  --primary-dark: oklch(0.26 0.08 258);      /* Navy foundation - 60% usage */
-  --primary-violet: oklch(0.67 0.25 286);    /* Violet secondary - 30% usage */
-  --primary-neon: oklch(0.91 0.20 127);      /* Lime accent - 10% usage */
+  --primary-light: oklch(0.98 0.005 155);     /* Off-White - light mode base */
+  --primary-accent: oklch(0.89 0.24 128);     /* Acid Green - 10% accent usage */
+  --primary-dark: oklch(0.30 0.06 165);       /* Dark Green - 60% foundation */
+  --primary-neutral: oklch(0.26 0.01 155);    /* Deep Neutral - 30% secondary */
+
+  /* Legacy aliases for backward compatibility */
+  --color-brand-neon: var(--color-brand-accent);
+  --primary-neon: var(--primary-accent);
+  --color-brand-violet: var(--color-brand-neutral);
+  --primary-violet: var(--primary-neutral);
 }
 
 /* ================================================================
    2. EXTENDED GRAYSCALE SYSTEM
-   Derived from Primary Dark for visual harmony
+   Derived from brand colors for visual harmony (green-tinted)
    ================================================================ */
 
 :root {
-  /* Grayscale Palette (Derived from #242834) */
-  --gray-50: oklch(0.98 0.005 258);    /* Almost white with subtle navy tint */
-  --gray-100: oklch(0.95 0.01 258);    /* Very light gray */
-  --gray-200: oklch(0.88 0.015 258);   /* Light gray */
-  --gray-300: oklch(0.78 0.02 258);    /* Medium light gray */
-  --gray-400: oklch(0.65 0.025 258);   /* Medium gray */
-  --gray-500: oklch(0.52 0.03 258);    /* True middle gray */
-  --gray-600: oklch(0.42 0.035 258);   /* Medium dark gray */
-  --gray-700: oklch(0.32 0.04 258);    /* Dark gray */
-  --gray-800: oklch(0.26 0.045 258);   /* Primary dark equivalent */
-  --gray-900: oklch(0.18 0.05 258);    /* Very dark gray */
+  /* Grayscale Palette (Derived from Dark Green hue 155) */
+  --gray-50: oklch(0.98 0.005 155);    /* Off-White with subtle green tint */
+  --gray-100: oklch(0.95 0.008 155);   /* Very light gray */
+  --gray-200: oklch(0.88 0.012 155);   /* Light gray */
+  --gray-300: oklch(0.78 0.015 155);   /* Medium light gray */
+  --gray-400: oklch(0.65 0.018 155);   /* Medium gray */
+  --gray-500: oklch(0.52 0.020 155);   /* True middle gray */
+  --gray-600: oklch(0.42 0.022 155);   /* Medium dark gray */
+  --gray-700: oklch(0.32 0.025 155);   /* Dark gray */
+  --gray-800: oklch(0.26 0.015 155);   /* Deep neutral equivalent */
+  --gray-900: oklch(0.18 0.020 155);   /* Very dark gray */
 }
 
 /* ================================================================
-   3. ACCESSIBLE NEON VARIATIONS
-   Multiple shades of the brand neon for different use cases
+   3. ACCENT GREEN VARIATIONS
+   Multiple shades of the brand accent for different use cases
    ================================================================ */
 
 :root {
-  /* Neon Color Scale */
-  --neon-50: oklch(0.98 0.03 127);     /* Very light neon tint */
-  --neon-100: oklch(0.96 0.06 127);    /* Light neon tint */
-  --neon-200: oklch(0.94 0.10 127);    /* Subtle neon */
-  --neon-300: oklch(0.92 0.15 127);    /* Muted neon */
-  --neon-400: oklch(0.91 0.20 127);    /* Primary neon */
-  --neon-500: oklch(0.85 0.22 127);    /* Slightly darker neon */
-  --neon-600: oklch(0.75 0.20 127);    /* Medium neon */
-  --neon-700: oklch(0.65 0.18 127);    /* Dark neon */
-  --neon-800: oklch(0.55 0.15 127);    /* Very dark neon */
-  --neon-900: oklch(0.45 0.12 127);    /* Darkest neon */
+  /* Accent Green Color Scale (Acid Green based) */
+  --accent-50: oklch(0.98 0.04 128);     /* Very light accent tint */
+  --accent-100: oklch(0.96 0.08 128);    /* Light accent tint */
+  --accent-200: oklch(0.94 0.12 128);    /* Subtle accent */
+  --accent-300: oklch(0.92 0.18 128);    /* Muted accent */
+  --accent-400: oklch(0.90 0.22 128);    /* Medium light accent */
+  --accent-500: oklch(0.89 0.24 128);    /* Primary accent (Acid Green) */
+  --accent-600: oklch(0.80 0.22 128);    /* Medium accent */
+  --accent-700: oklch(0.70 0.20 128);    /* Dark accent */
+  --accent-800: oklch(0.60 0.18 128);    /* Very dark accent */
+  --accent-900: oklch(0.50 0.15 128);    /* Darkest accent */
+
+  /* Legacy neon aliases */
+  --neon-50: var(--accent-50);
+  --neon-100: var(--accent-100);
+  --neon-200: var(--accent-200);
+  --neon-300: var(--accent-300);
+  --neon-400: var(--accent-400);
+  --neon-500: var(--accent-500);
+  --neon-600: var(--accent-600);
+  --neon-700: var(--accent-700);
+  --neon-800: var(--accent-800);
+  --neon-900: var(--accent-900);
 }
 
 /* ================================================================
-   4. VIOLET COLOR VARIATIONS
-   Extended violet palette for design flexibility
+   4. DARK GREEN VARIATIONS
+   Extended dark green palette for design flexibility
    ================================================================ */
 
 :root {
-  /* Violet Color Scale */
-  --violet-50: oklch(0.96 0.05 286);   /* Very light violet */
-  --violet-100: oklch(0.92 0.08 286);  /* Light violet */
-  --violet-200: oklch(0.85 0.12 286);  /* Subtle violet */
-  --violet-300: oklch(0.78 0.16 286);  /* Muted violet */
-  --violet-400: oklch(0.72 0.20 286);  /* Medium light violet */
-  --violet-500: oklch(0.67 0.25 286);  /* Primary violet */
-  --violet-600: oklch(0.62 0.22 286);  /* Medium violet */
-  --violet-700: oklch(0.55 0.20 286);  /* Dark violet */
-  --violet-800: oklch(0.45 0.18 286);  /* Very dark violet */
-  --violet-900: oklch(0.35 0.15 286);  /* Darkest violet */
+  /* Dark Green Color Scale */
+  --green-50: oklch(0.95 0.03 165);     /* Very light green */
+  --green-100: oklch(0.90 0.05 165);    /* Light green */
+  --green-200: oklch(0.80 0.06 165);    /* Subtle green */
+  --green-300: oklch(0.65 0.07 165);    /* Muted green */
+  --green-400: oklch(0.50 0.07 165);    /* Medium green */
+  --green-500: oklch(0.40 0.06 165);    /* Mid dark green */
+  --green-600: oklch(0.35 0.06 165);    /* Dark green */
+  --green-700: oklch(0.30 0.06 165);    /* Primary dark green */
+  --green-800: oklch(0.25 0.05 165);    /* Very dark green */
+  --green-900: oklch(0.20 0.04 165);    /* Darkest green */
+
+  /* Legacy violet aliases (now maps to neutral/dark green) */
+  --violet-50: var(--green-50);
+  --violet-100: var(--green-100);
+  --violet-200: var(--green-200);
+  --violet-300: var(--green-300);
+  --violet-400: var(--green-400);
+  --violet-500: var(--green-500);
+  --violet-600: var(--green-600);
+  --violet-700: var(--green-700);
+  --violet-800: var(--green-800);
+  --violet-900: var(--green-900);
 }
 
 /* ================================================================
@@ -82,58 +115,58 @@
    ================================================================ */
 
 :root {
-  /* Status Colors */
-  --color-success: oklch(0.75 0.15 142);       /* Verified properties, success states */
-  --color-success-light: oklch(0.85 0.10 142); /* Light success background */
-  --color-success-dark: oklch(0.65 0.18 142);  /* Dark success text */
+  /* Status Colors - harmonized with green palette */
+  --color-success: oklch(0.72 0.18 145);       /* Verified properties, success states */
+  --color-success-light: oklch(0.85 0.12 145); /* Light success background */
+  --color-success-dark: oklch(0.55 0.15 145);  /* Dark success text */
 
-  --color-warning: oklch(0.82 0.18 95);        /* Pending verification, warnings */
-  --color-warning-light: oklch(0.92 0.12 95);  /* Light warning background */
-  --color-warning-dark: oklch(0.72 0.22 95);   /* Dark warning text */
+  --color-warning: oklch(0.82 0.18 85);        /* Pending verification, warnings */
+  --color-warning-light: oklch(0.92 0.12 85);  /* Light warning background */
+  --color-warning-dark: oklch(0.72 0.22 85);   /* Dark warning text */
 
-  --color-error: oklch(0.62 0.2 20);           /* Rejected/Issues, errors */
-  --color-error-light: oklch(0.75 0.15 20);    /* Light error background */
-  --color-error-dark: oklch(0.52 0.25 20);     /* Dark error text */
+  --color-error: oklch(0.62 0.22 25);          /* Rejected/Issues, errors */
+  --color-error-light: oklch(0.75 0.15 25);    /* Light error background */
+  --color-error-dark: oklch(0.52 0.25 25);     /* Dark error text */
 
-  --color-info: oklch(0.78 0.12 270);          /* Informational messages */
-  --color-info-light: oklch(0.88 0.08 270);    /* Light info background */
-  --color-info-dark: oklch(0.68 0.16 270);     /* Dark info text */
+  --color-info: oklch(0.70 0.12 220);          /* Informational messages */
+  --color-info-light: oklch(0.85 0.08 220);    /* Light info background */
+  --color-info-dark: oklch(0.55 0.14 220);     /* Dark info text */
 }
 
 /* ================================================================
    6. DESIGN SYSTEM COLOR ASSIGNMENTS
-   Semantic mappings for consistent theming
+   Semantic mappings for consistent theming - LIGHT MODE
    ================================================================ */
 
 :root {
   /* Core UI Colors (Light Mode) */
-  --background: oklch(1 0 0);                   /* Pure white */
-  --foreground: var(--gray-900);                /* Primary text */
-  --card: oklch(1 0 0);                         /* Card backgrounds */
-  --card-foreground: var(--gray-900);           /* Card text */
-  --popover: oklch(1 0 0);                      /* Popover backgrounds */
-  --popover-foreground: var(--gray-900);        /* Popover text */
+  --background: var(--primary-light);           /* Off-White background */
+  --foreground: var(--primary-neutral);         /* Deep Neutral text */
+  --card: oklch(1 0 0);                         /* Pure white cards */
+  --card-foreground: var(--primary-neutral);    /* Deep Neutral card text */
+  --popover: oklch(1 0 0);                      /* White popover backgrounds */
+  --popover-foreground: var(--primary-neutral); /* Deep Neutral popover text */
 
   /* Interactive Colors */
-  --primary: var(--primary-neon);               /* Primary buttons, links */
-  --primary-foreground: var(--primary-dark);    /* Text on primary */
-  --secondary: var(--primary-violet);           /* Secondary buttons */
-  --secondary-foreground: var(--gray-50);       /* Text on secondary */
+  --primary: var(--primary-accent);             /* Acid Green buttons, links */
+  --primary-foreground: var(--primary-dark);    /* Dark Green text on accent */
+  --secondary: var(--primary-dark);             /* Dark Green secondary buttons */
+  --secondary-foreground: var(--primary-light); /* Off-White text on secondary */
 
   /* Subtle UI Elements */
   --muted: var(--gray-100);                     /* Muted backgrounds */
   --muted-foreground: var(--gray-600);          /* Muted text */
-  --accent: var(--primary-violet);              /* Accent elements */
-  --accent-foreground: var(--gray-50);          /* Text on accent */
+  --accent: var(--primary-dark);                /* Dark Green accent elements */
+  --accent-foreground: var(--primary-light);    /* Off-White text on accent */
 
   /* Feedback Colors */
   --destructive: var(--color-error);            /* Destructive actions */
-  --destructive-foreground: oklch(0.985 0 0);   /* Text on destructive */
+  --destructive-foreground: oklch(0.98 0 0);    /* White text on destructive */
 
   /* Form Elements */
   --border: var(--gray-200);                    /* Default borders */
   --input: var(--gray-200);                     /* Input borders */
-  --ring: var(--primary-violet);                /* Focus rings */
+  --ring: var(--primary-accent);                /* Acid Green focus rings */
 }
 
 /* ================================================================
@@ -143,33 +176,33 @@
 
 .dark {
   /* Core UI Colors (Dark Mode) */
-  --background: var(--primary-dark);            /* Navy background */
-  --foreground: var(--gray-50);                 /* Light text */
-  --card: var(--gray-800);                      /* Card backgrounds */
-  --card-foreground: var(--gray-50);            /* Card text */
-  --popover: var(--gray-800);                   /* Popover backgrounds */
-  --popover-foreground: var(--gray-50);         /* Popover text */
+  --background: var(--primary-dark);            /* Dark Green background */
+  --foreground: var(--primary-light);           /* Off-White text */
+  --card: var(--primary-neutral);               /* Deep Neutral cards */
+  --card-foreground: var(--primary-light);      /* Off-White card text */
+  --popover: var(--primary-neutral);            /* Deep Neutral popovers */
+  --popover-foreground: var(--primary-light);   /* Off-White popover text */
 
   /* Interactive Colors (Dark Mode) */
-  --primary: var(--primary-neon);               /* Neon green primary */
-  --primary-foreground: var(--primary-dark);    /* Dark text on neon */
+  --primary: var(--primary-accent);             /* Acid Green primary */
+  --primary-foreground: var(--primary-dark);    /* Dark Green text on accent */
   --secondary: var(--gray-700);                 /* Muted secondary */
-  --secondary-foreground: var(--gray-50);       /* Light text on secondary */
+  --secondary-foreground: var(--primary-light); /* Off-White text on secondary */
 
   /* Subtle UI Elements (Dark Mode) */
-  --muted: var(--gray-700);                     /* Muted backgrounds */
+  --muted: var(--gray-800);                     /* Muted backgrounds */
   --muted-foreground: var(--gray-400);          /* Muted text */
-  --accent: var(--primary-violet);              /* Violet accent */
-  --accent-foreground: var(--gray-50);          /* Light text on accent */
+  --accent: var(--primary-accent);              /* Acid Green accent */
+  --accent-foreground: var(--primary-dark);     /* Dark Green text on accent */
 
   /* Feedback Colors (Dark Mode) */
-  --destructive: oklch(0.62 0.2 20);            /* Adjusted for dark bg */
-  --destructive-foreground: var(--gray-50);     /* Light text on destructive */
+  --destructive: var(--color-error-light);      /* Adjusted for dark bg */
+  --destructive-foreground: var(--gray-900);    /* Dark text on destructive */
 
   /* Form Elements (Dark Mode) */
   --border: var(--gray-700);                    /* Dark borders */
   --input: var(--gray-700);                     /* Dark input borders */
-  --ring: var(--primary-neon);                  /* Neon focus rings */
+  --ring: var(--primary-accent);                /* Acid Green focus rings */
 }
 
 /* ================================================================
@@ -178,27 +211,29 @@
    ================================================================ */
 
 :root {
-  /* Text Color Tokens */
-  --text-primary: var(--gray-900);              /* Primary text color */
+  /* Text Color Tokens (Light Mode) */
+  --text-primary: var(--primary-neutral);       /* Deep Neutral primary text */
   --text-secondary: var(--gray-600);            /* Secondary text color */
   --text-muted: var(--gray-500);                /* Muted text color */
   --text-disabled: var(--gray-400);             /* Disabled text color */
-  --text-inverse: var(--gray-50);               /* Inverse text (on dark) */
-  --text-accent: var(--primary-violet);         /* Accent text color */
-  --text-success: var(--color-success);         /* Success text color */
-  --text-warning: var(--color-warning);         /* Warning text color */
+  --text-inverse: var(--primary-light);         /* Off-White inverse text */
+  --text-accent: var(--primary-dark);           /* Dark Green accent text */
+  --text-brand: var(--primary-accent);          /* Acid Green brand text */
+  --text-success: var(--color-success-dark);    /* Success text color */
+  --text-warning: var(--color-warning-dark);    /* Warning text color */
   --text-error: var(--color-error);             /* Error text color */
-  --text-info: var(--color-info);               /* Info text color */
+  --text-info: var(--color-info-dark);          /* Info text color */
 }
 
 .dark {
   /* Dark Mode Text Colors */
-  --text-primary: var(--gray-50);               /* Light primary text */
+  --text-primary: var(--primary-light);         /* Off-White primary text */
   --text-secondary: var(--gray-300);            /* Light secondary text */
   --text-muted: var(--gray-400);                /* Light muted text */
-  --text-disabled: var(--gray-600);             /* Light disabled text */
-  --text-inverse: var(--gray-900);              /* Dark text (on light) */
-  --text-accent: var(--primary-violet);         /* Violet accent text */
+  --text-disabled: var(--gray-600);             /* Dimmed disabled text */
+  --text-inverse: var(--primary-neutral);       /* Deep Neutral inverse text */
+  --text-accent: var(--primary-accent);         /* Acid Green accent text */
+  --text-brand: var(--primary-accent);          /* Acid Green brand text */
   --text-success: var(--color-success-light);   /* Light success text */
   --text-warning: var(--color-warning-light);   /* Light warning text */
   --text-error: var(--color-error-light);       /* Light error text */
@@ -212,14 +247,14 @@
 
 :root {
   /* Chart Color Palette */
-  --chart-1: var(--primary-neon);               /* Primary data series */
-  --chart-2: var(--primary-violet);             /* Secondary data series */
-  --chart-3: var(--color-info);                 /* Tertiary data series */
-  --chart-4: var(--color-success);              /* Quaternary data series */
-  --chart-5: var(--color-warning);              /* Quinary data series */
-  --chart-6: var(--gray-600);                   /* Additional series */
-  --chart-7: var(--violet-400);                 /* Additional series */
-  --chart-8: var(--neon-600);                   /* Additional series */
+  --chart-1: var(--primary-accent);             /* Acid Green - primary series */
+  --chart-2: var(--primary-dark);               /* Dark Green - secondary series */
+  --chart-3: var(--color-info);                 /* Blue - tertiary series */
+  --chart-4: var(--color-success);              /* Green - quaternary series */
+  --chart-5: var(--color-warning);              /* Yellow - quinary series */
+  --chart-6: var(--gray-500);                   /* Gray - additional series */
+  --chart-7: var(--accent-600);                 /* Medium accent */
+  --chart-8: var(--green-400);                  /* Medium green */
 }
 
 /* ================================================================
@@ -229,20 +264,24 @@
 
 :root {
   /* Gradient Colors */
-  --gradient-brand-start: var(--primary-violet); /* Brand gradient start */
-  --gradient-brand-end: var(--primary-neon);     /* Brand gradient end */
-  --gradient-hero-start: var(--gray-900);        /* Hero gradient start */
-  --gradient-hero-middle: var(--primary-violet); /* Hero gradient middle */
-  --gradient-hero-end: var(--primary-neon);      /* Hero gradient end */
+  --gradient-brand-start: var(--primary-dark);   /* Dark Green gradient start */
+  --gradient-brand-end: var(--primary-accent);   /* Acid Green gradient end */
+  --gradient-hero-start: var(--primary-dark);    /* Dark Green hero start */
+  --gradient-hero-middle: var(--green-500);      /* Mid green hero middle */
+  --gradient-hero-end: var(--primary-accent);    /* Acid Green hero end */
 
   /* Shadow Colors */
-  --shadow-color: oklch(0.26 0.08 258);          /* Base shadow color */
-  --shadow-neon: oklch(0.91 0.20 127 / 0.25);   /* Neon glow shadow */
-  --shadow-violet: oklch(0.67 0.25 286 / 0.25);  /* Violet glow shadow */
+  --shadow-color: oklch(0.26 0.01 155 / 0.15);   /* Deep Neutral shadow */
+  --shadow-accent: oklch(0.89 0.24 128 / 0.25);  /* Acid Green glow shadow */
+  --shadow-dark: oklch(0.30 0.06 165 / 0.30);    /* Dark Green glow shadow */
+
+  /* Legacy shadow aliases */
+  --shadow-neon: var(--shadow-accent);
+  --shadow-violet: var(--shadow-dark);
 
   /* Overlay Colors */
-  --overlay-light: oklch(1 0 0 / 0.8);           /* Light overlay */
-  --overlay-dark: oklch(0.26 0.08 258 / 0.8);    /* Dark overlay */
+  --overlay-light: oklch(0.98 0.005 155 / 0.8);  /* Off-White overlay */
+  --overlay-dark: oklch(0.30 0.06 165 / 0.85);   /* Dark Green overlay */
 }
 
 /* ================================================================
@@ -251,11 +290,14 @@
    ================================================================ */
 
 :root {
-  /* Cultural Colors */
-  --color-nigerian-green: oklch(0.6 0.15 142);   /* Nigerian flag green */
-  --color-trust-blue: oklch(0.5 0.12 250);       /* Trust and reliability */
-  --color-prosperity-gold: oklch(0.8 0.15 85);   /* Prosperity and success */
-  --color-safety-orange: oklch(0.7 0.18 45);     /* Safety and attention */
+  /* Cultural Colors - harmonized with new palette */
+  --color-nigerian-green: var(--primary-dark);   /* Nigerian flag green (Dark Green) */
+  --color-trust-green: oklch(0.45 0.08 165);     /* Trust and reliability */
+  --color-prosperity-gold: oklch(0.80 0.15 85);  /* Prosperity and success */
+  --color-safety-orange: oklch(0.70 0.18 45);    /* Safety and attention */
+
+  /* Legacy alias */
+  --color-trust-blue: var(--color-trust-green);
 }
 
 /* ================================================================
@@ -266,15 +308,15 @@
 @media (prefers-contrast: high) {
   :root {
     /* High Contrast Mode Adjustments */
-    --border: oklch(0.5 0 0);                     /* Stronger borders */
-    --ring: oklch(0.2 0 0);                       /* Stronger focus rings */
+    --border: oklch(0.4 0.02 155);                /* Stronger borders */
+    --ring: var(--primary-neutral);               /* Deep Neutral focus rings */
     --text-muted: var(--gray-700);                /* Darker muted text */
   }
 
   .dark {
     /* High Contrast Dark Mode */
-    --border: oklch(0.7 0 0);                     /* Lighter borders */
-    --ring: oklch(0.8 0 0);                       /* Lighter focus rings */
+    --border: oklch(0.7 0.01 155);                /* Lighter borders */
+    --ring: var(--primary-accent);                /* Acid Green focus rings */
     --text-muted: var(--gray-200);                /* Lighter muted text */
   }
 }
@@ -287,13 +329,23 @@
 @layer utilities {
   /* Background Colors */
   .bg-brand-dark { background-color: var(--color-brand-dark); }
-  .bg-brand-violet { background-color: var(--color-brand-violet); }
-  .bg-brand-neon { background-color: var(--color-brand-neon); }
+  .bg-brand-light { background-color: var(--color-brand-light); }
+  .bg-brand-accent { background-color: var(--color-brand-accent); }
+  .bg-brand-neutral { background-color: var(--color-brand-neutral); }
+
+  /* Legacy aliases */
+  .bg-brand-neon { background-color: var(--color-brand-accent); }
+  .bg-brand-violet { background-color: var(--color-brand-neutral); }
 
   /* Text Colors */
   .text-brand-dark { color: var(--color-brand-dark); }
-  .text-brand-violet { color: var(--color-brand-violet); }
-  .text-brand-neon { color: var(--color-brand-neon); }
+  .text-brand-light { color: var(--color-brand-light); }
+  .text-brand-accent { color: var(--color-brand-accent); }
+  .text-brand-neutral { color: var(--color-brand-neutral); }
+
+  /* Legacy aliases */
+  .text-brand-neon { color: var(--color-brand-accent); }
+  .text-brand-violet { color: var(--color-brand-neutral); }
 
   /* Status Colors */
   .text-success { color: var(--color-success); }
@@ -308,8 +360,13 @@
 
   /* Border Colors */
   .border-brand-dark { border-color: var(--color-brand-dark); }
-  .border-brand-violet { border-color: var(--color-brand-violet); }
-  .border-brand-neon { border-color: var(--color-brand-neon); }
+  .border-brand-light { border-color: var(--color-brand-light); }
+  .border-brand-accent { border-color: var(--color-brand-accent); }
+  .border-brand-neutral { border-color: var(--color-brand-neutral); }
+
+  /* Legacy aliases */
+  .border-brand-neon { border-color: var(--color-brand-accent); }
+  .border-brand-violet { border-color: var(--color-brand-neutral); }
 
   /* Gradient Backgrounds */
   .bg-gradient-brand {
@@ -318,5 +375,10 @@
 
   .bg-gradient-hero {
     background: linear-gradient(135deg, var(--gradient-hero-start) 0%, var(--gradient-hero-middle) 50%, var(--gradient-hero-end) 100%);
+  }
+
+  /* New accent gradient */
+  .bg-gradient-accent {
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary-accent));
   }
 }

@@ -2,15 +2,15 @@
 
 | Role               | Use Case                                               | Color | Hex       |
 | ------------------ | ------------------------------------------------------ | ----- | --------- |
-| **Primary Dark**   | Base UI, Headers, Navigation, Footers, Cards           | ■     | `#242834` |
-| **Primary Neon**   | CTAs, Highlights, Active States, Important Badges      | ■     | `#B6FF00` |
-| **Primary Violet** | Secondary accents, Gradients, Empty states, Onboarding | ■     | `#7D53FF` |
+| **Primary Dark**   | Base UI, Headers, Navigation, Footers, Cards           | ■     | `#07402F` |
+| **Primary Accent** | CTAs, Highlights, Active States, Important Badges      | ■     | `#ADF434` |
+| **Primary Neutral**| Secondary accents, Text, Borders, Content backgrounds  | ■     | `#2E322E` |
 
 ---
 
 # ✅ **60-30-10 Application**
 
-## **✔ 60% — Primary Dark (#242834)**
+## **✔ 60% — Primary Dark (#07402F)**
 
 This is your **foundation**, forming the bulk of your UI.  
 It reinforces **trust, maturity, and professionalism**.
@@ -41,13 +41,17 @@ This is where your conservative brand tone strengthens.
 
 Recommended neutral ramp:
 
-- **Grey 100:** `#F7F8FA`
+- **Off-White:** `#F8F9F7` (Light backgrounds)
     
-- **Grey 300:** `#D7DAE2`
+- **Grey 100:** `#F0F1EE` (Subtle backgrounds)
     
-- **Grey 500:** `#9EA3B3`
+- **Grey 300:** `#C8CCC4` (Borders, dividers)
     
-- **Grey 700:** `#52586A`
+- **Grey 500:** `#7A8072` (Secondary text)
+    
+- **Grey 700:** `#4A5242` (Active text)
+    
+- **Deep Neutral:** `#2E322E` (Strong text, dark elements)
     
 
 Use for:
@@ -67,11 +71,11 @@ This keeps the UI breathable and corporate-clean.
 
 ---
 
-## **✔ 10% — Accents (Neon + Violet)**
+## **✔ 10% — Accents (Acid Green + Natural tones)**
 
 This is where **your unique identity** lives.
 
-### ✅ **Neon Green (#B6FF00)**
+### ✅ **Acid Green (#ADF434)**
 
 Use for:
 
@@ -83,24 +87,24 @@ Use for:
     
 - Success alerts
     
-- Key confirmation steps (RealProof carryover)
+- Key confirmation steps (verification focus)
     
 
-### ✅ **Violet (#7D53FF)**
+### ✅ **Deep Neutral (#2E322E)**
 
 Use for:
 
 - Secondary CTAs
     
-- Gradient blends (Neon → Violet)
+- Text content and descriptions
     
-- Interactive onboarding
+- Border elements and dividers
     
-- Tooltips
+- Subtle background elements
     
-- Map highlights
+- Content containers
     
-- Selling features on marketing pages
+- Supporting interface elements
     
 
 ❗ Using them sparingly (10%) keeps it professional while feeling quietly high-tech.
@@ -109,11 +113,11 @@ Use for:
 
 # ✅ **Why This Still Feels “Conservative Professional”**
 
-Even with neon:  
-✅ The dark base anchors the brand  
-✅ Neutrals keep the system mature  
-✅ Neon acts only as a guide, not decoration  
-✅ Violet supports tech flavor without overpowering  
+Even with bright accent:  
+✅ The dark green base anchors the brand with natural authority  
+✅ Neutrals keep the system mature and professional  
+✅ Acid green acts only as a guide, not decoration  
+✅ Deep neutral supports content hierarchy without overpowering  
 ✅ Strict 60-30-10 keeps everything controlled and premium
 
 This is the same structure used by top-tier brands like:
@@ -133,13 +137,13 @@ This is the same structure used by top-tier brands like:
 
 # ✅ **Visual Identity Summary**
 
-- **Brand Tone:** Professional, modern, credible
+- **Brand Tone:** Professional, natural, trustworthy
     
-- **Color Strategy:** Conservative base + controlled modern accents
+- **Color Strategy:** Earth-tone foundation + controlled vibrant accents
     
-- **Vibe:** Corporate-grade trust with subtle futurism
+- **Vibe:** Corporate-grade trust with natural growth symbolism
     
-- **Differentiator:** The neon-violet dual accent, very RealEST-specific
+- **Differentiator:** The acid green + earth tone combination, very RealEST-specific
     
 
 ---

@@ -61,7 +61,7 @@ export default function SignUpPage() {
       }
 
       if (data.user) {
-        router.push("/auth/sign-up-success");
+        router.push("/sign-up-success");
       }
     } catch (err) {
       setError("An unexpected error occurred");

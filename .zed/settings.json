@@ -8,23 +8,23 @@
     "button": true,
     "dock": "right",
     "default_width": 400,
-    "custom_instructions": "You are an expert full-stack developer working on the RealEST property marketplace project. Always reference the design system documentation in docs/zed-context-realest-design-system.md for design decisions, component implementations, and brand guidelines. Use HeroUI v3 as the primary component library and UntitledUI for status components. Follow the established color palette (#242834, #B6FF00, #7D53FF) and typography system. Ensure all code follows React 19, Next.js 16, and TypeScript best practices while maintaining Nigerian market cultural sensitivity."
+    "custom_instructions": "You are an expert full-stack developer working on the RealEST property marketplace project. Always reference the design system documentation in docs/zed-context-realest-design-system.md for design decisions, component implementations, and brand guidelines. Use HeroUI v3 as the primary component library and UntitledUI for status components. Follow the established color palette (Dark Green #07402F, Acid Green #ADF434, Deep Neutral #2E322E, Off-White #F8F9F7) and typography system. Ensure all code follows React 19, Next.js 16, and TypeScript best practices while maintaining Nigerian market cultural sensitivity."
   },
   "context_servers": {
     "heroui": {
       "command": "npx",
-      "args": ["-y","@heroui/mcp"],
+      "args": ["-y", "@heroui/mcp"],
       "source": "custom"
     },
     "heroui-react": {
       "command": "npx",
-      "args": ["-y","@heroui/react-mcp@latest"],
+      "args": ["-y", "@heroui/react-mcp@latest"],
       "env": {},
       "source": "custom"
     },
     "supabase": {
       "command": "npx",
-      "args": ["-y","mcp-remote","https://mcp.supabase.com/mcp?project_ref=evlkccjtirecdxksoqmq"],
+      "args": ["-y", "mcp-remote", "https://mcp.supabase.com/mcp"],
       "source": "custom"
     }
   },

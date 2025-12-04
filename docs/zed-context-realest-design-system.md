@@ -54,30 +54,30 @@ This project has access to specialized MCP servers for real-time documentation a
 
 ```css
 /* Primary Colors */
---color-primary-dark: #242834;     /* 60% - Foundation color */
---color-primary-neon: #B6FF00;     /* 10% - Accent/CTA color */
---color-primary-violet: #7D53FF;   /* 30% - Secondary accent */
+--color-primary-dark: #07402F;     /* 60% - Foundation color */
+--color-primary-accent: #ADF434;   /* 10% - Accent/CTA color */
+--color-primary-neutral: #2E322E;  /* 30% - Secondary neutral */
 
 /* OKLCH Equivalents */
---primary-dark: oklch(0.26 0.08 258);
---primary-neon: oklch(0.91 0.20 127);
---primary-violet: oklch(0.67 0.25 286);
+--primary-dark: oklch(0.30 0.06 165);
+--primary-accent: oklch(0.89 0.24 128);
+--primary-neutral: oklch(0.26 0.01 155);
 ```
 
 ### Extended Grayscale System
 
 ```css
-/* Derived from primary dark (#242834) */
---gray-50: oklch(0.98 0.005 258);   /* Almost white with subtle navy tint */
---gray-100: oklch(0.95 0.01 258);
---gray-200: oklch(0.88 0.015 258);
---gray-300: oklch(0.78 0.02 258);
---gray-400: oklch(0.65 0.025 258);
---gray-500: oklch(0.52 0.03 258);
---gray-600: oklch(0.42 0.035 258);
---gray-700: oklch(0.32 0.04 258);   /* Close to primary dark */
---gray-800: oklch(0.26 0.045 258);  /* Primary dark */
---gray-900: oklch(0.18 0.05 258);   /* Darker than primary */
+/* Derived from primary dark (#07402F) */
+--gray-50: oklch(0.98 0.005 155);   /* Off-White with subtle green tint */
+--gray-100: oklch(0.95 0.008 155);
+--gray-200: oklch(0.88 0.012 155);
+--gray-300: oklch(0.78 0.015 155);
+--gray-400: oklch(0.65 0.018 155);
+--gray-500: oklch(0.52 0.020 155);
+--gray-600: oklch(0.42 0.022 155);
+--gray-700: oklch(0.32 0.025 155);  /* Close to primary dark */
+--gray-800: oklch(0.26 0.015 155);  /* Deep neutral equivalent */
+--gray-900: oklch(0.18 0.020 155);  /* Darker than primary */
 ```
 
 ### Semantic Color Tokens
@@ -99,21 +99,21 @@ This project has access to specialized MCP servers for real-time documentation a
 
 ### Color Usage Guidelines
 
-**60% Primary Dark (#242834)**
+**60% Primary Dark (#07402F)**
 - Page backgrounds in dark mode
 - Navigation headers
 - Primary text content
 - Main container backgrounds
 - Footer areas
 
-**30% Violet Secondary (#7D53FF)**
+**30% Deep Neutral (#2E322E)**
 - Secondary buttons
 - Feature highlights
 - Gradient overlays
 - Progress indicators
 - Interactive elements
 
-**10% Neon Accent (#B6FF00)**
+**10% Acid Green Accent (#ADF434)**
 - Primary CTAs
 - Success states
 - Verified badges
