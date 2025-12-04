@@ -7,7 +7,15 @@
     "dev": "next dev",
     "lint": "eslint .",
     "start": "next start",
-    "test": "echo 'no tests'"
+    "test": "echo 'no tests'",
+    "setup:branches": "bash scripts/setup-branch-management.sh",
+    "check:deployment": "bash scripts/check-deployment.sh",
+    "switch:develop": "bash scripts/switch-branch.sh develop",
+    "switch:staging": "bash scripts/switch-branch.sh staging",
+    "switch:main": "bash scripts/switch-branch.sh main",
+    "dev:coming-soon": "NEXT_PUBLIC_APP_MODE=coming-soon npm run dev",
+    "dev:full-site": "NEXT_PUBLIC_APP_MODE=full-site npm run dev",
+    "dev:demo": "NEXT_PUBLIC_APP_MODE=development npm run dev"
   },
   "dependencies": {
     "@heroui/react": "^3.0.0-alpha.35",
