@@ -83,7 +83,7 @@ Use for:
     
 - Success alerts
     
-- Key confirmation steps (RealProof carryover)
+- Key confirmation steps (verification focus)
     
 
 ### ✅ **Violet (#7D53FF)**

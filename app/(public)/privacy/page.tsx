@@ -186,7 +186,7 @@ export default function PrivacyPage() {
               <Card.Content className="space-y-4">
                 <h2 className="text-2xl font-bold">Introduction</h2>
                 <p className="text-muted-foreground leading-relaxed">
-                  This Privacy Policy explains how RealProof ("we," "us," or
+                  This Privacy Policy explains how RealEST ("we," "us," or
                   "our") collects, uses, discloses, and safeguards your
                   information when you visit our website, use our services, or
                   interact with our platform. We respect your privacy and are
@@ -320,7 +320,7 @@ export default function PrivacyPage() {
                       <div>
                         <p className="font-semibold">Email</p>
                         <p className="text-muted-foreground">
-                          privacy@realproof.com
+                          privacy@realest.ng
                         </p>
                       </div>
                     </div>
@@ -329,7 +329,7 @@ export default function PrivacyPage() {
                       <div>
                         <p className="font-semibold">Data Protection Officer</p>
                         <p className="text-muted-foreground">
-                          dpo@realproof.com
+                          dpo@realest.ng
                         </p>
                       </div>
                     </div>

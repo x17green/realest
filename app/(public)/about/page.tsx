@@ -92,7 +92,7 @@ export default function AboutPage() {
             <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-2 mb-6">
               <Sparkles className="w-4 h-4 text-primary" />
               <span className="text-sm font-medium text-primary">
-                About RealProof
+                About RealEST
               </span>
             </div>
 
@@ -178,7 +178,7 @@ export default function AboutPage() {
               <div className="space-y-6">
                 <h3 className="text-2xl font-bold">Our Solution</h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  RealProof was born from the vision to create a marketplace
+                  RealEST was born from the vision to create a marketplace
                   where every property is verified, every listing is authentic,
                   and every transaction is secure.
                 </p>
@@ -236,7 +236,7 @@ export default function AboutPage() {
               Meet Our Team
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              The passionate experts behind RealProof
+              The passionate experts behind RealEST
             </p>
           </div>
 
@@ -272,7 +272,7 @@ export default function AboutPage() {
               </h2>
               <p className="text-lg text-muted-foreground mb-8">
                 Be part of the future of real estate. Whether you're buying,
-                selling, or renting, RealProof is here to help.
+                selling, or renting, RealEST is here to help.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/login">
