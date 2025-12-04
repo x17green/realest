@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 import { RealEstButton } from '@/components/heroui/realest-button'
 import { StatusBadge, VerifiedBadge } from '@/components/ui/status-badge'
 import { StatusDot } from '@/components/untitledui/status-components'
-import { useRealEstTheme } from '@/components/providers/realest-theme-provider'
+import { ThemeToggleCompact } from '@/components/ui/theme-toggle-wrapper'
 
 // ================================================================
 // HEADER NAVIGATION COMPONENT
@@ -34,7 +34,6 @@ export function HeaderNavigation({
   className
 }: HeaderNavigationProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const { theme, toggleTheme } = useRealEstTheme()
 
   return (
     <header className={cn(
@@ -75,14 +74,7 @@ export function HeaderNavigation({
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center gap-4">
             {/* Theme Toggle */}
-            <RealEstButton
-              variant="ghost"
-              size="sm"
-              onClick={toggleTheme}
-              aria-label="Toggle theme"
-            >
-              {theme === 'light' ? '🌙' : '☀️'}
-            </RealEstButton>
+            <ThemeToggleCompact />
 
             {!isAuthenticated ? (
               <>
@@ -199,14 +191,10 @@ export function HeaderNavigation({
                 </>
               )}
 
-              <RealEstButton
-                variant="ghost"
-                size="sm"
-                className="w-full"
-                onClick={toggleTheme}
-              >
-                {theme === 'light' ? '🌙 Dark Mode' : '☀️ Light Mode'}
-              </RealEstButton>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Theme</span>
+                <ThemeToggleCompact />
+              </div>
             </div>
           </div>
         )}

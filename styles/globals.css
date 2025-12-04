@@ -194,14 +194,14 @@
 
 .dark {
   /* Sidebar specific overrides for dark mode */
-  --sidebar: var(--gray-800);
-  --sidebar-foreground: var(--gray-50);
-  --sidebar-primary: var(--primary-neon);
+  --sidebar: var(--primary-neutral);
+  --sidebar-foreground: var(--primary-light);
+  --sidebar-primary: var(--primary-accent);
   --sidebar-primary-foreground: var(--primary-dark);
   --sidebar-accent: var(--gray-700);
-  --sidebar-accent-foreground: var(--gray-50);
+  --sidebar-accent-foreground: var(--primary-light);
   --sidebar-border: var(--gray-700);
-  --sidebar-ring: var(--primary-neon);
+  --sidebar-ring: var(--primary-accent);
 }
 
 /* ================================================================
@@ -283,7 +283,7 @@
 
   /* Selection Colors */
   ::selection {
-    background-color: var(--primary-neon);
+    background-color: var(--primary-accent);
     color: var(--primary-dark);
   }
 
@@ -325,7 +325,7 @@
 
   .card-enhanced:hover {
     box-shadow: var(--shadow-lg);
-    border-color: var(--primary-violet);
+    border-color: var(--primary-dark);
   }
 
   /* Status Indicators */
@@ -346,33 +346,53 @@
 
   /* Gradient Backgrounds */
   .bg-gradient-brand {
-    background: linear-gradient(135deg, var(--primary-violet), var(--primary-neon));
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary-accent));
   }
 
   .bg-gradient-hero {
-    background: linear-gradient(135deg, var(--gray-900) 0%, var(--primary-violet) 50%, var(--primary-neon) 100%);
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--green-500) 50%, var(--primary-accent) 100%);
   }
 
   /* Button Glow Effects */
+  .btn-glow-accent {
+    box-shadow: var(--shadow-accent);
+  }
+
   .btn-glow-neon {
-    box-shadow: var(--shadow-neon);
+    box-shadow: var(--shadow-accent);
   }
 
   .btn-glow-violet {
-    box-shadow: var(--shadow-violet);
+    box-shadow: var(--shadow-dark);
+  }
+
+  .btn-glow-dark {
+    box-shadow: var(--shadow-dark);
   }
 
   /* Text Color Utilities */
-  .text-brand-neon {
-    color: var(--primary-neon);
+  .text-brand-accent {
+    color: var(--primary-accent);
   }
 
-  .text-brand-violet {
-    color: var(--primary-violet);
+  .text-brand-neon {
+    color: var(--primary-accent);
   }
 
   .text-brand-dark {
     color: var(--primary-dark);
+  }
+
+  .text-brand-light {
+    color: var(--primary-light);
+  }
+
+  .text-brand-neutral {
+    color: var(--primary-neutral);
+  }
+
+  .text-brand-violet {
+    color: var(--primary-neutral);
   }
 }
 

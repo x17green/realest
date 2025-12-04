@@ -272,4 +272,4 @@ export function VerificationBadgeGroup({
 }
 
 export { verificationBadgeVariants };
-export type { VerificationBadgeProps };
+// export type { VerificationBadgeProps };

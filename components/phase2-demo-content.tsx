@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useState } from 'react'
-import { RealEstThemeProvider, useRealEstTheme } from '@/components/providers/realest-theme-provider'
+import { useRealEstTheme } from '@/components/providers/realest-theme-provider'
+import { ThemeToggleDropdown } from '@/components/ui/theme-toggle-wrapper'
 import {
   RealEstButton,
   FindPropertiesButton,
@@ -32,9 +33,10 @@ import {
   ContactRequestToast
 } from '@/components/untitledui/status-components'
 import { StatusBadge, VerifiedBadge } from '@/components/ui/status-badge'
+import { VerificationBadge } from './realest'
 
 export default function Phase2DemoContent() {
-  const { theme, toggleTheme } = useRealEstTheme()
+  const { theme, effectiveTheme, systemTheme } = useRealEstTheme()
   const [toastVisible, setToastVisible] = useState(false)
   const [toastType, setToastType] = useState<'saved' | 'verified' | 'contact'>('saved')
 
@@ -56,13 +58,11 @@ export default function Phase2DemoContent() {
             </div>
             <div className="flex items-center gap-4">
               <StatusIndicator
-                label={`${theme} mode`}
+                label={`${effectiveTheme} mode ${theme === 'system' ? '(auto)' : ''}`}
                 status="verified"
                 position="left"
               />
-              <RealEstButton variant="tertiary" size="sm" onClick={toggleTheme}>
-                {theme === 'light' ? '🌙' : '☀️'} Toggle Theme
-              </RealEstButton>
+              <ThemeToggleDropdown size="sm" />
             </div>
           </div>
         </div>
@@ -549,6 +549,7 @@ export default function Phase2DemoContent() {
           <div className="flex items-center justify-center gap-4">
             <div className="font-display text-2xl font-bold text-brand-violet">RealEST</div>
             <VerifiedBadge size="sm">Verified</VerifiedBadge>
+            <VerificationBadge size="sm" status="fully-verified">Verified</VerificationBadge>
             <StatusBadge variant="available" size="sm">Phase 2 Complete</StatusBadge>
           </div>
           <p className="text-muted-foreground max-w-2xl mx-auto">

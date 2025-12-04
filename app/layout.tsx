@@ -1,6 +1,7 @@
 import type React from "react";
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
+import { RealEstThemeProvider } from "@/components/providers/realest-theme-provider";
 import "../styles/globals.css";
 
 export const metadata: Metadata = {
@@ -111,7 +112,7 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="//api.mapbox.com" />
 
         {/* Theme color for mobile browsers */}
-        <meta name="theme-color" content="#7D53FF" />
+        <meta name="theme-color" content="#07402F" />
         <meta name="color-scheme" content="light dark" />
 
         {/* Viewport meta for responsive design */}
@@ -126,7 +127,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="RealEST" />
 
         {/* Microsoft specific meta tags */}
-        <meta name="msapplication-TileColor" content="#7D53FF" />
+        <meta name="msapplication-TileColor" content="#07402F" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
 
         {/* Favicon and app icons */}
@@ -135,20 +136,22 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
       </head>
-      <body className="font-body antialiased bg-background text-foreground min-h-screen">
-        <noscript>
-          <div className="fixed inset-0 bg-background flex items-center justify-center z-50">
-            <div className="text-center p-8">
-              <h1 className="text-h1 mb-4">JavaScript Required</h1>
-              <p className="text-body-m text-muted-foreground">
-                RealEST requires JavaScript to function properly. Please enable
-                JavaScript in your browser.
-              </p>
+      <body className="font-body antialiased">
+        <RealEstThemeProvider defaultTheme="system" enableSystem={true}>
+          <noscript>
+            <div className="fixed inset-0 bg-background flex items-center justify-center z-50">
+              <div className="text-center p-8">
+                <h1 className="text-h1 mb-4">JavaScript Required</h1>
+                <p className="text-body-m text-muted-foreground">
+                  RealEST requires JavaScript to function properly. Please enable
+                  JavaScript in your browser.
+                </p>
+              </div>
             </div>
-          </div>
-        </noscript>
-        {children}
-        <Analytics />
+          </noscript>
+          {children}
+          <Analytics />
+        </RealEstThemeProvider>
       </body>
     </html>
   );
