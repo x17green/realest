@@ -20,7 +20,7 @@ import HeroSection from "./hero-section";
 import FeaturedProperties from "./featured-properties";
 
 const ComingSoonHero = () => {
-  const releaseDateStr = process.env.NEXT_PUBLIC_RELEASE_DATE || '2025-03-01T00:00:00Z';
+  const releaseDateStr = process.env.NEXT_PUBLIC_RELEASE_DATE || '2026-03-01T00:00:00Z';
   const releaseDate = new Date(releaseDateStr).getTime();
 
   const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
