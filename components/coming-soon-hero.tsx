@@ -20,14 +20,20 @@ import HeroSection from "./hero-section";
 import FeaturedProperties from "./featured-properties";
 
 const ComingSoonHero = () => {
-  const releaseDateStr = process.env.NEXT_PUBLIC_RELEASE_DATE || '2026-03-01T00:00:00Z';
-  const releaseDate = new Date(releaseDateStr).getTime();
+  // Check if release date is actually set (not empty or just whitespace)
+  const releaseDateStr = process.env.NEXT_PUBLIC_RELEASE_DATE;
+  const hasReleaseDate = releaseDateStr && releaseDateStr.trim() !== '';
+  const releaseDate = hasReleaseDate ? new Date(releaseDateStr).getTime() : null;
 
-  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
+  const [timeLeft, setTimeLeft] = useState(() => hasReleaseDate ? calculateTimeLeft() : null);
   const [showFullSite, setShowFullSite] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   function calculateTimeLeft() {
+    if (!hasReleaseDate || !releaseDate) {
+      return null;
+    }
+
     const now = new Date().getTime();
     const difference = releaseDate - now;
 
@@ -46,18 +52,24 @@ const ComingSoonHero = () => {
 
   useEffect(() => {
     setMounted(true);
+
+    // Only set up timer if release date is configured
+    if (!hasReleaseDate) {
+      return;
+    }
+
     const timer = setInterval(() => {
       const newTimeLeft = calculateTimeLeft();
       setTimeLeft(newTimeLeft);
 
-      if (newTimeLeft.expired) {
+      if (newTimeLeft && newTimeLeft.expired) {
         setShowFullSite(true);
         clearInterval(timer);
       }
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [releaseDate]);
+  }, [hasReleaseDate, releaseDate]);
 
   // Don't render until mounted to prevent hydration issues
   if (!mounted) {
@@ -69,7 +81,7 @@ const ComingSoonHero = () => {
   }
 
   // If countdown expired or manual override, show full site
-  if (showFullSite || timeLeft.expired) {
+  if (showFullSite || (timeLeft && timeLeft.expired)) {
     return (
       <div className="min-h-screen w-full bg-background">
         <Header user={null} />
@@ -100,7 +112,6 @@ const ComingSoonHero = () => {
 
   return (
     <div className="min-h-screen w-full bg-background">
-      {/*<Header user={null} />*/}
 
       <main className="relative w-full overflow-hidden">
         {/* Animated Background */}
@@ -138,55 +149,73 @@ const ComingSoonHero = () => {
               Get ready for a revolutionary real estate experience.
             </p>
 
-            {/* Countdown Timer */}
-            <div className="max-w-2xl mx-auto mb-12 animate-scale-in">
-              <div className="bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl p-6 shadow-2xl">
-                <div className="flex items-center gap-2 mb-4 justify-center">
-                  <Clock className="w-5 h-5 text-primary" />
-                  <span className="text-body-m font-medium text-muted-foreground">
-                    Launching in
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-4 gap-4">
-                  <div className="text-center">
-                    <div className="bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 rounded-xl p-4">
-                      <div className="text-h1 font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                        {timeLeft.days.toString().padStart(2, '0')}
-                      </div>
-                      <div className="text-body-s text-muted-foreground mt-1">Days</div>
-                    </div>
+            {/* Countdown Timer - Only show if release date is set */}
+            {hasReleaseDate && timeLeft ? (
+              <div className="max-w-2xl mx-auto mb-12 animate-scale-in">
+                <div className="bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl p-6 shadow-2xl">
+                  <div className="flex items-center gap-2 mb-4 justify-center">
+                    <Clock className="w-5 h-5 text-primary" />
+                    <span className="text-body-m font-medium text-muted-foreground">
+                      Launching in
+                    </span>
                   </div>
 
-                  <div className="text-center">
-                    <div className="bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 rounded-xl p-4">
-                      <div className="text-h1 font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                        {timeLeft.hours.toString().padStart(2, '0')}
+                  <div className="grid grid-cols-4 gap-4">
+                    <div className="text-center">
+                      <div className="bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 rounded-xl p-4">
+                        <div className="text-h1 font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                          {timeLeft.days.toString().padStart(2, '0')}
+                        </div>
+                        <div className="text-body-s text-muted-foreground mt-1">Days</div>
                       </div>
-                      <div className="text-body-s text-muted-foreground mt-1">Hours</div>
                     </div>
-                  </div>
 
-                  <div className="text-center">
-                    <div className="bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 rounded-xl p-4">
-                      <div className="text-h1 font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                        {timeLeft.minutes.toString().padStart(2, '0')}
+                    <div className="text-center">
+                      <div className="bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 rounded-xl p-4">
+                        <div className="text-h1 font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                          {timeLeft.hours.toString().padStart(2, '0')}
+                        </div>
+                        <div className="text-body-s text-muted-foreground mt-1">Hours</div>
                       </div>
-                      <div className="text-body-s text-muted-foreground mt-1">Minutes</div>
                     </div>
-                  </div>
 
-                  <div className="text-center">
-                    <div className="bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 rounded-xl p-4">
-                      <div className="text-h1 font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                        {timeLeft.seconds.toString().padStart(2, '0')}
+                    <div className="text-center">
+                      <div className="bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 rounded-xl p-4">
+                        <div className="text-h1 font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                          {timeLeft.minutes.toString().padStart(2, '0')}
+                        </div>
+                        <div className="text-body-s text-muted-foreground mt-1">Minutes</div>
                       </div>
-                      <div className="text-body-s text-muted-foreground mt-1">Seconds</div>
+                    </div>
+
+                    <div className="text-center">
+                      <div className="bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 rounded-xl p-4">
+                        <div className="text-h1 font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                          {timeLeft.seconds.toString().padStart(2, '0')}
+                        </div>
+                        <div className="text-body-s text-muted-foreground mt-1">Seconds</div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              // No release date set - show simple coming soon message
+              <div className="max-w-2xl mx-auto mb-12 animate-scale-in">
+                <div className="bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl p-6 shadow-2xl text-center">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 rounded-full mb-6">
+                    <Sparkles className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="text-h3 font-bold mb-3 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                    Get Ready for Launch
+                  </h3>
+                  <p className="text-body-m text-muted-foreground">
+                    We're putting the finishing touches on Nigeria's most trusted property marketplace.
+                    Launch date will be announced soon!
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* Feature Highlights */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
@@ -244,10 +273,13 @@ const ComingSoonHero = () => {
                 className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 px-8 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
                 isDisabled
               >
-                Get Notified at Launch
+                {hasReleaseDate ? 'Get Notified at Launch' : 'Notify Me When Ready'}
               </Button>
               <p className="text-body-xs text-muted-foreground">
-                Be the first to explore verified properties when we go live
+                {hasReleaseDate
+                  ? 'Be the first to explore verified properties when we go live'
+                  : 'Join our waitlist to be notified when we announce our launch date'
+                }
               </p>
             </div>
 
@@ -289,7 +321,6 @@ const ComingSoonHero = () => {
         </div>
       </main>
 
-      {/*<Footer />*/}
     </div>
   );
 };
