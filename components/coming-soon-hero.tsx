@@ -5,15 +5,18 @@ import { Button, Chip } from "@heroui/react";
 import {
   Calendar,
   MapPin,
+  MailCheck,
   TrendingUp,
   Building,
   Sparkles,
+  MapPinCheck,
   Clock,
   Star,
   Shield
 } from "lucide-react";
 import Header from "./header";
 import Footer from "./footer";
+import { HeroLogo } from "@/components/ui/real-est-logo";
 
 // Import the full website components for dynamic reveal
 import HeroSection from "./hero-section";
@@ -96,17 +99,17 @@ const ComingSoonHero = () => {
     {
       icon: Shield,
       title: "Geo-Verified Properties",
-      description: "Every property verified with precise location data"
+      description: "Every property is verified with precise location and on-site expert verification."
     },
     {
       icon: Star,
       title: "Zero Duplicates",
-      description: "Our proof-first approach eliminates fake listings"
+      description: "Every listing is uniquely verified, ensuring you never encounter fake or duplicate properties."
     },
     {
       icon: TrendingUp,
       title: "Real-Time Market Data",
-      description: "Access live property insights and market trends"
+      description: "Access live property insights, market trends, data-driven updates on pricing and availability."
     },
   ];
 
@@ -123,31 +126,36 @@ const ComingSoonHero = () => {
         <div className="absolute top-40 right-20 w-32 h-32 bg-secondary/10 rounded-full blur-xl animate-pulse delay-1000" />
         <div className="absolute bottom-20 left-1/4 w-24 h-24 bg-primary/5 rounded-full blur-xl animate-pulse delay-500" />
 
+        {/* Logo at top */}
+        <div className="relative z-10 flex justify-center pt-8">
+          <HeroLogo animated className="animate-fade-in" />
+        </div>
+
         {/* Main Content */}
         <div className="relative z-10 container mx-auto px-4 py-20 min-h-screen flex items-center">
           <div className="max-w-4xl mx-auto text-center">
             {/* Status Badge */}
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20 rounded-full px-4 py-2 mb-6 backdrop-blur-sm">
-              <Sparkles className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Nigeria's First Geo-Verified Marketplace
+            <div className="inline-flex items-center gap-2 animate-pulse bg-linear-to-l from-primary/10 to-accent/10 border border-primary/20 rounded-full px-4 py-2 mb-6 backdrop-blur-md">
+              <MapPinCheck className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium bg-linear-to-bl from-primary to-accent bg-clip-text text-transparent">
+                Geo-Tagged & Verified Property Marketplace
               </span>
             </div>
 
             {/* Main Heading */}
-            <h1 className="text-display-1 font-bold mb-6 gradient-text-slanted leading-tight animate-fade-in">
-              Something Amazing
+            <h1 className="text-display-1 font-bold mb-6 linear-text-slanted leading-tight animate-fade-in">
+              Nigeria’s Most Trusted
               <br />
-              <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-                Is Coming Soon
+              <span className="bg-linear-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+                Real Estate Platform
               </span>
             </h1>
 
             {/* Subtitle */}
-            <p className="text-body-l text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed animate-slide-up">
+            {/*<p className="text-body-l text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed animate-slide-up">
               We're building Nigeria's most trusted property marketplace with cutting-edge geo-verification technology.
               Get ready for a revolutionary real estate experience.
-            </p>
+            </p>*/}
 
             {/* Countdown Timer - Only show if release date is set */}
             {hasReleaseDate && timeLeft ? (
@@ -162,8 +170,8 @@ const ComingSoonHero = () => {
 
                   <div className="grid grid-cols-4 gap-4">
                     <div className="text-center">
-                      <div className="bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 rounded-xl p-4">
-                        <div className="text-h1 font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                      <div className="bg-linear-to-br from-primary/20 to-accent/20 border border-primary/30 rounded-xl p-4">
+                        <div className="text-h1 font-bold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
                           {timeLeft.days.toString().padStart(2, '0')}
                         </div>
                         <div className="text-body-s text-muted-foreground mt-1">Days</div>
@@ -171,8 +179,8 @@ const ComingSoonHero = () => {
                     </div>
 
                     <div className="text-center">
-                      <div className="bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 rounded-xl p-4">
-                        <div className="text-h1 font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                      <div className="bg-linear-to-br from-primary/20 to-accent/20 border border-primary/30 rounded-xl p-4">
+                        <div className="text-h1 font-bold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
                           {timeLeft.hours.toString().padStart(2, '0')}
                         </div>
                         <div className="text-body-s text-muted-foreground mt-1">Hours</div>
@@ -180,8 +188,8 @@ const ComingSoonHero = () => {
                     </div>
 
                     <div className="text-center">
-                      <div className="bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 rounded-xl p-4">
-                        <div className="text-h1 font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                      <div className="bg-linear-to-br from-primary/20 to-accent/20 border border-primary/30 rounded-xl py-4 px-0">
+                        <div className="text-h1 font-bold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
                           {timeLeft.minutes.toString().padStart(2, '0')}
                         </div>
                         <div className="text-body-s text-muted-foreground mt-1">Minutes</div>
@@ -189,8 +197,8 @@ const ComingSoonHero = () => {
                     </div>
 
                     <div className="text-center">
-                      <div className="bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 rounded-xl p-4">
-                        <div className="text-h1 font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                      <div className="bg-linear-to-br from-primary/20 to-accent/20 border border-primary/30 rounded-xl py-4 px-0">
+                        <div className="text-h1 font-bold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
                           {timeLeft.seconds.toString().padStart(2, '0')}
                         </div>
                         <div className="text-body-s text-muted-foreground mt-1">Seconds</div>
@@ -202,16 +210,21 @@ const ComingSoonHero = () => {
             ) : (
               // No release date set - show simple coming soon message
               <div className="max-w-2xl mx-auto mb-12 animate-scale-in">
-                <div className="bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl p-6 shadow-2xl text-center">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 rounded-full mb-6">
-                    <Sparkles className="w-8 h-8 text-primary" />
+                <div className="bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl p-6 shadow-2xl text-center animate-slide-up">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-linear-to-br from-primary/20 to-accent/20 border border-primary/30 rounded-full mb-6">
+                    <Sparkles className="w-8 h-8 text-accent bg-linear-to-r from-primary to-accent bg-clip-text" />
                   </div>
-                  <h3 className="text-h3 font-bold mb-3 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                  <h3 className="text-h3 font-bold mb-3 bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
                     Get Ready for Launch
                   </h3>
-                  <p className="text-body-m text-muted-foreground">
-                    We're putting the finishing touches on Nigeria's most trusted property marketplace.
-                    Launch date will be announced soon!
+                  <p className="text-body-m text-muted-foreground gap-2 flex flex-col">
+                    Nigeria’s first verified property marketplace,
+                    no fake listings, no duplicates, only real properties.
+                    Prepare for transparency, confidence, and pinpoint accuracy across every listing.
+                    <br />
+                    <span>
+                      Launch date coming soon!
+                    </span>
                   </p>
                 </div>
               </div>
@@ -222,11 +235,11 @@ const ComingSoonHero = () => {
               {features.map((feature, index) => (
                 <div
                   key={feature.title}
-                  className="bg-surface/50 backdrop-blur-sm border border-border/30 rounded-xl p-6 hover:bg-surface/70 transition-all duration-300 hover:scale-105"
+                  className="bg-surface/50 backdrop-blur-sm border border-border/30 rounded-xl p-6 hover:bg-surface/70 transition-all duration-300 hover:scale-105 shadow-sm hover:shadow-2xl animate-fade-in-up"
                   style={{ animationDelay: `${index * 200}ms` }}
                 >
-                  <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full flex items-center justify-center mb-4 mx-auto">
-                    <feature.icon className="w-6 h-6 text-primary" />
+                  <div className="w-12 h-12 bg-linear-to-br from-primary/20 to-accent/20 rounded-full flex items-center justify-center mb-4 mx-auto">
+                    <feature.icon className="w-6 h-6 text-accent" />
                   </div>
                   <h3 className="text-h4 font-semibold mb-2">{feature.title}</h3>
                   <p className="text-body-s text-muted-foreground">{feature.description}</p>
@@ -238,28 +251,28 @@ const ComingSoonHero = () => {
             <div className="flex flex-wrap gap-2 justify-center mb-8">
               <Chip
                 variant="secondary"
-                className="cursor-default bg-primary/10 border-primary/30 hover:bg-primary/15 transition-all duration-200 gap-2"
+                className="flex justify-center items-center cursor-default bg-primary/10 hover:bg-primary/15 transition-all duration-200 gap-2 p-2 border border-primary/20 rounded-xs"
               >
                 <Building className="w-4 h-4" />
                 Modern Apartments
               </Chip>
               <Chip
                 variant="secondary"
-                className="cursor-default bg-primary/10 border-primary/30 hover:bg-primary/15 transition-all duration-200 gap-2"
+                className="flex justify-center items-center cursor-default bg-primary/10 hover:bg-primary/15 transition-all duration-200 gap-2 p-2 border border-primary/20 rounded-xs"
               >
                 <TrendingUp className="w-4 h-4" />
-                Luxury Villas
+                Exclusive Luxury Villas
               </Chip>
               <Chip
                 variant="secondary"
-                className="cursor-default bg-primary/10 border-primary/30 hover:bg-primary/15 transition-all duration-200 gap-2"
+                className="flex justify-center items-center cursor-default bg-primary/10 hover:bg-primary/15 transition-all duration-200 gap-2 p-2 border border-primary/20 rounded-xs"
               >
                 <Calendar className="w-4 h-4" />
                 Event Spaces
               </Chip>
               <Chip
                 variant="secondary"
-                className="cursor-default bg-primary/10 border-primary/30 hover:bg-primary/15 transition-all duration-200 gap-2"
+                className="flex justify-center items-center cursor-default bg-primary/10 hover:bg-primary/15 transition-all duration-200 gap-2 p-2 border border-primary/20 rounded-xs"
               >
                 <MapPin className="w-4 h-4" />
                 Lagos • Abuja • PH
@@ -267,13 +280,17 @@ const ComingSoonHero = () => {
             </div>
 
             {/* CTA */}
-            <div className="space-y-4">
+            <div className="space-y-4 flex flex-col gap-2 justify-center mb-8">
               <Button
+                variant='ghost'
                 size="lg"
-                className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 px-8 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
-                isDisabled
+                className="flex justify-center items-center cursor-pointer bg-linear-to-tl from-primary/20 to-accent/20 hover:from-primary/40 hover:to-accent/40 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 gap-2 py-3 px-6 max-w-2xs mx-auto"
+                // isDisabled
               >
-                {hasReleaseDate ? 'Get Notified at Launch' : 'Notify Me When Ready'}
+                <MailCheck className="w-4 h-4 text-accent" />
+                <span className="text-sm font-medium bg-linear-to-bl from-primary to-accent bg-clip-text text-transparent">
+                  {hasReleaseDate ? 'Get Notified at Launch' : 'Notify Me When Ready'}
+                </span>
               </Button>
               <p className="text-body-xs text-muted-foreground">
                 {hasReleaseDate
@@ -286,7 +303,7 @@ const ComingSoonHero = () => {
             {/* Stats Preview */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-2xl mx-auto mt-16 animate-fade-in">
               <div className="text-center group hover:scale-105 transition-transform duration-200">
-                <div className="text-h2 font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-1">
+                <div className="text-h2 font-bold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent mb-1">
                   10K+
                 </div>
                 <div className="text-body-s text-muted-foreground">
@@ -294,7 +311,7 @@ const ComingSoonHero = () => {
                 </div>
               </div>
               <div className="text-center group hover:scale-105 transition-transform duration-200">
-                <div className="text-h2 font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-1">
+                <div className="text-h2 font-bold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent mb-1">
                   50K+
                 </div>
                 <div className="text-body-s text-muted-foreground">
@@ -302,7 +319,7 @@ const ComingSoonHero = () => {
                 </div>
               </div>
               <div className="text-center group hover:scale-105 transition-transform duration-200">
-                <div className="text-h2 font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-1">
+                <div className="text-h2 font-bold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent mb-1">
                   99.9%
                 </div>
                 <div className="text-body-s text-muted-foreground">
@@ -311,6 +328,11 @@ const ComingSoonHero = () => {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Logo at bottom */}
+        <div className="animate-pulse hover:animate-none relative z-10 flex justify-center pb-8">
+          <HeroLogo animated className="animate-fade-in opacity-60 hover:opacity-100 transition-opacity duration-300" />
         </div>
 
         {/* Bottom Wave */}
