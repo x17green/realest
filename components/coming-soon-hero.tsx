@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Header from "./header";
 import Footer from "./footer";
+import { HeroLogo } from "@/components/ui/real-est-logo";
 
 // Import the full website components for dynamic reveal
 import HeroSection from "./hero-section";
@@ -125,6 +126,11 @@ const ComingSoonHero = () => {
         <div className="absolute top-40 right-20 w-32 h-32 bg-secondary/10 rounded-full blur-xl animate-pulse delay-1000" />
         <div className="absolute bottom-20 left-1/4 w-24 h-24 bg-primary/5 rounded-full blur-xl animate-pulse delay-500" />
 
+        {/* Logo at top */}
+        <div className="relative z-10 flex justify-center pt-8">
+          <HeroLogo animated className="animate-fade-in" />
+        </div>
+
         {/* Main Content */}
         <div className="relative z-10 container mx-auto px-4 py-20 min-h-screen flex items-center">
           <div className="max-w-4xl mx-auto text-center">
@@ -212,9 +218,9 @@ const ComingSoonHero = () => {
                     Get Ready for Launch
                   </h3>
                   <p className="text-body-m text-muted-foreground gap-2 flex flex-col">
-                    Nigeria’s first verified property marketplace, 
-                    no fake listings, no duplicates, only real properties. 
-                    Prepare for transparency, confidence, and pinpoint accuracy across every listing. 
+                    Nigeria’s first verified property marketplace,
+                    no fake listings, no duplicates, only real properties.
+                    Prepare for transparency, confidence, and pinpoint accuracy across every listing.
                     <br />
                     <span>
                       Launch date coming soon!
@@ -322,6 +328,11 @@ const ComingSoonHero = () => {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Logo at bottom */}
+        <div className="animate-pulse hover:animate-none relative z-10 flex justify-center pb-8">
+          <HeroLogo animated className="animate-fade-in opacity-60 hover:opacity-100 transition-opacity duration-300" />
         </div>
 
         {/* Bottom Wave */}
