@@ -170,8 +170,8 @@ const ComingSoonHero = () => {
 
                   <div className="grid grid-cols-4 gap-4">
                     <div className="text-center">
-                      <div className="bg-linear-to-br from-primary/20 to-accent/20 border border-primary/30 rounded-xl p-4">
-                        <div className="text-h1 font-bold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
+                      <div className="bg-linear-to-br from-primary/20 to-accent/20 border border-primary/30 rounded-xl py-4 px-0">
+                        <div className="text-4xl font-bold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent p-1">
                           {timeLeft.days.toString().padStart(2, '0')}
                         </div>
                         <div className="text-body-s text-muted-foreground mt-1">Days</div>
@@ -179,8 +179,8 @@ const ComingSoonHero = () => {
                     </div>
 
                     <div className="text-center">
-                      <div className="bg-linear-to-br from-primary/20 to-accent/20 border border-primary/30 rounded-xl p-4">
-                        <div className="text-h1 font-bold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
+                      <div className="bg-linear-to-br from-primary/20 to-accent/20 border border-primary/30 rounded-xl py-4 px-0">
+                        <div className="text-4xl font-bold bg-linear-to-r from-primary to-accent bg-clip-text p-1 text-transparent">
                           {timeLeft.hours.toString().padStart(2, '0')}
                         </div>
                         <div className="text-body-s text-muted-foreground mt-1">Hours</div>
@@ -189,7 +189,7 @@ const ComingSoonHero = () => {
 
                     <div className="text-center">
                       <div className="bg-linear-to-br from-primary/20 to-accent/20 border border-primary/30 rounded-xl py-4 px-0">
-                        <div className="text-h1 font-bold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
+                        <div className="text-4xl font-bold bg-linear-to-r from-primary to-accent bg-clip-text p-1 text-transparent">
                           {timeLeft.minutes.toString().padStart(2, '0')}
                         </div>
                         <div className="text-body-s text-muted-foreground mt-1">Minutes</div>
@@ -198,7 +198,7 @@ const ComingSoonHero = () => {
 
                     <div className="text-center">
                       <div className="bg-linear-to-br from-primary/20 to-accent/20 border border-primary/30 rounded-xl py-4 px-0">
-                        <div className="text-h1 font-bold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
+                        <div className="text-4xl font-bold bg-linear-to-r from-primary to-accent bg-clip-text p-1 text-transparent">
                           {timeLeft.seconds.toString().padStart(2, '0')}
                         </div>
                         <div className="text-body-s text-muted-foreground mt-1">Seconds</div>
