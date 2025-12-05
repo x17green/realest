@@ -34,6 +34,7 @@ import {
 } from '@/components/untitledui/status-components'
 import { StatusBadge, VerifiedBadge } from '@/components/ui/status-badge'
 import { VerificationBadge } from './realest'
+import RealEstLogo from './ui/real-est-logo'
 
 export default function Phase2DemoContent() {
   const { theme, effectiveTheme, systemTheme } = useRealEstTheme()
@@ -547,6 +548,7 @@ export default function Phase2DemoContent() {
         {/* Footer */}
         <footer className="text-center space-y-6 py-12 border-t border-border">
           <div className="flex items-center justify-center gap-4">
+            <RealEstLogo variant="text" size="xl" hideTagline />
             <div className="font-display text-2xl font-bold text-brand-violet">RealEST</div>
             <VerifiedBadge size="sm">Verified</VerifiedBadge>
             <VerificationBadge size="sm" status="fully-verified">Verified</VerificationBadge>

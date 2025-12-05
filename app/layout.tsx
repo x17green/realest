@@ -5,9 +5,9 @@ import { RealEstThemeProvider } from "@/components/providers/realest-theme-provi
 import "../styles/globals.css";
 
 export const metadata: Metadata = {
-  title: "RealEST - Geo-Verified Property Marketplace",
+  title: "RealEST - Nigeria’s Most Trusted Real Estate Platform",
   description:
-    "Find Your Next Move. Discover geo-verified, authentic properties with RealEST's proof-first marketplace. No duplicates, only verified listings.",
+    "Discover geo-verified, authentic properties with RealEST's proof-first marketplace. No duplicates, only verified listings.",
   keywords: [
     "real estate",
     "property marketplace",
@@ -17,7 +17,11 @@ export const metadata: Metadata = {
     "property verification",
     "real estate Nigeria",
   ],
-  authors: [{ name: "RealEST Team" }],
+  authors: [
+    { name: "RealEST Team" },
+    { name: "AstroMANIA Enterprise", url: "https://astromania.tech" },
+    { name: "Precious Okoyen", url: "https://x17green.tech" }
+  ],
   creator: "RealEST",
   publisher: "RealEST",
   metadataBase: new URL("https://realest.ng"),
@@ -124,7 +128,7 @@ export default function RootLayout({
         {/* Apple specific meta tags */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="RealEST" />
+        <meta name="apple-mobile-web-app-title" content="RealEST Connect" />
 
         {/* Microsoft specific meta tags */}
         <meta name="msapplication-TileColor" content="#07402F" />

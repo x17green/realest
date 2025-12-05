@@ -16,6 +16,7 @@ import {
   User as UserIcon,
   LogOut,
 } from "lucide-react";
+import { HeaderLogo } from "@/components/ui/real-est-logo";
 import { ThemeToggleCompact } from "@/components/ui/theme-toggle-wrapper";
 
 interface HeaderProps {
@@ -47,18 +48,8 @@ export default function Header({ user }: HeaderProps) {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary via-primary/80 to-primary rounded-xl flex items-center justify-center group-hover:scale-105 transition-all duration-200 shadow-lg">
-              <Home className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <div className="flex flex-col">
-              <div className="font-bold text-xl bg-gradient-to-r from-primary via-primary/80 to-accent bg-clip-text text-transparent">
-                RealEST
-              </div>
-              <div className="text-xs text-muted-foreground font-medium -mt-1">
-                Find Your Next Move
-              </div>
-            </div>
+          <Link href="/" className="flex items-center group">
+            <HeaderLogo />
           </Link>
 
           {/* Desktop Navigation */}
