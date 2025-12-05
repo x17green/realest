@@ -55,10 +55,10 @@ const RealEstLogo: React.FC<RealEstLogoProps> = ({
       tagline: 'text-sm',
     },
     '2xl': {
-      icon: 'w-16 h-16',
+      icon: 'w-16 h-16 -mr-6',
       text: 'text-3xl',
       container: 'gap-4',
-      tagline: 'text-base',
+      tagline: 'text-xs',
     },
   };
 
