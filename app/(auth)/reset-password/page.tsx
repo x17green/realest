@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button, Input, Card } from "@heroui/react";
 import { createClient } from "@/lib/supabase/client";
-import { Eye, EyeOff, Lock, CheckCircle, Shield } from "lucide-react";
+import { Eye, EyeOff, Lock, CheckCircle, Shield, RefreshCw } from "lucide-react";
 
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
@@ -27,15 +27,64 @@ export default function ResetPasswordPage() {
     hasSpecialChar: false,
   });
 
-  // Check for access token in URL
+  // Check for access token in URL and handle session
   useEffect(() => {
-    const accessToken = searchParams.get('access_token');
-    const refreshToken = searchParams.get('refresh_token');
+    const initializeSession = async () => {
+      const accessToken = searchParams.get('access_token');
+      const refreshToken = searchParams.get('refresh_token');
+      const type = searchParams.get('type');
+      const error = searchParams.get('error');
+      const errorDescription = searchParams.get('error_description');
 
-    if (!accessToken || !refreshToken) {
-      // If no tokens, redirect to forgot password
-      router.push('/forgot-password');
-    }
+      // Handle error responses from Supabase
+      if (error) {
+        console.error('Auth error:', error, errorDescription);
+        setError(errorDescription || 'Invalid reset link. Please request a new password reset.');
+        setTimeout(() => {
+          router.push('/forgot-password');
+        }, 5000);
+        return;
+      }
+
+      // If no tokens at all, redirect to forgot password
+      if (!accessToken && !refreshToken) {
+        setError('No reset token found. Please check your email link or request a new password reset.');
+        setTimeout(() => {
+          router.push('/forgot-password');
+        }, 3000);
+        return;
+      }
+
+      // If we have access token and refresh token, set the session
+      if (accessToken && refreshToken) {
+        try {
+          const supabase = createClient();
+          const { error: sessionError } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          });
+
+          if (sessionError) {
+            console.error('Session error:', sessionError);
+            setError('Invalid or expired reset link. Please request a new password reset.');
+            setTimeout(() => {
+              router.push('/forgot-password');
+            }, 5000);
+          } else {
+            // Successfully set session, clear any previous errors
+            setError('');
+          }
+        } catch (err) {
+          console.error('Error setting session:', err);
+          setError('Failed to initialize password reset. Please try again.');
+          setTimeout(() => {
+            router.push('/forgot-password');
+          }, 3000);
+        }
+      }
+    };
+
+    initializeSession();
   }, [searchParams, router]);
 
   const validatePassword = (password: string) => {
@@ -77,23 +126,49 @@ export default function ResetPasswordPage() {
 
     try {
       const supabase = createClient();
+
+      // Verify user is still authenticated before updating password
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+      if (userError || !user) {
+        setError('Session expired. Please request a new password reset link.');
+        setTimeout(() => {
+          router.push('/forgot-password');
+        }, 3000);
+        return;
+      }
+
       const { error: updateError } = await supabase.auth.updateUser({
         password: formData.password
       });
 
       if (updateError) {
-        setError(updateError.message);
+        // Handle specific error types
+        if (updateError.message.includes('session') || updateError.message.includes('expired')) {
+          setError('Your reset session has expired. Please request a new password reset link.');
+          setTimeout(() => {
+            router.push('/forgot-password');
+          }, 3000);
+        } else if (updateError.message.includes('same_password')) {
+          setError('New password must be different from your current password.');
+        } else {
+          setError(updateError.message || 'Failed to update password. Please try again.');
+        }
         return;
       }
 
       setIsSuccess(true);
 
+      // Sign out after password reset for security
+      await supabase.auth.signOut();
+
       // Redirect to login after 3 seconds
       setTimeout(() => {
-        router.push('/login');
+        router.push('/login?reset=true');
       }, 3000);
 
     } catch (err) {
+      console.error('Password reset error:', err);
       setError("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
@@ -127,7 +202,8 @@ export default function ResetPasswordPage() {
             <div className="text-center space-y-4">
               <div className="bg-success-50 border border-success-200 p-4 rounded-lg">
                 <p className="text-sm text-success-700">
-                  Your password has been securely updated. You can now sign in with your new password.
+                  Your password has been securely updated. For security, you have been signed out.
+                  Please sign in with your new password.
                 </p>
               </div>
 
@@ -297,5 +373,31 @@ export default function ResetPasswordPage() {
         </Card.Content>
       </Card.Root>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-background px-4">
+          <Card.Root className="w-full max-w-md">
+            <Card.Header className="text-center">
+              <div className="flex justify-center mb-4">
+                <RefreshCw className="w-12 h-12 text-primary animate-spin" />
+              </div>
+              <Card.Title className="text-2xl font-bold">
+                Loading Reset Form
+              </Card.Title>
+              <Card.Description>
+                Please wait while we prepare your password reset form
+              </Card.Description>
+            </Card.Header>
+          </Card.Root>
+        </div>
+      }
+    >
+      <ResetPasswordContent />
+    </Suspense>
   );
 }

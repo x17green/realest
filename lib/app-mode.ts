@@ -117,13 +117,21 @@ export function isRouteAccessible(pathname: string): boolean {
       '/',           // Home page (coming soon)
       '/not-found',  // 404 page
       '/favicon.ico', // Browser favicon
+      '/login',      // Login page
+      '/sign-up',    // Sign up page
+      '/forgot-password', // Forgot password page
+      '/reset-password',  // Reset password page
+      '/verify-email',    // Email verification page
+      '/otp',            // OTP verification page
+      '/logout',         // Logout page
+      '/sign-up-success', // Sign up success page
     ];
 
     // Allow exact matches or static assets
     return allowedRoutes.includes(pathname) ||
            pathname.startsWith('/_next/') ||     // Next.js static assets
            pathname.startsWith('/api/_') ||       // Next.js internal API routes
-           pathname.match(/\.(ico|png|jpg|jpeg|gif|svg|webp|css|js|woff|woff2|ttf|otf)$/); // Static files
+           !!pathname.match(/\.(ico|png|jpg|jpeg|gif|svg|webp|css|js|woff|woff2|ttf|otf)$/); // Static files
   }
 
   // For other modes, check restricted routes list
@@ -240,7 +248,7 @@ export function isComingSoonRouteAllowed(pathname: string): boolean {
   return allowedRoutes.includes(pathname) ||
          pathname.startsWith('/_next/') ||
          pathname.startsWith('/api/_') ||
-         pathname.match(/\.(ico|png|jpg|jpeg|gif|svg|webp|css|js|woff|woff2|ttf|otf)$/);
+         !!pathname.match(/\.(ico|png|jpg|jpeg|gif|svg|webp|css|js|woff|woff2|ttf|otf)$/);
 }
 
 /**
