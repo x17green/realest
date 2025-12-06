@@ -41,7 +41,7 @@ export default async function HomePage() {
   // Original full site rendering (for develop/staging/production after release)
   return (
     <div className="min-h-screen w-full bg-background">
-      <Header user={user} />
+      <Header />
       <HeroSection />
       <FeaturedProperties />
       <Footer />

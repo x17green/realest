@@ -136,7 +136,7 @@ export function LocationPin({
   onClick,
   ...props
 }: LocationPinProps) {
-  const config = pinTypeConfig[pinType];
+  const config = pinTypeConfig[pinType || "residential"];
   const IconComponent = customIcon || config.icon;
 
   // Auto-determine variant based on verification status
@@ -333,4 +333,3 @@ export function formatCoordinates(coordinates: [number, number]): string {
 }
 
 export { locationPinVariants, pinTypeConfig };
-export type { LocationPinProps };

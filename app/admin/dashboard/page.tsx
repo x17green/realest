@@ -49,7 +49,7 @@ export default async function AdminDashboardPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header user={user} />
+      <Header />
       <AdminDashboardContent
         user={user}
         pendingProperties={pendingProperties || []}

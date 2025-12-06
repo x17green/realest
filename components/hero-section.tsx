@@ -4,6 +4,7 @@ import { Button, Input, Chip } from "@heroui/react";
 import { useState } from "react";
 import {
   Search,
+  ChevronRight,
   MapPin,
   TrendingUp,
   Building,
@@ -16,7 +17,7 @@ export default function HeroSection() {
 
   const popularSearches = [
     { label: "Modern Apartments", icon: Building },
-    { label: "Luxury Villas", icon: TrendingUp },
+    { label: "Exclusive Luxury Villas", icon: TrendingUp },
     { label: "Event Spaces", icon: Calendar },
   ];
 
@@ -35,9 +36,9 @@ export default function HeroSection() {
       <div className="relative z-10 container mx-auto px-4 py-20">
         <div className="max-w-4xl mx-auto text-center">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20 rounded-full px-4 py-2 mb-6 backdrop-blur-sm">
+          <div className="inline-flex items-center gap-2 bg-linear-to-r from-primary/10 to-accent/10 border border-primary/20 rounded-full px-4 py-2 mb-6 backdrop-blur-sm">
             <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            <span className="text-sm font-medium bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
               Geo-Verified Properties Only
             </span>
           </div>
@@ -46,7 +47,7 @@ export default function HeroSection() {
           <h1 className="text-display-1 font-bold mb-6 gradient-text-slanted leading-tight animate-fade-in">
             Find Your
             <br />
-            <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
               Next Move
             </span>
           </h1>
@@ -58,9 +59,9 @@ export default function HeroSection() {
           </p>
 
           {/* Enhanced Search */}
-          <div className="max-w-2xl mx-auto mb-8 animate-scale-in">
-            <div className="bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl p-2 shadow-2xl hover:shadow-3xl transition-all duration-300">
-              <div className="flex gap-2">
+          <div className="max-w-2xl mx-auto mb-10 animate-scale-in">
+            <div className="bg-surface/90 mb-15 backdrop-blur-lg border border-primary/30 rounded-2xl p-1 shadow-2xl hover:shadow-3xl transition-all duration-300">
+              <div className="flex gap-2 focus-within:bg-linear-to-bl from-primary/10 to-accent/10 focus-within:outline-4 outline-accent/50 rounded-xl focus-within:ring-0 focus-within:shadow-lg transition-all duration-200">
                 <div className="flex-1 flex items-center gap-3 px-4 py-3">
                   <MapPin className="w-5 h-5 text-primary" />
                   <Input
@@ -73,10 +74,10 @@ export default function HeroSection() {
                 </div>
                 <Button
                   size="lg"
-                  className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 px-8 rounded-xl font-semibold gap-2 shadow-lg hover:shadow-xl transition-all duration-200"
+                  className="flex flex-wrap justify-center items-center bg-linear-to-br hover:bg-linear-to-bl from-primary/20 to-accent/20 hover:from-primary/30 hover:to-accent/30 px-4 rounded-xl font-semibold gap-2 shadow-lg hover:shadow-xl transition-all duration-200 hover:animate-pulse"
                 >
-                  <Search className="w-5 h-5" />
-                  Explore Properties
+                  {/*Search*/}
+                  <ChevronRight className="w-5 h-5" />
                 </Button>
               </div>
             </div>
@@ -87,7 +88,7 @@ export default function HeroSection() {
                 <Chip
                   key={search.label}
                   variant="secondary"
-                  className="cursor-pointer hover:bg-primary/10 hover:border-primary/30 transition-all duration-200 gap-2 hover:scale-105"
+                  className="flex justify-center items-center cursor-pointer bg-primary/10 hover:bg-primary/15 hover:border-primary/30 transition-all duration-200 gap-2 p-2 border border-primary/20 rounded-xs hover:scale-103"
                   onClick={() => setSearchQuery(search.label)}
                 >
                   <search.icon className="w-4 h-4" />
@@ -100,7 +101,7 @@ export default function HeroSection() {
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-2xl mx-auto animate-fade-in">
             <div className="text-center group hover:scale-105 transition-transform duration-200">
-              <div className="text-h2 font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-1">
+              <div className="text-h2 font-bold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent mb-1">
                 10K+
               </div>
               <div className="text-body-s text-muted-foreground">
@@ -108,7 +109,7 @@ export default function HeroSection() {
               </div>
             </div>
             <div className="text-center group hover:scale-105 transition-transform duration-200">
-              <div className="text-h2 font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-1">
+              <div className="text-h2 font-bold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent mb-1">
                 50K+
               </div>
               <div className="text-body-s text-muted-foreground">
@@ -116,7 +117,7 @@ export default function HeroSection() {
               </div>
             </div>
             <div className="text-center group hover:scale-105 transition-transform duration-200">
-              <div className="text-h2 font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-1">
+              <div className="text-h2 font-bold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent mb-1">
                 99.9%
               </div>
               <div className="text-body-s text-muted-foreground">

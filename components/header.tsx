@@ -5,7 +5,7 @@ import { Button } from "@heroui/react";
 import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Menu,
   X,
@@ -19,14 +19,31 @@ import {
 import { HeaderLogo } from "@/components/ui/real-est-logo";
 import { ThemeToggleCompact } from "@/components/ui/theme-toggle-wrapper";
 
-interface HeaderProps {
-  user: User | null;
-}
-
-export default function Header({ user }: HeaderProps) {
+export default function Header() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const fetchUserSession = async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+
+    fetchUserSession();
+
+    // Listen for auth state changes
+    const supabase = createClient();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setUser(session?.user ?? null);
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleLogout = async () => {
     setIsLoading(true);
@@ -75,7 +92,7 @@ export default function Header({ user }: HeaderProps) {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="gap-2 hover:bg-primary/10"
+                    className="flex flex-wrap justify-center items-center hover:bg-primary/50 p-1 rounded-sm font-semibold gap-2 hover:shadow-sm transition-all duration-200"
                   >
                     <UserIcon className="w-4 h-4" />
                     Dashboard
@@ -86,7 +103,7 @@ export default function Header({ user }: HeaderProps) {
                   size="sm"
                   onPress={handleLogout}
                   isDisabled={isLoading}
-                  className="gap-2 text-error hover:text-error hover:bg-error/10"
+                  className="flex flex-wrap justify-center items-center hover:text-error/90 hover:bg-error/40 p-1 rounded-sm font-semibold gap-2 hover:shadow-sm transition-all duration-200 text-error"
                 >
                   <LogOut className="w-4 h-4" />
                   {isLoading ? "Logging out..." : "Logout"}
@@ -106,7 +123,7 @@ export default function Header({ user }: HeaderProps) {
                 <Link href="/sign-up">
                   <Button
                     size="sm"
-                    className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg"
+                    className="bg-linear-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg"
                   >
                     Sign Up
                   </Button>
@@ -199,7 +216,7 @@ export default function Header({ user }: HeaderProps) {
                       href="/sign-up"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
-                      <Button className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70">
+                      <Button className="w-full bg-linear-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70">
                         Sign Up
                       </Button>
                     </Link>
