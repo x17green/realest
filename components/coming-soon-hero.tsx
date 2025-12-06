@@ -284,11 +284,11 @@ const ComingSoonHero = () => {
               <Button
                 variant='ghost'
                 size="lg"
-                className="flex justify-center items-center cursor-pointer bg-linear-to-tl from-primary/20 to-accent/20 hover:from-primary/40 hover:to-accent/40 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 gap-2 py-3 px-6 max-w-2xs mx-auto"
-                // isDisabled
+                className="flex justify-center items-center bg-muted-foreground/50 hover:bg-muted-foreground/60 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 gap-2 py-3 px-6 max-w-2xs mx-auto"
+                isDisabled
               >
-                <MailCheck className="w-4 h-4 text-accent" />
-                <span className="text-sm font-medium bg-linear-to-bl from-primary to-accent bg-clip-text text-transparent">
+                <MailCheck className="w-4 h-4 text-muted-foreground bg-clip-text" />
+                <span className="text-sm font-medium text-muted-foreground">
                   {hasReleaseDate ? 'Get Notified at Launch' : 'Notify Me When Ready'}
                 </span>
               </Button>
