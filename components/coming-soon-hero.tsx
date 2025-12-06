@@ -73,8 +73,9 @@ const ComingSoonHero = () => {
 
   // Real-time email validation
   const emailValidation = useEmailValidation(email, {
-    debounceMs: 800,
-    minLength: 5
+    debounceMs: 500,
+    minLength: 3,
+    validateOnMount: true
   });
 
   function calculateTimeLeft() {
@@ -98,15 +99,17 @@ const ComingSoonHero = () => {
     };
   }
 
-  // Email validation function
-  const isValidEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
+  // Email validation function (using hook instead)
+  // const isValidEmail = (email: string) => {
+  //   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  //   return emailRegex.test(email);
+  // };
+
+
 
   // Handle keyboard events
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !isSubmitting && email.trim() && firstName.trim() && isValidEmail(email.trim())) {
+    if (e.key === 'Enter' && !isSubmitting && email.trim() && firstName.trim() && emailValidation.isValid && emailValidation.isAvailable) {
       e.preventDefault();
       handleEmailSubmit();
     }
@@ -119,8 +122,14 @@ const ComingSoonHero = () => {
       return;
     }
 
-    if (!isValidEmail(email)) {
+    // Email validation now handled by hook
+    if (!emailValidation.isValid) {
       setSubmitError("Please enter a valid email address");
+      return;
+    }
+
+    if (!emailValidation.isAvailable) {
+      setSubmitError("This email is already on our waitlist");
       return;
     }
 
@@ -594,11 +603,11 @@ const ComingSoonHero = () => {
                             if (submitError) setSubmitError("");
                           }}
                           className={`w-full px-3 py-2.5 sm:px-4 sm:py-3 bg-surface rounded-xl focus:ring-2 transition-all duration-200 text-base ${
-                            email && !emailValidation.isValid && !emailValidation.isLoading
+                            email && email.length > 3 && !emailValidation.isValid && !emailValidation.isLoading
                               ? 'border-red-300 focus:border-red-500 focus:ring-red-200/20'
-                              : email && emailValidation.isValid && emailValidation.isAvailable
+                              : email && emailValidation.isValid && emailValidation.isAvailable && !emailValidation.isLoading
                               ? 'border-green-300 focus:border-green-500 focus:ring-green-200/20'
-                              : email && emailValidation.isValid && !emailValidation.isAvailable
+                              : email && emailValidation.isValid && !emailValidation.isAvailable && !emailValidation.isLoading
                               ? 'border-orange-300 focus:border-orange-500 focus:ring-orange-200/20'
                               : 'border-border/50 focus:border-primary/50 focus:ring-primary/20'
                           }`}
@@ -608,7 +617,7 @@ const ComingSoonHero = () => {
                         />
 
                         {/* Email validation feedback */}
-                        {emailValidation.isLoading && email.length > 3 && (
+                        {emailValidation.isLoading && email.length > 2 && (
                           <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
                             <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></div>
                             <span>Checking availability...</span>
@@ -616,7 +625,7 @@ const ComingSoonHero = () => {
                         )}
 
                         {/* Email format invalid */}
-                        {email && !emailValidation.isValid && !emailValidation.isLoading && (
+                        {email && email.length > 2 && !emailValidation.isValid && !emailValidation.isLoading && (
                           <div className="flex items-center gap-2 mt-2 text-sm text-red-600 dark:text-red-400">
                             <AlertCircle className="w-4 h-4" />
                             <span>Please enter a valid email address</span>
@@ -624,7 +633,7 @@ const ComingSoonHero = () => {
                         )}
 
                         {/* Email available */}
-                        {emailValidation.isValid && emailValidation.isAvailable && !emailValidation.isLoading && (
+                        {email && emailValidation.isValid && emailValidation.isAvailable && !emailValidation.isLoading && !emailValidation.userInfo && (
                           <div className="flex items-center gap-2 mt-2 text-sm text-green-600 dark:text-green-400">
                             <CheckCircle className="w-4 h-4" />
                             <span>Email available!</span>
@@ -632,7 +641,7 @@ const ComingSoonHero = () => {
                         )}
 
                         {/* User already in waitlist */}
-                        {emailValidation.isValid && !emailValidation.isAvailable && emailValidation.userInfo && !emailValidation.isLoading && (
+                        {email && emailValidation.isValid && !emailValidation.isAvailable && emailValidation.userInfo && !emailValidation.isLoading && (
                           <div className="mt-3 p-3 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg">
                             <div className="flex items-start gap-2">
                               <Info className="w-4 h-4 text-orange-600 dark:text-orange-400 mt-0.5 shrink-0" />
@@ -653,6 +662,8 @@ const ComingSoonHero = () => {
                             </div>
                           </div>
                         )}
+
+
                       </TextField>
 
                       {submitError && (
@@ -661,11 +672,7 @@ const ComingSoonHero = () => {
                         </div>
                       )}
 
-                      {email && !isValidEmail(email) && !submitError && (
-                        <div className="text-sm text-amber-600 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg px-3 py-2 animate-fade-in-up">
-                          Please enter a valid email address
-                        </div>
-                      )}
+
 
                       <div className="bg-surface/50 border border-border/30 rounded-xl p-4">
                         <div className="flex items-start gap-3">

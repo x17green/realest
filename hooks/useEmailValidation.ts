@@ -107,11 +107,6 @@ export function useEmailValidation(
       return;
     }
 
-    // Skip validation on mount unless explicitly enabled
-    if (!validateOnMount && !isLoading && !error && !userInfo) {
-      return;
-    }
-
     const timeoutId = setTimeout(async () => {
       // Reset states
       setError(undefined);
@@ -133,14 +128,19 @@ export function useEmailValidation(
       const result = await checkEmailInWaitlist(email.trim());
 
       setIsLoading(false);
-      setIsAvailable(!result.exists);
+
+      // If there's an error, still mark as available but show error
+      if (result.error) {
+        setError(result.error);
+        setIsAvailable(true); // Allow submission if API fails
+        return;
+      }
+
+      const available = !result.exists;
+      setIsAvailable(available);
 
       if (result.exists && result.userInfo) {
         setUserInfo(result.userInfo);
-      }
-
-      if (result.error) {
-        setError(result.error);
       }
 
     }, debounceMs);
