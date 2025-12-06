@@ -34,7 +34,11 @@ import {
   X,
   AlertCircle,
   Info,
-  Users
+  Users,
+  Rocket,
+  Mail2,
+  Gift,
+  ExternalLink
 } from "lucide-react";
 import Header from "./header";
 import Footer from "./footer";
@@ -122,16 +126,8 @@ const ComingSoonHero = () => {
       return;
     }
 
-    // Email validation now handled by hook
-    if (!emailValidation.isValid) {
-      setSubmitError("Please enter a valid email address");
-      return;
-    }
-
-    if (!emailValidation.isAvailable) {
-      setSubmitError("This email is already on our waitlist");
-      return;
-    }
+    // Email validation is now handled by the hook and UI
+    // The submit button is already disabled for invalid/unavailable emails
 
     if (!firstName.trim()) {
       setSubmitError("Please enter your first name");
@@ -681,15 +677,15 @@ const ComingSoonHero = () => {
                             <p className="font-medium text-foreground">What you'll get:</p>
                             <ul className="space-y-1">
                               <li className="flex items-center gap-2">
-                                <div className="w-1 h-1 bg-primary rounded-full"></div>
+                                <CheckCircle className="w-3 h-3 text-green-600 dark:text-green-400" />
                                 Early access to verified properties
                               </li>
                               <li className="flex items-center gap-2">
-                                <div className="w-1 h-1 bg-primary rounded-full"></div>
+                                <Mail2 className="w-3 h-3 text-blue-600 dark:text-blue-400" />
                                 Launch notifications & exclusive updates
                               </li>
                               <li className="flex items-center gap-2">
-                                <div className="w-1 h-1 bg-primary rounded-full"></div>
+                                <Shield className="w-3 h-3 text-purple-600 dark:text-purple-400" />
                                 No spam, unsubscribe anytime
                               </li>
                             </ul>
@@ -762,10 +758,19 @@ const ComingSoonHero = () => {
                         <div className="text-sm font-medium text-green-700 dark:text-green-300">
                           What happens next?
                         </div>
-                        <div className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-green-600 dark:text-green-400">
-                          <p>✅ Confirmation email sent to your inbox</p>
-                          <p>🚀 Early access when we launch</p>
-                          <p>📧 Exclusive updates and property previews</p>
+                        <div className="space-y-2 text-xs sm:text-sm text-green-600 dark:text-green-400">
+                          <div className="flex items-center justify-center gap-2">
+                            <MailCheck className="w-4 h-4" />
+                            <span>Confirmation email sent to your inbox</span>
+                          </div>
+                          <div className="flex items-center justify-center gap-2">
+                            <Rocket className="w-4 h-4" />
+                            <span>Early access when we launch</span>
+                          </div>
+                          <div className="flex items-center justify-center gap-2">
+                            <Gift className="w-4 h-4" />
+                            <span>Exclusive updates and property previews</span>
+                          </div>
                         </div>
                       </div>
                     </div>
