@@ -77,7 +77,7 @@ export default function HeroSection() {
                   className="flex flex-wrap justify-center items-center bg-linear-to-br hover:bg-linear-to-bl from-primary/20 to-accent/20 hover:from-primary/30 hover:to-accent/30 px-4 rounded-xl font-semibold gap-2 shadow-lg hover:shadow-xl transition-all duration-200 hover:animate-pulse"
                 >
                   {/*Search*/}
-                  <Search className="w-5 h-5" />
+                  <ChevronRight className="w-5 h-5" />
                 </Button>
               </div>
             </div>

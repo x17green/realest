@@ -1,14 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button, Input, Card } from "@heroui/react";
 import { createClient } from "@/lib/supabase/client";
-import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, CheckCircle } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -16,10 +17,23 @@ export default function LoginPage() {
     password: "",
   });
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
+  useEffect(() => {
+    const verified = searchParams.get("verified");
+    const reset = searchParams.get("reset");
+
+    if (verified === "true") {
+      setSuccessMessage("Your email has been verified! You can now sign in.");
+    } else if (reset === "true") {
+      setSuccessMessage("Your password has been reset successfully. Please sign in with your new password.");
+    }
+  }, [searchParams]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (error) setError("");
+    if (successMessage) setSuccessMessage("");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -123,6 +137,13 @@ export default function LoginPage() {
                 </button>
               </div>
             </div>
+
+            {successMessage && (
+              <div className="text-sm text-success bg-success-50 border border-success-200 rounded-md p-3 flex items-center gap-2">
+                <CheckCircle className="w-4 h-4" />
+                {successMessage}
+              </div>
+            )}
 
             {error && (
               <div className="text-sm text-danger bg-danger-50 border border-danger-200 rounded-md p-3">
