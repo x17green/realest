@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button, Card } from "@heroui/react";
 import { createClient } from "@/lib/supabase/client";
 import { CheckCircle, Shield, RefreshCw, AlertTriangle } from "lucide-react";
 
-export default function OTPPage() {
+function OTPContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
@@ -306,5 +306,33 @@ export default function OTPPage() {
         </Card.Content>
       </Card.Root>
     </div>
+  );
+}
+
+function OTPFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+      <Card.Root className="w-full max-w-md">
+        <Card.Header className="text-center">
+          <div className="flex justify-center mb-4">
+            <RefreshCw className="w-12 h-12 text-primary animate-spin" />
+          </div>
+          <Card.Title className="text-2xl font-bold">
+            Loading Verification
+          </Card.Title>
+          <Card.Description>
+            Please wait while we prepare your OTP verification
+          </Card.Description>
+        </Card.Header>
+      </Card.Root>
+    </div>
+  );
+}
+
+export default function OTPPage() {
+  return (
+    <Suspense fallback={<OTPFallback />}>
+      <OTPContent />
+    </Suspense>
   );
 }

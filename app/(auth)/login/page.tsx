@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button, Input, Card } from "@heroui/react";
 import { createClient } from "@/lib/supabase/client";
 import { Eye, EyeOff, Mail, Lock, CheckCircle } from "lucide-react";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
@@ -177,5 +177,29 @@ export default function LoginPage() {
         </Card.Content>
       </Card.Root>
     </div>
+  );
+}
+
+function LoginPageFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+      <Card.Root className="w-full max-w-md">
+        <Card.Header className="text-center">
+          <Card.Title className="text-2xl font-bold">Welcome Back</Card.Title>
+          <Card.Description>Sign in to your RealEST account</Card.Description>
+        </Card.Header>
+        <Card.Content className="flex items-center justify-center py-8">
+          <div className="text-muted-foreground">Loading...</div>
+        </Card.Content>
+      </Card.Root>
+    </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<LoginPageFallback />}>
+      <LoginForm />
+    </Suspense>
   );
 }

@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button, Card } from "@heroui/react";
 import { createClient } from "@/lib/supabase/client";
 import { LogOut, CheckCircle, RefreshCw, AlertCircle } from "lucide-react";
 
-export default function LogoutPage() {
+function LogoutContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
@@ -214,5 +214,33 @@ export default function LogoutPage() {
         </Card.Content>
       </Card.Root>
     </div>
+  );
+}
+
+function LogoutFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+      <Card.Root className="w-full max-w-md">
+        <Card.Header className="text-center">
+          <div className="flex justify-center mb-4">
+            <RefreshCw className="w-12 h-12 text-primary animate-spin" />
+          </div>
+          <Card.Title className="text-2xl font-bold">
+            Loading Sign Out
+          </Card.Title>
+          <Card.Description>
+            Please wait while we prepare the sign out page
+          </Card.Description>
+        </Card.Header>
+      </Card.Root>
+    </div>
+  );
+}
+
+export default function LogoutPage() {
+  return (
+    <Suspense fallback={<LogoutFallback />}>
+      <LogoutContent />
+    </Suspense>
   );
 }

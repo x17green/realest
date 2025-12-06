@@ -27,14 +27,16 @@ function ResetPasswordContent() {
     hasSpecialChar: false,
   });
 
-  // Check for access token in URL and handle session
+  // Check for auth parameters in URL and handle session
   useEffect(() => {
     const initializeSession = async () => {
       const accessToken = searchParams.get('access_token');
       const refreshToken = searchParams.get('refresh_token');
-      const type = searchParams.get('type');
+      const code = searchParams.get('code');
       const error = searchParams.get('error');
       const errorDescription = searchParams.get('error_description');
+
+      console.log('Reset password params:', { accessToken, refreshToken, code, error });
 
       // Handle error responses from Supabase
       if (error) {
@@ -46,16 +48,33 @@ function ResetPasswordContent() {
         return;
       }
 
-      // If no tokens at all, redirect to forgot password
-      if (!accessToken && !refreshToken) {
-        setError('No reset token found. Please check your email link or request a new password reset.');
-        setTimeout(() => {
-          router.push('/forgot-password');
-        }, 3000);
+      // Check for PKCE code parameter (modern Supabase flow)
+      if (code) {
+        try {
+          const supabase = createClient();
+          const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+
+          if (exchangeError) {
+            console.error('Code exchange error:', exchangeError);
+            setError('Invalid or expired reset link. Please request a new password reset.');
+            setTimeout(() => {
+              router.push('/forgot-password');
+            }, 5000);
+          } else if (data.session) {
+            console.log('Successfully exchanged code for session');
+            setError(''); // Clear any previous errors
+          }
+        } catch (err) {
+          console.error('Error exchanging code:', err);
+          setError('Failed to initialize password reset. Please try again.');
+          setTimeout(() => {
+            router.push('/forgot-password');
+          }, 3000);
+        }
         return;
       }
 
-      // If we have access token and refresh token, set the session
+      // Legacy flow: If we have access token and refresh token, set the session
       if (accessToken && refreshToken) {
         try {
           const supabase = createClient();
@@ -81,7 +100,14 @@ function ResetPasswordContent() {
             router.push('/forgot-password');
           }, 3000);
         }
+        return;
       }
+
+      // If no tokens or code, redirect to forgot password
+      setError('No reset token found. Please check your email link or request a new password reset.');
+      setTimeout(() => {
+        router.push('/forgot-password');
+      }, 3000);
     };
 
     initializeSession();
@@ -127,6 +153,17 @@ function ResetPasswordContent() {
     try {
       const supabase = createClient();
 
+      // Get current session to verify user is authenticated
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+      if (sessionError || !session) {
+        setError('Your session has expired. Please request a new password reset link.');
+        setTimeout(() => {
+          router.push('/forgot-password');
+        }, 3000);
+        return;
+      }
+
       // Verify user is still authenticated before updating password
       const { data: { user }, error: userError } = await supabase.auth.getUser();
 
@@ -138,25 +175,28 @@ function ResetPasswordContent() {
         return;
       }
 
+      // Update password
       const { error: updateError } = await supabase.auth.updateUser({
         password: formData.password
       });
 
       if (updateError) {
+        console.error('Password update error:', updateError);
         // Handle specific error types
-        if (updateError.message.includes('session') || updateError.message.includes('expired')) {
+        if (updateError.message.includes('session') || updateError.message.includes('expired') || updateError.message.includes('unauthorized')) {
           setError('Your reset session has expired. Please request a new password reset link.');
           setTimeout(() => {
             router.push('/forgot-password');
           }, 3000);
-        } else if (updateError.message.includes('same_password')) {
-          setError('New password must be different from your current password.');
+        } else if (updateError.message.includes('same_password') || updateError.message.includes('password')) {
+          setError('New password must be different from your current password or does not meet requirements.');
         } else {
           setError(updateError.message || 'Failed to update password. Please try again.');
         }
         return;
       }
 
+      console.log('Password updated successfully');
       setIsSuccess(true);
 
       // Sign out after password reset for security

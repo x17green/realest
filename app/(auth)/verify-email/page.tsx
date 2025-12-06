@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button, Card } from "@heroui/react";
 import { createClient } from "@/lib/supabase/client";
 import { CheckCircle, Mail, AlertCircle, RefreshCw } from "lucide-react";
 
-export default function VerifyEmailPage() {
+function VerifyEmailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(true);
@@ -289,5 +289,33 @@ export default function VerifyEmailPage() {
         </Card.Content>
       </Card.Root>
     </div>
+  );
+}
+
+function VerifyEmailFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+      <Card.Root className="w-full max-w-md">
+        <Card.Header className="text-center">
+          <div className="flex justify-center mb-4">
+            <RefreshCw className="w-12 h-12 text-primary animate-spin" />
+          </div>
+          <Card.Title className="text-2xl font-bold">
+            Loading Verification
+          </Card.Title>
+          <Card.Description>
+            Please wait while we prepare your email verification
+          </Card.Description>
+        </Card.Header>
+      </Card.Root>
+    </div>
+  );
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={<VerifyEmailFallback />}>
+      <VerifyEmailContent />
+    </Suspense>
   );
 }
