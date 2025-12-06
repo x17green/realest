@@ -23,11 +23,11 @@ export default async function ListPropertyPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header user={user} />
+      <Header />
       <main className="container py-8">
         <ListPropertyForm userId={user.id} />
       </main>
       <Footer />
     </div>
-  )
+  );
 }

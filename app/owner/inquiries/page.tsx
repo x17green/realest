@@ -30,7 +30,7 @@ export default async function InquiriesPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header user={user} />
+      <Header />
       <OwnerInquiriesPage inquiries={inquiries || []} />
       <Footer />
     </div>

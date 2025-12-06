@@ -8,6 +8,8 @@ import { RealEstButton } from "@/components/heroui/realest-button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { AdvancedSearchForm } from "@/components/patterns/forms";
 import { Card, Input, Button, Chip } from "@heroui/react";
+import Header from "@/components/header";
+import Footer from "@/components/footer";
 import {
   MapPin,
   Bed,
@@ -542,7 +544,9 @@ function SearchPageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <Header />
+      <div className="min-h-screen bg-background">
       {/* Search Header */}
       <div className="bg-linear-to-r from-primary/5 to-accent/5 border-b border-border">
         <div className="container mx-auto px-4 py-8">
@@ -791,7 +795,9 @@ function SearchPageContent() {
           </>
         )}
       </div>
-    </div>
+      </div>
+      <Footer />
+    </>
   );
 }
 

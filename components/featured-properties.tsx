@@ -64,9 +64,9 @@ export default function FeaturedProperties() {
 
         <div className="relative z-10 container mx-auto px-4">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20 rounded-full px-4 py-2 mb-6 backdrop-blur-sm">
+            <div className="inline-flex items-center gap-2 bg-linear-to-r from-primary/10 to-accent/10 border border-primary/20 rounded-full px-4 py-2 mb-6 backdrop-blur-sm">
               <MapPinned className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              <span className="text-sm font-medium bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
                 Geo-Verified Properties
               </span>
             </div>
@@ -101,9 +101,9 @@ export default function FeaturedProperties() {
       <div className="relative z-10 container mx-auto px-4">
         <div className="text-center mb-12">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-secondary/10 border border-secondary/20 rounded-full px-4 py-2 mb-6">
-            <Sparkles className="w-4 h-4 text-secondary" />
-            <span className="text-sm font-medium text-secondary">
+          <div className="inline-flex items-center gap-2 bg-accent/10 border border-accent/20 rounded-full px-4 py-2 mb-6">
+            <Sparkles className="w-4 h-4 text-accent" />
+            <span className="text-sm font-medium text-accent">
               Premium Properties
             </span>
           </div>
@@ -139,7 +139,7 @@ export default function FeaturedProperties() {
                 <Card.Root className="property-card group h-full bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer overflow-hidden">
                   {/* Property Image */}
                   <div className="relative h-48 bg-muted rounded-t-2xl overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-accent/10 to-primary/30" />
+                    <div className="absolute inset-0 bg-linear-to-br from-primary/20 via-accent/10 to-primary/30" />
                     {/* Overlay on hover */}
                     <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
@@ -182,7 +182,7 @@ export default function FeaturedProperties() {
                     <h3 className="text-h3 line-clamp-2 mb-2 group-hover:text-primary transition-colors">
                       {property.title}
                     </h3>
-                    <p className="text-h2 font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-3">
+                    <p className="text-h2 font-bold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent mb-3">
                       ₦{property.price.toLocaleString()}
                     </p>
                     <div className="flex items-center gap-1 text-body-s text-muted-foreground mb-4">

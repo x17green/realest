@@ -70,13 +70,13 @@ export default function Footer() {
               Get the latest property listings and market insights delivered to
               your inbox.
             </p>
-            <div className="flex gap-2 max-w-md mx-auto">
+            <div className="flex gap-2 max-w-md mx-auto border border-primary/30 rounded-xs focus-within:outline-2 outline-primary/50 focus-within:border-0 focus-within:shadow-lg transition-all duration-200 bg-surface/90 backdrop-blur-lg">
               <Input
                 type="email"
                 placeholder="Enter your email"
-                className="flex-1"
+                className="flex-1 outline-none bg-transparent border-none focus:ring-0 ml-2"
               />
-              <Button className="bg-primary hover:bg-primary/90">
+              <Button className="cursor-pointer bg-primary hover:bg-primary/90 p-1 m-0 text-secondary">
                 Subscribe
               </Button>
             </div>

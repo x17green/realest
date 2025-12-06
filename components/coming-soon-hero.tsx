@@ -87,7 +87,7 @@ const ComingSoonHero = () => {
   if (showFullSite || (timeLeft && timeLeft.expired)) {
     return (
       <div className="min-h-screen w-full bg-background">
-        <Header user={null} />
+        <Header />
         <HeroSection />
         <FeaturedProperties />
         <Footer />
