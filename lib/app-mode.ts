@@ -127,8 +127,14 @@ export function isRouteAccessible(pathname: string): boolean {
       '/sign-up-success', // Sign up success page
     ];
 
+    // Allow specific API routes for coming-soon functionality
+    const allowedApiRoutes = [
+      '/api/waitlist',   // Waitlist subscription endpoint
+    ];
+
     // Allow exact matches or static assets
     return allowedRoutes.includes(pathname) ||
+           allowedApiRoutes.includes(pathname) || // Essential API routes
            pathname.startsWith('/_next/') ||     // Next.js static assets
            pathname.startsWith('/api/_') ||       // Next.js internal API routes
            !!pathname.match(/\.(ico|png|jpg|jpeg|gif|svg|webp|css|js|woff|woff2|ttf|otf)$/); // Static files
