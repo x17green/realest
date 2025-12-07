@@ -141,7 +141,7 @@ export default function VerificationPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header user={null} />
+      <Header />
       {/* Hero Section */}
       <section className="relative py-20 overflow-hidden">
         {/* Animated Background */}

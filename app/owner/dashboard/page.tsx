@@ -38,7 +38,7 @@ export default async function OwnerDashboardPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header user={user} />
+      <Header />
       <OwnerDashboardContent user={user} properties={properties || []} inquiries={inquiries || []} />
       <Footer />
     </div>

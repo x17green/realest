@@ -1,7 +1,14 @@
+/**
+ * Coming Soon Hero Component
+ *
+ * Main coming soon page with countdown timer and waitlist integration.
+ * Features beautiful animations, responsive design, and modern UI.
+ * Uses WaitlistModal component for subscription functionality.
+ */
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Button, Chip } from "@heroui/react";
+import { Chip } from "@heroui/react";
 import {
   Calendar,
   MapPin,
@@ -17,6 +24,8 @@ import {
 import Header from "./header";
 import Footer from "./footer";
 import { HeroLogo } from "@/components/ui/real-est-logo";
+import { WaitlistModal } from ".";
+import { Button } from "@/components/ui/button";
 
 // Import the full website components for dynamic reveal
 import HeroSection from "./hero-section";
@@ -31,6 +40,8 @@ const ComingSoonHero = () => {
   const [timeLeft, setTimeLeft] = useState(() => hasReleaseDate ? calculateTimeLeft() : null);
   const [showFullSite, setShowFullSite] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [waitlistCount, setWaitlistCount] = useState<number>(0);
 
   function calculateTimeLeft() {
     if (!hasReleaseDate || !releaseDate) {
@@ -53,6 +64,14 @@ const ComingSoonHero = () => {
     };
   }
 
+  // Handle waitlist success callback
+  const handleWaitlistSuccess = (data: { firstName: string; lastName?: string; position?: number; totalCount?: number }) => {
+    // Update local waitlist count if provided
+    if (data.totalCount) {
+      setWaitlistCount(data.totalCount);
+    }
+  };
+
   useEffect(() => {
     setMounted(true);
 
@@ -74,6 +93,23 @@ const ComingSoonHero = () => {
     return () => clearInterval(timer);
   }, [hasReleaseDate, releaseDate]);
 
+  // Fetch waitlist count on mount
+  useEffect(() => {
+    const fetchWaitlistCount = async () => {
+      try {
+        const response = await fetch('/api/waitlist?stats=true');
+        if (response.ok) {
+          const data = await response.json();
+          setWaitlistCount(data.active || 0);
+        }
+      } catch (error) {
+        console.error('Failed to fetch waitlist count:', error);
+      }
+    };
+
+    fetchWaitlistCount();
+  }, []);
+
   // Don't render until mounted to prevent hydration issues
   if (!mounted) {
     return (
@@ -87,7 +123,7 @@ const ComingSoonHero = () => {
   if (showFullSite || (timeLeft && timeLeft.expired)) {
     return (
       <div className="min-h-screen w-full bg-background">
-        <Header user={null} />
+        <Header />
         <HeroSection />
         <FeaturedProperties />
         <Footer />
@@ -115,7 +151,6 @@ const ComingSoonHero = () => {
 
   return (
     <div className="min-h-screen w-full bg-background">
-
       <main className="relative w-full overflow-hidden">
         {/* Animated Background */}
         <div className="absolute inset-0 bg-linear-to-br from-primary/20 via-primary/10 to-secondary/20" />
@@ -150,12 +185,6 @@ const ComingSoonHero = () => {
                 Real Estate Platform
               </span>
             </h1>
-
-            {/* Subtitle */}
-            {/*<p className="text-body-l text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed animate-slide-up">
-              We're building Nigeria's most trusted property marketplace with cutting-edge geo-verification technology.
-              Get ready for a revolutionary real estate experience.
-            </p>*/}
 
             {/* Countdown Timer - Only show if release date is set */}
             {hasReleaseDate && timeLeft ? (
@@ -218,7 +247,7 @@ const ComingSoonHero = () => {
                     Get Ready for Launch
                   </h3>
                   <p className="text-body-m text-muted-foreground gap-2 flex flex-col">
-                    Nigeria’s first verified property marketplace,
+                    Nigeria's first verified property marketplace,
                     no fake listings, no duplicates, only real properties.
                     Prepare for transparency, confidence, and pinpoint accuracy across every listing.
                     <br />
@@ -279,17 +308,17 @@ const ComingSoonHero = () => {
               </Chip>
             </div>
 
-            {/* CTA */}
+            {/* CTA - Updated to open modal */}
             <div className="space-y-4 flex flex-col gap-2 justify-center mb-8">
               <Button
-                variant='ghost'
+                variant='neon'
                 size="lg"
-                className="flex justify-center items-center cursor-pointer bg-linear-to-tl from-primary/20 to-accent/20 hover:from-primary/40 hover:to-accent/40 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 gap-2 py-3 px-6 max-w-2xs mx-auto"
-                // isDisabled
+                className="flex justify-center items-center rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 gap-2 py-3 px-6 max-w-2xs mx-auto backdrop-blur-sm"
+                onClick={() => setIsModalOpen(true)}
               >
-                <MailCheck className="w-4 h-4 text-accent" />
-                <span className="text-sm font-medium bg-linear-to-bl from-primary to-accent bg-clip-text text-transparent">
-                  {hasReleaseDate ? 'Get Notified at Launch' : 'Notify Me When Ready'}
+                <MailCheck className="w-4 h-4" />
+                <span className="text-sm font-medium ">
+                  {hasReleaseDate ? 'Get Notified at Launch' : 'Join Waitlist'}
                 </span>
               </Button>
               <p className="text-body-xs text-muted-foreground">
@@ -312,10 +341,10 @@ const ComingSoonHero = () => {
               </div>
               <div className="text-center group hover:scale-105 transition-transform duration-200">
                 <div className="text-h2 font-bold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent mb-1">
-                  50K+
+                  {waitlistCount > 0 ? waitlistCount.toLocaleString() : '50+'}
                 </div>
                 <div className="text-body-s text-muted-foreground">
-                  Users Waiting to Join
+                  {waitlistCount > 1 ? 'People on Waitlist' : waitlistCount === 1 ? 'Person on Waitlist' : 'Users Waiting to Join'}
                 </div>
               </div>
               <div className="text-center group hover:scale-105 transition-transform duration-200">
@@ -343,6 +372,12 @@ const ComingSoonHero = () => {
         </div>
       </main>
 
+      {/* Waitlist Modal */}
+      <WaitlistModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={handleWaitlistSuccess}
+      />
     </div>
   );
 };

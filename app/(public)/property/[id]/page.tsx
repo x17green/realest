@@ -27,6 +27,8 @@ import {
   CheckCircle,
   Star,
 } from "lucide-react";
+import Header from "@/components/header";
+import Footer from "@/components/footer";
 
 interface Property {
   id: string;
@@ -152,39 +154,47 @@ export default function PropertyDetailsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8">
-          <div className="animate-pulse space-y-8">
-            <div className="h-96 bg-muted rounded-lg" />
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2 space-y-6">
-                <div className="h-8 bg-muted rounded" />
-                <div className="h-4 bg-muted rounded w-3/4" />
-                <div className="h-32 bg-muted rounded" />
+      <>
+        <Header />
+        <div className="min-h-screen bg-background">
+          <div className="container mx-auto px-4 py-8">
+            <div className="animate-pulse space-y-8">
+              <div className="h-96 bg-muted rounded-lg" />
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-2 space-y-6">
+                  <div className="h-8 bg-muted rounded" />
+                  <div className="h-4 bg-muted rounded w-3/4" />
+                  <div className="h-32 bg-muted rounded" />
+                </div>
+                <div className="h-96 bg-muted rounded" />
               </div>
-              <div className="h-96 bg-muted rounded" />
             </div>
           </div>
         </div>
-      </div>
+        <Footer />
+      </>
     );
   }
 
   if (!property) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Card.Root className="max-w-md">
-          <Card.Content className="text-center py-8">
-            <h2 className="text-xl font-semibold mb-2">Property Not Found</h2>
-            <p className="text-muted-foreground mb-4">
-              The property you're looking for doesn't exist or has been removed.
-            </p>
-            <Button asChild variant="primary">
-              <Link href="/">Back to Homepage</Link>
-            </Button>
-          </Card.Content>
-        </Card.Root>
-      </div>
+      <>
+        <Header />
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <Card.Root className="max-w-md">
+            <Card.Content className="text-center py-8">
+              <h2 className="text-xl font-semibold mb-2">Property Not Found</h2>
+              <p className="text-muted-foreground mb-4">
+                The property you're looking for doesn't exist or has been removed.
+              </p>
+              <Button asChild variant="primary">
+                <Link href="/">Back to Homepage</Link>
+              </Button>
+            </Card.Content>
+          </Card.Root>
+        </div>
+        <Footer />
+      </>
     );
   }
 
@@ -196,7 +206,9 @@ export default function PropertyDetailsPage() {
   );
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <Header />
+      <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         {/* Image Gallery */}
         <div className="mb-8">
@@ -620,6 +632,8 @@ export default function PropertyDetailsPage() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+      <Footer />
+    </>
   );
 }

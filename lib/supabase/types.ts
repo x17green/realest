@@ -252,12 +252,107 @@ export interface Database {
           updated_at?: string;
         };
       };
+      waitlist: {
+        Row: {
+          id: string;
+          email: string;
+          first_name: string;
+          last_name: string | null;
+          phone: string | null;
+          source: string;
+          status: "active" | "unsubscribed" | "bounced";
+          interests: string[] | null;
+          location_preference: string | null;
+          property_type_preference: string | null;
+          budget_range: string | null;
+          subscribed_at: string;
+          unsubscribed_at: string | null;
+          last_contacted_at: string | null;
+          contact_count: number;
+          referrer_url: string | null;
+          user_agent: string | null;
+          ip_address: string | null;
+          utm_source: string | null;
+          utm_medium: string | null;
+          utm_campaign: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          email: string;
+          first_name: string;
+          last_name?: string | null;
+          phone?: string | null;
+          source?: string;
+          status?: "active" | "unsubscribed" | "bounced";
+          interests?: string[] | null;
+          location_preference?: string | null;
+          property_type_preference?: string | null;
+          budget_range?: string | null;
+          subscribed_at?: string;
+          unsubscribed_at?: string | null;
+          last_contacted_at?: string | null;
+          contact_count?: number;
+          referrer_url?: string | null;
+          user_agent?: string | null;
+          ip_address?: string | null;
+          utm_source?: string | null;
+          utm_medium?: string | null;
+          utm_campaign?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          email?: string;
+          first_name?: string;
+          last_name?: string | null;
+          phone?: string | null;
+          source?: string;
+          status?: "active" | "unsubscribed" | "bounced";
+          interests?: string[] | null;
+          location_preference?: string | null;
+          property_type_preference?: string | null;
+          budget_range?: string | null;
+          subscribed_at?: string;
+          unsubscribed_at?: string | null;
+          last_contacted_at?: string | null;
+          contact_count?: number;
+          referrer_url?: string | null;
+          user_agent?: string | null;
+          ip_address?: string | null;
+          utm_source?: string | null;
+          utm_medium?: string | null;
+          utm_campaign?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
     };
     Views: {
-      [_ in never]: never;
+      active_waitlist: {
+        Row: {
+          id: string;
+          email: string;
+          first_name: string;
+          last_name: string | null;
+          source: string;
+          location_preference: string | null;
+          property_type_preference: string | null;
+          interests: string[] | null;
+          subscribed_at: string;
+          created_at: string;
+        };
+      };
     };
     Functions: {
-      [_ in never]: never;
+      unsubscribe_from_waitlist: {
+        Args: {
+          user_email: string;
+        };
+        Returns: boolean;
+      };
     };
     Enums: {
       [_ in never]: never;

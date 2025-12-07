@@ -8,6 +8,8 @@ import { RealEstButton } from "@/components/heroui/realest-button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { AdvancedSearchForm } from "@/components/patterns/forms";
 import { Card, Input, Button, Chip } from "@heroui/react";
+import Header from "@/components/header";
+import Footer from "@/components/footer";
 import {
   MapPin,
   Bed,
@@ -122,7 +124,16 @@ function SearchPageContent() {
 
   // Search state
   const [quickSearch, setQuickSearch] = useState(searchParams.get("q") || "");
-  const [activeFilters, setActiveFilters] = useState<any>({});
+  const [activeFilters, setActiveFilters] = useState<{
+    state?: string;
+    propertyType?: string[];
+    purpose?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    bedrooms?: number;
+    bathrooms?: number;
+    verifiedOnly?: boolean;
+  }>({});
 
   const itemsPerPage = 12;
 
@@ -176,7 +187,7 @@ function SearchPageContent() {
       }
 
       // Apply filters
-      if (activeFilters.propertyType?.length > 0) {
+      if (activeFilters.propertyType && activeFilters.propertyType.length > 0) {
         query = query.in("property_type", activeFilters.propertyType);
       }
 
@@ -185,11 +196,11 @@ function SearchPageContent() {
       }
 
       if (activeFilters.minPrice) {
-        query = query.gte("price", parseInt(activeFilters.minPrice));
+        query = query.gte("price", activeFilters.minPrice);
       }
 
       if (activeFilters.maxPrice) {
-        query = query.lte("price", parseInt(activeFilters.maxPrice));
+        query = query.lte("price", activeFilters.maxPrice);
       }
 
       if (activeFilters.state) {
@@ -289,7 +300,7 @@ function SearchPageContent() {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-muted to-muted/50">
+                <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-muted to-muted/50">
                   <Building className="w-8 h-8 text-muted-foreground" />
                 </div>
               )}
@@ -433,7 +444,7 @@ function SearchPageContent() {
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-muted to-muted/50">
+            <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-muted to-muted/50">
               <Building className="w-12 h-12 text-muted-foreground" />
             </div>
           )}
@@ -542,7 +553,9 @@ function SearchPageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <Header />
+      <div className="min-h-screen bg-background">
       {/* Search Header */}
       <div className="bg-linear-to-r from-primary/5 to-accent/5 border-b border-border">
         <div className="container mx-auto px-4 py-8">
@@ -562,7 +575,6 @@ function SearchPageContent() {
                     value={quickSearch}
                     onChange={(e) => setQuickSearch(e.target.value)}
                     className="pl-12 h-12 text-base"
-                    size="lg"
                   />
                 </div>
                 <RealEstButton type="submit" size="lg" className="px-8">
@@ -588,13 +600,13 @@ function SearchPageContent() {
                   {activeFilters.state && (
                     <Chip variant="secondary" className="flex items-center gap-1">
                       {activeFilters.state}
-                      <X className="w-3 h-3 cursor-pointer" onClick={() => setActiveFilters(prev => ({ ...prev, state: '' }))} />
+                      <X className="w-3 h-3 cursor-pointer" onClick={() => setActiveFilters((prev) => ({ ...prev, state: '' }))} />
                     </Chip>
                   )}
-                  {activeFilters.propertyType?.length > 0 && activeFilters.propertyType.map((type: string) => (
+                  {activeFilters.propertyType && activeFilters.propertyType.length > 0 && activeFilters.propertyType.map((type: string) => (
                     <Chip key={type} variant="secondary" className="flex items-center gap-1">
                       {type.replace('_', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
-                      <X className="w-3 h-3 cursor-pointer" onClick={() => setActiveFilters(prev => ({
+                      <X className="w-3 h-3 cursor-pointer" onClick={() => setActiveFilters((prev) => ({
                         ...prev,
                         propertyType: prev.propertyType?.filter((t: string) => t !== type)
                       }))} />
@@ -603,7 +615,7 @@ function SearchPageContent() {
                   {activeFilters.purpose && activeFilters.purpose !== 'any' && (
                     <Chip variant="secondary" className="flex items-center gap-1">
                       For {activeFilters.purpose}
-                      <X className="w-3 h-3 cursor-pointer" onClick={() => setActiveFilters(prev => ({ ...prev, purpose: 'any' }))} />
+                      <X className="w-3 h-3 cursor-pointer" onClick={() => setActiveFilters((prev) => ({ ...prev, purpose: 'any' }))} />
                     </Chip>
                   )}
                 </div>
@@ -704,7 +716,7 @@ function SearchPageContent() {
         {/* No Results */}
         {!isLoading && properties.length === 0 && (
           <div className="text-center py-16">
-            <div className="w-24 h-24 bg-gradient-to-br from-muted to-muted/50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <div className="w-24 h-24 bg-linear-to-br from-muted to-muted/50 rounded-2xl flex items-center justify-center mx-auto mb-6">
               <Search className="w-12 h-12 text-muted-foreground" />
             </div>
             <h3 className="text-xl font-heading font-semibold mb-3">No Properties Found</h3>
@@ -724,7 +736,7 @@ function SearchPageContent() {
 
         {/* Map View */}
         {viewMode === 'map' && !isLoading && properties.length > 0 && (
-          <div className="h-[600px] bg-gradient-to-br from-muted to-muted/50 rounded-2xl border-2 border-dashed border-border flex items-center justify-center">
+          <div className="h-[600px] bg-linear-to-br from-muted to-muted/50 rounded-2xl border-2 border-dashed border-border flex items-center justify-center">
             <div className="text-center">
               <MapIcon className="w-16 h-16 text-primary mx-auto mb-4" />
               <h3 className="text-lg font-heading font-semibold mb-2">Interactive Map View</h3>
@@ -791,7 +803,9 @@ function SearchPageContent() {
           </>
         )}
       </div>
-    </div>
+      </div>
+      <Footer />
+    </>
   );
 }
 

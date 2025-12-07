@@ -324,4 +324,3 @@ export function isStatusAnimated(status: keyof typeof statusConfig): boolean {
 }
 
 export { propertyStatusChipVariants, statusConfig };
-export type { PropertyStatusChipProps };
