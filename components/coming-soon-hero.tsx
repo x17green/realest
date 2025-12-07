@@ -1,23 +1,14 @@
 /**
- * Coming Soon Hero Component with Email Subscription Modal
+ * Coming Soon Hero Component
  *
- * Enhanced with a modern, responsive modal for waitlist subscription featuring:
- * - Beautiful animations with custom easing functions
- * - Real-time email validation with visual feedback
- * - Keyboard navigation support (Enter to submit)
- * - Mobile-optimized responsive design
- * - API integration with rate limiting and error handling
- * - Success state with confirmation messaging
- * - Accessible design following ARIA best practices
- *
- * The modal uses HeroUI v3's Modal component with custom animations
- * and integrates with /api/waitlist for email subscription functionality.
+ * Main coming soon page with countdown timer and waitlist integration.
+ * Features beautiful animations, responsive design, and modern UI.
+ * Uses WaitlistModal component for subscription functionality.
  */
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useEmailValidation, formatWaitlistMessage } from '@/hooks/useEmailValidation';
-import { Button, Chip, Modal, TextField, Label, Input } from "@heroui/react";
+import { Chip } from "@heroui/react";
 import {
   Calendar,
   MapPin,
@@ -28,21 +19,13 @@ import {
   MapPinCheck,
   Clock,
   Star,
-  Shield,
-  Mail,
-  CheckCircle,
-  X,
-  AlertCircle,
-  Info,
-  Users,
-  Rocket,
-  Mail2,
-  Gift,
-  ExternalLink
+  Shield
 } from "lucide-react";
 import Header from "./header";
 import Footer from "./footer";
 import { HeroLogo } from "@/components/ui/real-est-logo";
+import { WaitlistModal } from ".";
+import { Button } from "@/components/ui/button";
 
 // Import the full website components for dynamic reveal
 import HeroSection from "./hero-section";
@@ -57,30 +40,8 @@ const ComingSoonHero = () => {
   const [timeLeft, setTimeLeft] = useState(() => hasReleaseDate ? calculateTimeLeft() : null);
   const [showFullSite, setShowFullSite] = useState(false);
   const [mounted, setMounted] = useState(false);
-
-  // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [email, setEmail] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [submittedData, setSubmittedData] = useState<{
-    firstName: string;
-    lastName?: string;
-    position?: number;
-    totalCount?: number;
-  } | null>(null);
-  const [submitError, setSubmitError] = useState("");
   const [waitlistCount, setWaitlistCount] = useState<number>(0);
-
-  // Real-time email validation
-  const emailValidation = useEmailValidation(email, {
-    debounceMs: 500,
-    minLength: 3,
-    validateOnMount: true
-  });
 
   function calculateTimeLeft() {
     if (!hasReleaseDate || !releaseDate) {
@@ -103,97 +64,12 @@ const ComingSoonHero = () => {
     };
   }
 
-  // Email validation function (using hook instead)
-  // const isValidEmail = (email: string) => {
-  //   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  //   return emailRegex.test(email);
-  // };
-
-
-
-  // Handle keyboard events
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !isSubmitting && email.trim() && firstName.trim() && emailValidation.isValid && emailValidation.isAvailable) {
-      e.preventDefault();
-      handleEmailSubmit();
+  // Handle waitlist success callback
+  const handleWaitlistSuccess = (data: { firstName: string; lastName?: string; position?: number; totalCount?: number }) => {
+    // Update local waitlist count if provided
+    if (data.totalCount) {
+      setWaitlistCount(data.totalCount);
     }
-  };
-
-  // Handle email submission
-  const handleEmailSubmit = async () => {
-    if (!email.trim()) {
-      setSubmitError("Please enter your email address");
-      return;
-    }
-
-    // Email validation is now handled by the hook and UI
-    // The submit button is already disabled for invalid/unavailable emails
-
-    if (!firstName.trim()) {
-      setSubmitError("Please enter your first name");
-      return;
-    }
-
-    setIsSubmitting(true);
-    setSubmitError("");
-
-    try {
-      // Make API call to waitlist endpoint
-      const response = await fetch('/api/waitlist', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: email.trim(),
-          firstName: firstName.trim(),
-          lastName: lastName.trim() || undefined,
-          phone: phone.trim() || undefined
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setSubmitError(data.error || 'Something went wrong. Please try again.');
-        return;
-      }
-
-      setIsSubmitted(true);
-      setSubmittedData({
-        firstName: data.firstName,
-        lastName: data.lastName,
-        position: data.position,
-        totalCount: data.totalCount
-      });
-      // Update local waitlist count
-      if (data.totalCount) {
-        setWaitlistCount(data.totalCount);
-      }
-      setEmail("");
-      setFirstName("");
-      setLastName("");
-      setPhone("");
-    } catch (error) {
-      console.error('Waitlist subscription error:', error);
-      setSubmitError("Network error. Please check your connection and try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  // Handle modal close
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-    setTimeout(() => {
-      setIsSubmitted(false);
-      setSubmitError("");
-      setSubmittedData(null);
-      setEmail("");
-      setFirstName("");
-      setLastName("");
-      setPhone("");
-    }, 300);
   };
 
   useEffect(() => {
@@ -303,7 +179,7 @@ const ComingSoonHero = () => {
 
             {/* Main Heading */}
             <h1 className="text-display-1 font-bold mb-6 linear-text-slanted leading-tight animate-fade-in">
-              Nigeria's Most Trusted
+              Nigeria’s Most Trusted
               <br />
               <span className="bg-linear-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
                 Real Estate Platform
@@ -435,13 +311,13 @@ const ComingSoonHero = () => {
             {/* CTA - Updated to open modal */}
             <div className="space-y-4 flex flex-col gap-2 justify-center mb-8">
               <Button
-                variant='ghost'
+                variant='neon'
                 size="lg"
-                className="flex justify-center items-center bg-linear-to-r from-primary/20 to-accent/20 hover:from-primary/30 hover:to-accent/30 border border-primary/30 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 gap-2 py-3 px-6 max-w-2xs mx-auto backdrop-blur-sm"
-                onPress={() => setIsModalOpen(true)}
+                className="flex justify-center items-center rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 gap-2 py-3 px-6 max-w-2xs mx-auto backdrop-blur-sm"
+                onClick={() => setIsModalOpen(true)}
               >
-                <MailCheck className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
+                <MailCheck className="w-4 h-4" />
+                <span className="text-sm font-medium ">
                   {hasReleaseDate ? 'Get Notified at Launch' : 'Join Waitlist'}
                 </span>
               </Button>
@@ -496,301 +372,12 @@ const ComingSoonHero = () => {
         </div>
       </main>
 
-      {/* Email Subscription Modal */}
-      <Modal.Container
+      {/* Waitlist Modal */}
+      <WaitlistModal
         isOpen={isModalOpen}
-        onOpenChange={setIsModalOpen}
-        variant="blur"
-        placement="center"
-        className="data-entering:animate-in data-entering:zoom-in-95 data-entering:fade-in-0 data-entering:duration-300 data-entering:ease-[cubic-bezier(0.16,1,0.3,1)] data-exiting:animate-out data-exiting:zoom-out-95 data-exiting:fade-out-0 data-exiting:duration-200 data-exiting:ease-out"
-        backdropClassName="data-entering:animate-in data-entering:fade-in-0 data-entering:duration-300 data-exiting:animate-out data-exiting:fade-out-0 data-exiting:duration-200"
-      >
-        <Modal.Dialog className="w-full max-w-[90vw] mx-4 sm:max-w-md lg:max-w-lg max-h-[85vh] sm:max-h-[90vh] overflow-y-auto">
-          {({ close }) => (
-            <>
-              <Modal.CloseTrigger className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 w-8 h-8 rounded-full bg-surface/80 backdrop-blur-sm border border-border/30 flex items-center justify-center hover:bg-surface transition-colors duration-200">
-                <X className="w-4 h-4 text-muted-foreground" />
-              </Modal.CloseTrigger>
-
-              {!isSubmitted ? (
-                <>
-                  <Modal.Header className="text-center pb-4 sm:pb-6 px-4 sm:px-6 pt-4 sm:pt-6">
-                    <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-linear-to-br from-primary/20 to-accent/20 border border-primary/30 rounded-full mb-4 sm:mb-6 mx-auto">
-                      <Mail className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
-                    </div>
-                    <Modal.Heading className="text-xl sm:text-h3 font-bold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent mb-3">
-                      Join the Waitlist
-                    </Modal.Heading>
-                    <p className="text-sm sm:text-body-m text-muted-foreground leading-relaxed px-2 sm:px-0">
-                      {hasReleaseDate
-                        ? "Get exclusive early access and be notified the moment we launch Nigeria's most trusted property marketplace."
-                        : "Be the first to know when we announce our launch date and get exclusive early access to verified properties."
-                      }
-                    </p>
-                  </Modal.Header>
-
-                  <Modal.Body className="px-4 sm:px-6 pb-4 sm:pb-6">
-                    <div className="space-y-4 sm:space-y-6">
-                      <TextField className="w-full">
-                        <Label className="text-sm font-medium text-foreground mb-2 block">
-                          First Name
-                        </Label>
-                        <Input
-                          type="text"
-                          placeholder="Enter your first name"
-                          value={firstName}
-                          onChange={(e) => {
-                            setFirstName(e.target.value);
-                            if (submitError) setSubmitError("");
-                          }}
-                          className="w-full px-3 py-2.5 sm:px-4 sm:py-3 bg-surface border border-border/50 rounded-xl focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200 text-base"
-                          disabled={isSubmitting}
-                          onKeyDown={handleKeyDown}
-                          autoFocus
-                        />
-                      </TextField>
-
-                      <TextField className="w-full">
-                        <Label className="text-sm font-medium text-foreground mb-2 block">
-                          Last Name (Optional)
-                        </Label>
-                        <Input
-                          type="text"
-                          placeholder="Enter your last name"
-                          value={lastName}
-                          onChange={(e) => {
-                            setLastName(e.target.value);
-                            if (submitError) setSubmitError("");
-                          }}
-                          className="w-full px-3 py-2.5 sm:px-4 sm:py-3 bg-surface border border-border/50 rounded-xl focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200 text-base"
-                          disabled={isSubmitting}
-                          onKeyDown={handleKeyDown}
-                        />
-                      </TextField>
-
-                      <TextField className="w-full">
-                        <Label className="text-sm font-medium text-foreground mb-2 block">
-                          Phone Number (Optional)
-                        </Label>
-                        <Input
-                          type="tel"
-                          placeholder="Enter your phone number"
-                          value={phone}
-                          onChange={(e) => {
-                            setPhone(e.target.value);
-                            if (submitError) setSubmitError("");
-                          }}
-                          className="w-full px-3 py-2.5 sm:px-4 sm:py-3 bg-surface border border-border/50 rounded-xl focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200 text-base"
-                          disabled={isSubmitting}
-                          onKeyDown={handleKeyDown}
-                        />
-                      </TextField>
-
-                      <TextField className="w-full">
-                        <Label className="text-sm font-medium text-foreground mb-2 block">
-                          Email Address
-                        </Label>
-                        <Input
-                          type="email"
-                          placeholder="Enter your email address"
-                          value={email}
-                          onChange={(e) => {
-                            setEmail(e.target.value);
-                            if (submitError) setSubmitError("");
-                          }}
-                          className={`w-full px-3 py-2.5 sm:px-4 sm:py-3 bg-surface rounded-xl focus:ring-2 transition-all duration-200 text-base ${
-                            email && email.length > 3 && !emailValidation.isValid && !emailValidation.isLoading
-                              ? 'border-red-300 focus:border-red-500 focus:ring-red-200/20'
-                              : email && emailValidation.isValid && emailValidation.isAvailable && !emailValidation.isLoading
-                              ? 'border-green-300 focus:border-green-500 focus:ring-green-200/20'
-                              : email && emailValidation.isValid && !emailValidation.isAvailable && !emailValidation.isLoading
-                              ? 'border-orange-300 focus:border-orange-500 focus:ring-orange-200/20'
-                              : 'border-border/50 focus:border-primary/50 focus:ring-primary/20'
-                          }`}
-                          disabled={isSubmitting}
-                          onKeyDown={handleKeyDown}
-                          required
-                        />
-
-                        {/* Email validation feedback */}
-                        {emailValidation.isLoading && email.length > 2 && (
-                          <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
-                            <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></div>
-                            <span>Checking availability...</span>
-                          </div>
-                        )}
-
-                        {/* Email format invalid */}
-                        {email && email.length > 2 && !emailValidation.isValid && !emailValidation.isLoading && (
-                          <div className="flex items-center gap-2 mt-2 text-sm text-red-600 dark:text-red-400">
-                            <AlertCircle className="w-4 h-4" />
-                            <span>Please enter a valid email address</span>
-                          </div>
-                        )}
-
-                        {/* Email available */}
-                        {email && emailValidation.isValid && emailValidation.isAvailable && !emailValidation.isLoading && !emailValidation.userInfo && (
-                          <div className="flex items-center gap-2 mt-2 text-sm text-green-600 dark:text-green-400">
-                            <CheckCircle className="w-4 h-4" />
-                            <span>Email available!</span>
-                          </div>
-                        )}
-
-                        {/* User already in waitlist */}
-                        {email && emailValidation.isValid && !emailValidation.isAvailable && emailValidation.userInfo && !emailValidation.isLoading && (
-                          <div className="mt-3 p-3 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg">
-                            <div className="flex items-start gap-2">
-                              <Info className="w-4 h-4 text-orange-600 dark:text-orange-400 mt-0.5 shrink-0" />
-                              <div className="text-sm">
-                                <div className="font-medium text-orange-800 dark:text-orange-200">
-                                  {formatWaitlistMessage(emailValidation.userInfo).title}
-                                </div>
-                                <div className="text-orange-700 dark:text-orange-300 mt-1">
-                                  {formatWaitlistMessage(emailValidation.userInfo).description}
-                                </div>
-                                {emailValidation.userInfo.status === 'active' && emailValidation.userInfo.position && (
-                                  <div className="flex items-center gap-1 mt-2 text-xs text-orange-600 dark:text-orange-400">
-                                    <Users className="w-3 h-3" />
-                                    <span>Position #{emailValidation.userInfo.position} of {emailValidation.userInfo.totalCount?.toLocaleString()}</span>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-
-                      </TextField>
-
-                      {submitError && (
-                        <div className="text-sm text-red-500 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg px-3 py-2 animate-fade-in-up">
-                          {submitError}
-                        </div>
-                      )}
-
-
-
-                      <div className="bg-surface/50 border border-border/30 rounded-xl p-4">
-                        <div className="flex items-start gap-3">
-                          <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 shrink-0" />
-                          <div className="space-y-2 text-sm text-muted-foreground">
-                            <p className="font-medium text-foreground">What you'll get:</p>
-                            <ul className="space-y-1">
-                              <li className="flex items-center gap-2">
-                                <CheckCircle className="w-3 h-3 text-green-600 dark:text-green-400" />
-                                Early access to verified properties
-                              </li>
-                              <li className="flex items-center gap-2">
-                                <Mail2 className="w-3 h-3 text-blue-600 dark:text-blue-400" />
-                                Launch notifications & exclusive updates
-                              </li>
-                              <li className="flex items-center gap-2">
-                                <Shield className="w-3 h-3 text-purple-600 dark:text-purple-400" />
-                                No spam, unsubscribe anytime
-                              </li>
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </Modal.Body>
-
-                  <Modal.Footer className="px-4 sm:px-6 pb-4 sm:pb-6 pt-0">
-                    <div className="flex flex-col sm:flex-row gap-3 w-full">
-                      <Button
-                        variant="secondary"
-                        onPress={close}
-                        className="flex-1 py-3 order-2 sm:order-1"
-                        isDisabled={isSubmitting}
-                      >
-                        Maybe Later
-                      </Button>
-                      <Button
-                        variant="primary"
-                        onPress={handleEmailSubmit}
-                        className="flex-1 py-2.5 sm:py-3 bg-linear-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 transition-all duration-200 order-1 sm:order-2"
-                        isDisabled={isSubmitting || !email.trim() || !firstName.trim() || !emailValidation.isValid || !emailValidation.isAvailable || emailValidation.isLoading}
-                        isPending={isSubmitting}
-                      >
-                        {isSubmitting ? "Joining..." : "Join Waitlist"}
-                      </Button>
-                    </div>
-                  </Modal.Footer>
-                </>
-              ) : (
-                <>
-                  <Modal.Header className="text-center pb-4 sm:pb-6 px-4 sm:px-6 pt-4 sm:pt-6">
-                    <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-linear-to-br from-green-500/20 to-green-600/20 border border-green-500/30 rounded-full mb-4 sm:mb-6 mx-auto animate-bounce-gentle">
-                      <CheckCircle className="w-6 h-6 sm:w-8 sm:h-8 text-green-500" />
-                    </div>
-                    <Modal.Heading className="text-xl sm:text-h3 font-bold text-green-600 dark:text-green-400 mb-3">
-                      {submittedData?.firstName && submittedData?.lastName
-                        ? `Welcome ${submittedData.firstName} ${submittedData.lastName}!`
-                        : submittedData?.firstName
-                        ? `Welcome ${submittedData.firstName}!`
-                        : "You're On The List!"}
-                    </Modal.Heading>
-                    <p className="text-sm sm:text-body-m text-muted-foreground leading-relaxed px-2 sm:px-0">
-                      Thank you for joining our waitlist{submittedData?.firstName ? `, ${submittedData.firstName}` : ""}. We'll notify you as soon as we launch with exclusive early access to Nigeria's most trusted property marketplace.
-                    </p>
-
-                    {/* Show user's position in waitlist */}
-                    {submittedData?.position && submittedData?.totalCount && (
-                      <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-                        <div className="flex items-center gap-2">
-                          <Users className="w-4 h-4 text-green-600 dark:text-green-400" />
-                          <div className="text-sm">
-                            <span className="font-medium text-green-800 dark:text-green-200">
-                              You're #{submittedData.position} out of {submittedData.totalCount.toLocaleString()} people!
-                            </span>
-                            <p className="text-green-700 dark:text-green-300 text-xs mt-1">
-                              The earlier you joined, the sooner you'll get access.
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </Modal.Header>
-
-                  <Modal.Body className="px-4 sm:px-6 pb-4 sm:pb-6">
-                    <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
-                      <div className="text-center space-y-3">
-                        <div className="text-sm font-medium text-green-700 dark:text-green-300">
-                          What happens next?
-                        </div>
-                        <div className="space-y-2 text-xs sm:text-sm text-green-600 dark:text-green-400">
-                          <div className="flex items-center justify-center gap-2">
-                            <MailCheck className="w-4 h-4" />
-                            <span>Confirmation email sent to your inbox</span>
-                          </div>
-                          <div className="flex items-center justify-center gap-2">
-                            <Rocket className="w-4 h-4" />
-                            <span>Early access when we launch</span>
-                          </div>
-                          <div className="flex items-center justify-center gap-2">
-                            <Gift className="w-4 h-4" />
-                            <span>Exclusive updates and property previews</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </Modal.Body>
-
-                  <Modal.Footer className="px-4 sm:px-6 pb-4 sm:pb-6 pt-0">
-                    <Button
-                      variant="primary"
-                      onPress={handleModalClose}
-                      className="w-full py-2.5 sm:py-3 bg-linear-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 transition-all duration-200"
-                    >
-                      Perfect, Thanks!
-                    </Button>
-                  </Modal.Footer>
-                </>
-              )}
-            </>
-          )}
-        </Modal.Dialog>
-      </Modal.Container>
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={handleWaitlistSuccess}
+      />
     </div>
   );
 };
