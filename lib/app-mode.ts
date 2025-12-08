@@ -117,14 +117,14 @@ export function isRouteAccessible(pathname: string): boolean {
       '/',           // Home page (coming soon)
       '/not-found',  // 404 page
       '/favicon.ico', // Browser favicon
-      '/login',      // Login page
-      '/sign-up',    // Sign up page
-      '/forgot-password', // Forgot password page
-      '/reset-password',  // Reset password page
-      '/verify-email',    // Email verification page
-      '/otp',            // OTP verification page
-      '/logout',         // Logout page
-      '/sign-up-success', // Sign up success page
+      // '/login',      // Login page
+      // '/sign-up',    // Sign up page
+      // '/forgot-password', // Forgot password page
+      // '/reset-password',  // Reset password page
+      // '/verify-email',    // Email verification page
+      // '/otp',            // OTP verification page
+      // '/logout',         // Logout page
+      // '/sign-up-success', // Sign up success page
     ];
 
     // Allow specific API routes for coming-soon functionality

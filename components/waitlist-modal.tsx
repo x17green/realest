@@ -14,8 +14,8 @@
 "use client";
 
 import React, { useState } from 'react';
-import { useEmailValidation, formatWaitlistMessage } from '@/hooks/useEmailValidation';
-import { useLocationSearch, formatLocationName } from '@/hooks/useLocationSearch';
+import { useEmailValidation, formatWaitlistMessage } from '@/hooks/use-email-validation';
+import { useLocationSearch, formatLocationName } from '@/hooks/use-location-search';
 import {
   Mail,
   CheckCircle,
