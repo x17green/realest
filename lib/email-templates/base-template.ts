@@ -1,235 +1,362 @@
-import { EmailStyles, defaultEmailStyles, EmailConfig, TemplateContext } from './types';
+import { EmailStyles, realestEmailStyles, EmailConfig, TemplateContext } from './types';
 
-// Base HTML structure for all email templates
+/**
+ * Modern, minimal base HTML structure with enhanced responsive design
+ */
 export function createBaseEmailHTML(
   content: string,
   title: string,
-  styles: EmailStyles = defaultEmailStyles
+  styles: EmailStyles = realestEmailStyles
 ): string {
   return `
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>${title}</title>
-        <style>
-            * { box-sizing: border-box; margin: 0; padding: 0; }
-            body {
-                font-family: ${styles.fonts.primary};
-                line-height: 1.6;
-                color: ${styles.colors.text};
-                background-color: ${styles.colors.background};
-                margin: 0;
-                padding: 0;
-                -webkit-text-size-adjust: 100%;
-                -ms-text-size-adjust: 100%;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="color-scheme" content="light">
+    <meta name="supported-color-schemes" content="light">
+    <title>${title}</title>
+    <!--[if mso]>
+    <noscript>
+        <xml>
+            <o:OfficeDocumentSettings>
+                <o:PixelsPerInch>96</o:PixelsPerInch>
+            </o:OfficeDocumentSettings>
+        </xml>
+    </noscript>
+    <![endif]-->
+    <style>
+        /* Reset & Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: ${styles.fonts.body};
+            line-height: 1.6;
+            color: ${styles.colors.text};
+            background-color: ${styles.colors.background};
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+
+        /* Main Container */
+        .email-wrapper {
+            width: 100%;
+            background-color: ${styles.colors.background};
+            padding: ${styles.spacing.lg} 0;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: ${styles.colors.cardBackground};
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+                        0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Header Styles */
+        .email-header {
+            background: linear-gradient(135deg, ${styles.colors.brandDark} 0%, ${styles.colors.brandNeutral} 100%);
+            color: white;
+            padding: ${styles.spacing.xl} ${styles.spacing.lg};
+            text-align: center;
+            position: relative;
+        }
+
+        .brand-logo {
+            display: inline-block;
+            margin-bottom: ${styles.spacing.md};
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+        }
+
+        .email-header h1 {
+            font-family: ${styles.fonts.heading};
+            font-size: 26px;
+            font-weight: 700;
+            margin: 0 0 ${styles.spacing.xs} 0;
+            letter-spacing: -0.5px;
+        }
+
+        .email-header h2 {
+            font-family: ${styles.fonts.body};
+            font-size: 14px;
+            font-weight: 400;
+            margin: 0;
+            opacity: 0.85;
+            letter-spacing: 0.3px;
+        }
+
+        /* Content Styles */
+        .email-content {
+            padding: ${styles.spacing.xl} ${styles.spacing.lg};
+            background-color: ${styles.colors.cardBackground};
+        }
+
+        /* Footer Styles */
+        .email-footer {
+            text-align: center;
+            padding: ${styles.spacing.xl} ${styles.spacing.lg};
+            background: ${styles.colors.brandLight};
+            border-top: 1px solid ${styles.colors.border};
+            color: ${styles.colors.textMuted};
+            font-size: 13px;
+        }
+
+        .email-footer p {
+            margin: 0 0 ${styles.spacing.md} 0;
+        }
+
+        /* Position Badge */
+        .position-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: ${styles.spacing.sm};
+            background: linear-gradient(135deg, ${styles.colors.brandAccent} 0%, #9FE02A 100%);
+            color: ${styles.colors.brandDark};
+            padding: ${styles.spacing.md} ${styles.spacing.xl};
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            box-shadow: 0 4px 12px ${styles.colors.brandAccent}40;
+        }
+
+        .verification-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            background: ${styles.colors.brandDark};
+            border-radius: 50%;
+            color: ${styles.colors.brandAccent};
+        }
+
+        /* Social Links */
+        .social-links {
+            margin: ${styles.spacing.lg} 0 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: ${styles.spacing.md};
+            flex-wrap: wrap;
+        }
+
+        .social-links a {
+            color: ${styles.colors.textMuted};
+            text-decoration: none;
+            font-size: 13px;
+            padding: ${styles.spacing.xs} ${styles.spacing.sm};
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .social-links a:hover {
+            color: ${styles.colors.brandDark};
+            background: ${styles.colors.brandAccent}20;
+        }
+
+        .divider {
+            color: ${styles.colors.border};
+            user-select: none;
+        }
+
+        /* Responsive Design */
+        @media only screen and (max-width: 640px) {
+            .email-wrapper {
+                padding: ${styles.spacing.sm} 0;
             }
+
             .email-container {
-                max-width: 600px;
-                margin: 0 auto;
-                background-color: ${styles.colors.cardBackground};
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                border-radius: 0;
+                margin: 0;
             }
-            .email-header {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-                padding: ${styles.spacing.large};
-                text-align: center;
-                border-radius: 10px 10px 0 0;
-            }
-            .email-header h1 {
-                font-size: 28px;
-                font-weight: bold;
-                margin-bottom: ${styles.spacing.small};
-            }
-            .email-header h2 {
-                font-size: 18px;
-                font-weight: normal;
-                opacity: 0.9;
-            }
-            .email-content {
-                padding: ${styles.spacing.large};
-                background-color: ${styles.colors.cardBackground};
-            }
+
+            .email-header,
+            .email-content,
             .email-footer {
-                text-align: center;
-                padding: ${styles.spacing.medium};
-                border-top: 1px solid ${styles.colors.border};
-                color: ${styles.colors.secondary};
-                font-size: 14px;
-                background-color: ${styles.colors.background};
-                border-radius: 0 0 10px 10px;
+                padding-left: ${styles.spacing.md};
+                padding-right: ${styles.spacing.md};
             }
-            .highlight-box {
-                background: linear-gradient(135deg, #e7f3ff 0%, #f0f8ff 100%);
-                padding: ${styles.spacing.medium};
-                border-radius: 8px;
-                margin: ${styles.spacing.medium} 0;
-                border-left: 4px solid ${styles.colors.primary};
+
+            .email-header h1 {
+                font-size: 22px;
             }
-            .success-box {
-                background: linear-gradient(135deg, #e8f5e8 0%, #f0fff0 100%);
-                border-left-color: ${styles.colors.success};
+
+            .email-header h2 {
+                font-size: 13px;
             }
-            .button {
-                display: inline-block;
-                padding: 12px 30px;
-                background: ${styles.colors.primary};
-                color: white;
-                text-decoration: none;
-                border-radius: 6px;
-                margin: ${styles.spacing.medium} 0;
-                font-weight: bold;
-                transition: background-color 0.3s ease;
+
+            .brand-logo {
+                width: 48px;
+                height: 48px;
             }
-            .button:hover {
-                background: #0056b3;
+
+            .position-badge {
+                font-size: 15px;
+                padding: ${styles.spacing.sm} ${styles.spacing.lg};
             }
-            .stats-container {
-                display: flex;
-                justify-content: space-around;
-                margin: ${styles.spacing.medium} 0;
-                flex-wrap: wrap;
+
+            /* Stack grid layouts on mobile */
+            [style*="display: grid"] {
+                display: block !important;
             }
-            .stat-item {
-                text-align: center;
-                padding: ${styles.spacing.small};
-                min-width: 100px;
+
+            [style*="display: grid"] > div {
+                margin-bottom: ${styles.spacing.md};
             }
-            .stat-number {
-                font-size: 24px;
-                font-weight: bold;
-                color: ${styles.colors.primary};
-                display: block;
+
+            [style*="display: grid"] > div:last-child {
+                margin-bottom: 0;
             }
-            .stat-label {
-                font-size: 12px;
-                color: ${styles.colors.secondary};
-                margin-top: 5px;
+        }
+
+        /* Dark Mode Support */
+        @media (prefers-color-scheme: dark) {
+            .email-container {
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
             }
-            .feature-list {
-                list-style: none;
-                padding: 0;
+        }
+
+        /* High Contrast Mode */
+        @media (prefers-contrast: high) {
+            .email-container {
+                border: 2px solid ${styles.colors.brandDark};
             }
-            .feature-list li {
-                padding: 8px 0;
-                border-bottom: 1px solid #f0f0f0;
-            }
-            .feature-list li:last-child {
-                border-bottom: none;
-            }
-            .feature-list strong {
-                color: ${styles.colors.primary};
-            }
-            .social-links {
-                margin: ${styles.spacing.medium} 0;
-            }
-            .social-links a {
-                display: inline-block;
-                margin: 0 ${styles.spacing.small};
-                color: ${styles.colors.secondary};
-                text-decoration: none;
-            }
-            @media only screen and (max-width: 600px) {
-                .email-container { width: 100% !important; }
-                .email-header, .email-content, .email-footer { padding: ${styles.spacing.medium} !important; }
-                .stats-container { flex-direction: column; }
-                .stat-item { margin-bottom: ${styles.spacing.small}; }
-            }
-        </style>
-    </head>
-    <body>
+        }
+    </style>
+</head>
+<body>
+    <div class="email-wrapper">
         <div class="email-container">
             ${content}
         </div>
-    </body>
-    </html>
-  `;
+    </div>
+</body>
+</html>
+  `.trim();
 }
 
-// Header component
+/**
+ * Minimal email header component
+ */
 export function createEmailHeader(
   companyName: string,
-  title: string,
-  emoji: string = '🏠'
+  tagline: string,
+  logoUrl?: string
 ): string {
+  const logoElement = logoUrl
+    ? `<img src="${logoUrl}" alt="${companyName}" class="brand-logo" style="display: block;" />`
+    : `<div class="brand-logo" style="
+        background: linear-gradient(135deg, ${realestEmailStyles.colors.brandAccent}, #9FE02A);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: 700;
+        color: ${realestEmailStyles.colors.brandDark};
+        font-family: ${realestEmailStyles.fonts.heading};
+      ">RE</div>`;
+
   return `
     <div class="email-header">
-        <h1>${emoji} ${companyName}</h1>
-        <h2>${title}</h2>
+        ${logoElement}
+        <h1>${companyName}</h1>
+        <h2>${tagline}</h2>
     </div>
   `;
 }
 
-// Footer component
-export function createEmailFooter(config: EmailConfig, year: number = new Date().getFullYear()): string {
+/**
+ * Clean email footer component
+ */
+export function createEmailFooter(
+  config: EmailConfig,
+  year: number = new Date().getFullYear()
+): string {
   return `
     <div class="email-footer">
-        <p>© ${year} ${config.companyName}. All rights reserved.</p>
-        <p>You received this email because you signed up for our waitlist.</p>
+        <p style="
+          font-weight: 600;
+          color: ${realestEmailStyles.colors.text};
+          margin-bottom: ${realestEmailStyles.spacing.md};
+        ">
+            © ${year} ${config.companyName}
+        </p>
+        <p style="
+          font-size: 12px;
+          color: ${realestEmailStyles.colors.textMuted};
+          margin-bottom: ${realestEmailStyles.spacing.lg};
+        ">
+            ${config.tagline} • ${config.domain}
+        </p>
+        <p style="
+          font-size: 12px;
+          color: ${realestEmailStyles.colors.textMuted};
+          margin-bottom: ${realestEmailStyles.spacing.md};
+        ">
+            You're receiving this because you joined our waitlist
+        </p>
         <div class="social-links">
-            <a href="${config.unsubscribeUrl}" style="color: #666;">Unsubscribe</a>
-            <span style="color: #ccc;">|</span>
-            <a href="mailto:${config.supportEmail}" style="color: #666;">Contact Us</a>
-            <span style="color: #ccc;">|</span>
-            <a href="${config.websiteUrl}" style="color: #666;">Visit Website</a>
+            <a href="${config.unsubscribeUrl}">Unsubscribe</a>
+            <span class="divider">•</span>
+            <a href="mailto:${config.supportEmail}">Support</a>
+            <span class="divider">•</span>
+            <a href="${config.websiteUrl}">Visit Site</a>
         </div>
     </div>
   `;
 }
 
-// Highlight box component
-export function createHighlightBox(
-  title: string,
-  content: string,
-  type: 'default' | 'success' = 'default'
-): string {
-  const className = type === 'success' ? 'highlight-box success-box' : 'highlight-box';
+/**
+ * Position badge with clean icon
+ */
+export function createPositionBadge(position: number): string {
+  const checkIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+
   return `
-    <div class="${className}">
-        <h3>${title}</h3>
-        ${content}
+    <div style="text-align: center; margin: ${realestEmailStyles.spacing.xl} 0;">
+      <div class="position-badge">
+        <span class="verification-icon">${checkIcon}</span>
+        <span>You're #${position} on the waitlist</span>
+      </div>
+      <p style="
+        color: ${realestEmailStyles.colors.textMuted};
+        margin-top: ${realestEmailStyles.spacing.md};
+        font-size: 14px;
+      ">
+        ${getPositionMessage(position)}
+      </p>
     </div>
   `;
 }
 
-// Stats component
-export function createStatsSection(stats: Array<{number: string; label: string}>): string {
-  const statsItems = stats.map(stat => `
-    <div class="stat-item">
-        <span class="stat-number">${stat.number}</span>
-        <div class="stat-label">${stat.label}</div>
-    </div>
-  `).join('');
-
-  return `
-    <div class="stats-container">
-        ${statsItems}
-    </div>
-  `;
+/**
+ * Get contextual message based on position
+ */
+function getPositionMessage(position: number): string {
+  if (position <= 10) return "You're among the first! Priority access guaranteed";
+  if (position <= 50) return "Early supporter - exclusive founding member benefits";
+  if (position <= 100) return "Part of our founding community";
+  if (position <= 500) return "You'll be notified when we launch";
+  return "Welcome to the community";
 }
 
-// Feature list component
-export function createFeatureList(features: Array<{title: string; description: string}>): string {
-  const featureItems = features.map(feature => `
-    <li><strong>${feature.title}:</strong> ${feature.description}</li>
-  `).join('');
-
-  return `
-    <ul class="feature-list">
-        ${featureItems}
-    </ul>
-  `;
-}
-
-// Button component
-export function createButton(text: string, url: string, style: 'primary' | 'secondary' = 'primary'): string {
-  return `<a href="${url}" class="button button-${style}">${text}</a>`;
-}
-
-// Context creator utility
+/**
+ * Create template context with enhanced defaults
+ */
 export function createTemplateContext(
   data: any,
   config: EmailConfig,
@@ -237,9 +364,20 @@ export function createTemplateContext(
 ): TemplateContext {
   const now = new Date();
   const fullName = data.lastName ? `${data.firstName} ${data.lastName}` : data.firstName;
-  const positionText = data.position && data.position > 0
-    ? `You're #${data.position} on our waitlist!`
-    : 'You\'re now on our exclusive waitlist!';
+
+  let positionText = "You're now on our waitlist";
+
+  if (data.position && data.position > 0) {
+    if (data.position <= 10) {
+      positionText = `You're #${data.position} - among the very first!`;
+    } else if (data.position <= 50) {
+      positionText = `You're #${data.position} - early supporter status`;
+    } else if (data.position <= 100) {
+      positionText = `You're #${data.position} - founding member`;
+    } else {
+      positionText = `You're #${data.position} on the waitlist`;
+    }
+  }
 
   return {
     user: {
@@ -260,28 +398,39 @@ export function createTemplateContext(
     },
     metadata: {
       timestamp: now.toISOString(),
-      formattedDate: now.toLocaleString(),
+      formattedDate: now.toLocaleString('en-NG', {
+        dateStyle: 'long',
+        timeStyle: 'short'
+      }),
       ...overrides.metadata
     }
   };
 }
 
-// Text template utilities
+/**
+ * Plain text template with clean formatting
+ */
 export function createPlainTextTemplate(content: string, config: EmailConfig): string {
+  const year = new Date().getFullYear();
   return `
 ${content}
 
---
-© ${new Date().getFullYear()} ${config.companyName}. All rights reserved.
-You received this email because you signed up for our waitlist.
+────────────────────────────────────────
+
+© ${year} ${config.companyName}
+${config.tagline} • ${config.domain}
+
+You're receiving this because you joined our waitlist.
 
 Unsubscribe: ${config.unsubscribeUrl}
-Contact: ${config.supportEmail}
+Support: ${config.supportEmail}
 Website: ${config.websiteUrl}
   `.trim();
 }
 
-// Utility to sanitize HTML content
+/**
+ * Sanitize HTML content
+ */
 export function sanitizeHtml(content: string): string {
   return content
     .replace(/&/g, '&amp;')
@@ -291,16 +440,27 @@ export function sanitizeHtml(content: string): string {
     .replace(/'/g, '&#39;');
 }
 
-// Utility to create responsive images
+/**
+ * Create responsive image element
+ */
 export function createResponsiveImage(
   src: string,
   alt: string,
   width: number = 600
 ): string {
   return `
-    <img src="${src}"
-         alt="${sanitizeHtml(alt)}"
-         style="max-width: 100%; width: ${width}px; height: auto; display: block; margin: 0 auto;"
-         width="${width}">
+    <img 
+      src="${src}"
+      alt="${sanitizeHtml(alt)}"
+      style="
+        max-width: 100%;
+        width: ${width}px;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+        border-radius: 12px;
+      "
+      width="${width}"
+    />
   `;
 }

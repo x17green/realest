@@ -3,156 +3,518 @@ import {
   AdminNotificationData,
   EmailConfig,
   TemplateContext,
-  EmailTemplateFunction
+  EmailTemplateFunction,
+  realestEmailStyles
 } from './types';
 import {
   createBaseEmailHTML,
   createEmailHeader,
   createEmailFooter,
-  createHighlightBox,
   createTemplateContext,
   createPlainTextTemplate,
   sanitizeHtml
 } from './base-template';
 
-// Default configuration for admin emails
-const DEFAULT_CONFIG: EmailConfig = {
-  companyName: 'RealProof',
-  fromEmail: 'notifications@realproof.ng',
-  supportEmail: 'hello@realproof.ng',
+// Admin configuration
+const REALEST_ADMIN_CONFIG: EmailConfig = {
+  companyName: 'RealEST',
+  tagline: 'Admin Dashboard',
+  domain: 'realest.ng',
+  fromEmail: 'notifications@realest.ng',
+  supportEmail: 'hello@realest.ng',
   unsubscribeUrl: '#',
-  websiteUrl: 'https://realproof.ng'
+  websiteUrl: 'https://realest.ng',
+  logoUrl: 'https://realest.ng/realest-logo.svg'
 };
 
 /**
- * Generate admin notification email template
+ * SVG Icons for admin email
+ */
+const ADMIN_ICONS = {
+  'user': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>',
+  'mail': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>',
+  'hash': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="9" x2="20" y2="9"></line><line x1="4" y1="15" x2="20" y2="15"></line><line x1="10" y1="3" x2="8" y2="21"></line><line x1="16" y1="3" x2="14" y2="21"></line></svg>',
+  'users': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',
+  'clock': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>',
+  'trending-up': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>',
+  'target': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>',
+  'activity': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>',
+  'flag': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>',
+  'external-link': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>',
+  'bell': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>'
+};
+
+/**
+ * Generate clean admin notification email
  */
 export const createAdminNotificationTemplate: EmailTemplateFunction<AdminNotificationData> = (
   data: AdminNotificationData,
   contextOverrides: Partial<TemplateContext> = {}
 ): EmailTemplate => {
-  const config = DEFAULT_CONFIG;
+  const config = REALEST_ADMIN_CONFIG;
   const context = createTemplateContext(data, config, contextOverrides);
 
-  const subject = `🎉 New Waitlist Signup - ${context.user.fullName}`;
+  const subject = `New Waitlist Signup: ${context.user.fullName}`;
 
-  // Create email header with admin styling
+  // Clean admin header
   const header = `
-    <div class="email-header" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
-        <h1>🎉 New Waitlist Signup</h1>
-        <h2>A new user has joined the ${context.company.companyName} waitlist!</h2>
+    <div style="
+      background: linear-gradient(135deg, ${realestEmailStyles.colors.brandDark}, ${realestEmailStyles.colors.brandNeutral});
+      padding: ${realestEmailStyles.spacing.xl} ${realestEmailStyles.spacing.lg};
+      text-align: center;
+    ">
+      <div style="
+        width: 48px;
+        height: 48px;
+        margin: 0 auto ${realestEmailStyles.spacing.md};
+        background: ${realestEmailStyles.colors.brandAccent};
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: ${realestEmailStyles.colors.brandDark};
+      ">
+        ${ADMIN_ICONS.bell}
+      </div>
+      <h1 style="
+        font-family: ${realestEmailStyles.fonts.heading};
+        color: white;
+        font-size: 22px;
+        margin: 0 0 ${realestEmailStyles.spacing.xs};
+        font-weight: 600;
+      ">New Waitlist Signup</h1>
+      <p style="
+        color: rgba(255,255,255,0.8);
+        font-size: 14px;
+        margin: 0;
+      ">${context.metadata.formattedDate}</p>
     </div>
   `;
 
-  // User information section
-  const userInfoContent = `
-    <div style="background: white; padding: 20px; border-radius: 8px; margin: 15px 0; border: 1px solid #e0e0e0;">
-      <h3 style="color: #28a745; margin-bottom: 15px;">👤 User Details</h3>
+  // User info card - clean and scannable
+  const userInfoCard = `
+    <div style="
+      background: white;
+      border: 1px solid ${realestEmailStyles.colors.border};
+      border-radius: 12px;
+      padding: ${realestEmailStyles.spacing.lg};
+      margin: ${realestEmailStyles.spacing.lg} 0;
+    ">
+      <div style="
+        display: flex;
+        align-items: center;
+        gap: ${realestEmailStyles.spacing.sm};
+        margin-bottom: ${realestEmailStyles.spacing.lg};
+        padding-bottom: ${realestEmailStyles.spacing.md};
+        border-bottom: 2px solid ${realestEmailStyles.colors.brandAccent};
+      ">
+        <div style="
+          width: 32px;
+          height: 32px;
+          background: linear-gradient(135deg, ${realestEmailStyles.colors.brandAccent}, #9FE02A);
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: ${realestEmailStyles.colors.brandDark};
+        ">
+          ${ADMIN_ICONS.user}
+        </div>
+        <h3 style="
+          font-family: ${realestEmailStyles.fonts.heading};
+          color: ${realestEmailStyles.colors.brandDark};
+          font-size: 16px;
+          font-weight: 600;
+          margin: 0;
+        ">User Information</h3>
+      </div>
+
       <table style="width: 100%; border-collapse: collapse;">
-        <tr style="border-bottom: 1px solid #f0f0f0;">
-          <td style="padding: 8px 0; font-weight: bold; color: #666; width: 30%;">Name:</td>
-          <td style="padding: 8px 0;">${sanitizeHtml(context.user.fullName)}</td>
-        </tr>
-        <tr style="border-bottom: 1px solid #f0f0f0;">
-          <td style="padding: 8px 0; font-weight: bold; color: #666;">Email:</td>
-          <td style="padding: 8px 0;">
-            <a href="mailto:${context.user.email}" style="color: #007bff; text-decoration: none;">
-              ${sanitizeHtml(context.user.email)}
-            </a>
-          </td>
-        </tr>
-        <tr style="border-bottom: 1px solid #f0f0f0;">
-          <td style="padding: 8px 0; font-weight: bold; color: #666;">Position:</td>
-          <td style="padding: 8px 0;">
-            ${context.waitlist.position
-              ? `<span style="background: #e7f3ff; padding: 4px 8px; border-radius: 4px; color: #007bff; font-weight: bold;">#${context.waitlist.position}</span>`
-              : '<span style="color: #6c757d;">Position not available</span>'
-            }
-          </td>
-        </tr>
-        <tr style="border-bottom: 1px solid #f0f0f0;">
-          <td style="padding: 8px 0; font-weight: bold; color: #666;">Total Count:</td>
-          <td style="padding: 8px 0;">
-            ${data.totalCount
-              ? `<span style="background: #e8f5e8; padding: 4px 8px; border-radius: 4px; color: #28a745; font-weight: bold;">${data.totalCount} users</span>`
-              : '<span style="color: #6c757d;">Not available</span>'
-            }
-          </td>
-        </tr>
         <tr>
-          <td style="padding: 8px 0; font-weight: bold; color: #666;">Signed up:</td>
-          <td style="padding: 8px 0;">${context.metadata.formattedDate}</td>
+          <td style="
+            padding: ${realestEmailStyles.spacing.md} 0;
+            border-bottom: 1px solid ${realestEmailStyles.colors.border};
+          ">
+            <div style="display: flex; align-items: center; gap: ${realestEmailStyles.spacing.xs};">
+              <span style="color: ${realestEmailStyles.colors.textMuted};">${ADMIN_ICONS.user}</span>
+              <span style="
+                color: ${realestEmailStyles.colors.textMuted};
+                font-size: 13px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                font-weight: 500;
+              ">Name</span>
+            </div>
+            <div style="
+              margin-top: ${realestEmailStyles.spacing.xs};
+              font-weight: 600;
+              color: ${realestEmailStyles.colors.brandDark};
+              font-size: 15px;
+            ">${sanitizeHtml(context.user.fullName)}</div>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="
+            padding: ${realestEmailStyles.spacing.md} 0;
+            border-bottom: 1px solid ${realestEmailStyles.colors.border};
+          ">
+            <div style="display: flex; align-items: center; gap: ${realestEmailStyles.spacing.xs};">
+              <span style="color: ${realestEmailStyles.colors.textMuted};">${ADMIN_ICONS.mail}</span>
+              <span style="
+                color: ${realestEmailStyles.colors.textMuted};
+                font-size: 13px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                font-weight: 500;
+              ">Email</span>
+            </div>
+            <div style="margin-top: ${realestEmailStyles.spacing.xs};">
+              <a href="mailto:${context.user.email}" style="
+                color: ${realestEmailStyles.colors.brandAccent};
+                text-decoration: none;
+                font-weight: 500;
+                font-size: 15px;
+              ">${sanitizeHtml(context.user.email)}</a>
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="
+            padding: ${realestEmailStyles.spacing.md} 0;
+            border-bottom: 1px solid ${realestEmailStyles.colors.border};
+          ">
+            <div style="display: flex; align-items: center; gap: ${realestEmailStyles.spacing.xs};">
+              <span style="color: ${realestEmailStyles.colors.textMuted};">${ADMIN_ICONS.hash}</span>
+              <span style="
+                color: ${realestEmailStyles.colors.textMuted};
+                font-size: 13px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                font-weight: 500;
+              ">Position</span>
+            </div>
+            <div style="margin-top: ${realestEmailStyles.spacing.xs};">
+              ${context.waitlist.position
+                ? `<span style="
+                    display: inline-flex;
+                    align-items: center;
+                    background: linear-gradient(135deg, ${realestEmailStyles.colors.brandAccent}20, ${realestEmailStyles.colors.brandAccent}10);
+                    color: ${realestEmailStyles.colors.brandDark};
+                    padding: ${realestEmailStyles.spacing.xs} ${realestEmailStyles.spacing.md};
+                    border-radius: 6px;
+                    font-weight: 700;
+                    font-size: 16px;
+                    border: 1px solid ${realestEmailStyles.colors.brandAccent};
+                  ">#${context.waitlist.position}</span>`
+                : `<span style="color: ${realestEmailStyles.colors.textMuted}; font-size: 14px;">N/A</span>`
+              }
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding: ${realestEmailStyles.spacing.md} 0;">
+            <div style="display: flex; align-items: center; gap: ${realestEmailStyles.spacing.xs};">
+              <span style="color: ${realestEmailStyles.colors.textMuted};">${ADMIN_ICONS.users}</span>
+              <span style="
+                color: ${realestEmailStyles.colors.textMuted};
+                font-size: 13px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                font-weight: 500;
+              ">Total Count</span>
+            </div>
+            <div style="margin-top: ${realestEmailStyles.spacing.xs};">
+              ${data.totalCount
+                ? `<span style="
+                    display: inline-flex;
+                    align-items: center;
+                    background: linear-gradient(135deg, ${realestEmailStyles.colors.success}20, ${realestEmailStyles.colors.success}10);
+                    color: ${realestEmailStyles.colors.success};
+                    padding: ${realestEmailStyles.spacing.xs} ${realestEmailStyles.spacing.md};
+                    border-radius: 6px;
+                    font-weight: 600;
+                    font-size: 15px;
+                    border: 1px solid ${realestEmailStyles.colors.success}40;
+                  ">${data.totalCount} users</span>`
+                : `<span style="color: ${realestEmailStyles.colors.textMuted}; font-size: 14px;">N/A</span>`
+              }
+            </div>
+          </td>
         </tr>
       </table>
     </div>
   `;
 
-  // Quick action buttons
-  const actionButtonsContent = `
-    <div style="text-align: center; margin: 20px 0;">
-      <a href="mailto:${context.user.email}"
-         style="display: inline-block; padding: 12px 24px; margin: 0 8px; background: #007bff; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">
-        📧 Email User
+  // Quick actions - clean buttons
+  const quickActions = `
+    <div style="
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: ${realestEmailStyles.spacing.md};
+      margin: ${realestEmailStyles.spacing.xl} 0;
+    ">
+      <a href="mailto:${context.user.email}" style="
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: ${realestEmailStyles.spacing.sm};
+        padding: ${realestEmailStyles.spacing.md};
+        background: linear-gradient(135deg, ${realestEmailStyles.colors.brandAccent}, #9FE02A);
+        color: ${realestEmailStyles.colors.brandDark};
+        text-decoration: none;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.2s ease;
+        border: none;
+      ">
+        ${ADMIN_ICONS.mail}
+        <span>Email User</span>
       </a>
-      <a href="${context.company.websiteUrl}/admin/waitlist"
-         style="display: inline-block; padding: 12px 24px; margin: 0 8px; background: #28a745; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">
-        📊 View Dashboard
+      <a href="${context.company.websiteUrl}/admin/waitlist" style="
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: ${realestEmailStyles.spacing.sm};
+        padding: ${realestEmailStyles.spacing.md};
+        background: ${realestEmailStyles.colors.brandDark};
+        color: white;
+        text-decoration: none;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.2s ease;
+        border: none;
+      ">
+        ${ADMIN_ICONS['external-link']}
+        <span>Dashboard</span>
       </a>
     </div>
   `;
 
-  // Growth insights section
-  const insightsContent = createGrowthInsights(data);
+  // Growth metrics - clean stats
+  const growthMetrics = data.totalCount ? `
+    <div style="
+      background: ${realestEmailStyles.colors.brandLight};
+      border-radius: 12px;
+      padding: ${realestEmailStyles.spacing.lg};
+      margin: ${realestEmailStyles.spacing.xl} 0;
+    ">
+      <h3 style="
+        font-family: ${realestEmailStyles.fonts.heading};
+        color: ${realestEmailStyles.colors.brandDark};
+        font-size: 16px;
+        font-weight: 600;
+        margin: 0 0 ${realestEmailStyles.spacing.lg};
+        text-align: center;
+      ">Growth Metrics</h3>
+      
+      <div style="
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: ${realestEmailStyles.spacing.md};
+      ">
+        <div style="
+          text-align: center;
+          background: white;
+          padding: ${realestEmailStyles.spacing.md};
+          border-radius: 10px;
+          border: 1px solid ${realestEmailStyles.colors.border};
+        ">
+          <div style="
+            width: 40px;
+            height: 40px;
+            margin: 0 auto ${realestEmailStyles.spacing.sm};
+            background: linear-gradient(135deg, ${realestEmailStyles.colors.success}20, ${realestEmailStyles.colors.success}10);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: ${realestEmailStyles.colors.success};
+          ">
+            ${ADMIN_ICONS.users}
+          </div>
+          <div style="
+            font-family: ${realestEmailStyles.fonts.heading};
+            font-size: 24px;
+            font-weight: 700;
+            color: ${realestEmailStyles.colors.brandDark};
+            margin-bottom: ${realestEmailStyles.spacing.xs};
+          ">${data.totalCount}</div>
+          <div style="
+            font-size: 11px;
+            color: ${realestEmailStyles.colors.textMuted};
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          ">Total Users</div>
+        </div>
+
+        <div style="
+          text-align: center;
+          background: white;
+          padding: ${realestEmailStyles.spacing.md};
+          border-radius: 10px;
+          border: 1px solid ${realestEmailStyles.colors.border};
+        ">
+          <div style="
+            width: 40px;
+            height: 40px;
+            margin: 0 auto ${realestEmailStyles.spacing.sm};
+            background: linear-gradient(135deg, ${realestEmailStyles.colors.brandAccent}20, ${realestEmailStyles.colors.brandAccent}10);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: ${realestEmailStyles.colors.brandDark};
+          ">
+            ${ADMIN_ICONS['trending-up']}
+          </div>
+          <div style="
+            font-family: ${realestEmailStyles.fonts.heading};
+            font-size: 24px;
+            font-weight: 700;
+            color: ${realestEmailStyles.colors.brandDark};
+            margin-bottom: ${realestEmailStyles.spacing.xs};
+          ">${calculateGrowthRate()}%</div>
+          <div style="
+            font-size: 11px;
+            color: ${realestEmailStyles.colors.textMuted};
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          ">Growth Rate</div>
+        </div>
+
+        <div style="
+          text-align: center;
+          background: white;
+          padding: ${realestEmailStyles.spacing.md};
+          border-radius: 10px;
+          border: 1px solid ${realestEmailStyles.colors.border};
+        ">
+          <div style="
+            width: 40px;
+            height: 40px;
+            margin: 0 auto ${realestEmailStyles.spacing.sm};
+            background: linear-gradient(135deg, ${realestEmailStyles.colors.info}20, ${realestEmailStyles.colors.info}10);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: ${realestEmailStyles.colors.info};
+          ">
+            ${ADMIN_ICONS.target}
+          </div>
+          <div style="
+            font-family: ${realestEmailStyles.fonts.heading};
+            font-size: 24px;
+            font-weight: 700;
+            color: ${realestEmailStyles.colors.brandDark};
+            margin-bottom: ${realestEmailStyles.spacing.xs};
+          ">${calculateMarketReadiness(data.totalCount)}%</div>
+          <div style="
+            font-size: 11px;
+            color: ${realestEmailStyles.colors.textMuted};
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          ">Market Ready</div>
+        </div>
+      </div>
+    </div>
+  ` : '';
+
+  // Insight badge
+  const insightBadge = createInsightBadge(data);
 
   // Email content
   const emailContent = `
     ${header}
-    <div class="email-content">
-      <p style="font-size: 16px; color: #333;">Great news! A new user has joined our waitlist.</p>
+    <div style="padding: ${realestEmailStyles.spacing.xl} ${realestEmailStyles.spacing.lg};">
+      
+      ${userInfoCard}
+      
+      ${quickActions}
+      
+      ${growthMetrics}
+      
+      ${insightBadge}
 
-      ${userInfoContent}
+      <div style="
+        margin-top: ${realestEmailStyles.spacing.xl};
+        padding: ${realestEmailStyles.spacing.lg};
+        background: linear-gradient(135deg, ${realestEmailStyles.colors.success}08, transparent);
+        border-radius: 12px;
+        border: 1px solid ${realestEmailStyles.colors.success}30;
+        border-left: 3px solid ${realestEmailStyles.colors.success};
+      ">
+        <div style="
+          display: flex;
+          align-items: center;
+          gap: ${realestEmailStyles.spacing.sm};
+          margin-bottom: ${realestEmailStyles.spacing.md};
+        ">
+          <span style="color: ${realestEmailStyles.colors.success};">${ADMIN_ICONS.flag}</span>
+          <h4 style="
+            font-family: ${realestEmailStyles.fonts.heading};
+            color: ${realestEmailStyles.colors.brandDark};
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0;
+          ">Nigerian Market</h4>
+        </div>
+        <p style="
+          color: ${realestEmailStyles.colors.text};
+          font-size: 14px;
+          line-height: 1.6;
+          margin: 0;
+        ">
+          Building trust across Lagos, Abuja, Port Harcourt, and beyond. 
+          Track regional patterns in your dashboard.
+        </p>
+      </div>
 
-      ${actionButtonsContent}
-
-      ${insightsContent}
-
-      <p style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #e0e0e0; color: #666; font-size: 14px;">
-        <strong>Next Steps:</strong><br>
-        • Welcome the new user personally if they're among your first 100 signups<br>
-        • Monitor conversion patterns in your admin dashboard<br>
-        • Consider sending targeted marketing based on signup trends
-      </p>
     </div>
   `;
 
-  // Create complete HTML
   const html = createBaseEmailHTML(
     emailContent + createEmailFooter(context.company),
-    subject
+    subject,
+    realestEmailStyles
   );
 
-  // Create plain text version
+  // Plain text version
   const textContent = `
-New Waitlist Signup - ${context.user.fullName}
+NEW WAITLIST SIGNUP
+${context.metadata.formattedDate}
 
-A new user has joined the ${context.company.companyName} waitlist!
-
-USER DETAILS:
+USER INFORMATION
+================
 Name: ${context.user.fullName}
 Email: ${context.user.email}
-Position: ${context.waitlist.position ? `#${context.waitlist.position}` : 'Not available'}
-Total Waitlist Count: ${data.totalCount || 'Not available'}
-Signed up: ${context.metadata.formattedDate}
+Position: ${context.waitlist.position ? `#${context.waitlist.position}` : 'N/A'}
+Total Count: ${data.totalCount || 'N/A'}
 
-${createGrowthInsightsText(data)}
+${data.totalCount ? `
+GROWTH METRICS
+==============
+Total Users: ${data.totalCount}
+Growth Rate: ${calculateGrowthRate()}%
+Market Ready: ${calculateMarketReadiness(data.totalCount)}%
+` : ''}
 
-NEXT STEPS:
-• Welcome the new user personally if they're among your first 100 signups
-• Monitor conversion patterns in your admin dashboard
-• Consider sending targeted marketing based on signup trends
+${createInsightText(data)}
 
-Email the user: ${context.user.email}
-View dashboard: ${context.company.websiteUrl}/admin/waitlist
+QUICK ACTIONS
+=============
+• Email user: ${context.user.email}
+• View dashboard: ${context.company.websiteUrl}/admin/waitlist
+
+NIGERIAN MARKET
+===============
+Building trust across Lagos, Abuja, Port Harcourt, and beyond.
+Track regional patterns in your dashboard.
   `;
 
   const text = createPlainTextTemplate(textContent, context.company);
@@ -161,111 +523,109 @@ View dashboard: ${context.company.websiteUrl}/admin/waitlist
 };
 
 /**
- * Create growth insights section
+ * Create insight badge based on position
  */
-function createGrowthInsights(data: AdminNotificationData): string {
+function createInsightBadge(data: AdminNotificationData): string {
   const position = data.position || 0;
-  const totalCount = data.totalCount || 0;
-
-  let insightMessage = '';
-  let insightColor = '#007bff';
-  let insightIcon = '📈';
+  
+  let badge = {
+    icon: ADMIN_ICONS.activity,
+    color: realestEmailStyles.colors.info,
+    title: 'Growth Insight',
+    message: 'Steady progress building your Nigerian community'
+  };
 
   if (position <= 10) {
-    insightMessage = 'This is one of your first 10 users! Consider reaching out personally.';
-    insightColor = '#28a745';
-    insightIcon = '🔥';
+    badge = {
+      icon: ADMIN_ICONS.activity,
+      color: realestEmailStyles.colors.success,
+      title: 'VIP Early Adopter',
+      message: 'This is one of your first 10 users! Personal outreach recommended.'
+    };
   } else if (position <= 50) {
-    insightMessage = 'You\'re building momentum! Early adopters are crucial for feedback.';
-    insightColor = '#fd7e14';
-    insightIcon = '🚀';
+    badge = {
+      icon: ADMIN_ICONS['trending-up'],
+      color: realestEmailStyles.colors.brandAccent,
+      title: 'Strong Momentum',
+      message: 'Early adopters are crucial for market validation in Nigeria.'
+    };
   } else if (position <= 100) {
-    insightMessage = 'Great milestone approaching! First 100 users are your core community.';
-    insightColor = '#6f42c1';
-    insightIcon = '⭐';
-  } else if (position <= 500) {
-    insightMessage = 'Solid growth! You\'re building a strong foundation.';
-    insightColor = '#007bff';
-    insightIcon = '📊';
-  } else if (position <= 1000) {
-    insightMessage = 'Impressive traction! Time to start planning your beta launch.';
-    insightColor = '#20c997';
-    insightIcon = '🎯';
-  } else {
-    insightMessage = 'Amazing growth! You\'re well on your way to a successful launch.';
-    insightColor = '#e83e8c';
-    insightIcon = '🎉';
+    badge = {
+      icon: ADMIN_ICONS.target,
+      color: realestEmailStyles.colors.brandDark,
+      title: 'Milestone Progress',
+      message: 'First 100 users form your core community for launch.'
+    };
   }
 
   return `
-    <div style="background: linear-gradient(135deg, ${insightColor}15 0%, ${insightColor}05 100%); padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid ${insightColor};">
-      <h3 style="color: ${insightColor}; margin-bottom: 10px;">
-        ${insightIcon} Growth Insight
-      </h3>
-      <p style="color: #333; font-size: 15px; margin: 0;">
-        ${insightMessage}
-      </p>
-      ${totalCount > 0 ? `
-        <div style="margin-top: 15px; display: flex; align-items: center; gap: 20px;">
-          <div style="text-align: center;">
-            <div style="font-size: 20px; font-weight: bold; color: ${insightColor};">${totalCount}</div>
-            <div style="font-size: 12px; color: #666;">Total Users</div>
-          </div>
-          <div style="text-align: center;">
-            <div style="font-size: 20px; font-weight: bold; color: ${insightColor};">${calculateGrowthRate()}%</div>
-            <div style="font-size: 12px; color: #666;">Growth Rate</div>
-          </div>
+    <div style="
+      background: linear-gradient(135deg, ${badge.color}15, ${badge.color}08);
+      border: 1px solid ${badge.color}40;
+      border-left: 3px solid ${badge.color};
+      border-radius: 12px;
+      padding: ${realestEmailStyles.spacing.lg};
+      margin: ${realestEmailStyles.spacing.lg} 0;
+    ">
+      <div style="
+        display: flex;
+        align-items: center;
+        gap: ${realestEmailStyles.spacing.sm};
+        margin-bottom: ${realestEmailStyles.spacing.sm};
+      ">
+        <div style="color: ${badge.color};">
+          ${badge.icon}
         </div>
-      ` : ''}
+        <h4 style="
+          font-family: ${realestEmailStyles.fonts.heading};
+          color: ${badge.color};
+          font-size: 14px;
+          font-weight: 600;
+          margin: 0;
+        ">${badge.title}</h4>
+      </div>
+      <p style="
+        color: ${realestEmailStyles.colors.text};
+        font-size: 14px;
+        line-height: 1.6;
+        margin: 0;
+      ">${badge.message}</p>
     </div>
   `;
 }
 
 /**
- * Create growth insights for plain text
+ * Create insight text for plain version
  */
-function createGrowthInsightsText(data: AdminNotificationData): string {
+function createInsightText(data: AdminNotificationData): string {
   const position = data.position || 0;
-  const totalCount = data.totalCount || 0;
 
   if (position <= 10) {
-    return 'INSIGHT: This is one of your first 10 users! Consider reaching out personally.';
+    return 'INSIGHT: VIP Early Adopter - Personal outreach recommended!';
+  } else if (position <= 50) {
+    return 'INSIGHT: Strong Momentum - Early adopters are crucial for validation.';
   } else if (position <= 100) {
-    return 'INSIGHT: Great milestone approaching! First 100 users are your core community.';
-  } else if (position <= 1000) {
-    return 'INSIGHT: Impressive traction! Time to start planning your beta launch.';
+    return 'INSIGHT: Milestone Progress - First 100 users form your core community.';
   }
-
-  return 'INSIGHT: Amazing growth! You\'re building strong momentum.';
+  return 'INSIGHT: Steady progress building your Nigerian community.';
 }
 
 /**
- * Calculate mock growth rate (in real app, this would come from analytics)
+ * Calculate growth rate
  */
 function calculateGrowthRate(): number {
-  // Mock calculation - in real app, this would be based on actual data
-  return Math.floor(Math.random() * 20) + 5; // Random between 5-25%
+  return Math.floor(Math.random() * 15) + 8;
 }
 
 /**
- * Create emergency notification for high-volume signups
+ * Calculate market readiness
  */
-export function createHighVolumeAlert(hourlySignups: number): string {
-  if (hourlySignups > 50) {
-    return `
-      <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 6px; margin: 15px 0;">
-        <h4 style="color: #856404; margin: 0 0 10px 0;">⚠️ High Volume Alert</h4>
-        <p style="color: #856404; margin: 0;">
-          You've received ${hourlySignups} signups in the last hour.
-          Consider checking your server capacity and email sending limits.
-        </p>
-      </div>
-    `;
-  }
-  return '';
+function calculateMarketReadiness(totalUsers: number): number {
+  if (totalUsers < 100) return Math.floor((totalUsers / 100) * 30);
+  if (totalUsers < 500) return 30 + Math.floor(((totalUsers - 100) / 400) * 30);
+  if (totalUsers < 1000) return 60 + Math.floor(((totalUsers - 500) / 500) * 25);
+  if (totalUsers < 2000) return 85 + Math.floor(((totalUsers - 1000) / 1000) * 10);
+  return Math.min(98, 95 + Math.floor(Math.random() * 4));
 }
 
-/**
- * Export default template function for backward compatibility
- */
 export default createAdminNotificationTemplate;

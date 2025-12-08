@@ -7,14 +7,11 @@ export * from './base-template';
 // Template generators
 export {
   createWaitlistConfirmationTemplate,
-  createPersonalizedWelcome,
-  createPositionMessage,
   default as waitlistConfirmation
 } from './waitlist-confirmation';
 
 export {
   createAdminNotificationTemplate,
-  createHighVolumeAlert,
   default as adminNotification
 } from './admin-notification';
 
@@ -34,13 +31,16 @@ import { createWaitlistConfirmationTemplate } from './waitlist-confirmation';
 import { createAdminNotificationTemplate } from './admin-notification';
 import { EmailConfig, WaitlistEmailData, AdminNotificationData } from './types';
 
-// Default email configuration
+// RealEST email configuration
 export const DEFAULT_EMAIL_CONFIG: EmailConfig = {
-  companyName: 'RealProof',
-  fromEmail: process.env.FROM_EMAIL || 'hello@realproof.ng',
-  supportEmail: 'hello@realproof.ng',
+  companyName: 'RealEST',
+  tagline: 'Find Your Next Move',
+  domain: 'realest.ng',
+  fromEmail: process.env.FROM_EMAIL || 'hello@realest.ng',
+  supportEmail: 'hello@realest.ng',
   unsubscribeUrl: '{unsubscribe_url}',
-  websiteUrl: 'https://realproof.ng'
+  websiteUrl: 'https://realest.ng',
+  logoUrl: 'https://realest.ng/realest-logo.svg'
 };
 
 /**
@@ -87,12 +87,16 @@ export class EmailTemplateFactory {
   }
 }
 
-// Singleton factory instance with environment-based configuration
+// Singleton factory instance with environment-based RealEST configuration
 export const emailFactory = new EmailTemplateFactory({
-  fromEmail: process.env.FROM_EMAIL || 'hello@realproof.ng',
-  supportEmail: process.env.SUPPORT_EMAIL || 'hello@realproof.ng',
+  companyName: 'RealEST',
+  tagline: 'Find Your Next Move',
+  domain: 'realest.ng',
+  fromEmail: process.env.FROM_EMAIL || 'hello@realest.ng',
+  supportEmail: process.env.SUPPORT_EMAIL || 'hello@realest.ng',
   unsubscribeUrl: process.env.UNSUBSCRIBE_URL || '{unsubscribe_url}',
-  websiteUrl: process.env.WEBSITE_URL || 'https://realproof.ng'
+  websiteUrl: process.env.WEBSITE_URL || 'https://realest.ng',
+  logoUrl: process.env.LOGO_URL || 'https://realest.ng/realest-logo.svg'
 });
 
 /**
@@ -129,9 +133,9 @@ export function createTemplatePreview(
   sampleData?: Partial<WaitlistEmailData>
 ) {
   const mockData: WaitlistEmailData = {
-    email: 'john.doe@example.com',
-    firstName: 'John',
-    lastName: 'Doe',
+    email: 'adebayo.okafor@example.com',
+    firstName: 'Adebayo',
+    lastName: 'Okafor',
     position: 42,
     ...sampleData
   };
