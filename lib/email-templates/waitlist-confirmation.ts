@@ -54,17 +54,40 @@ const CORE_FEATURES = [
 ];
 
 /**
- * SVG Icons - Lucide-inspired minimal icons
+ * Email-compatible icon data URLs - SVG converted to base64 data URLs
+ * Using consistent #07402F color for better email client compatibility
  */
 const ICONS: Record<string, string> = {
-  'map-pin': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>',
-  'check-circle': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>',
-  'trending-up': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>',
-  'home': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>',
-  'target': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>',
-  'shield': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>',
-  'flag': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>'
+  'map-pin': 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTIxIDEwQzIxIDE3IDEyIDIzIDEyIDIzUzMgMTcgMyAxMEEzIDkgMCAwIDEgMjEgMTBaIiBzdHJva2U9IiMwNzQwMkYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CjxjaXJjbGUgY3g9IjEyIiBjeT0iMTAiIHI9IjMiIHN0cm9rZT0iIzA3NDAyRiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+',
+  'check-circle': 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTIyIDExLjA4VjEyQTEwIDEwIDAgMSAxIDE2LjA3IDIuODYiIHN0cm9rZT0iIzA3NDAyRiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPHBvbHlsaW5lIHBvaW50cz0iMjIsNCA12CwxNC4wMSA5LDExLjAxIiBzdHJva2U9IiMwNzQwMkYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+Cjwvc3ZnPg==',
+  'trending-up': 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBvbHlsaW5lIHBvaW50cz0iMjMsNiAxMy41LDE1LjUgOC41LDEwLjUgMSwxOCIgc3Ryb2tlPSIjMDc0MDJGIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+Cjxwb2x5bGluZSBwb2ludHM9IjE3LDYgMjMsNiAyMywxMiIgc3Ryb2tlPSIjMDc0MDJGIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+Cjwvc3ZnPg==',
+  'home': 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTMgOUwxMiAyTDIxIDlWMjBBMiAyIDAgMCAxIDE5IDIySDVBMiAyIDAgMCAxIDMgMjBWOVoiIHN0cm9rZT0iIzA3NDAyRiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPHBvbHlsaW5lIHBvaW50cz0iOSwyMiA5LDEyIDE1LDEyIDE1LDIyIiBzdHJva2U9IiMwNzQwMkYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+Cjwvc3ZnPg==',
+  'target': 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiIHN0cm9rZT0iIzA3NDAyRiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iNiIgc3Ryb2tlPSIjMDc0MDJGIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CjxjaXJjbGUgY3g9IjEyIiBjeT0iMTIiIHI9IjIiIHN0cm9rZT0iIzA3NDAyRiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+',
+  'shield': 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDIyUzIwIDE4IDIwIDEyVjVMMTIgMkw0IDVWMTJDNCA4IDEyIDIyIDEyIDIyWiIgc3Ryb2tlPSIjMDc0MDJGIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+Cjwvc3ZnPg==',
+  'flag': 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTQgMTVTNSAxNCA4IDE0UzEzIDE2IDE2IDE2UzIwIDE1IDIwIDE1VjNTMTkgNCA2IDRTOSAyIDYgMlM0IDMgNCAzWiIgc3Ryb2tlPSIjMDc0MDJGIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CjxsaW5lIHgxPSI0IiB5MT0iMjIiIHgyPSI0IiB5Mj0iMTUiIHN0cm9rZT0iIzA3NDAyRiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+'
 };
+
+/**
+ * Create email-compatible icon element using data URL
+ */
+function createIconElement(iconKey: string, size: number = 20): string {
+  const iconUrl = ICONS[iconKey];
+  if (!iconUrl) {
+    // Fallback to unicode symbol if icon not found
+    const fallbacks: Record<string, string> = {
+      'map-pin': '📍',
+      'check-circle': '✓',
+      'trending-up': '📈',
+      'home': '🏠',
+      'target': '🎯',
+      'shield': '🛡️',
+      'flag': '🇳🇬'
+    };
+    return fallbacks[iconKey] || '•';
+  }
+
+  return `<img src="${iconUrl}" alt="" width="${size}" height="${size}" style="display: block; width: ${size}px; height: ${size}px; margin: 0;" />`;
+}
 
 /**
  * Generate minimal, modern waitlist confirmation email
@@ -90,28 +113,32 @@ export const createWaitlistConfirmationTemplate: EmailTemplateFunction<WaitlistE
     ? createPositionBadge(data.position)
     : `
       <div style="text-align: center; margin: ${realestEmailStyles.spacing.xxl} 0;">
-        <div style="
-          display: inline-flex;
-          align-items: center;
-          gap: ${realestEmailStyles.spacing.md};
-          background: ${realestEmailStyles.colors.cardBackground};
-          border: 1px solid ${realestEmailStyles.colors.brandAccent};
-          padding: ${realestEmailStyles.spacing.md} ${realestEmailStyles.spacing.lg};
-          border-radius: 8px;
-          box-shadow: 0 1px 3px rgba(7, 64, 47, 0.08);
-        ">
-          <div style="
-            width: 20px;
-            height: 20px;
-            color: ${realestEmailStyles.colors.brandAccent};
-          ">${ICONS['check-circle']}</div>
-          <span style="
-            font-family: ${realestEmailStyles.fonts.body};
-            font-weight: 600;
-            font-size: 16px;
-            color: ${realestEmailStyles.colors.brandDark};
-          ">You're In!</span>
-        </div>
+        <table style="margin: 0 auto; border-collapse: collapse;">
+          <tr>
+            <td style="
+              background: ${realestEmailStyles.colors.cardBackground};
+              border: 1px solid ${realestEmailStyles.colors.brandAccent};
+              padding: ${realestEmailStyles.spacing.md} ${realestEmailStyles.spacing.lg};
+              border-radius: 8px;
+            ">
+              <table style="border-collapse: collapse;">
+                <tr>
+                  <td style="vertical-align: middle; padding-right: ${realestEmailStyles.spacing.md};">
+                    ${createIconElement('check-circle', 20)}
+                  </td>
+                  <td style="vertical-align: middle;">
+                    <span style="
+                      font-family: ${realestEmailStyles.fonts.body};
+                      font-weight: 600;
+                      font-size: 16px;
+                      color: ${realestEmailStyles.colors.brandDark};
+                    ">You're In!</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
       </div>
     `;
 
@@ -135,39 +162,43 @@ export const createWaitlistConfirmationTemplate: EmailTemplateFunction<WaitlistE
 
       <table style="width: 100%; border-collapse: collapse;">
         <tr>
-          ${KEY_METRICS.map(metric => `
+          ${KEY_METRICS.map((metric, index) => `
             <td style="
               text-align: center;
               padding: ${realestEmailStyles.spacing.lg} ${realestEmailStyles.spacing.md};
-              border-right: 1px solid ${realestEmailStyles.colors.border};
+              ${index < KEY_METRICS.length - 1 ? `border-right: 1px solid ${realestEmailStyles.colors.border};` : ''}
             ">
-              <div style="
-                width: 40px;
-                height: 40px;
-                margin: 0 auto ${realestEmailStyles.spacing.md};
-                background: ${realestEmailStyles.colors.brandLight};
-                border-radius: 8px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: ${realestEmailStyles.colors.brandDark};
-              ">
-                ${ICONS[metric.icon]}
-              </div>
-              <div style="
-                font-family: ${realestEmailStyles.fonts.heading};
-                font-size: 24px;
-                font-weight: 700;
-                color: ${realestEmailStyles.colors.brandDark};
-                margin-bottom: ${realestEmailStyles.spacing.xs};
-              ">${metric.value}</div>
-              <div style="
-                font-size: 12px;
-                color: ${realestEmailStyles.colors.textMuted};
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-                font-weight: 500;
-              ">${metric.label}</div>
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                  <td style="text-align: center; padding-bottom: ${realestEmailStyles.spacing.md};">
+                    <table style="width: 40px; height: 40px; margin: 0 auto; background: ${realestEmailStyles.colors.brandLight}; border-radius: 8px; border-collapse: collapse;">
+                      <tr>
+                        <td style="text-align: center; vertical-align: middle;">
+                          ${createIconElement(metric.icon, 20)}
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="text-align: center;">
+                    <div style="
+                      font-family: ${realestEmailStyles.fonts.heading};
+                      font-size: 24px;
+                      font-weight: 700;
+                      color: ${realestEmailStyles.colors.brandDark};
+                      margin-bottom: ${realestEmailStyles.spacing.xs};
+                    ">${metric.value}</div>
+                    <div style="
+                      font-size: 12px;
+                      color: ${realestEmailStyles.colors.textMuted};
+                      text-transform: uppercase;
+                      letter-spacing: 0.5px;
+                      font-weight: 500;
+                    ">${metric.label}</div>
+                  </td>
+                </tr>
+              </table>
             </td>
           `).join('')}
         </tr>
@@ -197,19 +228,13 @@ export const createWaitlistConfirmationTemplate: EmailTemplateFunction<WaitlistE
               <table style="width: 100%; border-collapse: collapse;">
                 <tr>
                   <td style="width: 60px; vertical-align: top; padding-right: ${realestEmailStyles.spacing.lg};">
-                    <div style="
-                      width: 44px;
-                      height: 44px;
-                      background: ${realestEmailStyles.colors.brandLight};
-                      border: 1px solid ${realestEmailStyles.colors.brandAccent};
-                      border-radius: 8px;
-                      display: flex;
-                      align-items: center;
-                      justify-content: center;
-                      color: ${realestEmailStyles.colors.brandDark};
-                    ">
-                      ${ICONS[feature.icon]}
-                    </div>
+                    <table style="width: 44px; height: 44px; background: ${realestEmailStyles.colors.brandLight}; border: 1px solid ${realestEmailStyles.colors.brandAccent}; border-radius: 8px; border-collapse: collapse;">
+                      <tr>
+                        <td style="text-align: center; vertical-align: middle;">
+                          ${createIconElement(feature.icon, 20)}
+                        </td>
+                      </tr>
+                    </table>
                   </td>
                   <td style="vertical-align: top;">
                     <div style="
@@ -246,24 +271,21 @@ export const createWaitlistConfirmationTemplate: EmailTemplateFunction<WaitlistE
       border: 1px solid ${realestEmailStyles.colors.success};
       border-radius: 8px;
     ">
-      <div style="
-        display: inline-flex;
-        align-items: center;
-        gap: ${realestEmailStyles.spacing.sm};
-        margin-bottom: ${realestEmailStyles.spacing.lg};
-      ">
-        <div style="
-          width: 20px;
-          height: 20px;
-          color: ${realestEmailStyles.colors.success};
-        ">${ICONS.flag}</div>
-        <span style="
-          font-family: ${realestEmailStyles.fonts.heading};
-          font-weight: 600;
-          color: ${realestEmailStyles.colors.brandDark};
-          font-size: 16px;
-        ">Built for Nigeria</span>
-      </div>
+      <table style="margin: 0 auto ${realestEmailStyles.spacing.lg}; border-collapse: collapse;">
+        <tr>
+          <td style="vertical-align: middle; padding-right: ${realestEmailStyles.spacing.sm};">
+            ${createIconElement('flag', 20)}
+          </td>
+          <td style="vertical-align: middle;">
+            <span style="
+              font-family: ${realestEmailStyles.fonts.heading};
+              font-weight: 600;
+              color: ${realestEmailStyles.colors.brandDark};
+              font-size: 16px;
+            ">Built for Nigeria</span>
+          </td>
+        </tr>
+      </table>
 
       <p style="
         color: ${realestEmailStyles.colors.textMuted};

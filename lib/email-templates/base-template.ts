@@ -61,7 +61,7 @@ export function createBaseEmailHTML(
             background-color: ${styles.colors.cardBackground};
             border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
                         0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
 
@@ -324,14 +324,39 @@ export function createEmailFooter(
  * Position badge with clean icon
  */
 export function createPositionBadge(position: number): string {
-  const checkIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+  const checkIconDataUrl = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBvbHlsaW5lIHBvaW50cz0iMjAsNiA5LDE3IDQsMTIiIHN0cm9rZT0iIzA3NDAyRiIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+';
 
   return `
     <div style="text-align: center; margin: ${realestEmailStyles.spacing.xl} 0;">
-      <div class="position-badge">
-        <span class="verification-icon">${checkIcon}</span>
-        <span>You're #${position} on the waitlist</span>
-      </div>
+      <table style="margin: 0 auto; border-collapse: collapse;">
+        <tr>
+          <td style="
+            background: linear-gradient(135deg, ${realestEmailStyles.colors.brandAccent} 0%, #9FE02A 100%);
+            color: ${realestEmailStyles.colors.brandDark};
+            padding: ${realestEmailStyles.spacing.md} ${realestEmailStyles.spacing.xl};
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+          ">
+            <table style="border-collapse: collapse;">
+              <tr>
+                <td style="vertical-align: middle; padding-right: ${realestEmailStyles.spacing.sm};">
+                  <table style="width: 20px; height: 20px; background: ${realestEmailStyles.colors.brandDark}; border-radius: 50%; border-collapse: collapse;">
+                    <tr>
+                      <td style="text-align: center; vertical-align: middle;">
+                        <img src="${checkIconDataUrl}" alt="✓" width="16" height="16" style="display: block; width: 16px; height: 16px; margin: 0;" />
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+                <td style="vertical-align: middle;">
+                  <span>You're #${position} on the waitlist</span>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
       <p style="
         color: ${realestEmailStyles.colors.textMuted};
         margin-top: ${realestEmailStyles.spacing.md};
@@ -449,7 +474,7 @@ export function createResponsiveImage(
   width: number = 600
 ): string {
   return `
-    <img 
+    <img
       src="${src}"
       alt="${sanitizeHtml(alt)}"
       style="
