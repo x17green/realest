@@ -16,7 +16,11 @@
     "dev:coming-soon": "NEXT_PUBLIC_APP_MODE=coming-soon npm run dev",
     "dev:full-site": "NEXT_PUBLIC_APP_MODE=full-site npm run dev",
     "dev:demo": "NEXT_PUBLIC_APP_MODE=development npm run dev",
-    "test:lockdown": "node scripts/test-route-lockdown.js"
+    "test:lockdown": "node scripts/test-route-lockdown.js",
+    "email:generate": "tsx lib/email-templates/dev-utils.ts generate",
+    "email:test": "tsx lib/email-templates/dev-utils.ts test",
+    "email:benchmark": "tsx lib/email-templates/dev-utils.ts benchmark",
+    "email:preview": "tsx lib/email-templates/dev-utils.ts generate ./public/email-previews && echo 'Open http://localhost:3000/email-previews/index.html'"
   },
   "dependencies": {
     "@heroui/react": "^3.0.0-beta.2",
@@ -68,6 +72,7 @@
     "react-hook-form": "^7.60.0",
     "react-resizable-panels": "^2.1.7",
     "recharts": "2.15.4",
+    "resend": "^6.5.2",
     "sonner": "^1.7.4",
     "tailwind-merge": "^2.5.5",
     "tailwind-variants": "^3.1.1",

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { subscribeToWaitlist, checkEmailInWaitlist, getWaitlistStats, unsubscribeFromWaitlist, checkEmailWithPosition, getWaitlistPosition } from '@/lib/waitlist';
 import type { WaitlistSubscriptionData } from '@/lib/waitlist';
+import { sendWaitlistConfirmationEmail, sendWaitlistAdminNotification } from '@/lib/email-service';
+
 
 // Rate limiting store (in production, use Redis or database)
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
@@ -88,6 +90,27 @@ export async function POST(request: NextRequest) {
     // Get the user's position in the waitlist
     const positionData = await getWaitlistPosition(subscriptionData.email);
 
+    console.log(`📊 Position data for ${subscriptionData.email}:`, positionData);
+
+    // Add this after successful subscription in the POST function:
+    if (result.success && result.data) {
+      // Send confirmation email (don't block the response)
+      sendWaitlistConfirmationEmail({
+        email: subscriptionData.email,
+        firstName: subscriptionData.firstName,
+        lastName: subscriptionData.lastName,
+        position: positionData.position,
+      }).catch(error => console.error('❌ Email confirmation failed:', error));
+
+      // Send admin notification (optional)
+      sendWaitlistAdminNotification({
+        email: subscriptionData.email,
+        firstName: subscriptionData.firstName,
+        lastName: subscriptionData.lastName,
+        position: positionData.position,
+      }).catch(error => console.error('❌ Admin notification failed:', error));
+    }
+
     return NextResponse.json(
       {
         message: 'Successfully added to waitlist!',
@@ -95,7 +118,8 @@ export async function POST(request: NextRequest) {
         firstName: subscriptionData.firstName,
         lastName: subscriptionData.lastName,
         position: positionData.position || null,
-        totalCount: positionData.totalCount || 0
+        totalCount: positionData.totalCount || 0,
+        ...(positionData.error && { positionError: positionData.error })
       },
       { status: 201 }
     );

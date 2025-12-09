@@ -1,22 +1,18 @@
 import { Resend } from 'resend';
+import {
+  Templates,
+  emailFactory,
+  validateEmailData,
+  validateAdminData,
+  type WaitlistEmailData,
+  type AdminNotificationData,
+  type EmailTemplate
+} from './email-templates';
 
 // Email service configuration
 const resend = new Resend(process.env.RESEND_API_KEY);
-const FROM_EMAIL = process.env.FROM_EMAIL || 'hello@yourdomain.com';
+const FROM_EMAIL = process.env.FROM_EMAIL || 'hello@realproof.ng';
 const COMPANY_NAME = 'RealProof';
-
-interface WaitlistEmailData {
-  email: string;
-  firstName: string;
-  lastName?: string;
-  position?: number; // Position in waitlist
-}
-
-interface EmailTemplate {
-  subject: string;
-  html: string;
-  text: string;
-}
 
 /**
  * Send waitlist confirmation email
@@ -32,8 +28,16 @@ export async function sendWaitlistConfirmationEmail(data: WaitlistEmailData): Pr
       return { success: false, error: 'Email service not configured' };
     }
 
-    const fullName = data.lastName ? `${data.firstName} ${data.lastName}` : data.firstName;
-    const template = getWaitlistConfirmationTemplate(data.firstName, fullName, data.position);
+    // Validate input data
+    if (!validateEmailData(data)) {
+      console.error('❌ Invalid email data provided:', data);
+      return { success: false, error: 'Invalid email data' };
+    }
+
+    console.log(`📧 Sending waitlist email to ${data.email} with position: ${data.position || 'undefined'}`);
+
+    // Generate template using our modular system
+    const template = Templates.waitlistConfirmation(data);
 
     const { data: emailResult, error } = await resend.emails.send({
       from: FROM_EMAIL,
@@ -63,7 +67,7 @@ export async function sendWaitlistConfirmationEmail(data: WaitlistEmailData): Pr
 /**
  * Send admin notification email when someone joins waitlist
  */
-export async function sendWaitlistAdminNotification(data: WaitlistEmailData): Promise<{
+export async function sendWaitlistAdminNotification(data: AdminNotificationData): Promise<{
   success: boolean;
   error?: string;
 }> {
@@ -72,14 +76,23 @@ export async function sendWaitlistAdminNotification(data: WaitlistEmailData): Pr
       return { success: false, error: 'Admin notifications not configured' };
     }
 
-    const fullName = data.lastName ? `${data.firstName} ${data.lastName}` : data.firstName;
+    // Validate input data
+    if (!validateAdminData(data)) {
+      console.error('❌ Invalid admin notification data provided:', data);
+      return { success: false, error: 'Invalid admin notification data' };
+    }
+
+    console.log(`📧 Sending admin notification for ${data.email} with position: ${data.position || 'undefined'}`);
+
+    // Generate template using our modular system
+    const template = Templates.adminNotification(data);
 
     const { error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: [process.env.ADMIN_EMAIL],
-      subject: `New Waitlist Signup - ${fullName}`,
-      html: getAdminNotificationTemplate(data),
-      text: `New waitlist signup: ${fullName} (${data.email})`,
+      subject: template.subject,
+      html: template.html,
+      text: template.text,
     });
 
     if (error) {
@@ -87,6 +100,7 @@ export async function sendWaitlistAdminNotification(data: WaitlistEmailData): Pr
       return { success: false, error: error.message };
     }
 
+    console.log('✅ Admin notification sent successfully');
     return { success: true };
 
   } catch (error) {
@@ -99,177 +113,68 @@ export async function sendWaitlistAdminNotification(data: WaitlistEmailData): Pr
 }
 
 /**
- * Generate waitlist confirmation email template
+ * Batch email sending utility
  */
-function getWaitlistConfirmationTemplate(
-  firstName: string,
-  fullName: string,
-  position?: number
-): EmailTemplate {
-  const positionText = position ? `You're #${position} on our waitlist!` : '';
+export async function sendBatchEmails(
+  emails: Array<{ type: 'waitlist' | 'admin'; data: WaitlistEmailData | AdminNotificationData }>
+): Promise<{ success: boolean; results: Array<{ success: boolean; error?: string }> }> {
+  try {
+    const results = await Promise.allSettled(
+      emails.map(async ({ type, data }) => {
+        if (type === 'waitlist') {
+          return await sendWaitlistConfirmationEmail(data as WaitlistEmailData);
+        } else {
+          return await sendWaitlistAdminNotification(data as AdminNotificationData);
+        }
+      })
+    );
 
-  const subject = `Welcome to ${COMPANY_NAME} Waitlist! 🎉`;
+    const formattedResults = results.map(result =>
+      result.status === 'fulfilled'
+        ? result.value
+        : { success: false, error: result.reason?.message || 'Unknown error' }
+    );
 
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>${subject}</title>
-        <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-            .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 10px 10px; }
-            .highlight { background: #e7f3ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #007bff; }
-            .button { display: inline-block; padding: 12px 30px; background: #007bff; color: white; text-decoration: none; border-radius: 6px; margin: 20px 0; }
-            .footer { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; color: #666; font-size: 14px; }
-            .stats { display: flex; justify-content: space-around; margin: 20px 0; }
-            .stat { text-align: center; }
-            .stat-number { font-size: 24px; font-weight: bold; color: #007bff; }
-            .stat-label { font-size: 12px; color: #666; }
-        </style>
-    </head>
-    <body>
-        <div class="header">
-            <h1>🏠 ${COMPANY_NAME}</h1>
-            <h2>Welcome to the Future of Real Estate!</h2>
-        </div>
+    const allSuccessful = formattedResults.every(result => result.success);
 
-        <div class="content">
-            <h2>Hi ${firstName}! 👋</h2>
+    return {
+      success: allSuccessful,
+      results: formattedResults
+    };
 
-            <p>Thank you for joining our waitlist! We're thrilled to have you as part of our community.</p>
-
-            ${position ? `<div class="highlight">
-                <h3>🎯 ${positionText}</h3>
-                <p>You're one of our early supporters, and we can't wait to show you what we've been building.</p>
-            </div>` : ''}
-
-            <div class="highlight">
-                <h3>What happens next?</h3>
-                <ul>
-                    <li>✅ <strong>Confirmation:</strong> You're officially on our waitlist</li>
-                    <li>🚀 <strong>Early Access:</strong> You'll be among the first to access our platform</li>
-                    <li>📧 <strong>Updates:</strong> We'll keep you informed about our progress</li>
-                    <li>🎁 <strong>Exclusive Benefits:</strong> Special launch offers and features</li>
-                </ul>
-            </div>
-
-            <div class="stats">
-                <div class="stat">
-                    <div class="stat-number">10K+</div>
-                    <div class="stat-label">Properties Ready</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number">99.9%</div>
-                    <div class="stat-label">Verification Accuracy</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number">0</div>
-                    <div class="stat-label">Fake Listings</div>
-                </div>
-            </div>
-
-            <p><strong>What makes ${COMPANY_NAME} different?</strong></p>
-            <ul>
-                <li><strong>Geo-Verified Properties:</strong> Every listing is verified with precise location data</li>
-                <li><strong>Zero Duplicates:</strong> No more scrolling through the same property multiple times</li>
-                <li><strong>Real-Time Market Data:</strong> Live insights and pricing information</li>
-                <li><strong>Transparent Process:</strong> No hidden fees, no fake listings, no surprises</li>
-            </ul>
-
-            <p>We're working hard to launch soon and we'll notify you the moment we're ready!</p>
-
-            <p>Have questions? Just reply to this email - we'd love to hear from you.</p>
-
-            <p>Best regards,<br>
-            The ${COMPANY_NAME} Team</p>
-        </div>
-
-        <div class="footer">
-            <p>© 2024 ${COMPANY_NAME}. All rights reserved.</p>
-            <p>You received this email because you signed up for our waitlist.</p>
-            <p><a href="{unsubscribe_url}" style="color: #666;">Unsubscribe</a> | <a href="mailto:hello@realproof.ng" style="color: #666;">Contact Us</a></p>
-        </div>
-    </body>
-    </html>
-  `;
-
-  const text = `
-Welcome to ${COMPANY_NAME} Waitlist!
-
-Hi ${firstName}!
-
-Thank you for joining our waitlist! We're building Nigeria's most trusted property marketplace with geo-verified listings and zero duplicates.
-
-${positionText}
-
-What happens next:
-✅ You're officially on our waitlist
-🚀 You'll get early access when we launch
-📧 We'll keep you updated on our progress
-🎁 Exclusive launch benefits await you
-
-What makes us different:
-- Geo-Verified Properties: Every listing verified with precise location
-- Zero Duplicates: No more seeing the same property multiple times
-- Real-Time Market Data: Live insights and pricing
-- Transparent Process: No hidden fees or fake listings
-
-We'll notify you the moment we're ready to launch!
-
-Questions? Just reply to this email.
-
-Best regards,
-The ${COMPANY_NAME} Team
-
-© 2024 ${COMPANY_NAME}. All rights reserved.
-Unsubscribe: {unsubscribe_url}
-  `;
-
-  return { subject, html, text };
+  } catch (error) {
+    console.error('❌ Batch email sending error:', error);
+    return {
+      success: false,
+      results: [{ success: false, error: error instanceof Error ? error.message : 'Unknown error' }]
+    };
+  }
 }
 
 /**
- * Generate admin notification template
+ * Email template preview utility for development
  */
-function getAdminNotificationTemplate(data: WaitlistEmailData): string {
-  const fullName = data.lastName ? `${data.firstName} ${data.lastName}` : data.firstName;
+export async function previewEmailTemplate(
+  type: 'waitlist' | 'admin',
+  sampleData?: Partial<WaitlistEmailData>
+): Promise<EmailTemplate> {
+  const mockData: WaitlistEmailData = {
+    email: 'preview@example.com',
+    firstName: 'Preview',
+    lastName: 'User',
+    position: 42,
+    ...sampleData
+  };
 
-  return `
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="utf-8">
-        <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: #28a745; color: white; padding: 20px; text-align: center; border-radius: 8px; }
-            .content { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-top: 10px; }
-            .user-info { background: white; padding: 15px; border-radius: 6px; margin: 15px 0; }
-            .label { font-weight: bold; color: #666; }
-        </style>
-    </head>
-    <body>
-        <div class="header">
-            <h2>🎉 New Waitlist Signup</h2>
-        </div>
-
-        <div class="content">
-            <p>A new user has joined the ${COMPANY_NAME} waitlist!</p>
-
-            <div class="user-info">
-                <p><span class="label">Name:</span> ${fullName}</p>
-                <p><span class="label">Email:</span> ${data.email}</p>
-                ${data.position ? `<p><span class="label">Position:</span> #${data.position}</p>` : ''}
-                <p><span class="label">Signed up:</span> ${new Date().toLocaleString()}</p>
-            </div>
-
-            <p>Check your admin dashboard for more details.</p>
-        </div>
-    </body>
-    </html>
-  `;
+  if (type === 'waitlist') {
+    return Templates.waitlistConfirmation(mockData);
+  } else {
+    return Templates.adminNotification({
+      ...mockData,
+      totalCount: 150,
+      signupDate: new Date().toISOString()
+    });
+  }
 }
 
 /**
@@ -309,6 +214,15 @@ export async function testEmailConfiguration(): Promise<{
  * Environment variables needed:
  *
  * RESEND_API_KEY=re_xxxxxxxx (get from resend.com)
- * FROM_EMAIL=hello@yourdomain.com (verified domain in Resend)
- * ADMIN_EMAIL=admin@yourdomain.com (optional, for admin notifications)
+ * FROM_EMAIL=hello@realproof.ng (verified domain in Resend)
+ * ADMIN_EMAIL=admin@realproof.ng (optional, for admin notifications)
+ * SUPPORT_EMAIL=hello@realproof.ng (optional, for email footers)
+ * WEBSITE_URL=https://realproof.ng (optional, for email links)
+ * UNSUBSCRIBE_URL={unsubscribe_url} (optional, for unsubscribe functionality)
  */
+
+// Re-export types for convenience
+export type { WaitlistEmailData, AdminNotificationData, EmailTemplate } from './email-templates';
+
+// Export email factory for advanced usage
+export { emailFactory, Templates } from './email-templates';
