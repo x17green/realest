@@ -1,0 +1,94 @@
+<svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradient for the outer pin -->
+    <linearGradient id="pinGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ADF434" />
+      <stop offset="30%" stop-color="#9FE02A" />
+      <stop offset="70%" stop-color="#6BB01F" />
+      <stop offset="100%" stop-color="#07402F" />
+    </linearGradient>
+
+    <!-- Gradient for buildings -->
+    <linearGradient id="buildingGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ADF434" />
+      <stop offset="100%" stop-color="#9FE02A" />
+    </linearGradient>
+
+    <!-- Shadow gradient -->
+    <radialGradient id="shadowGradient" cx="50%" cy="50%">
+      <stop offset="0%" stop-color="#07402F" stop-opacity="0.2" />
+      <stop offset="100%" stop-color="#07402F" stop-opacity="0.05" />
+    </radialGradient>
+  </defs>
+
+  <!-- Background with slight rounded corners for iOS -->
+  <rect width="120" height="120" rx="15" ry="15" fill="#07402F"/>
+
+  <!-- Drop shadow -->
+  <ellipse cx="60" cy="100" rx="21" ry="7" fill="url(#shadowGradient)" />
+
+  <!-- Main pin shape -->
+  <path
+    d="M60 17 C44 17, 31 30, 31 46 C31 62, 60 90, 60 90 C60 90, 89 62, 89 46 C89 30, 76 17, 60 17 Z"
+    fill="url(#pinGradient)"
+    stroke="#FFFFFF"
+    stroke-width="0.8"
+  />
+
+  <!-- Inner circle background (dark green) -->
+  <circle cx="60" cy="46" r="18" fill="#07402F" />
+
+  <!-- Buildings cityscape -->
+  <g fill="url(#buildingGradient)">
+    <!-- Building 1 (left) -->
+    <rect x="47" y="36" width="5" height="16" rx="1" />
+    <rect x="48" y="37.5" width="1.3" height="1.3" fill="#07402F" />
+    <rect x="50" y="37.5" width="1.3" height="1.3" fill="#07402F" />
+    <rect x="48" y="40" width="1.3" height="1.3" fill="#07402F" />
+    <rect x="50" y="40" width="1.3" height="1.3" fill="#07402F" />
+    <rect x="48" y="42.5" width="1.3" height="1.3" fill="#07402F" />
+    <rect x="50" y="42.5" width="1.3" height="1.3" fill="#07402F" />
+
+    <!-- Building 2 (center, tallest) -->
+    <rect x="53" y="30" width="8" height="22" rx="1" />
+    <rect x="54.5" y="32" width="1.3" height="1.3" fill="#07402F" />
+    <rect x="56.5" y="32" width="1.3" height="1.3" fill="#07402F" />
+    <rect x="58.5" y="32" width="1.3" height="1.3" fill="#07402F" />
+    <rect x="54.5" y="35" width="1.3" height="1.3" fill="#07402F" />
+    <rect x="56.5" y="35" width="1.3" height="1.3" fill="#07402F" />
+    <rect x="58.5" y="35" width="1.3" height="1.3" fill="#07402F" />
+    <rect x="54.5" y="38" width="1.3" height="1.3" fill="#07402F" />
+    <rect x="56.5" y="38" width="1.3" height="1.3" fill="#07402F" />
+    <rect x="58.5" y="38" width="1.3" height="1.3" fill="#07402F" />
+    <rect x="54.5" y="41" width="1.3" height="1.3" fill="#07402F" />
+    <rect x="56.5" y="41" width="1.3" height="1.3" fill="#07402F" />
+    <rect x="58.5" y="41" width="1.3" height="1.3" fill="#07402F" />
+
+    <!-- Building 3 (right) -->
+    <rect x="62" y="33" width="5" height="19" rx="1" />
+    <rect x="63" y="35" width="1.3" height="1.3" fill="#07402F" />
+    <rect x="65" y="35" width="1.3" height="1.3" fill="#07402F" />
+    <rect x="63" y="38" width="1.3" height="1.3" fill="#07402F" />
+    <rect x="65" y="38" width="1.3" height="1.3" fill="#07402F" />
+    <rect x="63" y="41" width="1.3" height="1.3" fill="#07402F" />
+    <rect x="65" y="41" width="1.3" height="1.3" fill="#07402F" />
+
+    <!-- Small buildings (background) -->
+    <rect x="43" y="42" width="3" height="10" rx="0.5" />
+    <rect x="69" y="39" width="3" height="13" rx="0.5" />
+    <rect x="40" y="45" width="2" height="7" rx="0.4" />
+    <rect x="73" y="42" width="2" height="10" rx="0.4" />
+    <rect x="75" y="44" width="1.5" height="8" rx="0.3" />
+  </g>
+
+  <!-- Ground/landscape base -->
+  <path
+    d="M 41 52 Q 47 51, 53 52 Q 60 52.5, 67 51 Q 73 50, 79 52 L 79 54 L 41 54 Z"
+    fill="#ADF434"
+    opacity="0.8"
+  />
+
+  <!-- Verification checkmark (top right of pin) -->
+  <circle cx="72" cy="30" r="5" fill="#ADF434" stroke="#07402F" stroke-width="0.6" />
+  <path d="M 69.5 30 L 71.5 32 L 74.5 29" stroke="#07402F" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+</svg>

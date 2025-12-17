@@ -1,0 +1,171 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Enhanced gradient for the outer pin -->
+    <linearGradient id="pinGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ADF434" />
+      <stop offset="15%" stop-color="#9FE02A" />
+      <stop offset="35%" stop-color="#7AC91D" />
+      <stop offset="65%" stop-color="#5BA318" />
+      <stop offset="85%" stop-color="#3B7A10" />
+      <stop offset="100%" stop-color="#07402F" />
+    </linearGradient>
+
+    <!-- Metallic gradient for buildings -->
+    <linearGradient id="buildingGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#B8FF4F" />
+      <stop offset="20%" stop-color="#ADF434" />
+      <stop offset="70%" stop-color="#9FE02A" />
+      <stop offset="100%" stop-color="#7AC91D" />
+    </linearGradient>
+
+    <!-- Glass effect for windows -->
+    <linearGradient id="windowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ADF434" stop-opacity="0.8" />
+      <stop offset="50%" stop-color="#5BA318" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#07402F" stop-opacity="1" />
+    </linearGradient>
+
+    <!-- Enhanced shadow with multiple levels -->
+    <radialGradient id="shadowGradient" cx="50%" cy="50%">
+      <stop offset="0%" stop-color="#07402F" stop-opacity="0.4" />
+      <stop offset="60%" stop-color="#07402F" stop-opacity="0.2" />
+      <stop offset="100%" stop-color="#07402F" stop-opacity="0.05" />
+    </radialGradient>
+
+    <!-- Verification badge gradient -->
+    <radialGradient id="verificationGradient" cx="30%" cy="30%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.3" />
+      <stop offset="50%" stop-color="#ADF434" />
+      <stop offset="100%" stop-color="#9FE02A" />
+    </radialGradient>
+
+    <!-- Pin highlight gradient -->
+    <linearGradient id="pinHighlight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.4" />
+      <stop offset="30%" stop-color="#FFFFFF" stop-opacity="0.2" />
+      <stop offset="70%" stop-color="#FFFFFF" stop-opacity="0.1" />
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0" />
+    </linearGradient>
+
+    <!-- Subtle inner shadow -->
+    <radialGradient id="innerShadow" cx="50%" cy="30%">
+      <stop offset="0%" stop-color="#07402F" stop-opacity="0.1" />
+      <stop offset="100%" stop-color="#07402F" stop-opacity="0.3" />
+    </radialGradient>
+  </defs>
+
+  <!-- Drop shadow with multiple layers -->
+  <ellipse cx="100" cy="176" rx="36" ry="12" fill="url(#shadowGradient)" />
+  <ellipse cx="100" cy="176" rx="24" ry="8" fill="#07402F" opacity="0.2" />
+
+  <!-- Main pin shape with enhanced styling -->
+  <path
+    d="M100 16 C66 16, 40 42, 40 76 C40 110, 100 160, 100 160 C100 160, 160 110, 160 76 C160 42, 134 16, 100 16 Z"
+    fill="url(#pinGradient)"
+    stroke="#07402F"
+    stroke-width="1"
+  />
+
+  <!-- Pin highlight overlay -->
+  <path
+    d="M100 16 C66 16, 40 42, 40 76 C40 110, 100 160, 100 160 C100 160, 160 110, 160 76 C160 42, 134 16, 100 16 Z"
+    fill="url(#pinHighlight)"
+  />
+
+  <!-- Inner circle background with depth -->
+  <circle cx="100" cy="76" r="40" fill="url(#innerShadow)" />
+  <circle cx="100" cy="76" r="38" fill="#07402F" />
+
+  <!-- Buildings cityscape with enhanced details -->
+  <g fill="url(#buildingGradient)">
+    <!-- Building 1 (left) -->
+    <rect x="70" y="56" width="12" height="36" rx="2" />
+    <rect x="72" y="60" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <rect x="77" y="60" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <rect x="72" y="66" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <rect x="77" y="66" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <rect x="72" y="72" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <rect x="77" y="72" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <rect x="72" y="78" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <rect x="77" y="78" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <!-- Rooftop detail -->
+    <rect x="69" y="54" width="14" height="3" rx="1" fill="#ADF434" />
+
+    <!-- Building 2 (center, tallest) -->
+    <rect x="86" y="44" width="16" height="48" rx="2" />
+    <rect x="89" y="48" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <rect x="94" y="48" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <rect x="99" y="48" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <rect x="89" y="54" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <rect x="94" y="54" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <rect x="99" y="54" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <rect x="89" y="60" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <rect x="94" y="60" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <rect x="99" y="60" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <rect x="89" y="66" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <rect x="94" y="66" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <rect x="99" y="66" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <rect x="89" y="72" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <rect x="94" y="72" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <rect x="99" y="72" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <rect x="89" y="78" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <rect x="94" y="78" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <rect x="99" y="78" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <!-- Antenna/spire -->
+    <rect x="93" y="40" width="2" height="6" fill="#ADF434" />
+    <circle cx="94" cy="39" r="1.5" fill="#ADF434" />
+    <!-- Rooftop detail -->
+    <rect x="85" y="42" width="18" height="3" rx="1" fill="#ADF434" />
+
+    <!-- Building 3 (right) -->
+    <rect x="106" y="52" width="12" height="40" rx="2" />
+    <rect x="108" y="56" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <rect x="113" y="56" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <rect x="108" y="62" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <rect x="113" y="62" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <rect x="108" y="68" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <rect x="113" y="68" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <rect x="108" y="74" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <rect x="113" y="74" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <rect x="108" y="80" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <rect x="113" y="80" width="3" height="3" rx="0.5" fill="url(#windowGradient)" />
+    <!-- Rooftop detail -->
+    <rect x="105" y="50" width="14" height="3" rx="1" fill="#ADF434" />
+
+    <!-- Small background buildings for depth -->
+    <rect x="62" y="70" width="6" height="22" rx="1" opacity="0.7" />
+    <rect x="120" y="64" width="6" height="28" rx="1" opacity="0.7" />
+    <rect x="56" y="76" width="4" height="16" rx="0.8" opacity="0.5" />
+    <rect x="128" y="70" width="4" height="22" rx="0.8" opacity="0.5" />
+    <rect x="134" y="74" width="3" height="18" rx="0.6" opacity="0.4" />
+    <rect x="50" y="80" width="3" height="12" rx="0.6" opacity="0.3" />
+  </g>
+
+  <!-- Enhanced ground/landscape with texture -->
+  <path
+    d="M 60 92 Q 70 88, 86 90 Q 100 92, 114 88 Q 130 86, 140 90 L 140 96 L 60 96 Z"
+    fill="#ADF434"
+    opacity="0.8"
+  />
+  <path
+    d="M 60 94 Q 75 92, 90 93 Q 100 94, 110 92 Q 125 91, 140 93 L 140 96 L 60 96 Z"
+    fill="#9FE02A"
+    opacity="0.6"
+  />
+
+  <!-- Street elements -->
+  <rect x="75" y="96" width="2" height="8" rx="1" fill="#5BA318" opacity="0.8" />
+  <rect x="123" y="96" width="2" height="8" rx="1" fill="#5BA318" opacity="0.8" />
+
+  <!-- Enhanced verification checkmark -->
+  <circle cx="130" cy="46" r="12" fill="url(#verificationGradient)" stroke="#07402F" stroke-width="1" />
+  <circle cx="130" cy="46" r="10" fill="none" stroke="#FFFFFF" stroke-width="0.5" opacity="0.3" />
+  <path d="M 124 46 L 128 50 L 136 42" stroke="#07402F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+  <path d="M 124 46 L 128 50 L 136 42" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.4" />
+
+  <!-- Subtle glow effect around the pin -->
+  <circle cx="100" cy="76" r="45" fill="none" stroke="#ADF434" stroke-width="0.5" opacity="0.3" />
+
+  <!-- Brand text integration (optional) -->
+  <text x="100" y="190" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#07402F" opacity="0.7">RealEST</text>
+</svg>
