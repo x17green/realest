@@ -23,10 +23,11 @@
       "args": ["-y", "@heroui/react-mcp@latest"],
       "env": {}
     },
-    "supabase": {
-      "command": "npx",
-      "args": ["-y", "mcp-remote", "https://mcp.supabase.com/mcp"],
-      "env": {}
+    "supabase-mcp": {
+      "url": "https://mcp.supabase.com/mcp?project_ref=${SUPABASE_PROJECT_REF}",
+      "headers": {
+        "Authorization": "Bearer ${SUPABASE_ACCESS_TOKEN}"
+      }
     }
   },
   "languages": {
@@ -142,10 +143,19 @@
   "collaboration_panel": {
     "button": false
   },
+  "autosave": {
+    "after_delay": {
+      "milliseconds": 1000
+    }
+  },
   "terminal": {
+    "button": true,
     "dock": "bottom",
     "default_height": 320,
-    "button": true
+    "working_directory": "current_project_directory",
+    "shell": {
+      "program": "pwsh"
+    }
   },
   "tabs": {
     "close_position": "right",
@@ -195,5 +205,6 @@
     "**/build",
     "**/.supabase"
   ],
-  "auto_update": true
+  "auto_update": true,
+  "format_on_save": "on"
 }

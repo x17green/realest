@@ -169,6 +169,7 @@ const ComingSoonHero = () => {
         {/* Main Content */}
         <div className="relative z-10 container mx-auto px-4 py-20 min-h-screen flex items-center">
           <div className="max-w-4xl mx-auto text-center">
+            
             {/* Status Badge */}
             <div className="inline-flex items-center gap-2 animate-pulse bg-linear-to-l from-primary/10 to-accent/10 border border-primary/20 rounded-full px-4 py-2 mb-6 backdrop-blur-md">
               <MapPinCheck className="w-4 h-4 text-primary" />
@@ -259,6 +260,27 @@ const ComingSoonHero = () => {
               </div>
             )}
 
+            {/* CTA - Updated to open modal */}
+            <div className="space-y-4 flex flex-col gap-2 justify-center mb-8">
+              <Button
+                variant='neon'
+                size="lg"
+                className="flex justify-center items-center rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 gap-2 py-3 px-6 max-w-2xs mx-auto backdrop-blur-sm"
+                onClick={() => setIsModalOpen(true)}
+              >
+                <MailCheck className="w-4 h-4" />
+                <span className="text-sm font-medium ">
+                  {hasReleaseDate ? 'Get Notified at Launch' : 'Join Waitlist'}
+                </span>
+              </Button>
+              <p className="text-body-xs text-muted-foreground">
+                {hasReleaseDate
+                  ? 'Be the first to explore verified properties when we go live'
+                  : 'Join our waitlist to be notified when we announce our launch date'
+                }
+              </p>
+            </div>
+
             {/* Feature Highlights */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
               {features.map((feature, index) => (
@@ -306,27 +328,6 @@ const ComingSoonHero = () => {
                 <MapPin className="w-4 h-4" />
                 Lagos • Abuja • PH
               </Chip>
-            </div>
-
-            {/* CTA - Updated to open modal */}
-            <div className="space-y-4 flex flex-col gap-2 justify-center mb-8">
-              <Button
-                variant='neon'
-                size="lg"
-                className="flex justify-center items-center rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 gap-2 py-3 px-6 max-w-2xs mx-auto backdrop-blur-sm"
-                onClick={() => setIsModalOpen(true)}
-              >
-                <MailCheck className="w-4 h-4" />
-                <span className="text-sm font-medium ">
-                  {hasReleaseDate ? 'Get Notified at Launch' : 'Join Waitlist'}
-                </span>
-              </Button>
-              <p className="text-body-xs text-muted-foreground">
-                {hasReleaseDate
-                  ? 'Be the first to explore verified properties when we go live'
-                  : 'Join our waitlist to be notified when we announce our launch date'
-                }
-              </p>
             </div>
 
             {/* Stats Preview */}

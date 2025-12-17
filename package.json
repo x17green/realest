@@ -20,7 +20,8 @@
     "email:generate": "tsx lib/email-templates/dev-utils.ts generate",
     "email:test": "tsx lib/email-templates/dev-utils.ts test",
     "email:benchmark": "tsx lib/email-templates/dev-utils.ts benchmark",
-    "email:preview": "tsx lib/email-templates/dev-utils.ts generate ./public/email-previews && echo 'Open http://localhost:3000/email-previews/index.html'"
+    "email:preview": "tsx lib/email-templates/dev-utils.ts generate ./public/email-previews && echo 'Open http://localhost:3000/email-previews/index.html'",
+    "icons:generate": "node scripts/generate-png-icons.js"
   },
   "dependencies": {
     "@heroui/react": "^3.0.0-beta.2",
@@ -83,6 +84,7 @@
   "devDependencies": {
     "@commitlint/cli": "^20.1.0",
     "@commitlint/config-conventional": "^20.0.0",
+    "@resvg/resvg-js": "^2.6.2",
     "@tailwindcss/postcss": "^4.1.9",
     "@types/node": "^22",
     "@types/react": "^19",
@@ -90,6 +92,7 @@
     "baseline-browser-mapping": "^2.9.2",
     "husky": "^9.1.7",
     "postcss": "^8.5",
+    "sharp": "^0.34.5",
     "tailwindcss": "^4.1.9",
     "tw-animate-css": "1.3.3",
     "typescript": "^5"
