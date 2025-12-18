@@ -15,29 +15,12 @@
   "context_servers": {
     "heroui": {
       "command": "npx",
-      "args": ["-y", "@heroui/mcp"],
-      "env": {}
-    },
-    "heroui-react": {
-      "command": "npx",
       "args": ["-y", "@heroui/react-mcp@latest"],
       "env": {}
     },
-    "supabase-mcp": {
-      "url": "https://mcp.supabase.com/mcp?project_ref=${SUPABASE_PROJECT_REF}",
-      "headers": {
-        "Authorization": "Bearer ${SUPABASE_ACCESS_TOKEN}"
-      }
-    }
   },
   "languages": {
     "TypeScript": {
-      "format_on_save": {
-        "external": {
-          "command": "prettier",
-          "arguments": ["--stdin-filepath", "{buffer_path}"]
-        }
-      },
       "language_servers": [
         "typescript-language-server",
         "tailwindcss-language-server"
@@ -46,12 +29,6 @@
       "hard_tabs": false
     },
     "TSX": {
-      "format_on_save": {
-        "external": {
-          "command": "prettier",
-          "arguments": ["--stdin-filepath", "{buffer_path}"]
-        }
-      },
       "language_servers": [
         "typescript-language-server",
         "tailwindcss-language-server"
@@ -60,12 +37,6 @@
       "hard_tabs": false
     },
     "JavaScript": {
-      "format_on_save": {
-        "external": {
-          "command": "prettier",
-          "arguments": ["--stdin-filepath", "{buffer_path}"]
-        }
-      },
       "language_servers": [
         "typescript-language-server",
         "tailwindcss-language-server"
@@ -74,12 +45,6 @@
       "hard_tabs": false
     },
     "CSS": {
-      "format_on_save": {
-        "external": {
-          "command": "prettier",
-          "arguments": ["--stdin-filepath", "{buffer_path}"]
-        }
-      },
       "language_servers": [
         "tailwindcss-language-server",
         "css-language-server"
@@ -88,12 +53,6 @@
       "hard_tabs": false
     },
     "JSON": {
-      "format_on_save": {
-        "external": {
-          "command": "prettier",
-          "arguments": ["--stdin-filepath", "{buffer_path}"]
-        }
-      },
       "tab_size": 2,
       "hard_tabs": false
     }
@@ -188,7 +147,7 @@
   "seed_search_query_from_cursor": "always",
   "ui_font_size": 14,
   "buffer_font_size": 14,
-  "buffer_font_family": ".ZedMono",
+  "buffer_font_family": "VictorMono Nerd Font Mono",
   "theme": {
     "mode": "system",
     "light": "One Light",
