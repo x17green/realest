@@ -3,7 +3,10 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { Card, Button, Chip, Avatar, Separator, Tabs } from "@heroui/react";
+import { Card } from "@/components/ui/card";
+import { Tabs } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Chip, Avatar, Separator } from "@heroui/react";
 import {
   Heart,
   Search,
