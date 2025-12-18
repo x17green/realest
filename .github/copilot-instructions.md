@@ -10,6 +10,7 @@ This is a **multi-layered, context-aware AI instruction system** providing deep,
 
 | File | Purpose | When to Use |
 |------|---------|-------------|
+| **[AI-COMMIT-RULES.md](../.github/copilot-instructions/AI-COMMIT-RULES.md)** | ⚠️ MANDATORY commit workflow: typecheck → lint → user consent | BEFORE EVERY COMMIT - No exceptions |
 | **[00-architecture-overview.md](../.github/copilot-instructions/00-architecture-overview.md)** | System architecture, tech stack, project structure, phase status | Understanding big picture, architectural decisions, project organization |
 | **[01-design-system.md](../.github/copilot-instructions/01-design-system.md)** | Complete design system: colors, typography, spacing, shadows, accessibility | Styling components, brand compliance, OKLCH colors, 60-30-10 rule |
 | **[02-component-library.md](../.github/copilot-instructions/02-component-library.md)** | 70-25-5 component strategy, HeroUI integration, Nigerian market components | Building UI, selecting components, composition patterns |
