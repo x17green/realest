@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { useRealEstTheme } from '@/components/providers/realest-theme-provider'
+import { useRealEstTheme } from '@/components/providers/RealEstThemeProvider'
 import { ThemeToggleDropdown } from '@/components/ui/theme-toggle-wrapper'
 import {
   RealEstButton,
@@ -9,14 +9,14 @@ import {
   ContactOwnerButton,
   VerifyPropertyButton,
   ListPropertyButton
-} from '@/components/heroui/realest-button'
+} from '@/components/heroui/RealEstButton'
 import {
   RealEstCard,
   PropertyCard,
   AgentCard,
   FeaturedPropertyCard,
   NigerianPropertyCard
-} from '@/components/heroui/realest-card'
+} from '@/components/heroui/RealEstCard'
 import {
   ProgressRing,
   StatusDot,
@@ -34,7 +34,8 @@ import {
 } from '@/components/untitledui/status-components'
 import { StatusBadge, VerifiedBadge } from '@/components/ui/status-badge'
 import { VerificationBadge } from '@/components/realest'
-import RealEstLogo from '@/components/ui/real-est-logo'
+import * as RealEstLogoNS from '@/components/ui/RealEstLogo'
+const RealEstLogo = (RealEstLogoNS as any).default || RealEstLogoNS
 
 export default function Phase2DemoContent() {
   const { theme, effectiveTheme, systemTheme } = useRealEstTheme()

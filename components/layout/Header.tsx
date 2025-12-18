@@ -16,7 +16,7 @@ import {
   User as UserIcon,
   LogOut,
 } from "lucide-react";
-import { HeaderLogo } from "@/components/ui/real-est-logo";
+import { HeaderLogo } from "@/components/ui/RealEstLogo";
 import { ThemeToggleCompact } from "@/components/ui/theme-toggle-wrapper";
 
 export default function Header() {

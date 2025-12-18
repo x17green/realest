@@ -19,7 +19,7 @@ import {
   Award,
   Users,
 } from "lucide-react";
-import { FooterLogo } from "@/components/ui/real-est-logo";
+import { FooterLogo } from "@/components/ui/RealEstLogo";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();

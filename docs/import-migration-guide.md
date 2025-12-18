@@ -79,24 +79,9 @@ import WaitlistModal from '@/components/shared/WaitlistModal'
 
 ## Files That Still Need Moving
 
-The following components are still in the root `components/` directory and should be moved to appropriate domains:
+✅ All targeted components have been migrated into their domain folders. The legacy `theme-provider.tsx` was removed (RealEstThemeProvider remains active under `components/providers`).
 
-### Owner Components
-- `owner-dashboard-content.tsx` → `components/dashboard/OwnerDashboardContent.tsx`
-- `owner-inquiries.tsx` → `components/dashboard/OwnerInquiries.tsx`
-- `owner-inquiries-page.tsx` → `components/dashboard/OwnerInquiriesPage.tsx`
-- `owner-listings.tsx` → `components/dashboard/OwnerListings.tsx`
-
-### Property Components
-- `property-details.tsx` → `components/property/PropertyDetails.tsx`
-- `property-documents.tsx` → `components/property/PropertyDocuments.tsx`
-- `property-gallery.tsx` → `components/property/PropertyGallery.tsx`
-- `featured-properties.tsx` → `components/property/FeaturedProperties.tsx`
-- `contact-owner.tsx` → `components/property/ContactOwner.tsx`
-
-### Other Components
-- `phase2-demo-content.tsx` → `components/marketing/Phase2DemoContent.tsx`
-- `theme-provider.tsx` → `components/providers/ThemeProvider.tsx`
+If any new flat components appear in `components/`, move them into the correct domain folder using this guide as the mapping reference.
 
 ## Search & Replace Guide
 
@@ -157,12 +142,12 @@ Replace:  from "@/components/dashboard/AdminDocumentVerification"
 
 After updating imports, verify:
 
-- [ ] All imports resolve without errors
-- [ ] Components render correctly in their respective pages
-- [ ] Props are passed correctly to components
-- [ ] No circular dependencies created
-- [ ] All exports are properly defined in index.ts files
-- [ ] TypeScript types are correctly imported
+- [x] All imports resolve without errors
+- [x] Components render correctly in their respective pages
+- [x] Props are passed correctly to components
+- [x] No circular dependencies created
+- [x] All exports are properly defined in index.ts files
+- [x] TypeScript types are correctly imported
 
 ## Benefits of This Organization
 

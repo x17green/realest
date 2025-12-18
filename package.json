@@ -5,7 +5,8 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "lint": "eslint .",
+    "lint": "npm run ci:filenames && eslint .",
+    "ci:filenames": "node scripts/check-filenames.js",
     "lint:staged": "lint-staged",
     "typecheck": "tsc --noEmit",
     "precommit": "npm run typecheck && npm run lint",

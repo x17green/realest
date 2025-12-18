@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { cn } from '@/lib/utils'
-import { RealEstButton } from '@/components/heroui/realest-button'
+import { RealEstButton } from '@/components/heroui/RealEstButton'
 import { StatusBadge, VerifiedBadge } from '@/components/ui/status-badge'
 import { StatusDot } from '@/components/untitledui/status-components'
 import { ThemeToggleCompact } from '@/components/ui/theme-toggle-wrapper'

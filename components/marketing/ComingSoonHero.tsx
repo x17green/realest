@@ -22,9 +22,9 @@ import {
   Shield
 } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
-import { HeroLogo } from "@/components/ui/real-est-logo";
+import { HeroLogo } from "@/components/ui/RealEstLogo";
 import WaitlistModal from "@/components/shared/WaitlistModal";
-import { RealEstButton } from "@/components/heroui/realest-button";
+import { RealEstButton } from "@/components/heroui/RealEstButton";
 
 // Import the full website components for dynamic reveal
 import { HeroSection } from "@/components/marketing";

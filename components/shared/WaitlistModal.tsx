@@ -14,8 +14,8 @@
 "use client";
 
 import React, { useState } from 'react';
-import { useEmailValidation, formatWaitlistMessage } from '@/hooks/use-email-validation';
-import { useLocationSearch, formatLocationName } from '@/hooks/use-location-search';
+import { useEmailValidation, formatWaitlistMessage } from '@/lib/hooks/use-email-validation';
+import { useLocationSearch, formatLocationName } from '@/lib/hooks/use-location-search';
 import {
   Mail,
   CheckCircle,
@@ -37,7 +37,7 @@ import {
   Gift,
   Users
 } from "lucide-react";
-import { HeroLogo } from '@/components/ui/real-est-logo';
+import { HeroLogo } from '@/components/ui/RealEstLogo';
 import { Button } from '@/components/ui/button'
 
 interface WaitlistModalProps {
