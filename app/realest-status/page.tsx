@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { RealEstButton } from '@/components/heroui/realest-button'
+import { RealEstButton } from '@/components/heroui/RealEstButton'
 import { StatusBadge } from '@/components/ui/status-badge'
 import {
   CheckCircle,

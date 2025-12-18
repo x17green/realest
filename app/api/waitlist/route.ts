@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { subscribeToWaitlist, checkEmailInWaitlist, getWaitlistStats, unsubscribeFromWaitlist, checkEmailWithPosition, getWaitlistPosition } from '@/lib/waitlist';
 import type { WaitlistSubscriptionData } from '@/lib/waitlist';
-import { sendWaitlistConfirmationEmail, sendWaitlistAdminNotification } from '@/lib/email-service';
+import { sendWaitlistConfirmationEmail, sendWaitlistAdminNotification } from '@/lib/emailService';
 
 
 // Rate limiting store (in production, use Redis or database)

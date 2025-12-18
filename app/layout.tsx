@@ -1,7 +1,7 @@
 import type React from "react";
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
-import { RealEstThemeProvider } from "@/components/providers/realest-theme-provider";
+import { RealEstThemeProvider } from "@/components/providers/RealEstThemeProvider";
 import "../styles/globals.css";
 
 export const metadata: Metadata = {

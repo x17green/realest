@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
-import { RealEstButton } from '@/components/heroui/realest-button'
+import { RealEstButton } from '@/components/heroui/RealEstButton'
 import {
   PropertyListingForm,
   UserRegistrationForm,

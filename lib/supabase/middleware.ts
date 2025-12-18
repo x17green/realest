@@ -1,6 +1,6 @@
 import { createServerClient } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
-import { getAppMode, isRouteAccessible, shouldEnableAuthentication } from "@/lib/app-mode"
+import { getAppMode, isRouteAccessible, shouldEnableAuthentication } from "@/lib/appMode"
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({

@@ -16,4 +16,4 @@ export { default as FeaturedProperties } from './property/FeaturedProperties';
 export { default as WaitlistModal } from './shared/WaitlistModal';
 
 // UI Components
-export { HeroLogo } from './ui/real-est-logo';
+export { HeroLogo } from './ui/RealEstLogo';

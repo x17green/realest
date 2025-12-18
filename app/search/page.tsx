@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { RealEstButton } from "@/components/heroui/realest-button";
+import { RealEstButton } from "@/components/heroui/RealEstButton";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { AdvancedSearchForm } from "@/components/patterns/forms";
 import { Card, Input, Button, Chip } from "@heroui/react";

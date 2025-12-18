@@ -3,7 +3,7 @@ import { redirect } from "next/navigation"
 import { Header, Footer } from "@/components/layout"
 import { HeroSection, ComingSoonHero } from "@/components/marketing"
 import { FeaturedProperties } from "@/components/property"
-import { getAppMode, shouldShowFullSite, shouldEnableAuthentication } from "@/lib/app-mode"
+import { getAppMode, shouldShowFullSite, shouldEnableAuthentication } from "@/lib/appMode"
 
 export default async function HomePage() {
   const appMode = getAppMode()
