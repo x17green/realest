@@ -6,14 +6,14 @@
  */
 
 // Core Components
-export { default as Header } from './header';
-export { default as Footer } from './footer';
-export { default as ComingSoonHero } from './coming-soon-hero';
-export { default as HeroSection } from './hero-section';
-export { default as FeaturedProperties } from './featured-properties';
+export { default as Header } from './layout/Header';
+export { default as Footer } from './layout/Footer';
+export { default as ComingSoonHero } from './marketing/ComingSoonHero';
+export { default as HeroSection } from './marketing/HeroSection';
+export { default as FeaturedProperties } from './property/FeaturedProperties';
 
 // Modal Components
-export { default as WaitlistModal } from './waitlist-modal';
+export { default as WaitlistModal } from './shared/WaitlistModal';
 
 // UI Components
 export { HeroLogo } from './ui/real-est-logo';

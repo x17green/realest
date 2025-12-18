@@ -4,10 +4,10 @@ import { Input, TextArea, type InputProps, type TextAreaProps } from "@heroui/re
 
 export type RealEstInputProps = InputProps
 export function RealEstInput(props: RealEstInputProps) {
-  return <Input variant="bordered" radius="md" {...props} />
+  return <Input {...props} />
 }
 
 export type RealEstTextAreaProps = TextAreaProps
 export function RealEstTextArea(props: RealEstTextAreaProps) {
-  return <TextArea variant="bordered" radius="md" {...props} />
+  return <TextArea {...props} />
 }

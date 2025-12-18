@@ -1,4 +1,4 @@
-export { default as OwnerDashboardContent } from "../owner-dashboard-content"
-export { default as OwnerInquiries } from "../owner-inquiries"
-export { default as OwnerInquiriesPage } from "../owner-inquiries-page"
-export { default as OwnerListings } from "../owner-listings"
+export { default as OwnerDashboardContent } from "../dashboard/OwnerDashboardContent"
+export { default as OwnerInquiries } from "../dashboard/OwnerInquiries"
+export { default as OwnerInquiriesPage } from "../dashboard/OwnerInquiriesPage"
+export { default as OwnerListings } from "../dashboard/OwnerListings"

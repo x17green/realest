@@ -224,7 +224,7 @@ export default function PropertyDetailsPage() {
             {property.verification_status === "verified" && (
               <div className="absolute top-4 left-4">
                 <Chip
-                  type="success"
+                  color="success"
                   variant="primary"
                   className="flex items-center gap-1"
                 >
@@ -613,7 +613,7 @@ export default function PropertyDetailsPage() {
                       Status
                     </span>
                     <Chip
-                      type={
+                      color={
                         property.verification_status === "verified"
                           ? "success"
                           : property.verification_status === "rejected"

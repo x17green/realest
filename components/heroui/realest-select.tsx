@@ -1,11 +1,9 @@
 "use client"
 
-import { Select, SelectItem, type SelectProps } from "@heroui/react"
+import { Select, type SelectProps } from "@heroui/react"
 
-export type RealEstSelectProps<T extends string = string> = SelectProps<T>
+export type RealEstSelectProps<T extends object = object> = SelectProps<T>
 
-export function RealEstSelect<T extends string = string>(props: RealEstSelectProps<T>) {
-  return <Select variant="bordered" radius="md" {...props} />
+export function RealEstSelect<T extends object = object>(props: RealEstSelectProps<T>) {
+  return <Select {...props} />
 }
-
-export { SelectItem as RealEstSelectItem }

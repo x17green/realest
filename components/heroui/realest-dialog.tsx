@@ -3,7 +3,6 @@
 import {
   Modal,
   ModalBody,
-  ModalContent,
   ModalFooter,
   ModalHeader,
   type ModalProps,
@@ -17,7 +16,6 @@ export function RealEstDialog(props: RealEstDialogProps) {
 
 export {
   ModalBody as RealEstDialogBody,
-  ModalContent as RealEstDialogContent,
   ModalFooter as RealEstDialogFooter,
   ModalHeader as RealEstDialogHeader,
 }

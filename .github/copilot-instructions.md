@@ -10,14 +10,14 @@ This is a **multi-layered, context-aware AI instruction system** providing deep,
 
 | File | Purpose | When to Use |
 |------|---------|-------------|
-| **[AI-COMMIT-RULES.md](../.github/copilot-instructions/AI-COMMIT-RULES.md)** | ⚠️ MANDATORY commit workflow: typecheck → lint → user consent | BEFORE EVERY COMMIT - No exceptions |
-| **[00-architecture-overview.md](../.github/copilot-instructions/00-architecture-overview.md)** | System architecture, tech stack, project structure, phase status | Understanding big picture, architectural decisions, project organization |
-| **[01-design-system.md](../.github/copilot-instructions/01-design-system.md)** | Complete design system: colors, typography, spacing, shadows, accessibility | Styling components, brand compliance, OKLCH colors, 60-30-10 rule |
-| **[02-component-library.md](../.github/copilot-instructions/02-component-library.md)** | 70-25-5 component strategy, HeroUI integration, Nigerian market components | Building UI, selecting components, composition patterns |
-| **[03-typescript-types.md](../.github/copilot-instructions/03-typescript-types.md)** | Database schema, types, Zod schemas, Nigerian location data | Type safety, form validation, database queries, API responses |
-| **[04-authentication.md](../.github/copilot-instructions/04-authentication.md)** | Auth patterns, RLS policies, role-based access, middleware | User auth, protected routes, permission checks, security |
-| **[05-nigerian-market.md](../.github/copilot-instructions/05-nigerian-market.md)** | Cultural context, infrastructure realities, localization, BQ features | Nigerian-specific features, cultural sensitivity, local patterns |
-| **[PROMPTS.md](../.github/copilot-instructions/PROMPTS.md)** | Battle-tested prompt templates for common tasks | Quick-start prompts, task templates, examples |
+| **[AI-COMMIT-RULES.md](copilot-instructions/AI-COMMIT-RULES.md)** | ⚠️ MANDATORY commit workflow: typecheck → lint → user consent | BEFORE EVERY COMMIT - No exceptions |
+| **[00-architecture-overview.md](copilot-instructions/00-architecture-overview.md)** | System architecture, tech stack, project structure, phase status | Understanding big picture, architectural decisions, project organization |
+| **[01-design-system.md](copilot-instructions/01-design-system.md)** | Complete design system: colors, typography, spacing, shadows, accessibility | Styling components, brand compliance, OKLCH colors, 60-30-10 rule |
+| **[02-component-library.md](copilot-instructions/02-component-library.md)** | 70-25-5 component strategy, HeroUI integration, Nigerian market components | Building UI, selecting components, composition patterns |
+| **[03-typescript-types.md](copilot-instructions/03-typescript-types.md)** | Database schema, types, Zod schemas, Nigerian location data | Type safety, form validation, database queries, API responses |
+| **[04-authentication.md](copilot-instructions/04-authentication.md)** | Auth patterns, RLS policies, role-based access, middleware | User auth, protected routes, permission checks, security |
+| **[05-nigerian-market.md](copilot-instructions/05-nigerian-market.md)** | Cultural context, infrastructure realities, localization, BQ features | Nigerian-specific features, cultural sensitivity, local patterns |
+| **[PROMPTS.md](copilot-instructions/PROMPTS.md)** | Battle-tested prompt templates for common tasks | Quick-start prompts, task templates, examples |
 
 ### How to Use This System
 
@@ -299,13 +299,13 @@ border: 1px solid var(--border);
 
 | Your Task | Read This File | Key Sections |
 |-----------|----------------|--------------|
-| Build a new page/component | [02-component-library.md](../.github/copilot-instructions/02-component-library.md) | HeroUI patterns, composition examples |
-| Style a component | [01-design-system.md](../.github/copilot-instructions/01-design-system.md) | Color usage, typography, spacing |
-| Add authentication | [04-authentication.md](../.github/copilot-instructions/04-authentication.md) | Auth patterns, RLS policies |
-| Define database types | [03-typescript-types.md](../.github/copilot-instructions/03-typescript-types.md) | Schema, Zod validation |
-| Nigerian market feature | [05-nigerian-market.md](../.github/copilot-instructions/05-nigerian-market.md) | BQ, NEPA, localization |
-| Understand project structure | [00-architecture-overview.md](../.github/copilot-instructions/00-architecture-overview.md) | Routes, data flow, phases |
-| Start a new task | [PROMPTS.md](../.github/copilot-instructions/PROMPTS.md) | Template prompts |
+| Build a new page/component | [02-component-library.md](copilot-instructions/02-component-library.md) | HeroUI patterns, composition examples |
+| Style a component | [01-design-system.md](copilot-instructions/01-design-system.md) | Color usage, typography, spacing |
+| Add authentication | [04-authentication.md](copilot-instructions/04-authentication.md) | Auth patterns, RLS policies |
+| Define database types | [03-typescript-types.md](copilot-instructions/03-typescript-types.md) | Schema, Zod validation |
+| Nigerian market feature | [05-nigerian-market.md](copilot-instructions/05-nigerian-market.md) | BQ, NEPA, localization |
+| Understand project structure | [00-architecture-overview.md](copilot-instructions/00-architecture-overview.md) | Routes, data flow, phases |
+| Start a new task | [PROMPTS.md](copilot-instructions/PROMPTS.md) | Template prompts |
 
 ## 📖 Essential Documentation Reference
 

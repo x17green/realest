@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { Header, Footer } from "@/components/layout"
-import OwnerInquiriesPage from "@/components/owner-inquiries-page"
+import OwnerInquiriesPage from "@/components/dashboard/OwnerInquiriesPage"
 
 export default async function InquiriesPage() {
   const supabase = await createClient()
