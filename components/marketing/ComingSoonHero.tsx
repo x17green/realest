@@ -301,35 +301,31 @@ const ComingSoonHero = () => {
             {/* Quick Previews */}
             <div className="flex flex-wrap gap-2 justify-center mb-8">
               <Chip
-                color="secondary"
-                variant="flat"
-                startContent={<Building className="w-4 h-4" />}
-                className="cursor-default bg-primary/10 hover:bg-primary/15 transition-all duration-200 border border-primary/20"
+                variant="secondary"
+                className="cursor-default bg-primary/10 hover:bg-primary/15 transition-all duration-200 border border-primary/20 flex items-center gap-2"
               >
+                <Building className="w-4 h-4" />
                 Modern Apartments
               </Chip>
               <Chip
-                color="secondary"
-                variant="flat"
-                startContent={<TrendingUp className="w-4 h-4" />}
-                className="cursor-default bg-primary/10 hover:bg-primary/15 transition-all duration-200 border border-primary/20"
+                variant="secondary"
+                className="cursor-default bg-primary/10 hover:bg-primary/15 transition-all duration-200 border border-primary/20 flex items-center gap-2"
               >
+                <TrendingUp className="w-4 h-4" />
                 Exclusive Luxury Villas
               </Chip>
               <Chip
-                color="secondary"
-                variant="flat"
-                startContent={<Calendar className="w-4 h-4" />}
-                className="cursor-default bg-primary/10 hover:bg-primary/15 transition-all duration-200 border border-primary/20"
+                variant="secondary"
+                className="cursor-default bg-primary/10 hover:bg-primary/15 transition-all duration-200 border border-primary/20 flex items-center gap-2"
               >
+                <Calendar className="w-4 h-4" />
                 Event Spaces
               </Chip>
               <Chip
-                color="secondary"
-                variant="flat"
-                startContent={<MapPin className="w-4 h-4" />}
-                className="cursor-default bg-primary/10 hover:bg-primary/15 transition-all duration-200 border border-primary/20"
+                variant="secondary"
+                className="cursor-default bg-primary/10 hover:bg-primary/15 transition-all duration-200 border border-primary/20 flex items-center gap-2"
               >
+                <MapPin className="w-4 h-4" />
                 Lagos • Abuja • PH
               </Chip>
             </div>

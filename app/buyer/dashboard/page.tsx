@@ -476,7 +476,7 @@ export default function BuyerDashboardPage() {
                             </p>
                           </div>
                           <Chip
-                            type={
+                            color={
                               inquiry.status === "pending"
                                 ? "warning"
                                 : "success"
