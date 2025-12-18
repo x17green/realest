@@ -1,10 +1,8 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
-import Header from "@/components/header"
-import HeroSection from "@/components/hero-section"
-import FeaturedProperties from "@/components/featured-properties"
-import Footer from "@/components/footer"
-import ComingSoonHero from "@/components/coming-soon-hero"
+import { Header, Footer } from "@/components/layout"
+import { HeroSection, ComingSoonHero } from "@/components/marketing"
+import { FeaturedProperties } from "@/components/property"
 import { getAppMode, shouldShowFullSite, shouldEnableAuthentication } from "@/lib/app-mode"
 
 export default async function HomePage() {

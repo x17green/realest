@@ -5,8 +5,8 @@ import type { User } from "@supabase/supabase-js"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { FileCheck, Home } from "lucide-react"
-import AdminPropertyVerification from "@/components/admin-property-verification"
-import AdminDocumentVerification from "@/components/admin-document-verification"
+import AdminPropertyVerification from "@/components/dashboard/AdminPropertyVerification"
+import AdminDocumentVerification from "@/components/dashboard/AdminDocumentVerification"
 
 interface Property {
   id: string

@@ -1,8 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
-import Header from "@/components/header"
-import Footer from "@/components/footer"
-import ListPropertyForm from "@/components/list-property-form"
+import { Header, Footer } from "@/components/layout"
+import { ListPropertyForm } from "@/components/forms"
 
 export default async function ListPropertyPage() {
   const supabase = await createClient()

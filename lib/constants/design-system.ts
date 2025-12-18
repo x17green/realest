@@ -233,40 +233,56 @@ export const BREAKPOINTS = {
 // ================================================================
 
 export const COMPONENT_LIBRARY = {
-  // Usage percentages and guidelines
-  heroui: {
-    percentage: 70,
-    usage: [
-      'Buttons (all variants)',
-      'Navigation components',
-      'Forms and inputs',
-      'Cards and containers',
-      'Modals and drawers',
-      'Data display components',
-      'Layout components',
-    ],
+  current: {
+    heroui: {
+      percentage: 20,
+      usage: ['Auth flows', 'Public marketing pages', 'Selected shared components'],
+    },
+    untitledui: {
+      percentage: 5,
+      usage: ['status-components.tsx in demos'],
+    },
+    shadcn: {
+      percentage: 75,
+      usage: ['components/ui/* (65+ primitives)', 'Dashboards and shared UI'],
+    },
   },
 
-  untitledui: {
-    percentage: 25,
-    usage: [
-      'Status badges and chips',
-      'Progress indicators',
-      'Alert banners',
-      'Small pills and tags',
-      'Tooltip components',
-      'Loading states',
-      'Empty states',
-    ],
-  },
+  target: {
+    heroui: {
+      percentage: 70,
+      usage: [
+        'Buttons (all variants)',
+        'Navigation components',
+        'Forms and inputs',
+        'Cards and containers',
+        'Modals and drawers',
+        'Data display components',
+        'Layout components',
+      ],
+    },
 
-  shadcn: {
-    percentage: 5,
-    usage: [
-      'Complex data tables',
-      'Advanced form patterns',
-      'Specialized interactions',
-    ],
+    untitledui: {
+      percentage: 25,
+      usage: [
+        'Status badges and chips',
+        'Progress indicators',
+        'Alert banners',
+        'Small pills and tags',
+        'Tooltip components',
+        'Loading states',
+        'Empty states',
+      ],
+    },
+
+    shadcn: {
+      percentage: 5,
+      usage: [
+        'Complex data tables',
+        'Advanced form patterns',
+        'Specialized interactions',
+      ],
+    },
   },
 } as const;
 

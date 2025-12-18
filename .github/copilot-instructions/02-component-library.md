@@ -1,15 +1,27 @@
 # Component Library Strategy & Patterns
 
-## 70-25-5 Component Distribution Rule
+## Component Distribution (Current vs Target)
 
-RealEST uses a strategic multi-library approach to balance development speed, consistency, and customization:
+RealEST uses a strategic multi-library approach to balance development speed, consistency, and customization. **Current adoption (Dec 2025) does not match the target.**
 
 ```
-Component Distribution
-├── 70% HeroUI v3      → Primary library (forms, buttons, cards, layout)
-├── 25% UntitledUI     → Status indicators, progress, alerts, microinteractions
-└── 5% Shadcn/Custom   → Complex patterns, data tables, custom RealEST components
+Current Distribution (observed)
+├── ~20% HeroUI v3      → Buttons, cards, some auth/public pages
+├── ~5%  UntitledUI     → status-components.tsx only
+└── ~75% Shadcn/Custom  → components/ui/* (65+ components) is dominant
+
+Target Distribution (70-25-5)
+├── 70% HeroUI v3       → Primary library (forms, buttons, cards, layout)
+├── 25% UntitledUI      → Status indicators, progress, alerts, microinteractions
+└── 5%  Shadcn/Custom   → Complex patterns, data tables, custom RealEST components
 ```
+
+**Hybrid plan (Option C):** Keep documenting the target while explicitly calling out current usage and migrate incrementally toward 70-25-5.
+
+### Guardrails for New Code (Dec 2025)
+- **HeroUI wrappers**: use `RealEstInput`, `RealEstTextArea`, `RealEstSelect`/`RealEstSelectItem`, `RealEstDialog` (new wrappers) for forms/dialogs instead of Shadcn primitives.
+- **Shadcn allowlist only**: `command`, `combobox`, `context-menu`, `data-table`. ESLint warns on other `@/components/ui/*` imports.
+- **Status/Infrastructure**: Prefer UntitledUI status components; add Nigerian infrastructure indicators there.
 
 ### Why This Strategy?
 
@@ -31,7 +43,9 @@ Component Distribution
 - Custom RealEST components (Logo, LocationPin)
 - Patterns unique to property marketplace
 
-## HeroUI v3 Integration (70% Usage)
+## HeroUI v3 Integration (Target 70% — Current ~20%)
+
+**Reality check (Dec 2025)**: HeroUI wrappers exist but adoption is limited to select pages (auth/public) and two wrappers (`realest-button`, `realest-card`). The majority of components currently use Shadcn primitives from `components/ui/`.
 
 ### Theme Provider Integration
 

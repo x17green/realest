@@ -2,8 +2,7 @@
 
 import { Card, Button, Chip } from "@heroui/react";
 import Link from "next/link";
-import Header from "@/components/header";
-import Footer from "@/components/footer";
+import { Header, Footer } from "@/components/layout";
 import {
   Users,
   Target,

@@ -1,39 +1,39 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import type { User } from "@supabase/supabase-js";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import Link from "next/link";
-import { Plus, Home, MessageSquare, TrendingUp } from "lucide-react";
-import OwnerListings from "@/components/owner-listings";
-import OwnerInquiries from "@/components/owner-inquiries";
+import { useState } from "react"
+import type { User } from "@supabase/supabase-js"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import Link from "next/link"
+import { Plus, Home, MessageSquare, TrendingUp } from "lucide-react"
+import OwnerListings from "@/components/dashboard/OwnerListings"
+import OwnerInquiries from "@/components/dashboard/OwnerInquiries"
 
 interface Property {
-  id: string;
-  title: string;
-  price: number;
-  address: string;
-  city: string;
-  status: string;
-  verification_status: string;
-  created_at: string;
+  id: string
+  title: string
+  price: number
+  address: string
+  city: string
+  status: string
+  verification_status: string
+  created_at: string
 }
 
 interface Inquiry {
-  id: string;
-  message: string;
-  status: string;
-  created_at: string;
-  properties: { title: string };
-  profiles: { full_name: string; email: string };
+  id: string
+  message: string
+  status: string
+  created_at: string
+  properties: { title: string }
+  profiles: { full_name: string; email: string }
 }
 
 interface OwnerDashboardContentProps {
-  user: User;
-  properties: Property[];
-  inquiries: Inquiry[];
+  user: User
+  properties: Property[]
+  inquiries: Inquiry[]
 }
 
 export default function OwnerDashboardContent({
@@ -41,13 +41,13 @@ export default function OwnerDashboardContent({
   properties,
   inquiries,
 }: OwnerDashboardContentProps) {
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState("overview")
 
-  const activeListings = properties.filter((p) => p.status === "active").length;
-  const totalInquiries = inquiries.length;
+  const activeListings = properties.filter((p) => p.status === "active").length
+  const totalInquiries = inquiries.length
   const verifiedProperties = properties.filter(
     (p) => p.verification_status === "verified",
-  ).length;
+  ).length
 
   return (
     <main className="container py-8">
@@ -166,5 +166,5 @@ export default function OwnerDashboardContent({
         </TabsContent>
       </Tabs>
     </main>
-  );
+  )
 }

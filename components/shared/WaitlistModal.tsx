@@ -37,7 +37,7 @@ import {
   Gift,
   Users
 } from "lucide-react";
-import { HeroLogo } from './ui/real-est-logo';
+import { HeroLogo } from '@/components/ui/real-est-logo';
 import { Button } from '@/components/ui/button'
 
 interface WaitlistModalProps {

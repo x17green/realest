@@ -8,8 +8,7 @@ import { RealEstButton } from "@/components/heroui/realest-button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { AdvancedSearchForm } from "@/components/patterns/forms";
 import { Card, Input, Button, Chip } from "@heroui/react";
-import Header from "@/components/header";
-import Footer from "@/components/footer";
+import { Header, Footer } from "@/components/layout";
 import {
   MapPin,
   Bed,

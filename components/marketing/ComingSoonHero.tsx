@@ -21,30 +21,24 @@ import {
   Star,
   Shield
 } from "lucide-react";
-import Header from "./header";
-import Footer from "./footer";
+import { Header, Footer } from "@/components/layout";
 import { HeroLogo } from "@/components/ui/real-est-logo";
-import { WaitlistModal } from ".";
-import { Button } from "@/components/ui/button";
+import WaitlistModal from "@/components/shared/WaitlistModal";
+import { RealEstButton } from "@/components/heroui/realest-button";
 
 // Import the full website components for dynamic reveal
-import HeroSection from "./hero-section";
-import FeaturedProperties from "./featured-properties";
+import { HeroSection } from "@/components/marketing";
+import { FeaturedProperties } from "@/components/property";
 
 const ComingSoonHero = () => {
   // Check if release date is actually set (not empty or just whitespace)
   const releaseDateStr = process.env.NEXT_PUBLIC_RELEASE_DATE;
   const hasReleaseDate = releaseDateStr && releaseDateStr.trim() !== '';
-  const releaseDate = hasReleaseDate ? new Date(releaseDateStr).getTime() : null;
-
-  const [timeLeft, setTimeLeft] = useState(() => hasReleaseDate ? calculateTimeLeft() : null);
-  const [showFullSite, setShowFullSite] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [waitlistCount, setWaitlistCount] = useState<number>(0);
+  const parsedReleaseDate = hasReleaseDate ? new Date(releaseDateStr).getTime() : null;
+  const releaseDate = hasReleaseDate && Number.isFinite(parsedReleaseDate) ? parsedReleaseDate : null;
 
   function calculateTimeLeft() {
-    if (!hasReleaseDate || !releaseDate) {
+    if (!releaseDate) {
       return null;
     }
 
@@ -64,6 +58,12 @@ const ComingSoonHero = () => {
     };
   }
 
+  const [timeLeft, setTimeLeft] = useState(() => calculateTimeLeft());
+  const [showFullSite, setShowFullSite] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [waitlistCount, setWaitlistCount] = useState<number>(0);
+
   // Handle waitlist success callback
   const handleWaitlistSuccess = (data: { firstName: string; lastName?: string; position?: number; totalCount?: number }) => {
     // Update local waitlist count if provided
@@ -76,7 +76,7 @@ const ComingSoonHero = () => {
     setMounted(true);
 
     // Only set up timer if release date is configured
-    if (!hasReleaseDate) {
+    if (!releaseDate) {
       return;
     }
 
@@ -91,7 +91,7 @@ const ComingSoonHero = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [hasReleaseDate, releaseDate]);
+  }, [releaseDate]);
 
   // Fetch waitlist count on mount
   useEffect(() => {
@@ -180,7 +180,7 @@ const ComingSoonHero = () => {
 
             {/* Main Heading */}
             <h1 className="text-display-1 font-bold mb-6 linear-text-slanted leading-tight animate-fade-in">
-              Nigeria’s Most Trusted
+              Nigeria's Most Trusted
               <br />
               <span className="bg-linear-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
                 Real Estate Platform
@@ -262,19 +262,19 @@ const ComingSoonHero = () => {
 
             {/* CTA - Updated to open modal */}
             <div className="space-y-4 flex flex-col gap-2 justify-center mb-8">
-              <Button
-                variant='neon'
+              <RealEstButton
+                variant="neon"
                 size="lg"
                 className="flex justify-center items-center rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 gap-2 py-3 px-6 max-w-2xs mx-auto backdrop-blur-sm"
-                onClick={() => setIsModalOpen(true)}
+                onPress={() => setIsModalOpen(true)}
               >
                 <MailCheck className="w-4 h-4" />
                 <span className="text-sm font-medium ">
-                  {hasReleaseDate ? 'Get Notified at Launch' : 'Join Waitlist'}
+                  {releaseDate ? 'Get Notified at Launch' : 'Join Waitlist'}
                 </span>
-              </Button>
+              </RealEstButton>
               <p className="text-body-xs text-muted-foreground">
-                {hasReleaseDate
+                {releaseDate
                   ? 'Be the first to explore verified properties when we go live'
                   : 'Join our waitlist to be notified when we announce our launch date'
                 }
@@ -301,28 +301,32 @@ const ComingSoonHero = () => {
             {/* Quick Previews */}
             <div className="flex flex-wrap gap-2 justify-center mb-8">
               <Chip
-                variant="secondary"
+                color="secondary"
+                variant="flat"
                 className="flex justify-center items-center cursor-default bg-primary/10 hover:bg-primary/15 transition-all duration-200 gap-2 p-2 border border-primary/20 rounded-xs"
               >
                 <Building className="w-4 h-4" />
                 Modern Apartments
               </Chip>
               <Chip
-                variant="secondary"
+                color="secondary"
+                variant="flat"
                 className="flex justify-center items-center cursor-default bg-primary/10 hover:bg-primary/15 transition-all duration-200 gap-2 p-2 border border-primary/20 rounded-xs"
               >
                 <TrendingUp className="w-4 h-4" />
                 Exclusive Luxury Villas
               </Chip>
               <Chip
-                variant="secondary"
+                color="secondary"
+                variant="flat"
                 className="flex justify-center items-center cursor-default bg-primary/10 hover:bg-primary/15 transition-all duration-200 gap-2 p-2 border border-primary/20 rounded-xs"
               >
                 <Calendar className="w-4 h-4" />
                 Event Spaces
               </Chip>
               <Chip
-                variant="secondary"
+                color="secondary"
+                variant="flat"
                 className="flex justify-center items-center cursor-default bg-primary/10 hover:bg-primary/15 transition-all duration-200 gap-2 p-2 border border-primary/20 rounded-xs"
               >
                 <MapPin className="w-4 h-4" />

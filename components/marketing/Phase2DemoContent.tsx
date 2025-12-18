@@ -33,8 +33,8 @@ import {
   ContactRequestToast
 } from '@/components/untitledui/status-components'
 import { StatusBadge, VerifiedBadge } from '@/components/ui/status-badge'
-import { VerificationBadge } from './realest'
-import RealEstLogo from './ui/real-est-logo'
+import { VerificationBadge } from '@/components/realest'
+import RealEstLogo from '@/components/ui/real-est-logo'
 
 export default function Phase2DemoContent() {
   const { theme, effectiveTheme, systemTheme } = useRealEstTheme()
@@ -77,7 +77,7 @@ export default function Phase2DemoContent() {
               Phase 2: Component Integration
             </h1>
             <p className="font-body text-xl text-muted-foreground max-w-4xl mx-auto">
-              70% HeroUI v3 • 25% UntitledUI Micro-components • 5% Shadcn Complex Patterns
+              Current: 20% HeroUI • 5% UntitledUI • 75% Shadcn — Target: 70% / 25% / 5%
             </p>
           </div>
 
@@ -85,31 +85,31 @@ export default function Phase2DemoContent() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
             <RealEstCard variant="elevated" className="p-6 text-center space-y-4">
               <div className="w-16 h-16 mx-auto bg-brand-violet/10 rounded-full flex items-center justify-center">
-                <ProgressRing value={70} size="lg" color="violet" showValue />
+                <ProgressRing value={20} size="lg" color="violet" showValue />
               </div>
               <div>
                 <h3 className="font-heading text-xl font-semibold">HeroUI v3</h3>
-                <p className="text-sm text-muted-foreground">Primary component library for buttons, cards, forms, and navigation</p>
+                <p className="text-sm text-muted-foreground">Current ~20% (auth/public). Target 70% as primary forms/buttons/cards/navigation.</p>
               </div>
             </RealEstCard>
 
             <RealEstCard variant="elevated" className="p-6 text-center space-y-4">
               <div className="w-16 h-16 mx-auto bg-brand-neon/10 rounded-full flex items-center justify-center">
-                <ProgressRing value={25} size="lg" color="neon" showValue />
+                <ProgressRing value={5} size="lg" color="neon" showValue />
               </div>
               <div>
                 <h3 className="font-heading text-xl font-semibold">UntitledUI</h3>
-                <p className="text-sm text-muted-foreground">Micro-components for status, progress, and state management</p>
+                <p className="text-sm text-muted-foreground">Current ~5% (status-components.tsx). Target 25% for status/progress/alerts.</p>
               </div>
             </RealEstCard>
 
             <RealEstCard variant="elevated" className="p-6 text-center space-y-4">
               <div className="w-16 h-16 mx-auto bg-gray-500/10 rounded-full flex items-center justify-center">
-                <ProgressRing value={5} size="lg" color="default" showValue />
+                <ProgressRing value={75} size="lg" color="default" showValue />
               </div>
               <div>
                 <h3 className="font-heading text-xl font-semibold">Shadcn</h3>
-                <p className="text-sm text-muted-foreground">Complex patterns for data tables and specialized interactions</p>
+                <p className="text-sm text-muted-foreground">Current ~75% (components/ui/*). Target 5% for complex patterns only.</p>
               </div>
             </RealEstCard>
           </div>
@@ -434,149 +434,20 @@ export default function Phase2DemoContent() {
           </div>
         </section>
 
-        {/* Integration Examples */}
-        <section className="space-y-8">
-          <div className="text-center">
-            <h2 className="font-heading text-4xl font-bold mb-4">Component Integration</h2>
-            <p className="text-muted-foreground">Real-world examples combining HeroUI + UntitledUI + RealEST branding</p>
-          </div>
-
-          {/* Property Listing Dashboard */}
-          <RealEstCard variant="elevated" className="p-8">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h3 className="font-heading text-2xl font-bold">Property Management Dashboard</h3>
-                <p className="text-muted-foreground">Manage your property listings and track performance</p>
-              </div>
-              <div className="flex items-center gap-4">
-                <StatusIndicator label="All Systems Online" status="online" />
-                <RealEstButton variant="neon">Add New Property</RealEstButton>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-              {/* Stats */}
-              <div className="space-y-4">
-                <div className="text-center">
-                  <ProgressRing value={85} color="success" size="lg" showValue />
-                  <h4 className="font-semibold mt-2">Profile Complete</h4>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-brand-violet">24</div>
-                  <h4 className="font-semibold">Active Listings</h4>
-                  <StatusDot status="online" />
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-brand-neon">156</div>
-                  <h4 className="font-semibold">Total Views</h4>
-                  <StatusDot status="verified" />
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-success">12</div>
-                  <h4 className="font-semibold">Inquiries</h4>
-                  <StatusDot status="verified" />
-                </div>
-              </div>
-            </div>
-          </RealEstCard>
-
-          {/* Property Search Interface */}
-          <RealEstCard variant="default" className="p-8">
-            <h3 className="font-heading text-2xl font-bold mb-6">Property Search Interface</h3>
-
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
-              <div>
-                <label className="block text-sm font-medium mb-2">Location</label>
-                <input
-                  type="text"
-                  placeholder="Lagos, Abuja, Port Harcourt..."
-                  className="w-full p-3 border border-input rounded-lg bg-background focus:ring-2 focus:ring-ring"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Property Type</label>
-                <select className="w-full p-3 border border-input rounded-lg bg-background">
-                  <option>Any Type</option>
-                  <option>Apartment</option>
-                  <option>Duplex</option>
-                  <option>Bungalow</option>
-                  <option>Boys Quarters</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Budget Range</label>
-                <select className="w-full p-3 border border-input rounded-lg bg-background">
-                  <option>Any Budget</option>
-                  <option>₦500k - ₦1M</option>
-                  <option>₦1M - ₦3M</option>
-                  <option>₦3M - ₦5M</option>
-                  <option>₦5M+</option>
-                </select>
-              </div>
-
-              <div className="flex items-end">
-                <FindPropertiesButton className="w-full" />
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex gap-2 flex-wrap">
-                <StatusBadge variant="info" interactive showIcon={false}>Gated Community</StatusBadge>
-                <StatusBadge variant="available" interactive showIcon={false}>NEPA</StatusBadge>
-                <StatusBadge variant="featured" interactive showIcon={false}>Water Supply</StatusBadge>
-                <StatusBadge variant="pending" interactive showIcon={false}>Good Roads</StatusBadge>
-              </div>
-              <div className="flex items-center gap-2">
-                <LoadingSpinner size="sm" color="violet" />
-                <span className="text-sm text-muted-foreground">Searching properties...</span>
-              </div>
+        {/* Footer Message */}
+        <section className="text-center py-12">
+          <RealEstCard variant="elevated" className="p-12 max-w-2xl mx-auto">
+            <h3 className="font-heading text-2xl font-bold mb-4">Migration Path</h3>
+            <p className="text-muted-foreground mb-4">
+              This demo showcases the 70-25-5 component strategy. As more HeroUI components are integrated and Shadcn is deprecated for complex patterns, the dashboard will update to reflect the target distribution.
+            </p>
+            <div className="flex gap-4 justify-center">
+              <RealEstButton variant="primary">View Status</RealEstButton>
+              <RealEstButton variant="ghost">Learn More</RealEstButton>
             </div>
           </RealEstCard>
         </section>
-
-        {/* Footer */}
-        <footer className="text-center space-y-6 py-12 border-t border-border">
-          <div className="flex items-center justify-center gap-4">
-            <RealEstLogo variant="text" size="xl" hideTagline />
-            <div className="font-display text-2xl font-bold text-brand-violet">RealEST</div>
-            <VerifiedBadge size="sm">Verified</VerifiedBadge>
-            <VerificationBadge size="sm" status="fully-verified">Verified</VerificationBadge>
-            <StatusBadge variant="available" size="sm">Phase 2 Complete</StatusBadge>
-          </div>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Phase 2 Component Library Integration successfully demonstrates the 70-25-5 strategy with
-            HeroUI v3 as primary, UntitledUI for micro-components, and Shadcn for complex patterns.
-          </p>
-          <div className="flex items-center justify-center gap-4">
-            <RealEstButton variant="tertiary" size="sm">
-              View Documentation
-            </RealEstButton>
-            <RealEstButton variant="neon" size="sm">
-              Ready for Phase 3
-            </RealEstButton>
-          </div>
-        </footer>
       </main>
-
-      {/* Toast Notifications */}
-      {toastVisible && (
-        <div className="fixed bottom-6 right-6 z-50">
-          {toastType === 'saved' && <PropertySavedToast onClose={() => setToastVisible(false)} />}
-          {toastType === 'verified' && <VerificationCompleteToast onClose={() => setToastVisible(false)} />}
-          {toastType === 'contact' && <ContactRequestToast onClose={() => setToastVisible(false)} />}
-        </div>
-      )}
     </div>
   )
 }

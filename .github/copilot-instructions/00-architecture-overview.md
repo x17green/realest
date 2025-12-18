@@ -16,10 +16,9 @@ Next.js 16 App Router
 ├── React 19 (Server Components + Client Components)
 ├── TypeScript (Strict Mode)
 ├── Tailwind CSS v4 (@theme inline)
-└── Component Strategy (70-25-5 Rule)
-    ├── 70% HeroUI v3 (Primary - Forms, Buttons, Cards)
-    ├── 25% UntitledUI (Status, Progress, Alerts)
-    └── 5% Shadcn (Complex Patterns)
+└── Component Strategy (Current vs Target)
+    ├── Current (Dec 2025): ~20% HeroUI, ~5% UntitledUI, ~75% Shadcn
+    └── Target: 70% HeroUI v3, 25% UntitledUI, 5% Shadcn
 ```
 
 ### Backend & Database
@@ -47,9 +46,13 @@ RealEST Conservative Professional Palette
 - **`(public)/`** - Marketing, landing, search (unauthenticated)
 - **`(demo)/`** - Design showcase, form patterns (development only)
 - **`(onboarding)/`** - Profile setup post-registration
+- **`(dashboard)/`** - Placeholder group (currently minimal/unused)
 - **`admin/`** - Admin dashboard (property validation, user management)
 - **`buyer/`** - Buyer-specific features (saved searches, inquiries)
 - **`owner/`** - Owner dashboard (listings, analytics)
+- **`search/`** - Dedicated search page (live)
+- **`realest-status/`** - Status/health page (live)
+- **`api/`** - API route handlers
 
 ### Component Organization
 ```

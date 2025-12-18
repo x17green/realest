@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Card, Chip, Button, Input } from "@heroui/react";
 import Link from "next/link";
-import Header from "@/components/header";
-import Footer from "@/components/footer";
+import { Header, Footer } from "@/components/layout";
 import {
   MapPin,
   Users,

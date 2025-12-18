@@ -1,7 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
-import Header from "@/components/header"
-import Footer from "@/components/footer"
+import { Header, Footer } from "@/components/layout"
 import OwnerInquiriesPage from "@/components/owner-inquiries-page"
 
 export default async function InquiriesPage() {

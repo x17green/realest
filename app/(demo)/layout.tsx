@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { shouldShowDemoPages } from "@/lib/app-mode";
-import ComingSoonHero from "@/components/coming-soon-hero";
+import { ComingSoonHero } from "@/components/marketing";
 
 export default function DemoLayout({
   children,
