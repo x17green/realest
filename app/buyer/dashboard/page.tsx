@@ -3,10 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { Card } from "@/components/ui/card";
-import { Tabs } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Chip, Avatar, Separator } from "@heroui/react";
+import { Card, Button, Chip, Avatar, Separator } from "@heroui/react";
 import {
   Heart,
   Search,
@@ -67,6 +64,7 @@ export default function BuyerDashboardPage() {
   const [recentSearches, setRecentSearches] = useState<RecentSearch[]>([]);
   const [sentInquiries, setSentInquiries] = useState<SentInquiry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'saved' | 'searches' | 'inquiries'>('saved');
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -272,20 +270,38 @@ export default function BuyerDashboardPage() {
         </div>
 
         {/* Main Content */}
-        <Tabs.Root defaultSelectedKey="saved" className="space-y-6">
-          <Tabs.ListWrapper>
-            <Tabs.List
-              aria-label="Dashboard sections"
-              className="grid w-full grid-cols-3"
+        <div className="space-y-6">
+          {/* Tab Navigation */}
+          <div className="flex gap-2 border-b border-border">
+            <Button
+              variant={activeTab === 'saved' ? 'primary' : 'ghost'}
+              onPress={() => setActiveTab('saved')}
+              className={activeTab === 'saved' ? 'border-b-2 border-primary rounded-b-none' : ''}
             >
-              <Tabs.Tab id="saved">Saved Properties</Tabs.Tab>
-              <Tabs.Tab id="searches">Recent Searches</Tabs.Tab>
-              <Tabs.Tab id="inquiries">My Inquiries</Tabs.Tab>
-            </Tabs.List>
-          </Tabs.ListWrapper>
+              <Heart className="w-4 h-4 mr-2" />
+              Saved Properties
+            </Button>
+            <Button
+              variant={activeTab === 'searches' ? 'primary' : 'ghost'}
+              onPress={() => setActiveTab('searches')}
+              className={activeTab === 'searches' ? 'border-b-2 border-primary rounded-b-none' : ''}
+            >
+              <Search className="w-4 h-4 mr-2" />
+              Recent Searches
+            </Button>
+            <Button
+              variant={activeTab === 'inquiries' ? 'primary' : 'ghost'}
+              onPress={() => setActiveTab('inquiries')}
+              className={activeTab === 'inquiries' ? 'border-b-2 border-primary rounded-b-none' : ''}
+            >
+              <MessageSquare className="w-4 h-4 mr-2" />
+              My Inquiries
+            </Button>
+          </div>
 
           {/* Saved Properties Tab */}
-          <Tabs.Panel id="saved" className="space-y-6">
+          {activeTab === 'saved' && (
+            <div className="space-y-6">
             <Card.Root>
               <Card.Header>
                 <Card.Title className="flex items-center gap-2">
@@ -361,10 +377,12 @@ export default function BuyerDashboardPage() {
                 )}
               </Card.Content>
             </Card.Root>
-          </Tabs.Panel>
+            </div>
+          )}
 
           {/* Recent Searches Tab */}
-          <Tabs.Panel id="searches" className="space-y-6">
+          {activeTab === 'searches' && (
+            <div className="space-y-6">
             <Card.Root>
               <Card.Header>
                 <Card.Title className="flex items-center gap-2">
@@ -415,10 +433,12 @@ export default function BuyerDashboardPage() {
                 )}
               </Card.Content>
             </Card.Root>
-          </Tabs.Panel>
+            </div>
+          )}
 
           {/* Inquiries Tab */}
-          <Tabs.Panel id="inquiries" className="space-y-6">
+          {activeTab === 'inquiries' && (
+            <div className="space-y-6">
             <Card.Root>
               <Card.Header>
                 <Card.Title className="flex items-center gap-2">
@@ -497,8 +517,9 @@ export default function BuyerDashboardPage() {
                 )}
               </Card.Content>
             </Card.Root>
-          </Tabs.Panel>
-        </Tabs.Root>
+            </div>
+          )}
+        </div>
 
         {/* Favorite Locations */}
         {stats?.favoriteLocations && stats.favoriteLocations.length > 0 && (
