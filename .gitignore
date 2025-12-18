@@ -35,3 +35,7 @@ next-env.d.ts
 # Exclude user-specific settings
 .zed/state.json
 .zed/recent_projects.json
+
+# Obsidian vault files
+.vault/
+.obsidian/*
