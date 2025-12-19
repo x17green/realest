@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { RealEstButton } from '@/components/heroui/RealEstButton'
 import { StatusBadge, VerifiedBadge } from '@/components/ui/status-badge'
-import { StatusDot } from '@/components/untitledui/status-components'
+import { StatusDot } from '@/components/untitledui/StatusComponents'
 import { ThemeToggleCompact } from '@/components/ui/theme-toggle-wrapper'
 
 // ================================================================
@@ -224,21 +224,21 @@ export function SidebarNavigation({
 }: SidebarNavigationProps) {
   const navigationItems = {
     buyer: [
-      { id: 'dashboard', label: 'Dashboard', icon: '🏠', href: '/buyer/dashboard' },
+      { id: 'dashboard', label: 'Dashboard', icon: '🏠', href: '/profile' },
       { id: 'search', label: 'Search Properties', icon: '🔍', href: '/search' },
-      { id: 'saved', label: 'Saved Properties', icon: '❤️', href: '/buyer/saved' },
-      { id: 'applications', label: 'Applications', icon: '📋', href: '/buyer/applications' },
-      { id: 'messages', label: 'Messages', icon: '💬', href: '/buyer/messages' },
-      { id: 'profile', label: 'Profile', icon: '👤', href: '/buyer/profile' },
+      { id: 'saved', label: 'Saved Properties', icon: '❤️', href: '/profile/saved' },
+      { id: 'applications', label: 'Applications', icon: '📋', href: '/profile/applications' },
+      { id: 'messages', label: 'Messages', icon: '💬', href: '/profile/messages' },
+      { id: 'profile', label: 'Profile', icon: '👤', href: '/profile' },
     ],
     owner: [
-      { id: 'dashboard', label: 'Dashboard', icon: '🏠', href: '/owner/dashboard' },
+      { id: 'dashboard', label: 'Dashboard', icon: '🏠', href: '/owner' },
       { id: 'properties', label: 'My Properties', icon: '🏘️', href: '/owner/properties' },
       { id: 'add-property', label: 'Add Property', icon: '➕', href: '/owner/add-property' },
       { id: 'applications', label: 'Applications', icon: '📋', href: '/owner/applications' },
       { id: 'messages', label: 'Messages', icon: '💬', href: '/owner/messages' },
       { id: 'analytics', label: 'Analytics', icon: '📊', href: '/owner/analytics' },
-      { id: 'profile', label: 'Profile', icon: '👤', href: '/owner/profile' },
+      { id: 'profile', label: 'Profile', icon: '👤', href: '/profile' },
     ],
     agent: [
       { id: 'dashboard', label: 'Dashboard', icon: '🏠', href: '/agent/dashboard' },
@@ -248,10 +248,10 @@ export function SidebarNavigation({
       { id: 'tours', label: 'Property Tours', icon: '🚶', href: '/agent/tours' },
       { id: 'commissions', label: 'Commissions', icon: '💰', href: '/agent/commissions' },
       { id: 'messages', label: 'Messages', icon: '💬', href: '/agent/messages' },
-      { id: 'profile', label: 'Profile', icon: '👤', href: '/agent/profile' },
+      { id: 'profile', label: 'Profile', icon: '👤', href: '/profile' },
     ],
     admin: [
-      { id: 'dashboard', label: 'Admin Dashboard', icon: '⚙️', href: '/admin/dashboard' },
+      { id: 'dashboard', label: 'Admin Dashboard', icon: '⚙️', href: '/admin' },
       { id: 'properties', label: 'All Properties', icon: '🏘️', href: '/admin/properties' },
       { id: 'users', label: 'Users', icon: '👥', href: '/admin/users' },
       { id: 'agents', label: 'Agents', icon: '🤵', href: '/admin/agents' },
