@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { RealEstButton } from '@/components/heroui/RealEstButton'
 import { StatusBadge } from '@/components/ui/status-badge'
-import { LoadingSpinner, ProgressRing } from '@/components/untitledui/status-components'
+import { LoadingSpinner, ProgressRing } from '@/components/untitledui/StatusComponents'
 
 // ================================================================
 // PROPERTY LISTING FORM COMPONENT

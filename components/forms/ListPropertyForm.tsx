@@ -81,7 +81,7 @@ export default function ListPropertyForm({ userId }: ListPropertyFormProps) {
       if (insertError) throw insertError
 
       if (data && data[0]) {
-        router.push(`/owner/dashboard`)
+        router.push(`/owner`)
         router.refresh()
       }
     } catch (err) {

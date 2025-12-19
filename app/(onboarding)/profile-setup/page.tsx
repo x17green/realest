@@ -107,11 +107,11 @@ export default function ProfileSetupPage() {
 
       // Redirect based on user type
       if (formData.userType === "property_owner") {
-        router.push("/owner/dashboard");
+        router.push("/owner");
       } else if (formData.userType === "admin") {
-        router.push("/admin/dashboard");
+        router.push("/admin");
       } else {
-        router.push("/buyer/dashboard");
+        router.push("/profile");
       }
     } catch (error) {
       console.error("Error updating profile:", error);

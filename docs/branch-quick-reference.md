@@ -91,7 +91,7 @@ In `coming-soon` mode, only these routes are accessible:
 ### All Other Routes Blocked
 - ❌ `/about`, `/buy`, `/rent`, `/contact` - Shows 404
 - ❌ `/admin`, `/owner`, `/buyer` - Shows 404  
-- ❌ `/login`, `/sign-up` - Shows 404
+- ❌ `/login`, `/register` - Shows 404
 - ❌ Demo pages - Shows 404
 
 ### Testing Route Protection

@@ -159,4 +159,4 @@ After updating imports, verify:
 
 ## Questions?
 
-Refer to `COMPONENT_ORGANIZATION.md` for the complete organization structure and benefits.
+Refer to `component-organization.md` for the complete organization structure and benefits.

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { RealEstButton } from "@/components/heroui/RealEstButton";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { AdvancedSearchForm } from "@/components/patterns/forms";
+import { AdvancedSearchForm } from "@/components/patterns/Forms";
 import { Card, Input, Button, Chip } from "@heroui/react";
 import { Header, Footer } from "@/components/layout";
 import {

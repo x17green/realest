@@ -31,13 +31,13 @@ const TEST_ROUTES = [
 
   // Authentication routes
   '/login',
-  '/sign-up',
-  '/sign-up-success',
+  '/register',
+  '/register-success',
 
   // Protected dashboard routes
-  '/admin/dashboard',
-  '/buyer/dashboard',
-  '/owner/dashboard',
+  '/admin',
+  '/profile',
+  '/owner',
   '/owner/inquiries',
   '/owner/list-property',
   '/profile-setup',

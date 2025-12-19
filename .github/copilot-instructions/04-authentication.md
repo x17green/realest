@@ -696,4 +696,4 @@ if (session) {
 - **Auth Utilities**: `lib/auth.ts`
 - **Auth Provider**: `components/providers/auth-provider.tsx`
 - **Login Page**: `app/(auth)/login/page.tsx`
-- **Registration**: `app/(auth)/sign-up/page.tsx`
+- **Registration**: `app/(auth)/register/page.tsx`

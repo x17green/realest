@@ -3,7 +3,7 @@ create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   email text not null,
   full_name text,
-  user_type text not null check (user_type in ('property_owner', 'buyer', 'admin')),
+  user_type text not null check (user_type in ('property_owner', 'buyer', 'admin', 'agent')),
   avatar_url text,
   phone text,
   bio text,

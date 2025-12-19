@@ -117,11 +117,11 @@ function OTPContent() {
 
         setTimeout(() => {
           if (profile?.user_type === "property_owner") {
-            router.push("/owner/dashboard");
+            router.push("/owner");
           } else if (profile?.user_type === "admin") {
-            router.push("/admin/dashboard");
+            router.push("/admin");
           } else {
-            router.push("/buyer/dashboard");
+            router.push("/profile");
           }
           router.refresh();
         }, 2000);

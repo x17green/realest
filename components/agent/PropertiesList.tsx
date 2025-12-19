@@ -9,8 +9,6 @@ export type PropertyListItem = {
   status: string
   price?: number | null
   price_frequency?: "sale" | "annual" | "monthly" | "nightly" | null
-  views_count?: number | null
-  inquiries_count?: number | null
   created_at?: string | null
 }
 
@@ -42,11 +40,7 @@ export function PropertiesList({ properties }: { properties: PropertyListItem[] 
                 {typeof p.price === "number" && (
                   <p className="mt-1 font-heading">₦{p.price.toLocaleString()} {p.price_frequency && p.price_frequency !== "sale" ? `/${p.price_frequency}` : ""}</p>
                 )}
-                <div className="mt-2 text-xs text-muted-foreground">
-                  <span>Views: {p.views_count ?? 0}</span>
-                  <span className="mx-2">•</span>
-                  <span>Inquiries: {p.inquiries_count ?? 0}</span>
-                </div>
+                {/* Premium features: views_count and inquiries_count removed for free tier */}
               </div>
               <div className="text-right">
                 <Link className="text-primary underline" href={`/agent/properties/${p.id}/edit`}>Edit</Link>

@@ -88,7 +88,7 @@ export default function Header() {
             <ThemeToggleCompact />
             {user ? (
               <>
-                <Link href="/owner/dashboard">
+                <Link href="/owner">
                   <Button
                     variant="ghost"
                     size="sm"
@@ -120,7 +120,7 @@ export default function Header() {
                     Log In
                   </Button>
                 </Link>
-                <Link href="/sign-up">
+                <Link href="/register">
                   <Button
                     size="sm"
                     className="bg-linear-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg"
@@ -175,7 +175,7 @@ export default function Header() {
                 {user ? (
                   <>
                     <Link
-                      href="/owner/dashboard"
+                      href="/owner"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       <Button
@@ -213,7 +213,7 @@ export default function Header() {
                       </Button>
                     </Link>
                     <Link
-                      href="/sign-up"
+                      href="/register"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       <Button className="w-full bg-linear-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70">

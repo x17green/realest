@@ -2,7 +2,7 @@ import type React from "react";
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { RealEstThemeProvider } from "@/components/providers/RealEstThemeProvider";
-import "../styles/globals.css";
+import "@/lib/styles/globals.css";
 
 export const metadata: Metadata = {
   title: "RealEST - Nigeria’s Most Trusted Real Estate Platform",

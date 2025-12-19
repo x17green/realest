@@ -215,7 +215,7 @@ function VerifyEmailContent() {
               </Button>
 
               <div className="text-center space-y-2">
-                <Link href="/sign-up" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/register" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Sign up with different email
                 </Link>
                 <br />
@@ -277,7 +277,7 @@ function VerifyEmailContent() {
             )}
 
             <div className="text-center space-y-2">
-              <Link href="/sign-up" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <Link href="/register" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Sign up again
               </Link>
               <br />

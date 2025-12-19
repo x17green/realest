@@ -140,7 +140,7 @@ Three role types stored in `profiles` table:
 Dashboard routes in `app/` (gated by role):
 - `buyer/` - Buyer-specific features
 - `owner/` - Owner listing management
-- `admin/dashboard/` - Verification workflows
+- `admin/` - Verification workflows
 
 ## Form Patterns
 

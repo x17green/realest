@@ -163,7 +163,7 @@ export default function HomePage() {
   )
 }
 
-// Dashboard page (app/admin/dashboard/page.tsx)
+// Dashboard page (app/admin/page.tsx)
 import { AdminDashboardContent } from '@/components/dashboard'
 
 export default function AdminDashboardPage() {

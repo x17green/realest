@@ -10,7 +10,7 @@ export {
   VerificationBadgeGroup,
   verificationBadgeVariants,
   type VerificationBadgeProps,
-} from "./verification-badge";
+} from "./VerificationBadge";
 
 export {
   PropertyStatusChip,
@@ -27,4 +27,4 @@ export {
   propertyStatusChipVariants,
   statusConfig,
   type PropertyStatusChipProps,
-} from "./property-status-chip";
+} from "./PropertyStatusChip";

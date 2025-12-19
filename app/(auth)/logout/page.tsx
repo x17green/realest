@@ -180,7 +180,7 @@ function LogoutContent() {
               className="w-full"
               asChild
             >
-              <Link href="/owner/dashboard">Cancel</Link>
+              <Link href="/owner">Cancel</Link>
             </Button>
 
             <Button

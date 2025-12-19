@@ -12,7 +12,7 @@ import {
   PropertyVerificationForm,
   ReviewForm,
   QuickInquiryForm
-} from '@/components/patterns/forms'
+} from '@/components/patterns/Forms'
 
 type FormType =
   | 'property-listing'

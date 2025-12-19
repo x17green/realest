@@ -24,9 +24,9 @@ export default async function HomePage() {
       const { data: profile } = await supabase.from("profiles").select("user_type").eq("id", user.id).single()
 
       if (profile?.user_type === "property_owner") {
-        redirect("/owner/dashboard")
+        redirect("/owner")
       } else if (profile?.user_type === "admin") {
-        redirect("/admin/dashboard")
+        redirect("/admin")
       }
     }
   }

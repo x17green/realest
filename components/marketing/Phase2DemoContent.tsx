@@ -31,7 +31,7 @@ import {
   PropertySavedToast,
   VerificationCompleteToast,
   ContactRequestToast
-} from '@/components/untitledui/status-components'
+} from '@/components/untitledui/StatusComponents'
 import { StatusBadge, VerifiedBadge } from '@/components/ui/status-badge'
 import { VerificationBadge } from '@/components/realest'
 import * as RealEstLogoNS from '@/components/ui/RealEstLogo'

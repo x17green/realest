@@ -21,13 +21,23 @@ export default async function AgentPropertiesPage() {
     redirect("/")
   }
 
-  const { data: props } = await supabase
-    .from("properties")
-    .select("id, title, status, price, price_frequency, views_count, inquiries_count, created_at")
-    .eq("owner_id", user.id)
-    .order("created_at", { ascending: false })
 
-  const properties = (props ?? []) as PropertyListItem[]
+  // Look up agent's id using the current user's profile id
+  const { data: agentRow } = await supabase
+    .from("agents")
+    .select("id")
+    .eq("profile_id", user.id)
+    .single()
+
+  let properties: PropertyListItem[] = []
+  if (agentRow) {
+    const { data: props } = await supabase
+      .from("properties")
+      .select("id, title, status, price, price_frequency, views_count, inquiries_count, created_at")
+      .eq("agent_id", agentRow.id)
+      .order("created_at", { ascending: false })
+    properties = (props ?? []) as PropertyListItem[]
+  }
 
   return (
     <div className="space-y-6">

@@ -95,7 +95,7 @@ export default function PropertyDetailsPage() {
       setIsLoading(true);
       const supabase = createClient();
 
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from("properties")
         .select(
           `
@@ -112,10 +112,11 @@ export default function PropertyDetailsPage() {
         `,
         )
         .eq("id", propertyId)
+        .eq("listing_source", "owner")
         .eq("status", "active")
         .single();
 
-      if (!error && data) {
+      if (data) {
         setProperty(data as Property);
       }
       setIsLoading(false);
