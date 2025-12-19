@@ -1,14 +1,18 @@
 import { NextResponse } from "next/server"
 import { randomBytes } from "crypto"
+import { Resend } from "resend"
 import { createClient } from "@/lib/supabase/server"
 import { createServiceClient } from "@/lib/supabase/service"
+import { logAdminAction } from "@/lib/audit"
+import { generateSubAdminInvitationEmail } from "@/lib/email-templates/subadmin-invitation"
+
+const resend = new Resend(process.env.RESEND_API_KEY!)
 
 export async function POST(request: Request) {
   try {
-    const { email, full_name, password } = (await request.json()) as {
+    const { email, full_name } = (await request.json()) as {
       email?: string
       full_name?: string
-      password?: string
     }
 
     if (!email || !full_name) {
@@ -21,7 +25,7 @@ export async function POST(request: Request) {
 
     const { data: profile } = await supabase
       .from("profiles")
-      .select("id, user_type")
+      .select("id, user_type, full_name")
       .eq("id", user.id)
       .single()
 
@@ -31,7 +35,7 @@ export async function POST(request: Request) {
 
     const service = createServiceClient()
 
-    const securePassword = password ?? randomBytes(16).toString("hex")
+    const securePassword = randomBytes(32).toString("hex")
 
     // Create the user via admin API (service role)
     const { data: created, error: adminError } = await service.auth.admin.createUser({
@@ -67,8 +71,40 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: profileError.message }, { status: 500 })
     }
 
-    // TODO: optionally send an email with a password-reset link rather than raw password
-    // For security, do not return the generated password. Admin should trigger email reset.
+    // Generate password reset link (secure, expires in 24 hours)
+    const { data: resetData, error: resetError } = await service.auth.admin.generateLink({
+      type: "recovery",
+      email,
+    })
+
+    if (resetError || !resetData.properties?.action_link) {
+      return NextResponse.json({ error: "Failed to generate reset link" }, { status: 500 })
+    }
+
+    const resetLink = resetData.properties.action_link
+
+    // Send invitation email via Resend
+    const htmlContent = generateSubAdminInvitationEmail({
+      email,
+      full_name,
+      inviter_name: profile.full_name ?? "RealEST Admin",
+      reset_link: resetLink,
+    })
+
+    await resend.emails.send({
+      from: "RealEST Admin <admin@realest.ng>",
+      to: email,
+      subject: "Welcome to the RealEST Admin Team",
+      html: htmlContent,
+    })
+
+    // Log the admin action
+    await logAdminAction({
+      actor_id: user.id,
+      action: "create_subadmin",
+      target_id: newUserId,
+      metadata: { email, full_name },
+    })
 
     return NextResponse.json({ success: true, user_id: newUserId })
   } catch (err) {

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
-import { VerifyAgentRow, type AgentItem } from "@/components/admin/VerifyAgentRow"
+import { type AgentItem } from "@/components/admin/VerifyAgentRow"
+import { VerifyAgentsList } from "@/components/admin/VerifyAgentsList"
 
 export default async function VerifyAgentsPage() {
   const supabase = await createClient()
@@ -34,22 +35,7 @@ export default async function VerifyAgentsPage() {
   return (
     <div className="space-y-6">
       <h1 className="font-heading text-2xl">Verify Agents</h1>
-      <div className="space-y-4">
-        {items.length === 0 ? (
-          <p className="text-muted-foreground">No agents pending verification.</p>
-        ) : (
-          items.map((agent) => (
-            <VerifyAgentRow
-              key={agent.id}
-              agent={agent}
-              onAction={() => {
-                // Soft refresh by reloading the page after an action
-                // This keeps it simple without client-side state management
-              }}
-            />
-          ))
-        )}
-      </div>
+      <VerifyAgentsList initialAgents={items} />
     </div>
   )
 }

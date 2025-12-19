@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
+import { logAdminAction } from "@/lib/audit"
 
 export async function POST(request: Request) {
   try {
@@ -32,6 +33,14 @@ export async function POST(request: Request) {
       .eq("id", agentId)
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+    // Log the admin action
+    await logAdminAction({
+      actor_id: user.id,
+      action: action === "approve" ? "approve_agent" : "reject_agent",
+      target_id: agentId,
+      metadata: { notes },
+    })
 
     return NextResponse.json({ success: true })
   } catch (err) {
