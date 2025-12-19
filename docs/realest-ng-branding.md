@@ -71,27 +71,33 @@ Based on the `RealEST Design System Architecture` you've provided, here's a docu
 
 ---
 
-### 2. Full List of Endpoints (Links/Routes)
 
-Here's an extensive, professional, and conventional list of endpoints, mapping to your page architecture. I'll use Next.js-style routing conventions with dynamic segments where appropriate.
+### 2. Full List of Endpoints (Links/Routes) — Updated for 2025 Routing Decisions
 
-#### **2.1. Public Routes (Marketing & Discovery - No Auth Required)**
+This list reflects the latest RealEST routing strategy, emphasizing:
+- **Profile-first**: All users have a `/dashboard/profile` (replaces `/owner` as the main user hub)
+- **Role-based dashboard grouping**: All role dashboards are under `/dashboard/[role]/*` (e.g., `/dashboard/owner`, `/dashboard/agent`, `/dashboard/admin`)
+- **Dual discovery**: Both `/search` (universal, quick) and `/explore/*` (curated, category-based) are retained for brand and UX reasons
+- **Consistent, DRY dynamic segments**: `[id]`, `[category]`, `[slug]` for all dynamic content
+
+#### **2.1. Public Routes (Marketing & Discovery — No Auth Required)**
 
 *   **Homepage:** `/`
-*   **Search/Explore Properties & Locations:** `/explore`
-    *   *Dynamic Category Search:* `/explore/[category]` (e.g., `/explore/houses`, `/explore/hotels`, `/explore/shops`)
-*   **Property/Location Details:** `/listing/[id]` (e.g., `/listing/h_abc123`, `/listing/s_xyz456`)
+*   **Universal Search:** `/search`
+*   **Explore Properties & Categories:** `/explore`
+    *   *Dynamic Category Search:* `/explore/[category]` (e.g., `/explore/houses`, `/explore/hotels`)
+*   **Property/Location Details:** `/listing/[id]`
 *   **About Us:** `/about`
 *   **How It Works (Verification Process):** `/how-it-works`
 *   **Contact Us:** `/contact`
-*   **Blog/Resources:** `/blog`
+*   **Blog:** `/blog`
     *   *Blog Post Details:* `/blog/[slug]`
 *   **Legal:**
     *   **Privacy Policy:** `/legal/privacy`
     *   **Terms of Service:** `/legal/terms`
     *   **Cookie Policy:** `/legal/cookies`
-*   **Testimonials/Success Stories:** `/testimonials`
-*   **"List Your Property/Business" Landing:** `/list-with-us`
+*   **Testimonials:** `/testimonials`
+*   **"List With Us:** `/list-with-us`
 
 #### **2.2. Authentication Routes**
 
@@ -101,7 +107,7 @@ Here's an extensive, professional, and conventional list of endpoints, mapping t
 *   **Reset Password:** `/auth/reset-password`
 *   **Verify Email/OTP:** `/auth/verify`
 
-#### **2.3. Authenticated User Routes (General - All Roles)**
+#### **2.3. Dashboard Routes (All Roles Grouped)**
 
 *   **User Profile:** `/profile`
 *   **Edit Profile:** `/profile/edit`
@@ -130,7 +136,13 @@ Here's an extensive, professional, and conventional list of endpoints, mapping t
 *   **Upgrade to Premium:** `/dashboard/owner/premium`
 *   **Payment & Billing:** `/dashboard/owner/billing`
 
-#### **2.5. Admin & Vetting Team Routes (`/admin/*`)**
+
+#### **2.5. Agent Dashboard: (`/dashboard/agent`)**
+
+*   **Assigned Properties:** `/dashboard/agent/properties`
+*   **Audit Log:** `/dashboard/agent/audit-log`
+
+#### **2.6. Admin & Vetting Team Routes (`/admin/*`)**
 
 *   **Admin Dashboard Home:** `/admin`
 *   **Property Validation Queue:** `/admin/validation`
@@ -150,13 +162,22 @@ Here's an extensive, professional, and conventional list of endpoints, mapping t
 *   **Support & Tickets:** `/admin/support`
     *   *View Specific Ticket:* `/admin/support/[id]`
 
-#### **2.6. System Owner / Analytics Routes (`/analytics/*`)**
+#### **2.7. System Owner / Analytics Routes (`/analytics/*`)**
 
 *   **Platform Overview:** `/analytics/platform`
 *   **Monetization Reports:** `/analytics/monetization`
 *   **User Engagement Reports:** `/analytics/engagement`
 *   **Validation Pipeline Performance:** `/analytics/validation`
 *   **Vetting Team Performance:** `/analytics/team`
+
+----
+**Key Rationale for Route Changes:**
+- **Profile-first**: All users, not just owners, have a dashboard profile. This clarifies user journeys and supports future role expansion.
+- **Role grouping**: All dashboards are under `/dashboard/[role]`, making access control and navigation more intuitive.
+- **Dual search/explore**: `/search` is for direct, fast queries; `/explore` is for browsing and brand storytelling.
+- **Consistent dynamic segments**: `[id]`, `[category]`, `[slug]` everywhere for maintainability.
+
+Update all onboarding, developer, and product docs to reference these new routes and rationale.
 
 ---
 
