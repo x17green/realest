@@ -66,12 +66,28 @@ interface Property {
     file_name: string;
     is_primary: boolean;
   }[];
-  owner: {
+  owner?: {
     id: string;
     full_name: string;
     email: string;
     phone: string | null;
     avatar_url: string | null;
+    user_type?: string;
+  };
+  agent?: {
+    id: string;
+    license_number: string;
+    agency_name: string;
+    specialization: string[];
+    verified: boolean;
+    rating: number | null;
+    agent_profile?: {
+      id: string;
+      full_name: string;
+      email: string;
+      phone: string | null;
+      avatar_url: string | null;
+    };
   };
 }
 
@@ -95,6 +111,7 @@ export default function PropertyDetailsPage() {
       setIsLoading(true);
       const supabase = createClient();
 
+
       const { data } = await supabase
         .from("properties")
         .select(
@@ -107,12 +124,27 @@ export default function PropertyDetailsPage() {
             full_name,
             email,
             phone,
-            avatar_url
+            avatar_url,
+            user_type
+          ),
+          agent:agents!properties_agent_id_fkey (
+            id,
+            license_number,
+            agency_name,
+            specialization,
+            verified,
+            rating,
+            agent_profile:profiles!agents_profile_id_fkey (
+              id,
+              full_name,
+              email,
+              phone,
+              avatar_url
+            )
           )
         `,
         )
         .eq("id", propertyId)
-        .eq("listing_source", "owner")
         .eq("status", "active")
         .single();
 
@@ -546,22 +578,35 @@ export default function PropertyDetailsPage() {
               </Card.Header>
               <Card.Content>
                 <div className="flex items-center gap-3 mb-4">
-                  <Avatar.Root size="lg">
-                    <Avatar.Image
-                      src={property.owner.avatar_url || undefined}
-                    />
-                    <Avatar.Fallback>
-                      {property.owner?.full_name ? property.owner.full_name.charAt(0) : '?'}
-                    </Avatar.Fallback>
-                  </Avatar.Root>
-                  <div>
-                    <div className="font-medium">
-                      {property.owner.full_name}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      Property Owner
-                    </div>
-                  </div>
+                  {(() => {
+                    // Robust lister resolution: agent > owner > fallback
+                    let lister = null;
+                    let listerType = '';
+                    if (property.agent && property.agent.agent_profile) {
+                      lister = property.agent.agent_profile;
+                      listerType = 'Agent';
+                    } else if (property.owner) {
+                      lister = property.owner;
+                      listerType = property.owner.user_type === 'admin' ? 'Admin' : 'Owner';
+                    } else {
+                      lister = { full_name: 'Unknown', avatar_url: null };
+                      listerType = 'Admin';
+                    }
+                    return (
+                      <>
+                        <Avatar.Root size="lg">
+                          <Avatar.Image src={lister.avatar_url || undefined} />
+                          <Avatar.Fallback>
+                            {lister.full_name ? lister.full_name.charAt(0) : "?"}
+                          </Avatar.Fallback>
+                        </Avatar.Root>
+                        <div>
+                          <div className="font-medium">{lister.full_name}</div>
+                          <div className="text-sm text-muted-foreground">{listerType}</div>
+                        </div>
+                      </>
+                    );
+                  })()}
                 </div>
 
                 <div className="space-y-2">
