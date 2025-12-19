@@ -20,7 +20,7 @@ export interface PasswordValidation {
 
 export interface UserProfile {
   id: string;
-  user_type: "buyer" | "property_owner" | "admin";
+  user_type: "buyer" | "property_owner" | "admin" | "agent";
   full_name: string;
   email: string;
   phone?: string;
@@ -116,7 +116,7 @@ export async function signUpWithPassword(
   email: string,
   password: string,
   fullName: string,
-  userType: "buyer" | "property_owner"
+  userType: "buyer" | "property_owner" | "agent"
 ): Promise<AuthResponse> {
   try {
     if (!isPasswordValid(password)) {
@@ -137,6 +137,67 @@ export async function signUpWithPassword(
 
     if (error) {
       return { success: false, error: error.message };
+    }
+
+    return { success: true, user: data.user || undefined };
+  } catch (err) {
+    return { success: false, error: "An unexpected error occurred" };
+  }
+}
+
+/**
+ * Sign up as a real estate agent
+ */
+export async function signUpWithAgent(
+  email: string,
+  password: string,
+  fullName: string,
+  licenseNumber: string,
+  agencyName: string,
+  specialization: string[]
+): Promise<AuthResponse> {
+  try {
+    if (!isPasswordValid(password)) {
+      return { success: false, error: "Password does not meet security requirements" };
+    }
+
+    const supabase = createClient();
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: fullName,
+          user_type: "agent",
+        },
+      },
+    });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    if (data.user) {
+      try {
+        // Create agents table record after profile is auto-created
+        const { error: agentError } = await supabase.from("agents").insert({
+          profile_id: data.user.id,
+          license_number: licenseNumber,
+          agency_name: agencyName,
+          specialization: specialization,
+          verified: false,
+          rating: null,
+        });
+
+        if (agentError) {
+          console.error("Failed to create agent record:", agentError);
+          // Don't return error here - user account is already created
+          // Admin can fix this later
+        }
+      } catch (err) {
+        console.error("Error creating agent record:", err);
+        // Continue - user can still onboard
+      }
     }
 
     return { success: true, user: data.user || undefined };
@@ -279,12 +340,12 @@ export async function resendEmailVerification(email: string): Promise<{ success:
 export function getRedirectUrl(userType?: string): string {
   switch (userType) {
     case "property_owner":
-      return "/owner/dashboard";
+      return "/owner";
     case "admin":
-      return "/admin/dashboard";
+      return "/admin";
     case "buyer":
     default:
-      return "/buyer/dashboard";
+      return "/profile";
   }
 }
 
