@@ -86,7 +86,9 @@ export default function AdminPropertyVerification({ properties }: AdminPropertyV
                       {property.address}, {property.city}
                     </span>
                   </div>
-                  <p className="text-sm text-muted-foreground">Submitted by: {property.profiles.full_name}</p>
+                  <p className="text-sm text-muted-foreground">
+                    Submitted by: {property.profiles ? property.profiles.full_name : "Unknown"}
+                  </p>
                 </div>
                 <div className="text-right">
                   <p className="text-2xl font-bold text-primary">£{property.price.toLocaleString()}</p>
