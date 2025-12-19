@@ -126,62 +126,68 @@ app/
 
 ### 3.1. Structural Difference
 
-**Branding Design**:
-```
-/dashboard/owner/
-├── (root)                    # Owner dashboard home
-├── listings/                 # My listings
-│   └── [id]/                # Specific listing
-│       ├── documents/
-│       └── media/
-├── new/                      # Multi-step listing creation
-│   ├── type/
-│   ├── details/
-│   ├── location/
-│   ├── media/
-│   ├── documents/
-│   └── review/
-├── inquiries/
-│   └── [id]/
-├── analytics/
-├── premium/
-└── billing/
-```
+# Route Alignment Analysis (2025)
 
-**Current Implementation**:
-```
-/owner/
-├── dashboard/                ⚠️ Root is /owner/dashboard not /owner
-├── inquiries/                ✅ EXISTS (correct structure)
-└── list-property/            ⚠️ Should be "new" per branding
-```
+This document analyzes the evolution and rationale of RealEST's routing structure, reflecting the 2025 refactor for clarity, scalability, and brand alignment.
 
-### 3.2. Missing Owner Routes
+---
 
-| Branding Route | Current Route | Status | Priority |
-|----------------|---------------|--------|----------|
-| `/dashboard/owner` | `/owner/dashboard` | ⚠️ URL different | 🔴 HIGH |
-| `/dashboard/owner/listings` | ❌ Missing | Property management | 🔴 HIGH |
-| `/dashboard/owner/listings/[id]` | ❌ Missing | Edit listing | 🔴 HIGH |
-| `/dashboard/owner/listings/[id]/documents` | ❌ Missing | Document upload | 🔴 HIGH |
-| `/dashboard/owner/listings/[id]/media` | ❌ Missing | Media management | 🔴 HIGH |
-| `/dashboard/owner/new` | `/owner/list-property` | ⚠️ Different naming | 🔴 HIGH |
-| `/dashboard/owner/new/type` | ❌ Missing | Multi-step form | 🔴 HIGH |
-| `/dashboard/owner/new/details` | ❌ Missing | Property details | 🔴 HIGH |
-| `/dashboard/owner/new/location` | ❌ Missing | Location/map | 🔴 HIGH |
-| `/dashboard/owner/new/media` | ❌ Missing | Photo upload | 🔴 HIGH |
-| `/dashboard/owner/new/documents` | ❌ Missing | Document upload | 🔴 HIGH |
-| `/dashboard/owner/new/review` | ❌ Missing | Final review | 🔴 HIGH |
-| `/dashboard/owner/inquiries/[id]` | ❌ Missing | View inquiry | 🟡 MEDIUM |
-| `/dashboard/owner/analytics` | ❌ Missing | Property analytics | 🟢 LOW |
-| `/dashboard/owner/premium` | ❌ Missing | Upgrade flow | 🟢 LOW |
-| `/dashboard/owner/billing` | ❌ Missing | Payment management | 🟢 LOW |
+## 1. Historical Context
 
-**Impact**: 
-- Owner cannot manage existing listings (only create new)
-- No individual property editing
-- No document/media management per property
-- No analytics/premium features
+RealEST began with a mix of flat and role-specific routes (`/owner`, `/admin`, `/profile`, `/search`). As the platform matured (agents, premium, more roles), a scalable, DRY, and brand-aligned routing system became essential.
+
+---
+
+## 2. 2025 Routing Refactor: Key Decisions
+
+### a. Profile-First, Role-Grouped Dashboards
+
+- All dashboards are now under `/dashboard/[role]/*` (e.g., `/dashboard/profile`, `/dashboard/owner`, `/dashboard/agent`, `/dashboard/admin`).
+- `/owner` is deprecated; owner features are under `/dashboard/owner`.
+- Every user has `/dashboard/profile` (not just owners), clarifying "profile" vs. "owner".
+
+### b. Dual Discovery: Search and Explore
+
+- Both `/search` (universal, direct) and `/explore/*` (curated, category-based) are retained.
+- `/search` = fast, power-user queries; `/explore` = guided, brand-driven discovery.
+
+### c. Dynamic Segments and DRY Principles
+
+- All dynamic content uses `[id]`, `[category]`, `[slug]` for maintainability and consistency.
+
+### d. Auth, Marketing, and Legal Groupings
+
+- `/auth/*` for authentication flows.
+- `/about`, `/how-it-works`, `/contact`, `/blog`, `/legal/*` for public/marketing/legal content.
+
+---
+
+## 3. Impact and Rationale
+
+- **Clarity:** Role-based grouping and profile-first approach reduce confusion for users and devs.
+- **Scalability:** New roles/features can be added without major refactors.
+- **Brand Alignment:** Dual discovery supports RealEST's verification-first brand and user habits.
+- **Maintainability:** Consistent dynamic segments and DRY structure make the codebase easier to extend.
+
+---
+
+## 4. Migration Checklist
+
+- [x] Deprecate `/owner` in favor of `/dashboard/profile` and `/dashboard/owner`.
+- [x] Move all dashboard routes under `/dashboard/[role]/*`.
+- [x] Update all links, navigation, and docs to new structure.
+- [x] Retain both `/search` and `/explore/*` for discovery.
+- [x] Refactor dynamic segments to `[id]`, `[category]`, `[slug]` everywhere.
+
+---
+
+## 5. Next Steps
+
+- Audit all documentation and onboarding for outdated route references.
+- Ensure all new features follow updated routing conventions.
+- Monitor user feedback for navigation clarity and iterate as needed.
+
+---
 
 ---
 
