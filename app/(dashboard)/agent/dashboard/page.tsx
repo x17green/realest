@@ -10,7 +10,6 @@ import { BarChart3, Home, MessageSquare, TrendingUp, Eye, Plus } from "lucide-re
 interface AgentStats {
   totalProperties: number;
   activeListings: number;
-  totalViews: number;
   totalInquiries: number;
   avgResponseTime: string;
 }
@@ -20,8 +19,6 @@ interface PropertyPreview {
   title: string;
   price: number;
   status: string;
-  views_count: number;
-  inquiries_count: number;
 }
 
 interface InquiryData {
@@ -81,42 +78,52 @@ export default function AgentDashboardPage() {
 
         setAgent({ ...profile, ...agentData });
 
-        // Get agent's properties
-        const { data: properties } = await supabase
-          .from("properties")
-          .select("id, title, price, status, views_count, inquiries_count")
-          .eq("owner_id", user.id)
-          .order("created_at", { ascending: false })
-          .limit(5);
+        // Look up agent's id using the current user's profile id
+        const { data: agentRow } = await supabase
+          .from("agents")
+          .select("id")
+          .eq("profile_id", user.id)
+          .single();
 
-        setRecentProperties(properties || []);
+        let properties: PropertyPreview[] = [];
+        let totalProperties = 0;
+        let activeListings = 0;
+        if (agentRow) {
+          // Get agent's properties
+          const { data: props } = await supabase
+            .from("properties")
+            .select("id, title, price, status")
+            .eq("agent_id", agentRow.id)
+            .order("created_at", { ascending: false })
+            .limit(5);
+          properties = props || [];
 
-        // Calculate stats
-        const { count: totalProperties } = await supabase
-          .from("properties")
-          .select("*", { count: "exact", head: true })
-          .eq("owner_id", user.id);
+          // Calculate stats
+          const { count: totalCount } = await supabase
+            .from("properties")
+            .select("*", { count: "exact", head: true })
+            .eq("agent_id", agentRow.id);
+          totalProperties = totalCount || 0;
 
-        const { count: activeListings } = await supabase
-          .from("properties")
-          .select("*", { count: "exact", head: true })
-          .eq("owner_id", user.id)
-          .eq("status", "live");
+          const { count: activeCount } = await supabase
+            .from("properties")
+            .select("*", { count: "exact", head: true })
+            .eq("agent_id", agentRow.id)
+            .eq("status", "live");
+          activeListings = activeCount || 0;
+        }
 
+        setRecentProperties(properties);
+
+        // Inquiries
         const { count: totalInquiries } = await supabase
           .from("inquiries")
           .select("*", { count: "exact", head: true })
           .eq("receiver_id", user.id);
 
-        let totalViews = 0;
-        if (properties) {
-          totalViews = properties.reduce((sum, prop) => sum + (prop.views_count || 0), 0);
-        }
-
         setStats({
-          totalProperties: totalProperties || 0,
-          activeListings: activeListings || 0,
-          totalViews,
+          totalProperties,
+          activeListings,
           totalInquiries: totalInquiries || 0,
           avgResponseTime: "2.5 hrs",
         });
@@ -226,23 +233,7 @@ export default function AgentDashboardPage() {
               </Card.Content>
             </Card.Root>
 
-            {/* Total Views */}
-            <Card.Root className="rounded-xl shadow-md">
-              <Card.Content className="py-6">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-muted-foreground text-sm font-medium">
-                      Total Views
-                    </p>
-                    <h3 className="text-3xl font-bold mt-2">{stats.totalViews}</h3>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      This month
-                    </p>
-                  </div>
-                  <Eye className="w-10 h-10 text-primary-accent opacity-50" />
-                </div>
-              </Card.Content>
-            </Card.Root>
+
 
             {/* Inquiries */}
             <Card.Root className="rounded-xl shadow-md">
@@ -254,7 +245,7 @@ export default function AgentDashboardPage() {
                     </p>
                     <h3 className="text-3xl font-bold mt-2">{stats.totalInquiries}</h3>
                     <p className="text-xs text-muted-foreground mt-2">
-                      This month
+                      Total received
                     </p>
                   </div>
                   <MessageSquare className="w-10 h-10 text-primary-accent opacity-50" />
@@ -323,28 +314,8 @@ export default function AgentDashboardPage() {
                           </p>
                           <div className="flex gap-6 mt-3">
                             <div>
-                              <span className="text-xs text-muted-foreground">
-                                Views
-                              </span>
-                              <p className="text-lg font-bold">
-                                {property.views_count || 0}
-                              </p>
-                            </div>
-                            <div>
-                              <span className="text-xs text-muted-foreground">
-                                Inquiries
-                              </span>
-                              <p className="text-lg font-bold">
-                                {property.inquiries_count || 0}
-                              </p>
-                            </div>
-                            <div>
-                              <span className="text-xs text-muted-foreground">
-                                Status
-                              </span>
-                              <p className="text-sm font-bold capitalize">
-                                {property.status}
-                              </p>
+                              <span className="text-xs text-muted-foreground">Status</span>
+                              <p className="text-sm font-bold capitalize">{property.status}</p>
                             </div>
                           </div>
                         </div>
