@@ -96,6 +96,23 @@ interface Property {
     verified?: boolean;
   };
 
+  // Agent listing support
+  agent?: {
+    id: string;
+    license_number: string;
+    agency_name: string;
+    specialization: string[];
+    verified: boolean;
+    rating: number | null;
+    agent_profile?: {
+      id: string;
+      full_name: string;
+      email: string;
+      phone: string | null;
+      avatar_url: string | null;
+    };
+  };
+
   // Computed fields
   view_count?: number;
   like_count?: number;
@@ -171,6 +188,21 @@ function SearchPageContent() {
             phone,
             avatar_url,
             user_type
+          ),
+          agent:agents!properties_agent_id_fkey (
+            id,
+            license_number,
+            agency_name,
+            specialization,
+            verified,
+            rating,
+            agent_profile:profiles!agents_profile_id_fkey (
+              id,
+              full_name,
+              email,
+              phone,
+              avatar_url
+            )
           )
         `,
           { count: 'exact' }
@@ -283,8 +315,27 @@ function SearchPageContent() {
 
   const PropertyCard = ({ property, isListView = false }: { property: Property; isListView?: boolean }) => {
     const primaryImage = property.property_media?.find(media => media.is_primary);
-    const propertyDetails = property.property_details?.[0];
+    const propertyDetails = Array.isArray(property.property_details) ? property.property_details[0] : property.property_details;
     const isLiked = likedProperties.has(property.id);
+
+    // Dynamic lister resolution
+    let lister = null;
+    let listerType = '';
+    let detailRoute = `/property/${property.id}`;
+    if (property.agent && property.agent.agent_profile) {
+      lister = property.agent.agent_profile;
+      listerType = 'Agent';
+      detailRoute = `/listing/${property.id}`;
+    } else if (property.owner) {
+      lister = property.owner;
+      if (property.owner.user_type === 'admin') {
+        listerType = 'Admin';
+        detailRoute = `/listing/${property.id}`;
+      } else {
+        listerType = 'Owner';
+        detailRoute = `/property/${property.id}`;
+      }
+    }
 
     if (isListView) {
       return (
@@ -319,7 +370,7 @@ function SearchPageContent() {
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1 min-w-0">
-                  <Link href={`/property/${property.id}`}>
+                  <Link href={detailRoute}>
                     <h3 className="text-lg font-heading font-semibold mb-2 hover:text-primary transition-colors truncate">
                       {property.title}
                     </h3>
@@ -338,6 +389,16 @@ function SearchPageContent() {
                     {property.days_listed != 7 && (
                       <StatusBadge variant="new" size="sm">New</StatusBadge>
                     )}
+                  </div>
+                  {/* Lister info */}
+                  <div className="flex items-center gap-2 mt-2">
+                    {lister?.avatar_url && (
+                      <img src={lister.avatar_url} alt={lister.full_name} className="w-7 h-7 rounded-full object-cover" />
+                    )}
+                    <span className="text-xs font-medium text-muted-foreground">
+                      Listed by {lister?.full_name ? lister.full_name : listerType || 'Admin'}
+                      {listerType && <span className="ml-1 text-[10px] px-2 py-0.5 rounded bg-muted">{listerType}</span>}
+                    </span>
                   </div>
                 </div>
                 <div className="text-right ml-4">
@@ -421,7 +482,7 @@ function SearchPageContent() {
                     <Heart className={`w-4 h-4 ${isLiked ? 'fill-current text-error' : ''}`} />
                   </RealEstButton>
                   <RealEstButton variant="primary" size="sm" asChild>
-                    <Link href={`/property/${property.id}`}>View Details</Link>
+                    <Link href={detailRoute}>View Details</Link>
                   </RealEstButton>
                 </div>
               </div>
@@ -485,7 +546,7 @@ function SearchPageContent() {
 
         {/* Content */}
         <div className="p-4">
-          <Link href={`/property/${property.id}`}>
+          <Link href={detailRoute}>
             <h3 className="font-heading font-semibold text-lg mb-2 hover:text-primary transition-colors line-clamp-1">
               {property.title}
             </h3>
