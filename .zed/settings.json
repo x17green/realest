@@ -1,41 +1,26 @@
 {
-  "assistant": {
+  "agent": {
+    "inline_assistant_model": {
+      "provider": "copilot_chat",
+      "model": "gpt-4o"
+    },
     "default_model": {
       "provider": "zed.dev",
       "model": "claude-3-5-sonnet-20241022"
     },
-    "version": "2",
     "button": true,
     "dock": "right",
-    "default_width": 400,
-    "custom_instructions": "You are an expert full-stack developer working on the RealEST property marketplace project. Always reference the design system documentation in docs/zed-context-realest-design-system.md for design decisions, component implementations, and brand guidelines. Use HeroUI v3 as the primary component library and UntitledUI for status components. Follow the established color palette (Dark Green #07402F, Acid Green #ADF434, Deep Neutral #2E322E, Off-White #F8F9F7) and typography system. Ensure all code follows React 19, Next.js 16, and TypeScript best practices while maintaining Nigerian market cultural sensitivity."
+    "default_width": 400
   },
   "context_servers": {
     "heroui": {
       "command": "npx",
-      "args": ["-y", "@heroui/mcp"],
-      "source": "custom"
-    },
-    "heroui-react": {
-      "command": "npx",
       "args": ["-y", "@heroui/react-mcp@latest"],
-      "env": {},
-      "source": "custom"
+      "env": {}
     },
-    "supabase": {
-      "command": "npx",
-      "args": ["-y", "mcp-remote", "https://mcp.supabase.com/mcp"],
-      "source": "custom"
-    }
   },
   "languages": {
     "TypeScript": {
-      "format_on_save": {
-        "external": {
-          "command": "prettier",
-          "arguments": ["--stdin-filepath", "{buffer_path}"]
-        }
-      },
       "language_servers": [
         "typescript-language-server",
         "tailwindcss-language-server"
@@ -44,12 +29,6 @@
       "hard_tabs": false
     },
     "TSX": {
-      "format_on_save": {
-        "external": {
-          "command": "prettier",
-          "arguments": ["--stdin-filepath", "{buffer_path}"]
-        }
-      },
       "language_servers": [
         "typescript-language-server",
         "tailwindcss-language-server"
@@ -58,12 +37,6 @@
       "hard_tabs": false
     },
     "JavaScript": {
-      "format_on_save": {
-        "external": {
-          "command": "prettier",
-          "arguments": ["--stdin-filepath", "{buffer_path}"]
-        }
-      },
       "language_servers": [
         "typescript-language-server",
         "tailwindcss-language-server"
@@ -72,12 +45,6 @@
       "hard_tabs": false
     },
     "CSS": {
-      "format_on_save": {
-        "external": {
-          "command": "prettier",
-          "arguments": ["--stdin-filepath", "{buffer_path}"]
-        }
-      },
       "language_servers": [
         "tailwindcss-language-server",
         "css-language-server"
@@ -86,12 +53,6 @@
       "hard_tabs": false
     },
     "JSON": {
-      "format_on_save": {
-        "external": {
-          "command": "prettier",
-          "arguments": ["--stdin-filepath", "{buffer_path}"]
-        }
-      },
       "tab_size": 2,
       "hard_tabs": false
     }
@@ -141,10 +102,19 @@
   "collaboration_panel": {
     "button": false
   },
+  "autosave": {
+    "after_delay": {
+      "milliseconds": 1000
+    }
+  },
   "terminal": {
+    "button": true,
     "dock": "bottom",
     "default_height": 320,
-    "button": true
+    "working_directory": "current_project_directory",
+    "shell": {
+      "program": "pwsh"
+    }
   },
   "tabs": {
     "close_position": "right",
@@ -157,7 +127,7 @@
     "git_diff": true,
     "search_results": true,
     "selected_symbol": true,
-    "diagnostics": true
+    "diagnostics": "error"
   },
   "inlay_hints": {
     "enabled": true,
@@ -174,19 +144,14 @@
   },
   "vim_mode": false,
   "cursor_blink": false,
-  "relative_line_numbers": false,
   "seed_search_query_from_cursor": "always",
   "ui_font_size": 14,
   "buffer_font_size": 14,
-  "buffer_font_family": ".ZedMono",
+  "buffer_font_family": "VictorMono Nerd Font Mono",
   "theme": {
     "mode": "system",
     "light": "One Light",
     "dark": "Ayu Dark"
-  },
-  "workspace": {
-    "restore_on_startup": "last_workspace",
-    "when_closing_with_no_tabs": "platform_default"
   },
   "diagnostics": {
     "include_warnings": true
@@ -199,6 +164,6 @@
     "**/build",
     "**/.supabase"
   ],
-  "projects_online_by_default": false,
-  "auto_update": true
+  "auto_update": true,
+  "format_on_save": "on"
 }

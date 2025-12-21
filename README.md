@@ -8,7 +8,7 @@ Nigeria's premier property marketplace that revolutionizes real estate through g
 - **Verified Listings**: Physical vetting and document validation ensure authenticity
 - **Live Location Mapping**: Accurate geolocation for all properties
 - **Comprehensive Search**: Advanced filters and map-based search
-- **Role-Based Access**: Separate dashboards for property owners, buyers, and admins
+- **Role-Based Access**: Separate dashboards for property owners, agents, usersers, and admins
 - **Nigerian Market Focus**: Culturally-aware design with local property types and infrastructure
 - **Modern Design System**: Built with Next.js 16, Supabase, HeroUI v3, and RealEST design tokens
 
@@ -166,7 +166,7 @@ The application uses the following main tables:
 - `property_details`: Detailed property information
 - `property_documents`: Document storage with ML validation
 - `property_media`: Images, videos, and virtual tours
-- `inquiries`: Communication between buyers and owners
+- `inquiries`: Communication between users and owners
 
 ## Key Features Implementation
 

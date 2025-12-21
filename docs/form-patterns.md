@@ -121,7 +121,7 @@ Loading states from UntitledUI components.
 **Purpose**: Role-based user account creation with type-specific fields.
 
 **Features**:
-- Role selection (buyer, owner, agent)
+- Role selection (user, owner, agent)
 - Progressive disclosure based on user type
 - Password strength indicator
 - Nigerian location integration
@@ -131,12 +131,12 @@ Loading states from UntitledUI components.
 ```typescript
 <UserRegistrationForm
   onSubmit={(data) => createUser(data)}
-  userType="buyer" | "owner" | "agent"
+  userType="user" | "owner" | "agent"
 />
 ```
 
 **Role-Specific Fields**:
-- **Buyer**: Preferences, budget range
+- **User**: Preferences, budget range
 - **Owner**: Property portfolio info
 - **Agent**: License number, company details
 
@@ -202,7 +202,7 @@ Loading states from UntitledUI components.
 <ProfileSettingsForm
   onSubmit={(data) => updateProfile(data)}
   initialData={userProfile}
-  userType="buyer" | "owner" | "agent" | "admin"
+  userType="user" | "owner" | "agent" | "admin"
 />
 ```
 

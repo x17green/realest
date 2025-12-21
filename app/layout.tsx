@@ -1,8 +1,8 @@
 import type React from "react";
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
-import { RealEstThemeProvider } from "@/components/providers/realest-theme-provider";
-import "../styles/globals.css";
+import { RealEstThemeProvider } from "@/components/providers/RealEstThemeProvider";
+import "@/lib/styles/globals.css";
 
 export const metadata: Metadata = {
   title: "RealEST - Nigeria’s Most Trusted Real Estate Platform",
@@ -137,7 +137,12 @@ export default function RootLayout({
         {/* Favicon and app icons */}
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+        <link rel="icon" href="/favicon-16x16.png" sizes="16x16" type="image/png" />
+        <link rel="icon" href="/favicon-32x32.png" sizes="32x32" type="image/png" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon-precomposed.png" />
+        <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png" />
+        <link rel="apple-touch-icon-precomposed" sizes="120x120" href="/apple-touch-icon-120x120-precomposed.png" />
         <link rel="manifest" href="/manifest.json" />
       </head>
       <body className="font-body antialiased">

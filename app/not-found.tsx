@@ -1,44 +1,55 @@
-import { Button } from "@heroui/react";
-import { Home, Search, ArrowLeft, MapPin, AlertTriangle } from "lucide-react";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { Home, Search, MapPin, AlertTriangle, ArrowLeft } from "lucide-react";
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen w-full bg-background flex items-center justify-center">
+    <div className="min-h-screen w-full bg-background flex items-center justify-center relative overflow-hidden">
       {/* Background Effects */}
-      <div className="absolute inset-0 bg-linear-to-br from-primary/5 via-background to-secondary/5" />
+      <div className="absolute inset-0 bg-linear-to-br from-primary/5 via-background to-accent/5" />
       <div className="absolute top-20 left-10 w-32 h-32 bg-primary/10 rounded-full blur-xl animate-pulse" />
-      <div className="absolute bottom-20 right-20 w-24 h-24 bg-secondary/10 rounded-full blur-xl animate-pulse delay-1000" />
+      <div className="absolute bottom-20 right-20 w-24 h-24 bg-accent/10 rounded-full blur-xl animate-pulse delay-1000" />
 
-      <div className="relative z-10 max-w-2xl mx-auto text-center px-4">
-        {/* 404 Icon */}
-        <div className="mb-8">
-          <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 rounded-full mb-6">
-            <AlertTriangle className="w-12 h-12 text-primary" />
+      <div className="relative z-10 max-w-2xl mx-auto text-center p-6 ">
+        
+        {/* Status Badge for Error Type */}
+        <div className="flex justify-center pb-8">
+          <StatusBadge variant="rejected" size="md">
+            Page Not Found
+          </StatusBadge>
+        </div>
+        
+        {/* Error Icon & Number */}
+        <div className="space-y-8 mb-12">
+          <div className="inline-flex items-center justify-center w-24 h-24 bg-linear-to-br from-primary/20 to-accent/20 border-2 border-accent/30 rounded-xl">
+            <AlertTriangle className="w-12 h-12 text-accent" />
           </div>
 
-          {/* 404 Number */}
-          <h1 className="text-9xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent mb-4">
+          {/* 404 Number with brand typography */}
+          <h1 className="text-display text-8xl lg:text-9xl font-bold bg-linear-to-br from-primary via-accent to-primary bg-clip-text text-transparent">
             404
           </h1>
         </div>
 
         {/* Error Message */}
-        <h2 className="text-h1 font-bold mb-4 text-foreground">
-          Page Not Found
-        </h2>
+        <div className="space-y-6 mb-12">
+          <h2 className="font-heading text-3xl lg:text-4xl font-bold text-foreground">
+            Page Not Found
+          </h2>
+          <p className="font-body text-lg text-muted-foreground max-w-lg mx-auto leading-relaxed">
+            Oops! The page you're looking for doesn't exist. It might have been moved,
+            deleted, or you entered the wrong URL.
+          </p>
+        </div>
 
-        <p className="text-body-l text-muted-foreground mb-8 max-w-lg mx-auto leading-relaxed">
-          Oops! The page you're looking for doesn't exist. It might have been moved,
-          deleted, or you entered the wrong URL.
-        </p>
-
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+        {/* Primary Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
           <Link href="/">
             <Button
+              variant="neon"
               size="lg"
-              className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 px-8 rounded-xl font-semibold gap-2 shadow-lg hover:shadow-xl transition-all duration-200 w-full"
+              className="w-full sm:w-auto min-w-48"
             >
               <Home className="w-5 h-5" />
               Back to Home
@@ -47,9 +58,9 @@ export default function NotFound() {
 
           <Link href="/search">
             <Button
-              variant="primary"
+              variant="violet"
               size="lg"
-              className="border-primary/30 hover:bg-primary/10 px-8 rounded-xl font-semibold gap-2 transition-all duration-200 w-full"
+              className="w-full sm:w-auto min-w-48"
             >
               <Search className="w-5 h-5" />
               Search Properties
@@ -57,66 +68,102 @@ export default function NotFound() {
           </Link>
         </div>
 
-        {/* Quick Links */}
-        <div className="bg-surface/50 backdrop-blur-sm border border-border/30 rounded-xl p-6">
-          <h3 className="text-h4 font-semibold mb-4 text-foreground">
-            Looking for something specific?
-          </h3>
+        {/* Quick Navigation Card */}
+        <div className="bg-card/50 backdrop-blur-sm border border-border rounded-xl p-8 space-y-6">
+          <div className="space-y-2">
+            <h3 className="font-heading text-xl font-semibold text-foreground">
+              Looking for something specific?
+            </h3>
+            <p className="font-body text-sm text-muted-foreground">
+              Explore popular sections of RealEST
+            </p>
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Link
               href="/buy"
-              className="flex items-center gap-3 p-3 rounded-lg hover:bg-surface/70 transition-colors duration-200 group"
+              className="group flex items-center gap-4 p-4 rounded-lg hover:bg-primary/5 border border-transparent hover:border-primary/20 transition-all duration-200"
             >
-              <MapPin className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
-              <span className="text-body-m text-foreground group-hover:text-primary transition-colors">
-                Buy Properties
-              </span>
+              <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+                <MapPin className="w-5 h-5 text-primary" />
+              </div>
+              <div className="text-left">
+                <div className="font-body font-medium text-foreground group-hover:text-primary transition-colors">
+                  Buy Properties
+                </div>
+                <div className="font-body text-xs text-muted-foreground">
+                  Explore verified listings
+                </div>
+              </div>
             </Link>
 
             <Link
               href="/rent"
-              className="flex items-center gap-3 p-3 rounded-lg hover:bg-surface/70 transition-colors duration-200 group"
+              className="group flex items-center gap-4 p-4 rounded-lg hover:bg-primary/5 border border-transparent hover:border-primary/20 transition-all duration-200"
             >
-              <MapPin className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
-              <span className="text-body-m text-foreground group-hover:text-primary transition-colors">
-                Rent Properties
-              </span>
+              <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+                <MapPin className="w-5 h-5 text-primary" />
+              </div>
+              <div className="text-left">
+                <div className="font-body font-medium text-foreground group-hover:text-primary transition-colors">
+                  Rent Properties
+                </div>
+                <div className="font-body text-xs text-muted-foreground">
+                  Find your next home
+                </div>
+              </div>
             </Link>
 
             <Link
               href="/sell"
-              className="flex items-center gap-3 p-3 rounded-lg hover:bg-surface/70 transition-colors duration-200 group"
+              className="group flex items-center gap-4 p-4 rounded-lg hover:bg-primary/5 border border-transparent hover:border-primary/20 transition-all duration-200"
             >
-              <MapPin className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
-              <span className="text-body-m text-foreground group-hover:text-primary transition-colors">
-                Sell Property
-              </span>
+              <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+                <MapPin className="w-5 h-5 text-primary" />
+              </div>
+              <div className="text-left">
+                <div className="font-body font-medium text-foreground group-hover:text-primary transition-colors">
+                  List Property
+                </div>
+                <div className="font-body text-xs text-muted-foreground">
+                  Sell or rent your property
+                </div>
+              </div>
             </Link>
 
             <Link
               href="/about"
-              className="flex items-center gap-3 p-3 rounded-lg hover:bg-surface/70 transition-colors duration-200 group"
+              className="group flex items-center gap-4 p-4 rounded-lg hover:bg-primary/5 border border-transparent hover:border-primary/20 transition-all duration-200"
             >
-              <MapPin className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
-              <span className="text-body-m text-foreground group-hover:text-primary transition-colors">
-                About RealEST
-              </span>
+              <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+                <MapPin className="w-5 h-5 text-primary" />
+              </div>
+              <div className="text-left">
+                <div className="font-body font-medium text-foreground group-hover:text-primary transition-colors">
+                  About RealEST
+                </div>
+                <div className="font-body text-xs text-muted-foreground">
+                  Learn about our platform
+                </div>
+              </div>
             </Link>
           </div>
+
         </div>
 
-        {/* Help Text */}
-        <p className="text-body-s text-muted-foreground mt-8">
-          If you believe this is an error, please{" "}
-          <Link
-            href="/contact"
-            className="text-primary hover:text-accent transition-colors underline"
-          >
-            contact our support team
-          </Link>
-          .
-        </p>
+        {/* Support Contact */}
+        <div className="mt-8 pt-6 border-t border-border/50">
+          <p className="font-body text-sm text-muted-foreground">
+            If you believe this is an error, please{" "}
+            <Link
+              href="/contact"
+              className="text-primary hover:text-accent transition-colors duration-200 underline underline-offset-4 font-medium"
+            >
+              contact our support team
+            </Link>
+            .
+          </p>
+        </div>
       </div>
     </div>
   );

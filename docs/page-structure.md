@@ -108,7 +108,7 @@ These pages adapt based on the logged-in user's role.
 
 ### 4. Property Owner / Business Pages (`/dashboard/owner/*`)
 
-Accessible only to users with `user_role = 'property_owner'` or `'business_owner'`.
+Accessible only to users with `user_role = 'owner'` or `'business_owner'`.
 
 *   **4.1. Owner Dashboard Home (`/dashboard/owner`):**
     *   **Headline:** "Your RealEST Hub: Manage Your Verified Assets."

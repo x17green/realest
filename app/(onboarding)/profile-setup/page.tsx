@@ -27,6 +27,7 @@ export default function ProfileSetupPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [user, setUser] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",
@@ -54,6 +55,7 @@ export default function ProfileSetupPage() {
           .single();
 
         if (profile) {
+          setProfile(profile);
           setFormData({
             fullName: profile.full_name || "",
             phone: profile.phone || "",
@@ -76,7 +78,7 @@ export default function ProfileSetupPage() {
   };
 
   const handleNext = () => {
-    if (currentStep < 3) {
+    if (currentStep < 2) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -92,6 +94,15 @@ export default function ProfileSetupPage() {
     try {
       const supabase = createClient();
 
+      // Get current user type from profile
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("user_type")
+        .eq("id", user.id)
+        .single();
+
+      if (!profile) throw new Error("Profile not found");
+
       // Update profile
       const { error } = await supabase.from("profiles").upsert({
         id: user.id,
@@ -99,19 +110,34 @@ export default function ProfileSetupPage() {
         full_name: formData.fullName,
         phone: formData.phone,
         bio: formData.bio,
-        user_type: formData.userType,
+        user_type: profile.user_type,
         updated_at: new Date().toISOString(),
       });
 
       if (error) throw error;
 
+      // Insert into owners table if user is an owner
+      if (profile.user_type === "owner") {
+        const { error: ownerError } = await supabase.from("owners").insert({
+          profile_id: user.id,
+          business_name: formData.companyName || null,
+          years_experience: formData.experience
+            ? parseInt(formData.experience)
+            : null,
+          phone: formData.phone || null,
+          verified: false,
+        });
+
+        if (ownerError) throw ownerError;
+      }
+
       // Redirect based on user type
-      if (formData.userType === "property_owner") {
-        router.push("/owner/dashboard");
-      } else if (formData.userType === "admin") {
-        router.push("/admin/dashboard");
+      if (profile.user_type === "owner") {
+        router.push("/owner");
+      } else if (profile.user_type === "admin") {
+        router.push("/admin");
       } else {
-        router.push("/buyer/dashboard");
+        router.push("/profile");
       }
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -128,11 +154,6 @@ export default function ProfileSetupPage() {
     },
     {
       number: 2,
-      title: "Account Type",
-      description: "How you'll use RealEST",
-    },
-    {
-      number: 3,
       title: "Additional Details",
       description: "Complete your profile",
     },
@@ -268,60 +289,8 @@ export default function ProfileSetupPage() {
               </div>
             )}
 
-            {/* Step 2: Account Type */}
+            {/* Step 2: Additional Details */}
             {currentStep === 2 && (
-              <div className="space-y-6">
-                <div className="text-center mb-6">
-                  <h3 className="text-lg font-medium mb-2">
-                    How will you use RealEST?
-                  </h3>
-                  <p className="text-muted-foreground">
-                    Choose the option that best describes you
-                  </p>
-                </div>
-
-                <RadioGroup
-                  value={formData.userType}
-                  onChange={(value) => handleInputChange("userType", value)}
-                  className="space-y-4"
-                >
-                  <div className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
-                    <Radio.Root value="buyer" className="mb-2">
-                      <div className="font-medium">
-                        I'm looking to buy or rent
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        Find verified properties and connect with owners
-                      </div>
-                    </Radio.Root>
-                  </div>
-
-                  <div className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
-                    <Radio.Root value="property_owner" className="mb-2">
-                      <div className="font-medium">I'm a property owner</div>
-                      <div className="text-sm text-muted-foreground">
-                        List properties and manage inquiries from potential
-                        buyers
-                      </div>
-                    </Radio.Root>
-                  </div>
-
-                  {user?.email?.includes("admin") && (
-                    <div className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
-                      <Radio.Root value="admin" className="mb-2">
-                        <div className="font-medium">I'm an administrator</div>
-                        <div className="text-sm text-muted-foreground">
-                          Manage platform operations and verify properties
-                        </div>
-                      </Radio.Root>
-                    </div>
-                  )}
-                </RadioGroup>
-              </div>
-            )}
-
-            {/* Step 3: Additional Details */}
-            {currentStep === 3 && (
               <div className="space-y-6">
                 <div className="text-center mb-6">
                   <CheckCircle className="w-12 h-12 text-success mx-auto mb-4" />
@@ -331,7 +300,7 @@ export default function ProfileSetupPage() {
                   </p>
                 </div>
 
-                {formData.userType === "property_owner" && (
+                {profile?.user_type === "owner" && (
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <label
@@ -347,24 +316,6 @@ export default function ProfileSetupPage() {
                         value={formData.companyName}
                         onChange={(e) =>
                           handleInputChange("companyName", e.target.value)
-                        }
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <label
-                        htmlFor="licenseNumber"
-                        className="text-sm font-medium"
-                      >
-                        License Number (Optional)
-                      </label>
-                      <Input
-                        id="licenseNumber"
-                        type="text"
-                        placeholder="Your real estate license number"
-                        value={formData.licenseNumber}
-                        onChange={(e) =>
-                          handleInputChange("licenseNumber", e.target.value)
                         }
                       />
                     </div>
@@ -414,15 +365,12 @@ export default function ProfileSetupPage() {
                 </Button>
               )}
 
-              {currentStep < 3 ? (
+              {currentStep < 2 ? (
                 <Button
                   variant="primary"
                   onPress={handleNext}
                   className="flex-1"
-                  isDisabled={
-                    (currentStep === 1 && !formData.fullName) ||
-                    (currentStep === 2 && !formData.userType)
-                  }
+                  isDisabled={currentStep === 1 && !formData.fullName}
                 >
                   Next
                   <ArrowRight className="w-4 h-4 ml-2" />

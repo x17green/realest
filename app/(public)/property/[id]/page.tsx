@@ -27,6 +27,7 @@ import {
   CheckCircle,
   Star,
 } from "lucide-react";
+import { Header, Footer } from "@/components/layout";
 
 interface Property {
   id: string;
@@ -65,12 +66,28 @@ interface Property {
     file_name: string;
     is_primary: boolean;
   }[];
-  owner: {
+  owner?: {
     id: string;
     full_name: string;
     email: string;
     phone: string | null;
     avatar_url: string | null;
+    user_type?: string;
+  };
+  agent?: {
+    id: string;
+    license_number: string;
+    agency_name: string;
+    specialization: string[];
+    verified: boolean;
+    rating: number | null;
+    agent_profile?: {
+      id: string;
+      full_name: string;
+      email: string;
+      phone: string | null;
+      avatar_url: string | null;
+    };
   };
 }
 
@@ -94,7 +111,8 @@ export default function PropertyDetailsPage() {
       setIsLoading(true);
       const supabase = createClient();
 
-      const { data, error } = await supabase
+
+      const { data } = await supabase
         .from("properties")
         .select(
           `
@@ -106,7 +124,23 @@ export default function PropertyDetailsPage() {
             full_name,
             email,
             phone,
-            avatar_url
+            avatar_url,
+            user_type
+          ),
+          agent:agents!properties_agent_id_fkey (
+            id,
+            license_number,
+            agency_name,
+            specialization,
+            verified,
+            rating,
+            agent_profile:profiles!agents_profile_id_fkey (
+              id,
+              full_name,
+              email,
+              phone,
+              avatar_url
+            )
           )
         `,
         )
@@ -114,7 +148,7 @@ export default function PropertyDetailsPage() {
         .eq("status", "active")
         .single();
 
-      if (!error && data) {
+      if (data) {
         setProperty(data as Property);
       }
       setIsLoading(false);
@@ -133,9 +167,9 @@ export default function PropertyDetailsPage() {
       const supabase = createClient();
       const { error } = await supabase.from("inquiries").insert({
         property_id: propertyId,
-        buyer_email: inquiryForm.email,
-        buyer_name: inquiryForm.name,
-        buyer_phone: inquiryForm.phone,
+        user_email: inquiryForm.email,
+        user_name: inquiryForm.name,
+        user_phone: inquiryForm.phone,
         message: inquiryForm.message,
       });
 
@@ -152,39 +186,47 @@ export default function PropertyDetailsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8">
-          <div className="animate-pulse space-y-8">
-            <div className="h-96 bg-muted rounded-lg" />
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2 space-y-6">
-                <div className="h-8 bg-muted rounded" />
-                <div className="h-4 bg-muted rounded w-3/4" />
-                <div className="h-32 bg-muted rounded" />
+      <>
+        <Header />
+        <div className="min-h-screen bg-background">
+          <div className="container mx-auto px-4 py-8">
+            <div className="animate-pulse space-y-8">
+              <div className="h-96 bg-muted rounded-lg" />
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-2 space-y-6">
+                  <div className="h-8 bg-muted rounded" />
+                  <div className="h-4 bg-muted rounded w-3/4" />
+                  <div className="h-32 bg-muted rounded" />
+                </div>
+                <div className="h-96 bg-muted rounded" />
               </div>
-              <div className="h-96 bg-muted rounded" />
             </div>
           </div>
         </div>
-      </div>
+        <Footer />
+      </>
     );
   }
 
   if (!property) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Card.Root className="max-w-md">
-          <Card.Content className="text-center py-8">
-            <h2 className="text-xl font-semibold mb-2">Property Not Found</h2>
-            <p className="text-muted-foreground mb-4">
-              The property you're looking for doesn't exist or has been removed.
-            </p>
-            <Button asChild variant="primary">
-              <Link href="/">Back to Homepage</Link>
-            </Button>
-          </Card.Content>
-        </Card.Root>
-      </div>
+      <>
+        <Header />
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <Card.Root className="max-w-md">
+            <Card.Content className="text-center py-8">
+              <h2 className="text-xl font-semibold mb-2">Property Not Found</h2>
+              <p className="text-muted-foreground mb-4">
+                The property you're looking for doesn't exist or has been removed.
+              </p>
+              <Button asChild variant="primary">
+                <Link href="/">Back to Homepage</Link>
+              </Button>
+            </Card.Content>
+          </Card.Root>
+        </div>
+        <Footer />
+      </>
     );
   }
 
@@ -196,7 +238,9 @@ export default function PropertyDetailsPage() {
   );
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <Header />
+      <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         {/* Image Gallery */}
         <div className="mb-8">
@@ -213,7 +257,7 @@ export default function PropertyDetailsPage() {
             {property.verification_status === "verified" && (
               <div className="absolute top-4 left-4">
                 <Chip
-                  type="success"
+                  color="success"
                   variant="primary"
                   className="flex items-center gap-1"
                 >
@@ -534,22 +578,35 @@ export default function PropertyDetailsPage() {
               </Card.Header>
               <Card.Content>
                 <div className="flex items-center gap-3 mb-4">
-                  <Avatar.Root size="lg">
-                    <Avatar.Image
-                      src={property.owner.avatar_url || undefined}
-                    />
-                    <Avatar.Fallback>
-                      {property.owner?.full_name ? property.owner.full_name.charAt(0) : '?'}
-                    </Avatar.Fallback>
-                  </Avatar.Root>
-                  <div>
-                    <div className="font-medium">
-                      {property.owner.full_name}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      Property Owner
-                    </div>
-                  </div>
+                  {(() => {
+                    // Robust lister resolution: agent > owner > fallback
+                    let lister = null;
+                    let listerType = '';
+                    if (property.agent && property.agent.agent_profile) {
+                      lister = property.agent.agent_profile;
+                      listerType = 'Agent';
+                    } else if (property.owner) {
+                      lister = property.owner;
+                      listerType = property.owner.user_type === 'admin' ? 'Admin' : 'Owner';
+                    } else {
+                      lister = { full_name: 'Unknown', avatar_url: null };
+                      listerType = 'Admin';
+                    }
+                    return (
+                      <>
+                        <Avatar.Root size="lg">
+                          <Avatar.Image src={lister.avatar_url || undefined} />
+                          <Avatar.Fallback>
+                            {lister.full_name ? lister.full_name.charAt(0) : "?"}
+                          </Avatar.Fallback>
+                        </Avatar.Root>
+                        <div>
+                          <div className="font-medium">{lister.full_name}</div>
+                          <div className="text-sm text-muted-foreground">{listerType}</div>
+                        </div>
+                      </>
+                    );
+                  })()}
                 </div>
 
                 <div className="space-y-2">
@@ -602,7 +659,7 @@ export default function PropertyDetailsPage() {
                       Status
                     </span>
                     <Chip
-                      type={
+                      color={
                         property.verification_status === "verified"
                           ? "success"
                           : property.verification_status === "rejected"
@@ -620,6 +677,8 @@ export default function PropertyDetailsPage() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+      <Footer />
+    </>
   );
 }

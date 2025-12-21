@@ -5,4 +5,7 @@
 export * from "./badges";
 
 // Location components
-export * from "./location/location-pin";
+export * from "./location/LocationPin";
+
+// Profile components
+export { ProfileDropdown } from "./ProfileDropdown";

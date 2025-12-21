@@ -14,7 +14,7 @@ This roadmap outlines the development phases, breaking down the project into man
 *   **0.1 Supabase Project Initialization:**
     *   Create Supabase project.
     *   Configure `auth.users` table extensions for `profiles` (add `user_role`).
-    *   Define and implement RLS policies for all core tables (`properties`, `property_documents`, `property_media`, `inquiries`, `profiles`) for `anon`, `authenticated` (owner/buyer), and `admin` roles.
+    *   Define and implement RLS policies for all core tables (`properties`, `property_documents`, `property_media`, `inquiries`, `profiles`) for `anon`, `authenticated` (owner/user/agent), and `admin` roles.
     *   Set up Supabase Storage buckets for `property_images` and `property_documents` with appropriate RLS policies.
     *   Initial schema creation for all tables outlined in V0 documentation.
 *   **0.2 Frontend Project Setup:**
@@ -31,7 +31,7 @@ This roadmap outlines the development phases, breaking down the project into man
 *   **1.1 Authentication & Profile Management:**
     *   **Frontend:** Develop `Register`, `Login`, `Logout` UI.
     *   **Supabase Auth:** Implement `signUp`, `signInWithPassword`, `signOut`, `updateUser` (for profile).
-    *   **Profiles:** Allow users to update `full_name`, `avatar_url` on their profile. Set `user_role` default to `buyer_renter` on signup.
+    *   **Profiles:** Allow users to update `full_name`, `avatar_url` on their profile. Set `user_role` default to `user` on signup.
 *   **1.2 Property Listing - Basic Details:**
     *   **Frontend:** Create multi-step "List Property" form:
         *   Step 1: Property Type, Title, Description, Price.
@@ -83,7 +83,7 @@ This roadmap outlines the development phases, breaking down the project into man
     *   **Supabase Trigger/Edge Function (future):** On new property insertion, a lightweight check against existing properties (e.g., exact address match, or properties within a very small radius).
     *   **Frontend (Admin):** If a potential duplicate is flagged (`is_duplicate = TRUE`), display it prominently for admin review. Admin can decide to approve, merge, or reject.
 *   **2.5 Admin User Management:**
-    *   **Admin UI:** View/manage user profiles, change `user_role` (e.g., elevate a user to 'admin' or 'property_owner').
+    *   **Admin UI:** View/manage user profiles, change `user_role` (e.g., elevate a user to 'admin' or 'owner').
 
 ### Phase 3: Enhancements & Scalability Prep
 
