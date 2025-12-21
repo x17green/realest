@@ -3,7 +3,7 @@ create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   email text not null,
   full_name text,
-  user_type text not null check (user_type in ('property_owner', 'buyer', 'admin', 'agent')),
+  user_type text not null check (user_type in ('owner', 'user', 'admin', 'agent')),
   avatar_url text,
   phone text,
   bio text,
@@ -33,4 +33,4 @@ create policy "profiles_delete_own"
 -- Allow public read for property owner profiles (for contact info)
 create policy "profiles_select_public_owners"
   on public.profiles for select
-  using (user_type = 'property_owner');
+  using (user_type = 'owner');

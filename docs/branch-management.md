@@ -79,7 +79,7 @@ NEXT_PUBLIC_APP_MODE=full-site
 
 | Mode | Demo Pages | Full Site | Authentication | Restricted Routes |
 |------|------------|-----------|----------------|-------------------|
-| `coming-soon` | ❌ | ❌* | ❌* | `/admin`, `/buyer`, `/owner`, `/demo` |
+| `coming-soon` | ❌ | ❌* | ❌* | `/admin`, `/profile`, `/owner`, `/agents`, `/demo` |
 | `full-site` | ❌ | ✅ | ✅ | None |
 | `development` | ✅ | ✅ | ✅ | None |
 | `demo` | ✅ | ✅ | ✅ | None |
@@ -187,7 +187,7 @@ Utility functions for:
 
 Routes are automatically protected based on app mode:
 
-- **Coming Soon Mode**: Only allows public routes, blocks `/admin`, `/buyer`, `/owner`, `/demo`
+- **Coming Soon Mode**: Only allows public routes, blocks `/admin`, `/agents`, `/owner`, `/demo`
 - **Full Site Mode**: All routes accessible with proper authentication
 - **Development Mode**: All routes accessible including demo pages
 

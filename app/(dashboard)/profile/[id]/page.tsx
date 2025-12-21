@@ -1,73 +1,93 @@
+// realest\app\(dashboard)\profile\[id]\page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Button, Input, TextArea, Card, Avatar } from "@heroui/react";
+import { Card, Avatar, Button, Chip } from "@heroui/react";
 import { Header, Footer } from "@/components/layout";
 import {
-  CheckCircle,
-  AlertCircle,
   User,
   Phone,
   MapPin,
   FileText,
+  Calendar,
+  Home,
+  MessageSquare,
+  Star,
 } from "lucide-react";
 
-export default function EditProfilePage() {
+interface UserProfile {
+  id: string;
+  full_name: string;
+  phone: string;
+  bio: string;
+  email: string;
+  user_type: string;
+  created_at: string;
+  avatar_url?: string;
+}
+
+export default function PublicProfilePage() {
   const params = useParams();
-  const router = useRouter();
   const userId = params.id as string;
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
-  const [currentUser, setCurrentUser] = useState<any>(null);
-
-  const [formData, setFormData] = useState({
-    fullName: "",
-    phone: "",
-    bio: "",
-    location: "",
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [stats, setStats] = useState({
+    totalListings: 0,
+    activeListings: 0,
+    totalInquiries: 0,
   });
 
   useEffect(() => {
     const fetchProfile = async () => {
+      if (!userId) return;
+
       setIsLoading(true);
       try {
         const supabase = createClient();
 
-        // Check if current user can edit this profile
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-        if (!user || user.id !== userId) {
-          setIsLoading(false);
-          router.push("/profile");
-          return;
-        }
-
-        setCurrentUser(user);
-
         // Fetch profile data
-        const { data: profile, error } = await supabase
+        const { data: profileData, error: profileError } = await supabase
           .from("profiles")
           .select("*")
           .eq("id", userId)
           .single();
 
-        if (error) {
-          setError("Failed to load profile");
+        if (profileError) {
+          setError("Profile not found");
           setIsLoading(false);
           return;
         }
 
-        setFormData({
-          fullName: profile.full_name || "",
-          phone: profile.phone || "",
-          bio: profile.bio || "",
-          location: "", // Not stored in profiles currently
+        setProfile(profileData);
+
+        // Fetch stats (mock for now - replace with real queries)
+        // Total listings by this user
+        const { count: totalListings } = await supabase
+          .from("properties")
+          .select("*", { count: "exact", head: true })
+          .eq("owner_id", userId);
+
+        // Active listings
+        const { count: activeListings } = await supabase
+          .from("properties")
+          .select("*", { count: "exact", head: true })
+          .eq("owner_id", userId)
+          .eq("status", "active");
+
+        // Total inquiries received (mock)
+        const { count: totalInquiries } = await supabase
+          .from("inquiries")
+          .select("*", { count: "exact", head: true })
+          .eq("property_owner_id", userId);
+
+        setStats({
+          totalListings: totalListings || 0,
+          activeListings: activeListings || 0,
+          totalInquiries: totalInquiries || 0,
         });
 
         setIsLoading(false);
@@ -77,49 +97,8 @@ export default function EditProfilePage() {
       }
     };
 
-    if (userId) {
-      fetchProfile();
-    }
-  }, [userId, router]);
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    if (error) setError("");
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSaving(true);
-    setError("");
-
-    try {
-      const supabase = createClient();
-
-      const { error: updateError } = await supabase
-        .from("profiles")
-        .update({
-          full_name: formData.fullName,
-          phone: formData.phone,
-          bio: formData.bio,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", userId);
-
-      if (updateError) {
-        setError(updateError.message);
-        return;
-      }
-
-      setSuccess(true);
-      setTimeout(() => {
-        router.push("/profile");
-      }, 2000);
-    } catch (err) {
-      setError("Failed to update profile");
-    } finally {
-      setIsSaving(false);
-    }
-  };
+    fetchProfile();
+  }, [userId]);
 
   if (isLoading) {
     return (
@@ -135,18 +114,16 @@ export default function EditProfilePage() {
     );
   }
 
-  if (success) {
+  if (error || !profile) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
         <div className="container mx-auto px-4 py-8">
           <Card.Root className="max-w-2xl mx-auto">
             <Card.Content className="py-12 text-center">
-              <CheckCircle className="w-16 h-16 text-success mx-auto mb-6" />
-              <h1 className="text-2xl font-bold mb-4">Profile Updated!</h1>
-              <p className="text-muted-foreground mb-8">
-                Your profile has been successfully updated. Redirecting...
-              </p>
+              <div className="text-muted-foreground">
+                {error || "Profile not found"}
+              </div>
             </Card.Content>
           </Card.Root>
         </div>
@@ -155,140 +132,144 @@ export default function EditProfilePage() {
     );
   }
 
+  const getUserTypeLabel = (type: string) => {
+    switch (type) {
+      case "property_owner":
+        return "Property Owner";
+      case "buyer":
+        return "Property Buyer";
+      case "admin":
+        return "Administrator";
+      default:
+        return "User";
+    }
+  };
+
+  const getUserTypeColor = (type: string) => {
+    switch (type) {
+      case "property_owner":
+        return "primary";
+      case "buyer":
+        return "secondary";
+      case "admin":
+        return "warning";
+      default:
+        return "default";
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-2xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">Edit Profile</h1>
-            <p className="text-muted-foreground">
-              Update your basic profile information
-            </p>
-          </div>
-
-          <Card.Root>
+        <div className="max-w-4xl mx-auto">
+          {/* Profile Header */}
+          <Card.Root className="mb-8">
             <Card.Content className="p-8">
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Profile Avatar */}
-                <div className="flex justify-center mb-6">
-                  <Avatar.Root size="lg">
-                    <Avatar.Fallback>
-                      {formData.fullName?.charAt(0) ||
-                        currentUser?.email?.charAt(0) ||
-                        "U"}
-                    </Avatar.Fallback>
-                  </Avatar.Root>
-                </div>
+              <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+                <Avatar.Root size="xl">
+                  <Avatar.Fallback className="text-2xl">
+                    {profile.full_name?.charAt(0) || profile.email?.charAt(0) || "U"}
+                  </Avatar.Fallback>
+                </Avatar.Root>
 
-                {/* Full Name */}
-                <div className="space-y-2">
-                  <label htmlFor="fullName" className="text-sm font-medium">
-                    Full Name *
-                  </label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      id="fullName"
-                      type="text"
-                      placeholder="Enter your full name"
-                      value={formData.fullName}
-                      onChange={(e) =>
-                        handleInputChange("fullName", e.target.value)
-                      }
-                      className="pl-10"
-                      required
-                    />
+                <div className="flex-1 text-center md:text-left">
+                  <h1 className="text-3xl font-bold mb-2">{profile.full_name}</h1>
+                  <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
+                    <Chip
+                      variant={getUserTypeColor(profile.user_type)}
+                      size="sm"
+                    >
+                      {getUserTypeLabel(profile.user_type)}
+                    </Chip>
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                      <Calendar className="w-4 h-4" />
+                      Joined {new Date(profile.created_at).toLocaleDateString()}
+                    </div>
+                  </div>
+
+                  {profile.bio && (
+                    <p className="text-muted-foreground mb-4">{profile.bio}</p>
+                  )}
+
+                  <div className="flex flex-wrap justify-center md:justify-start gap-4 text-sm">
+                    <div className="flex items-center gap-1">
+                      <Home className="w-4 h-4" />
+                      <span>{stats.totalListings} Total Listings</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Star className="w-4 h-4" />
+                      <span>{stats.activeListings} Active Listings</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <MessageSquare className="w-4 h-4" />
+                      <span>{stats.totalInquiries} Inquiries</span>
+                    </div>
                   </div>
                 </div>
-
-                {/* Phone */}
-                <div className="space-y-2">
-                  <label htmlFor="phone" className="text-sm font-medium">
-                    Phone Number
-                  </label>
-                  <div className="relative">
-                    <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      id="phone"
-                      type="tel"
-                      placeholder="Enter your phone number"
-                      value={formData.phone}
-                      onChange={(e) =>
-                        handleInputChange("phone", e.target.value)
-                      }
-                      className="pl-10"
-                    />
-                  </div>
-                </div>
-
-                {/* Location */}
-                <div className="space-y-2">
-                  <label htmlFor="location" className="text-sm font-medium">
-                    Location
-                  </label>
-                  <div className="relative">
-                    <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      id="location"
-                      type="text"
-                      placeholder="City, Country"
-                      value={formData.location}
-                      onChange={(e) =>
-                        handleInputChange("location", e.target.value)
-                      }
-                      className="pl-10"
-                    />
-                  </div>
-                </div>
-
-                {/* Bio */}
-                <div className="space-y-2">
-                  <label htmlFor="bio" className="text-sm font-medium">
-                    Bio
-                  </label>
-                  <div className="relative">
-                    <FileText className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-                    <TextArea
-                      id="bio"
-                      placeholder="Tell us a bit about yourself..."
-                      value={formData.bio}
-                      onChange={(e) => handleInputChange("bio", e.target.value)}
-                      rows={4}
-                      className="pl-10"
-                    />
-                  </div>
-                </div>
-
-                {error && (
-                  <div className="flex gap-3 p-4 bg-danger-50 border border-danger-200 rounded-lg">
-                    <AlertCircle className="w-5 h-5 text-danger shrink-0 mt-0.5" />
-                    <p className="text-sm text-danger">{error}</p>
-                  </div>
-                )}
-
-                {/* Action Buttons */}
-                <div className="flex gap-3 pt-4">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onPress={() => router.push("/profile")}
-                    className="flex-1"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    variant="primary"
-                    className="flex-1"
-                    isDisabled={isSaving}
-                  >
-                    {isSaving ? "Saving..." : "Save Changes"}
-                  </Button>
-                </div>
-              </form>
+              </div>
             </Card.Content>
           </Card.Root>
+
+          {/* Contact Information */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card.Root>
+              <Card.Header>
+                <Card.Title>Contact Information</Card.Title>
+              </Card.Header>
+              <Card.Content className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <User className="w-5 h-5 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Email</p>
+                    <p className="font-medium">{profile.email}</p>
+                  </div>
+                </div>
+
+                {profile.phone && (
+                  <div className="flex items-center gap-3">
+                    <Phone className="w-5 h-5 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm text-muted-foreground">Phone</p>
+                      <p className="font-medium">{profile.phone}</p>
+                    </div>
+                  </div>
+                )}
+              </Card.Content>
+            </Card.Root>
+
+            {/* Quick Actions */}
+            <Card.Root>
+              <Card.Header>
+                <Card.Title>Actions</Card.Title>
+              </Card.Header>
+              <Card.Content className="space-y-3">
+                <Button variant="primary" className="w-full">
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  Send Message
+                </Button>
+                <Button variant="secondary" className="w-full">
+                  <Home className="w-4 h-4 mr-2" />
+                  View Listings
+                </Button>
+              </Card.Content>
+            </Card.Root>
+          </div>
+
+          {/* Additional Information */}
+          {profile.bio && (
+            <Card.Root className="mt-6">
+              <Card.Header>
+                <Card.Title>About</Card.Title>
+              </Card.Header>
+              <Card.Content>
+                <div className="flex gap-3">
+                  <FileText className="w-5 h-5 text-muted-foreground mt-0.5" />
+                  <p className="text-muted-foreground">{profile.bio}</p>
+                </div>
+              </Card.Content>
+            </Card.Root>
+          )}
         </div>
       </div>
       <Footer />

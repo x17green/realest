@@ -284,9 +284,9 @@ app/
 ```
 
 **Role-Based Rendering**: Single `/profile` page renders different UI based on `profiles.user_type`:
-- **buyer**: Saved properties, inquiries sent, favorites
+- **user**: Saved properties, inquiries sent, favorites
 - **agent**: Client management, listings from `/listing`, analytics
-- **property_owner**: Properties from `/property`, owner analytics
+- **owner**: Properties from `/property`, owner analytics
 - **admin**: Admin dashboard link, verification queues
 
 **Analysis**: 

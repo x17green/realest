@@ -81,7 +81,7 @@ BEGIN
             'buyer_name', pr.full_name
         )
     FROM properties p
-    JOIN profiles pr ON pr.id = NEW.buyer_id
+    JOIN profiles pr ON pr.id = NEW.user_id
     WHERE p.id = NEW.property_id;
 
     RETURN NEW;

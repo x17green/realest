@@ -33,7 +33,7 @@ export async function signUpWithPassword(
   email: string,
   password: string,
   fullName: string,
-  userType: "buyer" | "property_owner" | "agent"  // Added agent
+  userType: "user" | "owner" | "agent"  // Added agent
 ): Promise<AuthResponse>
 ```
 
@@ -60,7 +60,7 @@ Features:
 **File**: `app/(auth)/register/page.tsx`
 
 **Step 1 - Role Selection**:
-- Buyer/Renter
+- User/Renter
 - Property Owner
 - **Real Estate Agent** (NEW) with Briefcase icon
 

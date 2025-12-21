@@ -70,7 +70,7 @@ footer (optional)
 
 ### Examples
 ```bash
-fix(buyer-dashboard): correct HeroUI Chip component usage
+fix(user-dashboard): correct HeroUI Chip component usage
 
 - Changed Chip to use icons as children, not startContent
 - Updated variant from "flat" to "secondary"

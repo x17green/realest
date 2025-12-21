@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
               is_primary
             )
           ),
-          profiles:user_id (
+          profiles:id (
             full_name,
             avatar_url
           )

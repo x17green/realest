@@ -211,7 +211,7 @@ interface SidebarNavigationProps {
   isOpen?: boolean
   onClose?: () => void
   activeItem?: string
-  userRole?: 'buyer' | 'owner' | 'agent' | 'admin'
+  userRole?: 'user' | 'owner' | 'agent' | 'admin'
   className?: string
 }
 
@@ -219,11 +219,11 @@ export function SidebarNavigation({
   isOpen = false,
   onClose,
   activeItem,
-  userRole = 'buyer',
+  userRole = 'user',
   className
 }: SidebarNavigationProps) {
   const navigationItems = {
-    buyer: [
+    user: [
       { id: 'dashboard', label: 'Dashboard', icon: '🏠', href: '/profile' },
       { id: 'search', label: 'Search Properties', icon: '🔍', href: '/search' },
       { id: 'saved', label: 'Saved Properties', icon: '❤️', href: '/profile/saved' },

@@ -48,7 +48,7 @@ RealEST Conservative Professional Palette
 - **`(onboarding)/`** - Profile setup post-registration
 - **`(dashboard)/`** - Placeholder group (currently minimal/unused)
 - **`admin/`** - Admin dashboard (property validation, user management)
-- **`buyer/`** - Buyer-specific features (saved searches, inquiries)
+- **`user/`** - User-specific features (saved searches, inquiries)
 - **`owner/`** - Owner dashboard (listings, analytics)
 - **`search/`** - Dedicated search page (live)
 - **`realest-status/`** - Status/health page (live)
@@ -95,7 +95,7 @@ NEXT_PUBLIC_APP_MODE determines feature availability:
 ### Middleware-Enforced Access Control
 - All routes validated in `lib/supabase/middleware.ts`
 - `isRouteAccessible()` checks current mode
-- Protected routes: `/admin`, `/buyer`, `/owner`, `/(demo)`
+- Protected routes: `/admin`, `/user`, `/owner`, `/(demo)`
 - Coming-soon mode: Only `/`, `/not-found` accessible
 
 ## Data Flow Architecture
@@ -123,7 +123,7 @@ NEXT_PUBLIC_APP_MODE determines feature availability:
 Supabase Auth
 ├── Client-side: lib/supabase/client.ts
 ├── Server-side: lib/supabase/server.ts
-├── Profiles table: user_type (buyer|property_owner|admin)
+├── Profiles table: user_type (user|owner|agent|admin)
 └── RLS policies enforce row-level access
 ```
 
@@ -166,7 +166,7 @@ Supabase Auth
 
 ### RLS Policies
 - `profiles` table: Users can only read/update own profile
-- `properties` table: Owners can CRUD own, buyers can read live only
+- `properties` table: Owners can CRUD own, users can read live only
 - `inquiries` table: Sender/receiver can read own
 - Admins bypass RLS with service role key (server-side only)
 

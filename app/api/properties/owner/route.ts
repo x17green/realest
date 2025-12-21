@@ -16,14 +16,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Check if user has property_owner role
+    // Check if user has owner role
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("user_type")
       .eq("id", user.id)
       .single();
 
-    if (profileError || profile?.user_type !== "property_owner") {
+    if (profileError || profile?.user_type !== "owner") {
       return NextResponse.json(
         { error: "Only property owners can access this endpoint" },
         { status: 403 },

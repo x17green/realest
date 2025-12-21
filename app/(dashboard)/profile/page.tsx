@@ -20,7 +20,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 
-interface BuyerDashboardStats {
+interface UserDashboardStats {
   savedProperties: number;
   activeSearches: number;
   sentInquiries: number;
@@ -69,9 +69,9 @@ interface UserProfile {
   user_type: string;
 }
 
-export default function BuyerDashboardPage() {
+export default function UserDashboardPage() {
   const router = useRouter();
-  const [stats, setStats] = useState<BuyerDashboardStats | null>(null);
+  const [stats, setStats] = useState<UserDashboardStats | null>(null);
   const [savedProperties, setSavedProperties] = useState<SavedProperty[]>([]);
   const [recentSearches, setRecentSearches] = useState<RecentSearch[]>([]);
   const [sentInquiries, setSentInquiries] = useState<SentInquiry[]>([]);

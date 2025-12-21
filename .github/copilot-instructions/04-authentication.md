@@ -15,17 +15,17 @@ Authentication Layers
 
 ### Role Hierarchy
 ```typescript
-export type UserRole = 'buyer' | 'property_owner' | 'admin'
+export type UserRole = 'user' | 'owner' 'admin' | 'admin'
 
 // Role capabilities
 const ROLE_PERMISSIONS = {
-  buyer: [
+  user: [
     'view_properties',
     'send_inquiries',
     'save_properties',
     'manage_profile'
   ],
-  property_owner: [
+  owner: [
     'view_properties',
     'send_inquiries',
     'create_listing',
@@ -49,9 +49,9 @@ const ROLE_PERMISSIONS = {
 export function canAccessRoute(role: UserRole, path: string): boolean {
   const routeAccess = {
     '/admin': ['admin'],
-    '/owner': ['property_owner', 'admin'],
-    '/buyer': ['buyer', 'property_owner', 'admin'],
-    '/search': ['buyer', 'property_owner', 'admin', null], // Public
+    '/owner': ['owner', 'admin'],
+    '/profile': ['user', 'owner', 'agent', 'admin'],
+    '/search': ['user', 'owner', 'agent', 'admin'owner, null], // Public
     '/': [null] // Public (unauthenticated)
   }
   
@@ -187,7 +187,7 @@ export function OwnerDashboard() {
     if (!isLoading && !user) {
       router.push('/auth/login?redirect=/owner')
     }
-    if (profile && profile.user_type !== 'property_owner' && profile.user_type !== 'admin') {
+    if (profile && profile.user_type !== 'owner' && profile.user_type !== 'admin') {
       router.push('/') // Unauthorized
     }
   }, [user, profile, isLoading])
@@ -229,7 +229,7 @@ export default async function OwnerDashboardPage() {
     .eq('id', user.id)
     .single()
 
-  if (!profile || (profile.user_type !== 'property_owner' && profile.user_type !== 'admin')) {
+  if (!profile || (profile.user_type !== 'owner' && profile.user_type !== 'admin')) {
     redirect('/')
   }
 
@@ -275,7 +275,7 @@ export async function POST(request: Request) {
     .eq('id', user.id)
     .single()
 
-  if (!profile || !['property_owner', 'admin'].includes(profile.user_type)) {
+  if (!profile || !['owner', 'admin'].includes(profile.user_type)) {
     return NextResponse.json(
       { error: 'Forbidden - Property owners only' },
       { status: 403 }
@@ -360,7 +360,7 @@ export async function middleware(request: NextRequest) {
   await supabase.auth.getUser()
 
   // Protected route patterns
-  const protectedRoutes = ['/owner', '/buyer', '/admin', '/profile']
+  const protectedRoutes = ['/owner', '/user', '/admin', '/profile']
   const isProtected = protectedRoutes.some(route => pathname.startsWith(route))
 
   if (isProtected) {

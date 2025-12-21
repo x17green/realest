@@ -37,7 +37,7 @@ This is a **multi-layered, context-aware AI instruction system** providing deep,
 - **Deployment**: Vercel (recommended)
 
 ### Directory Structure
-- **`app/`** - Next.js 16 App Router with route groups: `(auth)`, `(demo)`, `(onboarding)`, `(public)`, `admin/`, `buyer/`, `owner/`
+- **`app/`** - Next.js 16 App Router with route groups: `(auth)`, `(demo)`, `(onboarding)`, `(public)`, `admin/`, `user/`, `owner/`
 - **`components/`** - Reusable UI: `realest/` (custom), `heroui/`, `untitledui/` (status only), `ui/` (base utilities)
 - **`lib/`** - Core utilities: `supabase/` (client/server/middleware), `auth.ts`, `app-mode.ts`, `email-service.ts`
 - **`styles/`** - Global CSS + token system in `tokens/colors.css` with CSS variables
@@ -133,13 +133,15 @@ Core functions in `lib/auth.ts`:
 
 ### User Profiles
 Three role types stored in `profiles` table:
-- **`buyer`** - Search and inquire on properties
-- **`property_owner`** - List and manage properties
+- **`user`** - Search and inquire on properties
+- **`owner`** - List and manage properties
+- **`agent`** - Manage listings on behalf of owners
 - **`admin`** - Verify properties, documents, manage disputes
 
 Dashboard routes in `app/` (gated by role):
-- `buyer/` - Buyer-specific features
+- `profile/` - User-specific features
 - `owner/` - Owner listing management
+- `agent/` - Agent management features
 - `admin/` - Verification workflows
 
 ## Form Patterns

@@ -83,10 +83,10 @@ get_user_id() {
         "admin")
             echo "placeholder_admin_user_id"
             ;;
-        "buyer")
-            echo "placeholder_buyer_user_id"
+        "user")
+            echo "placeholder_user_id"
             ;;
-        "property_owner")
+        "owner")
             echo "placeholder_owner_user_id"
             ;;
     esac
@@ -129,17 +129,17 @@ echo ""
 echo "2. Get an admin user ID:"
 echo "   SELECT id FROM profiles WHERE user_type = 'admin' LIMIT 1;"
 echo ""
-echo "3. Get a buyer user ID:"
-echo "   SELECT id FROM profiles WHERE user_type = 'buyer' LIMIT 1;"
+echo "3. Get a user ID:"
+echo "   SELECT id FROM profiles WHERE user_type = 'user' LIMIT 1;"
 echo ""
 echo "4. Get a property owner user ID:"
-echo "   SELECT id FROM profiles WHERE user_type = 'property_owner' LIMIT 1;"
+echo "   SELECT id FROM profiles WHERE user_type = 'owner' LIMIT 1;"
 echo ""
 
 # Placeholder user IDs (replace with real ones)
 AGENT_USER_ID="placeholder_agent_user_id"
 ADMIN_USER_ID="placeholder_admin_user_id"
-BUYER_USER_ID="placeholder_buyer_user_id"
+USER_ID="placeholder_user_id"
 OWNER_USER_ID="placeholder_owner_user_id"
 
 echo -e "${YELLOW}Using placeholder user IDs for demonstration. Replace with real IDs from your database.${NC}"
@@ -167,17 +167,17 @@ echo ""
 # Placeholder tokens (replace with real ones)
 AGENT_TOKEN="your_agent_jwt_token_here"
 ADMIN_TOKEN="your_admin_jwt_token_here"
-BUYER_TOKEN="your_buyer_jwt_token_here"
+USER_TOKEN="your_user_jwt_token_here"
 OWNER_TOKEN="your_owner_jwt_token_here"
 
 echo -e "${YELLOW}Using placeholder tokens. Replace with real JWT tokens.${NC}"
 echo ""
 
 # Test 5: Get user profile
-make_request "GET" "/api/profile" "" "$BUYER_TOKEN" "Get current user profile"
+make_request "GET" "/api/profile" "" "$USER_TOKEN" "Get current user profile"
 
 # Test 6: Update user profile
-make_request "PUT" "/api/profile" '{"full_name":"Updated Name","phone":"+2348012345678","bio":"Updated bio"}' "$BUYER_TOKEN" "Update user profile with Nigerian phone"
+make_request "PUT" "/api/profile" '{"full_name":"Updated Name","phone":"+2348012345678","bio":"Updated bio"}' "$USER_TOKEN" "Update user profile with Nigerian phone"
 
 # Test 7: Get owner's properties
 make_request "GET" "/api/properties/owner" "" "$OWNER_TOKEN" "Get properties owned by current user"
@@ -278,27 +278,27 @@ echo -e "${GREEN}📋 STEP 7: Testing Inquiry System${NC}"
 echo -e "${GREEN}=================================${NC}"
 echo ""
 
-# Test 17: Create property inquiry (buyer)
+# Test 17: Create property inquiry (user)
 INQUIRY_DATA='{
   "property_id": "'$PROPERTY_ID'",
   "message": "Hello! I am interested in this property. Is the price negotiable? When can we schedule a viewing?",
   "contact_phone": "+2348012345678",
-  "contact_email": "buyer@example.com"
+  "contact_email": "user@example.com"
 }'
 
-make_request "POST" "/api/inquiries" "$INQUIRY_DATA" "$BUYER_TOKEN" "Create new property inquiry"
+make_request "POST" "/api/inquiries" "$INQUIRY_DATA" "$USER_TOKEN" "Create new property inquiry"
 
 # Get the created inquiry ID
 INQUIRY_ID="placeholder_inquiry_id"
 
-# Test 18: Get user's inquiries (buyer view)
-make_request "GET" "/api/inquiries" "" "$BUYER_TOKEN" "Get inquiries sent by current buyer"
+# Test 18: Get user's inquiries (user view)
+make_request "GET" "/api/inquiries" "" "$USER_TOKEN" "Get inquiries sent by current user"
 
 # Test 19: Get user's inquiries (owner view)
 make_request "GET" "/api/inquiries" "" "$OWNER_TOKEN" "Get inquiries received by current owner"
 
 # Test 20: Get specific inquiry details
-make_request "GET" "/api/inquiries/$INQUIRY_ID" "" "$BUYER_TOKEN" "Get detailed inquiry information"
+make_request "GET" "/api/inquiries/$INQUIRY_ID" "" "$USER_TOKEN" "Get detailed inquiry information"
 
 # Test 21: Update inquiry status (owner response)
 UPDATE_INQUIRY_DATA='{
@@ -317,13 +317,13 @@ SAVE_DATA='{
   "property_id": "'$PROPERTY_ID'"
 }'
 
-make_request "POST" "/api/saved-properties" "$SAVE_DATA" "$BUYER_TOKEN" "Save property to favorites"
+make_request "POST" "/api/saved-properties" "$SAVE_DATA" "$USER_TOKEN" "Save property to favorites"
 
 # Test 23: Get saved properties
-make_request "GET" "/api/saved-properties" "" "$BUYER_TOKEN" "Get user's saved properties"
+make_request "GET" "/api/saved-properties" "" "$USER_TOKEN" "Get user's saved properties"
 
 # Test 24: Remove from saved properties
-make_request "DELETE" "/api/saved-properties?property_id=$PROPERTY_ID" "" "$BUYER_TOKEN" "Remove property from favorites"
+make_request "DELETE" "/api/saved-properties?property_id=$PROPERTY_ID" "" "$USER_TOKEN" "Remove property from favorites"
 
 echo -e "${GREEN}📋 STEP 9: Testing Geocoding${NC}"
 echo -e "${GREEN}===========================${NC}"
@@ -360,10 +360,10 @@ echo -e "${GREEN}=================================${NC}"
 echo ""
 
 # Test 29: Get user notifications
-make_request "GET" "/api/notifications" "" "$BUYER_TOKEN" "Get user's notifications"
+make_request "GET" "/api/notifications" "" "$USER_TOKEN" "Get user's notifications"
 
 # Test 30: Mark all notifications as read
-make_request "POST" "/api/notifications/mark-all-read" "" "$BUYER_TOKEN" "Mark all notifications as read"
+make_request "POST" "/api/notifications/mark-all-read" "" "$USER_TOKEN" "Mark all notifications as read"
 
 echo -e "${GREEN}📋 STEP 12: Testing Duplicate Detection${NC}"
 echo -e "${GREEN}=========================================${NC}"

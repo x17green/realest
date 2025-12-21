@@ -49,7 +49,7 @@ interface ApiResponse {
 export default function ApiTestingPage() {
   const [activeTab, setActiveTab] = useState("auth");
   const [authToken, setAuthToken] = useState("");
-  const [userType, setUserType] = useState<"user" | "owner" | "admin">("user");
+  const [userType, setUserType] = useState<"user" | "owner" | "agent" | "admin">("user");
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<ApiResponse | null>(null);
 
@@ -86,7 +86,7 @@ export default function ApiTestingPage() {
     message:
       "Hello! I am interested in this property. Is the price negotiable?",
     contact_phone: "+2348012345678",
-    contact_email: "buyer@example.com",
+    contact_email: "user@example.com",
   });
 
   const [geocodeForm, setGeocodeForm] = useState({
@@ -265,6 +265,7 @@ export default function ApiTestingPage() {
                   <SelectContent>
                     <SelectItem value="user">User</SelectItem>
                     <SelectItem value="owner">Owner</SelectItem>
+                    <SelectItem value="agent">Agent</SelectItem>
                     <SelectItem value="admin">Admin</SelectItem>
                   </SelectContent>
                 </Select>
@@ -1017,7 +1018,7 @@ export default function ApiTestingPage() {
               <li>Test different endpoints using the tabs above</li>
               <li>Check the API Response section for results</li>
               <li>
-                Use different user types (buyer/owner/admin) to test role-based
+                Use different user types (user/owner/agent/admin) to test role-based
                 access
               </li>
             </ol>

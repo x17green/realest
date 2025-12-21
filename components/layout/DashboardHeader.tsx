@@ -39,7 +39,7 @@ export function DashboardHeader({ userRole }: DashboardHeaderProps) {
         return "Real Estate Agent";
       case "user":
       default:
-        return "Buyer";
+        return "User";
     }
   };
 

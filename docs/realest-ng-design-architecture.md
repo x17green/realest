@@ -813,7 +813,7 @@ export function SecondaryButton({ children, ...props }) {
 // ✅ GOOD: Helpful, specific
 <Input 
   label="Property Title" 
-  description="A clear, descriptive name buyers will see first"
+  description="A clear, descriptive name users will see first"
   placeholder="e.g., Modern 3BR Apartment in Lekki Phase 1"
 />
 
@@ -879,7 +879,7 @@ const statusMessages = {
   
   live: {
     label: "Vetted & Live",
-    description: "Your property is now visible to verified buyers",
+    description: "Your property is now visible to verified users",
     icon: "✓",
     color: "success",
     action: "View your listing"

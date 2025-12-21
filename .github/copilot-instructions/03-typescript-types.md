@@ -8,7 +8,7 @@
 ```typescript
 export interface Profile {
   id: string;                          // UUID (FK to auth.users)
-  user_type: 'buyer' | 'property_owner' | 'admin';
+  user_type: 'user' | 'owner' | 'admin';
   full_name: string;
   email: string;
   phone: string | null;
@@ -325,7 +325,7 @@ export const userRegistrationSchema = z.object({
   phone: z.string()
     .regex(/^\+234[0-9]{10}$/, 'Invalid Nigerian phone number')
     .optional(),
-  user_type: z.enum(['buyer', 'property_owner']),
+  user_type: z.enum(['user', 'owner', 'agent', 'admin']),
   terms_accepted: z.boolean().refine(val => val === true, {
     message: 'You must accept terms and conditions'
   })

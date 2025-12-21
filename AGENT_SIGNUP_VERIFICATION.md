@@ -151,7 +151,7 @@ Database migration: add_agent_user_type_support
 ### Immediate (Next Session):
 1. Create agent dashboard (`app/(dashboard)/agent/dashboard/page.tsx`)
 2. Create agent profile edit page (`app/(dashboard)/agent/profile/page.tsx`)
-3. Implement agent discovery page for buyers
+3. Implement agent discovery page for userss
 
 ### Short-term (This Week):
 1. Admin agent verification workflow
@@ -161,7 +161,7 @@ Database migration: add_agent_user_type_support
 ### Medium-term (This Month):
 1. Agent analytics and statistics
 2. Agent ratings and reviews system
-3. Agent-to-buyer messaging
+3. Agent-to-user messaging
 
 ---
 

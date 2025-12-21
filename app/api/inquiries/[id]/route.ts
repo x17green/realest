@@ -45,7 +45,7 @@ export async function GET(
             is_primary
           )
         ),
-        buyer:profiles!inquiries_buyer_id_fkey (
+        user:profiles!inquiries_user_id_fkey (
           id,
           full_name,
           avatar_url,
@@ -79,11 +79,11 @@ export async function GET(
       );
     }
 
-    // Check if user has access (buyer who sent it or property owner)
-    const isBuyer = inquiry.buyer_id === user.id;
+    // Check if user has access (user who sent it or property owner)
+    const isUser = inquiry.sender_id === user.id;
     const isOwner = inquiry.properties?.owner_id === user.id;
 
-    if (!isBuyer && !isOwner) {
+    if (!isUser && !isOwner) {
       return NextResponse.json({ error: "Access denied" }, { status: 403 });
     }
 
@@ -138,24 +138,24 @@ export async function PUT(
     }
 
     // Check permissions
-    const isBuyer = inquiry.buyer_id === user.id;
+    const isUser = inquiry.sender_id === user.id;
     const isOwner = inquiry.properties?.owner_id === user.id;
 
-    if (!isBuyer && !isOwner) {
+    if (!isUser && !isOwner) {
       return NextResponse.json({ error: "Access denied" }, { status: 403 });
     }
 
-    // Buyers can only close their inquiries
-    if (isBuyer && validatedData.status && validatedData.status !== "closed") {
+    // Users can only close their inquiries
+    if (isUser && validatedData.status && validatedData.status !== "closed") {
       return NextResponse.json(
-        { error: "Buyers can only close inquiries" },
+        { error: "Users can only close inquiries" },
         { status: 403 },
       );
     }
 
     // Owners can respond and update status
     if (isOwner && validatedData.response_message) {
-      // TODO: Send response notification to buyer
+      // TODO: Send response notification to user
     }
 
     // Update inquiry

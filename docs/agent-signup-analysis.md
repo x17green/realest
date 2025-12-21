@@ -37,7 +37,7 @@ The current registration system **does not support agent signup**. The UI only s
   </div>
 </button>
 
-<button onClick={() => handleRoleSelect("property_owner")}>
+<button onClick={() => handleRoleSelect("owner")}>
   <Building className="w-6 h-6" />
   <div>
     <div className="font-medium">Property Owner</div>
@@ -66,7 +66,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       options: {
         data: {
           full_name: formData.fullName,
-          user_type: formData.userType,  // ← Can be: buyer, property_owner, or WHAT agent?
+          user_type: formData.userType,  // ← Can be: user, owner, or agent
         },
       },
     });
@@ -94,7 +94,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 ```typescript
 export interface UserProfile {
   id: string;
-  user_type: "buyer" | "property_owner" | "admin";  // ← 'agent' NOT in type
+  user_type: "user" | "owner" | "admin";  // ← 'agent' NOT in type
   full_name: string;
   email: string;
   phone?: string;
@@ -111,7 +111,7 @@ export async function signUpWithPassword(
   email: string,
   password: string,
   fullName: string,
-  userType: "buyer" | "property_owner"  // ← 'agent' NOT accepted
+  userType: "user" | "owner"  // ← 'agent' NOT accepted
 ): Promise<AuthResponse>
 ```
 
@@ -128,7 +128,7 @@ create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   email text not null,
   full_name text,
-  user_type text not null check (user_type in ('property_owner', 'buyer', 'admin')),
+  user_type text not null check (user_type in ('owner', 'user', 'admin')),
   -- ↑ 'agent' NOT in allowed values
   avatar_url text,
   phone text,
@@ -182,7 +182,7 @@ password: "SecurePassword123!"
 
 // These go to auth.users.raw_user_meta_data
 full_name: "John Smith"
-user_type: "property_owner" | "buyer"  // Only these two
+user_type: "owner" | "user"  // Only these two
 
 // Trigger auto-creates profiles record with:
 // id, email, user_type
@@ -241,7 +241,7 @@ Trigger fires: handle_new_user()
   → INSERT into profiles (user_type='agent')
          ↓
 ❌ CONSTRAINT VIOLATION
-    "user_type in ('property_owner', 'buyer', 'admin')"
+    "user_type in ('owner', 'user', 'agent', 'admin')"
          ↓
 INSERT fails - profile never created
 User stuck in limbo
@@ -267,7 +267,7 @@ DROP CONSTRAINT profiles_user_type_check;
 
 ALTER TABLE public.profiles
 ADD CONSTRAINT profiles_user_type_check
-CHECK (user_type in ('property_owner', 'buyer', 'admin', 'agent'));
+CHECK (user_type in ('owner', 'user', 'admin', 'agent'));
 ```
 
 ### ❌ MUST DO - Backend (lib/auth.ts)
@@ -276,7 +276,7 @@ CHECK (user_type in ('property_owner', 'buyer', 'admin', 'agent'));
 // 1. Update UserProfile interface
 export interface UserProfile {
   id: string;
-  user_type: "buyer" | "property_owner" | "admin" | "agent";  // ← ADD 'agent'
+  user_type: "user" | "owner" | "admin" | "agent";  // ← ADD 'agent'
   full_name: string;
   email: string;
   phone?: string;
@@ -288,7 +288,7 @@ export async function signUpWithPassword(
   email: string,
   password: string,
   fullName: string,
-  userType: "buyer" | "property_owner" | "agent"  // ← ADD 'agent'
+  userType: "buyer" | "owner" | "agent"  // ← ADD 'agent'
 ): Promise<AuthResponse>
 
 // 3. Create new signUpWithAgent function (or extend signUpWithPassword)

@@ -7,13 +7,13 @@ import { StatusBadge } from "@/components/ui/status-badge";
 
 interface UserRegistrationFormProps {
   onSubmit?: (data: any) => void;
-  userType?: "buyer" | "owner" | "agent";
+  userType?: "user" | "owner" | "agent";
   className?: string;
 }
 
 export function UserRegistrationForm({
   onSubmit,
-  userType = "buyer",
+  userType = "user",
   className,
 }: UserRegistrationFormProps) {
   const [formData, setFormData] = useState({
@@ -108,7 +108,7 @@ export function UserRegistrationForm({
         </p>
         <div className="flex justify-center mt-4">
           <StatusBadge variant="verified">
-            {userType === "buyer" && "Property Buyer"}
+            {userType === "user" && "RealEST User"}
             {userType === "owner" && "Property Owner"}
             {userType === "agent" && "Real Estate Agent"}
           </StatusBadge>

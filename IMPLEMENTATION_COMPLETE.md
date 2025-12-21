@@ -178,7 +178,7 @@ const { data } = await supabase
 
 **Data Flow**:
 ```
-property_owner creates listing
+owner creates listing
   → properties.owner_id = user.id
   → properties.listing_source = 'owner'
   → properties.agent_id = NULL

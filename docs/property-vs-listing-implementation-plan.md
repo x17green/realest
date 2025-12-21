@@ -11,7 +11,7 @@
 - **Data Fetching**: Supabase query in useEffect hook
 - **Query Pattern**: `.from("properties").select(...).eq("id", propertyId).eq("status", "active").single()`
 - **Relations**: Joins to `property_details`, `property_media`, and `owner:profiles`
-- **Contact**: Inquiry form targeting owner (buyer_email field seems deprecated - should use inquiry table)
+- **Contact**: Inquiry form targeting owner (user_email field seems deprecated - should use inquiry table)
 - **UI Structure**: Image gallery (thumbnails) → Main details grid → Sidebar with contact form + owner info
 - **Components Used**: HeroUI Card, Button, Chip, Avatar, Input, TextArea; Lucide icons
 

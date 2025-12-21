@@ -49,7 +49,7 @@ export default function OwnerInquiriesPage({ inquiries }: OwnerInquiriesPageProp
     <main className="container py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold">Inquiries</h1>
-        <p className="text-muted-foreground">Manage inquiries from interested buyers</p>
+        <p className="text-muted-foreground">Manage inquiries from interested users</p>
       </div>
 
       {inquiries.length === 0 ? (

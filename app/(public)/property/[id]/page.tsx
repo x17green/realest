@@ -167,9 +167,9 @@ export default function PropertyDetailsPage() {
       const supabase = createClient();
       const { error } = await supabase.from("inquiries").insert({
         property_id: propertyId,
-        buyer_email: inquiryForm.email,
-        buyer_name: inquiryForm.name,
-        buyer_phone: inquiryForm.phone,
+        user_email: inquiryForm.email,
+        user_name: inquiryForm.name,
+        user_phone: inquiryForm.phone,
         message: inquiryForm.message,
       });
 

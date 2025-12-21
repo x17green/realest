@@ -7,14 +7,14 @@ import { RealEstButton } from "@/components/heroui/RealEstButton";
 interface ProfileSettingsFormProps {
   onSubmit?: (data: any) => void;
   initialData?: any;
-  userType?: "buyer" | "owner" | "agent" | "admin";
+  userType?: "user" | "owner" | "agent" | "admin";
   className?: string;
 }
 
 export function ProfileSettingsForm({
   onSubmit,
   initialData,
-  userType = "buyer",
+  userType = "user",
   className,
 }: ProfileSettingsFormProps) {
   const [activeTab, setActiveTab] = useState("personal");
@@ -238,11 +238,11 @@ export function ProfileSettingsForm({
         );
 
       case "professional":
-        if (userType === "buyer") {
+        if (userType === "user") {
           return (
             <div className="text-center py-8">
               <p className="text-muted-foreground">
-                Professional settings are not available for buyer accounts.
+                Professional settings are not available for user accounts.
               </p>
             </div>
           );

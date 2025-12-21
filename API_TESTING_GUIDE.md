@@ -36,8 +36,8 @@ SELECT id, user_type, full_name, email FROM profiles ORDER BY user_type;
 
 -- Get specific user types
 SELECT id FROM profiles WHERE user_type = 'admin' LIMIT 1;
-SELECT id FROM profiles WHERE user_type = 'property_owner' LIMIT 1;
-SELECT id FROM profiles WHERE user_type = 'buyer' LIMIT 1;
+SELECT id FROM profiles WHERE user_type = 'owner' LIMIT 1;
+SELECT id FROM profiles WHERE user_type = 'user' LIMIT 1;
 SELECT id FROM profiles WHERE user_type = 'agent' LIMIT 1;
 ```
 
@@ -228,24 +228,24 @@ curl -X GET "http://localhost:3000/api/search/properties?query=lekki&state=Lagos
   -H "Content-Type: application/json"
 ```
 
-#### 13. Create Property Inquiry (Buyer)
+#### 13. Create Property Inquiry (User)
 ```bash
 curl -X POST "http://localhost:3000/api/inquiries" \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer BUYER_JWT_TOKEN" \
+  -H "Authorization: Bearer USER_JWT_TOKEN" \
   -d '{
     "property_id": "PROPERTY_ID_HERE",
     "message": "Hello! I am interested in this property. Is the price negotiable? When can we schedule a viewing?",
     "contact_phone": "+2348012345678",
-    "contact_email": "buyer@example.com"
+    "contact_email": "user@example.com"
   }'
 ```
 
-#### 14. Get User Inquiries (Buyer View)
+#### 14. Get User Inquiries (User View)
 ```bash
 curl -X GET "http://localhost:3000/api/inquiries" \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer BUYER_JWT_TOKEN"
+  -H "Authorization: Bearer USER_JWT_TOKEN"
 ```
 
 #### 15. Get User Inquiries (Owner View)
@@ -270,7 +270,7 @@ curl -X PUT "http://localhost:3000/api/inquiries/INQUIRY_ID_HERE" \
 ```bash
 curl -X POST "http://localhost:3000/api/saved-properties" \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer BUYER_JWT_TOKEN" \
+  -H "Authorization: Bearer USER_JWT_TOKEN" \
   -d '{
     "property_id": "PROPERTY_ID_HERE"
   }'
@@ -280,14 +280,14 @@ curl -X POST "http://localhost:3000/api/saved-properties" \
 ```bash
 curl -X GET "http://localhost:3000/api/saved-properties" \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer BUYER_JWT_TOKEN"
+  -H "Authorization: Bearer USER_JWT_TOKEN"
 ```
 
 #### 19. Remove from Saved Properties
 ```bash
 curl -X DELETE "http://localhost:3000/api/saved-properties?property_id=PROPERTY_ID_HERE" \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer BUYER_JWT_TOKEN"
+  -H "Authorization: Bearer USER_JWT_TOKEN"
 ```
 
 #### 20. Check for Duplicate Properties
@@ -350,10 +350,10 @@ curl -X POST "http://localhost:3000/api/notifications/mark-all-read" \
 5. **Submit for Review** (Owner)
 6. **Admin Review** (Admin)
 7. **Property Goes Live** (System)
-8. **Buyer Searches** (Buyer)
-9. **Buyer Inquires** (Buyer)
+8. **User Searches** (User)
+9. **User Inquires** (User)
 10. **Owner Responds** (Owner)
-11. **Buyer Saves Property** (Buyer)
+11. **User Saves Property** (User)
 
 ### Complete User Journey
 
@@ -374,7 +374,7 @@ curl -X POST "http://localhost:3000/api/notifications/mark-all-read" \
    - Ensure user has correct permissions for the endpoint
 
 2. **403 Forbidden**
-   - Check user type (buyer vs owner vs admin)
+   - Check user type (user vs owner vs agent vs admin)
    - Verify ownership of resources
 
 3. **404 Not Found**
@@ -448,7 +448,7 @@ LIMIT 10;
 - Test cross-user access attempts
 
 ### Authorization Testing
-- Test buyer accessing owner-only endpoints
+- Test user accessing owner-only endpoints
 - Test owner accessing admin endpoints
 - Test accessing other users' data
 

@@ -368,7 +368,7 @@ Context:
 - Profiles table stores user metadata (user_type, full_name, phone, avatar_url)
 - Avatar stored in Supabase Storage
 - Users can update their own profile (RLS enforced)
-- Support role switching (buyer ↔ property_owner)
+- Support role switching (user ↔ owner)
 
 Features:
 1. Profile view page (app/profile/page.tsx)
@@ -378,7 +378,7 @@ Features:
    - Full name (required)
    - Email (read-only, from auth.users)
    - Phone (Nigerian +234 format)
-   - User type (buyer/property_owner)
+   - User type (user/owner)
 5. Password change link
 6. Account deletion option
 

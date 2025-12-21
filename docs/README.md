@@ -11,7 +11,7 @@
 
 ## 1. Executive Summary
 
-RealEST is an innovative online marketplace designed to revolutionize the real estate industry in Nigeria (and potentially beyond) by establishing an unparalleled level of trust and data integrity. We address common pain points like duplicate listings, fraudulent documents, and inaccurate property information by implementing a unique, multi-stage validation pipeline: **ML-powered document verification** combined with **physical, on-site vetting** by our team. RealEST ensures a seamless and transparent experience for property owners, buyers, renters, and leasers, making property transactions more reliable and efficient.
+RealEST is an innovative online marketplace designed to revolutionize the real estate industry in Nigeria (and potentially beyond) by establishing an unparalleled level of trust and data integrity. We address common pain points like duplicate listings, fraudulent documents, and inaccurate property information by implementing a unique, multi-stage validation pipeline: **ML-powered document verification** combined with **physical, on-site vetting** by our team. RealEST ensures a seamless and transparent experience for property owners, users, renters, and leasers, making property transactions more reliable and efficient.
 
 ## 2. Product Vision & Mission
 
@@ -41,7 +41,7 @@ RealEST is an innovative online marketplace designed to revolutionize the real e
 ## 5. Core Features & Modules
 
 ### 5.1. User & Profile Management
-*   **User Roles:** Property Owner, Buyer/Renter, Admin/Vetting Team.
+*   **User Roles:** Property Owner(owner), Agent/Agency(agent), Buyer/Renter(user), Admin/Vetting Team (admin).
 *   **Authentication:** Email/Password, Social Logins (Google, Apple).
 *   **Profile Management:** Detailed user profiles, preferences, saved searches.
 *   **Two-Factor Authentication (2FA):** Enhanced security for owners.
