@@ -20,7 +20,7 @@ export interface PasswordValidation {
 
 export interface UserProfile {
   id: string;
-  user_type: "buyer" | "property_owner" | "admin" | "agent";
+  user_type: "user" | "owner" | "agent" | "admin";
   full_name: string;
   email: string;
   phone?: string;
@@ -54,7 +54,10 @@ export function isPasswordValid(password: string): boolean {
 export async function getCurrentUser(): Promise<AuthResponse> {
   try {
     const supabase = createClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
     if (error) {
       return { success: false, error: error.message };
@@ -69,20 +72,39 @@ export async function getCurrentUser(): Promise<AuthResponse> {
 /**
  * Get user profile with type information
  */
-export async function getUserProfile(userId: string): Promise<{ success: boolean; profile?: UserProfile; error?: string }> {
+export async function getUserProfile(
+  userId: string,
+): Promise<{ success: boolean; profile?: UserProfile; error?: string }> {
   try {
     const supabase = createClient();
-    const { data: profile, error } = await supabase
+    // Get role from user_roles
+    const { data: userRole, error: roleError } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .single();
+
+    if (roleError) {
+      return { success: false, error: roleError.message };
+    }
+
+    // Get profile data if exists
+    const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("*")
       .eq("id", userId)
       .single();
 
-    if (error) {
-      return { success: false, error: error.message };
-    }
+    const profileData: UserProfile = {
+      id: userId,
+      user_type: userRole.role,
+      full_name: profile?.full_name || "",
+      email: profile?.email || "",
+      phone: profile?.phone,
+      avatar_url: profile?.avatar_url,
+    };
 
-    return { success: true, profile };
+    return { success: true, profile: profileData };
   } catch (err) {
     return { success: false, error: "Failed to get user profile" };
   }
@@ -91,7 +113,10 @@ export async function getUserProfile(userId: string): Promise<{ success: boolean
 /**
  * Sign in with email and password
  */
-export async function signInWithPassword(email: string, password: string): Promise<AuthResponse> {
+export async function signInWithPassword(
+  email: string,
+  password: string,
+): Promise<AuthResponse> {
   try {
     const supabase = createClient();
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -115,12 +140,16 @@ export async function signInWithPassword(email: string, password: string): Promi
 export async function signUpWithPassword(
   email: string,
   password: string,
-  fullName: string,
-  userType: "buyer" | "property_owner" | "agent"
+  fullName?: string,
+  userType?: "user" | "owner" | "agent",
 ): Promise<AuthResponse> {
   try {
     if (!isPasswordValid(password)) {
-      return { success: false, error: "Password does not meet security requirements" };
+      return {
+        success: false,
+        error: `Weak password: \n
+        Use at least 8 characters, including uppercase, lowercase, number, and special character.`,
+      };
     }
 
     const supabase = createClient();
@@ -129,8 +158,8 @@ export async function signUpWithPassword(
       password,
       options: {
         data: {
-          full_name: fullName,
-          user_type: userType,
+          full_name: fullName || "",
+          user_type: userType || "user",
         },
       },
     });
@@ -139,64 +168,16 @@ export async function signUpWithPassword(
       return { success: false, error: error.message };
     }
 
-    return { success: true, user: data.user || undefined };
-  } catch (err) {
-    return { success: false, error: "An unexpected error occurred" };
-  }
-}
-
-/**
- * Sign up as a real estate agent
- */
-export async function signUpWithAgent(
-  email: string,
-  password: string,
-  fullName: string,
-  licenseNumber: string,
-  agencyName: string,
-  specialization: string[]
-): Promise<AuthResponse> {
-  try {
-    if (!isPasswordValid(password)) {
-      return { success: false, error: "Password does not meet security requirements" };
-    }
-
-    const supabase = createClient();
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: fullName,
-          user_type: "agent",
-        },
-      },
-    });
-
-    if (error) {
-      return { success: false, error: error.message };
-    }
-
+    // Insert into user_roles table
     if (data.user) {
-      try {
-        // Create agents table record after profile is auto-created
-        const { error: agentError } = await supabase.from("agents").insert({
-          profile_id: data.user.id,
-          license_number: licenseNumber,
-          agency_name: agencyName,
-          specialization: specialization,
-          verified: false,
-          rating: null,
-        });
+      const { error: roleError } = await supabase.from("user_roles").insert({
+        user_id: data.user.id,
+        role: userType || "user",
+      });
 
-        if (agentError) {
-          console.error("Failed to create agent record:", agentError);
-          // Don't return error here - user account is already created
-          // Admin can fix this later
-        }
-      } catch (err) {
-        console.error("Error creating agent record:", err);
-        // Continue - user can still onboard
+      if (roleError) {
+        console.error("Failed to create user role:", roleError);
+        // Don't fail signup, but log error
       }
     }
 
@@ -209,7 +190,9 @@ export async function signUpWithAgent(
 /**
  * Send password reset email
  */
-export async function sendPasswordResetEmail(email: string): Promise<{ success: boolean; error?: string }> {
+export async function sendPasswordResetEmail(
+  email: string,
+): Promise<{ success: boolean; error?: string }> {
   try {
     const supabase = createClient();
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -229,10 +212,15 @@ export async function sendPasswordResetEmail(email: string): Promise<{ success: 
 /**
  * Reset password with new password
  */
-export async function resetPassword(newPassword: string): Promise<{ success: boolean; error?: string }> {
+export async function resetPassword(
+  newPassword: string,
+): Promise<{ success: boolean; error?: string }> {
   try {
     if (!isPasswordValid(newPassword)) {
-      return { success: false, error: "Password does not meet security requirements" };
+      return {
+        success: false,
+        error: "Password does not meet security requirements",
+      };
     }
 
     const supabase = createClient();
@@ -271,7 +259,9 @@ export async function signOut(): Promise<{ success: boolean; error?: string }> {
 /**
  * Send OTP for email verification
  */
-export async function sendOTP(email: string): Promise<{ success: boolean; error?: string }> {
+export async function sendOTP(
+  email: string,
+): Promise<{ success: boolean; error?: string }> {
   try {
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithOtp({
@@ -294,7 +284,10 @@ export async function sendOTP(email: string): Promise<{ success: boolean; error?
 /**
  * Verify OTP code
  */
-export async function verifyOTP(email: string, token: string): Promise<AuthResponse> {
+export async function verifyOTP(
+  email: string,
+  token: string,
+): Promise<AuthResponse> {
   try {
     const supabase = createClient();
     const { data, error } = await supabase.auth.verifyOtp({
@@ -316,11 +309,13 @@ export async function verifyOTP(email: string, token: string): Promise<AuthRespo
 /**
  * Resend email verification
  */
-export async function resendEmailVerification(email: string): Promise<{ success: boolean; error?: string }> {
+export async function resendEmailVerification(
+  email: string,
+): Promise<{ success: boolean; error?: string }> {
   try {
     const supabase = createClient();
     const { error } = await supabase.auth.resend({
-      type: 'signup',
+      type: "signup",
       email,
     });
 
@@ -339,11 +334,13 @@ export async function resendEmailVerification(email: string): Promise<{ success:
  */
 export function getRedirectUrl(userType?: string): string {
   switch (userType) {
-    case "property_owner":
-      return "/owner";
+    case "owner":
+      return "/profile-setup";
+    case "agent":
+      return "/agent-onboarding";
     case "admin":
       return "/admin";
-    case "buyer":
+    case "user":
     default:
       return "/profile";
   }
@@ -360,7 +357,9 @@ export async function isAuthenticated(): Promise<boolean> {
 /**
  * Check if user has specific role
  */
-export async function hasRole(requiredRole: "buyer" | "property_owner" | "admin"): Promise<boolean> {
+export async function hasRole(
+  requiredRole: "user" | "owner" | "agent" | "admin",
+): Promise<boolean> {
   try {
     const { success, user } = await getCurrentUser();
     if (!success || !user) return false;
@@ -379,14 +378,20 @@ export async function hasRole(requiredRole: "buyer" | "property_owner" | "admin"
  */
 export function formatAuthError(error: string): string {
   const errorMappings: Record<string, string> = {
-    "Invalid login credentials": "The email or password you entered is incorrect. Please try again.",
-    "Email not confirmed": "Please check your email and click the verification link before signing in.",
-    "Too many requests": "Too many login attempts. Please wait a few minutes before trying again.",
-    "User not found": "No account found with this email address. Please check your email or sign up.",
+    "Invalid login credentials":
+      "The email or password you entered is incorrect. Please try again.",
+    "Email not confirmed":
+      "Please check your email and click the verification link before signing in.",
+    "Too many requests":
+      "Too many login attempts. Please wait a few minutes before trying again.",
+    "User not found":
+      "No account found with this email address. Please check your email or sign up.",
     "Invalid email": "Please enter a valid email address.",
     "Password is too short": "Password must be at least 8 characters long.",
-    "Signup is disabled": "New user registration is currently disabled. Please contact support.",
-    "Email already registered": "An account with this email already exists. Please sign in instead.",
+    "Signup is disabled":
+      "New user registration is currently disabled. Please contact support.",
+    "Email already registered":
+      "An account with this email already exists. Please sign in instead.",
   };
 
   return errorMappings[error] || error;

@@ -16,6 +16,9 @@ export default function AgentOnboardingPage() {
   const [userId, setUserId] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
+    fullName: "",
+    licenseNumber: "",
+    agencyName: "",
     phone: "",
     whatsapp: "",
     bio: "",
@@ -49,7 +52,7 @@ export default function AgentOnboardingPage() {
 
       setUserId(user.id);
 
-      // Get existing agent profile data
+      // Check if agent profile already exists
       const { data: agent } = await supabase
         .from("agents")
         .select("*")
@@ -57,13 +60,9 @@ export default function AgentOnboardingPage() {
         .single();
 
       if (agent) {
-        setFormData((prev) => ({
-          ...prev,
-          phone: agent.phone || "",
-          whatsapp: agent.whatsapp || "",
-          bio: agent.bio || "",
-          specializations: agent.specialization || [],
-        }));
+        // If exists, redirect to dashboard
+        router.push("/agent/dashboard");
+        return;
       }
     };
 
@@ -126,6 +125,18 @@ export default function AgentOnboardingPage() {
       return;
     }
 
+    if (!formData.licenseNumber) {
+      setError("License number is required");
+      setIsLoading(false);
+      return;
+    }
+
+    if (!formData.agencyName) {
+      setError("Agency name is required");
+      setIsLoading(false);
+      return;
+    }
+
     if (!formData.phone) {
       setError("Phone number is required");
       setIsLoading(false);
@@ -154,25 +165,37 @@ export default function AgentOnboardingPage() {
 
       const supabase = createClient();
 
-      // Update agent profile
-      const updateData: any = {
+      // Insert agent profile
+      const insertData = {
+        profile_id: userId,
+        license_number: formData.licenseNumber,
+        agency_name: formData.agencyName,
         phone: formData.phone,
         whatsapp: formData.whatsapp || null,
         bio: formData.bio || null,
         specialization: formData.specializations,
+        photo_url: profilePhotoUrl || null,
+        verified: false,
       };
 
-      if (profilePhotoUrl) {
-        updateData.profile_photo_url = profilePhotoUrl;
+      const { error: insertError } = await supabase
+        .from("agents")
+        .insert(insertData);
+
+      if (insertError) {
+        setError(insertError.message);
+        return;
       }
 
-      const { error: updateError } = await supabase
-        .from("agents")
-        .update(updateData)
-        .eq("profile_id", userId);
+      // Update profiles with full_name and user_type
+      const { error: profileError } = await supabase.from("profiles").upsert({
+        id: userId,
+        full_name: formData.fullName,
+        user_type: "agent",
+      });
 
-      if (updateError) {
-        setError(updateError.message);
+      if (profileError) {
+        setError("Profile update failed");
         return;
       }
 
@@ -218,33 +241,52 @@ export default function AgentOnboardingPage() {
 
         <Card.Content className="py-8">
           <form onSubmit={handleSubmit} className="space-y-8">
-            {/* Step 1: Basic Info */}
+            {/* Step 1: License & Agency */}
             {step === 1 && (
               <div className="space-y-6">
                 <div className="space-y-2">
                   <label className="text-sm font-medium block">
-                    Profile Photo
+                    Full Name (Required)
                   </label>
-                  <div className="border-2 border-dashed rounded-lg p-8 text-center hover:bg-muted/50 transition-colors cursor-pointer">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileChange}
-                      className="hidden"
-                      id="profilePhoto"
-                    />
-                    <label htmlFor="profilePhoto" className="cursor-pointer">
-                      <Upload className="w-8 h-8 mx-auto mb-3 text-muted-foreground" />
-                      <div className="font-medium">
-                        {formData.profilePhoto
-                          ? formData.profilePhoto.name
-                          : "Click to upload or drag and drop"}
-                      </div>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        PNG, JPG up to 5MB
-                      </div>
-                    </label>
-                  </div>
+                  <Input
+                    type="text"
+                    placeholder="Enter your full name"
+                    value={formData.fullName}
+                    onChange={(e) =>
+                      handleInputChange("fullName", e.target.value)
+                    }
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium block">
+                    License Number (Required)
+                  </label>
+                  <Input
+                    type="text"
+                    placeholder="e.g., LICENSE-12345"
+                    value={formData.licenseNumber}
+                    onChange={(e) =>
+                      handleInputChange("licenseNumber", e.target.value)
+                    }
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium block">
+                    Agency Name (Required)
+                  </label>
+                  <Input
+                    type="text"
+                    placeholder="Your real estate agency"
+                    value={formData.agencyName}
+                    onChange={(e) =>
+                      handleInputChange("agencyName", e.target.value)
+                    }
+                    required
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -274,24 +316,9 @@ export default function AgentOnboardingPage() {
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium block">
-                    Professional Bio (Optional)
-                  </label>
-                  <TextArea
-                    placeholder="Tell clients about your experience and expertise..."
-                    value={formData.bio}
-                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleInputChange("bio", e.target.value)}
-                    rows={4}
-                  />
-                  <div className="text-xs text-muted-foreground">
-                    Max 500 characters
-                  </div>
-                </div>
-
                 {error && (
                   <div className="flex gap-3 p-4 bg-danger-50 border border-danger-200 rounded-lg">
-                    <AlertCircle className="w-5 h-5 text-danger flex-shrink-0 mt-0.5" />
+                    <AlertCircle className="w-5 h-5 text-danger shrink-0 mt-0.5" />
                     <p className="text-sm text-danger">{error}</p>
                   </div>
                 )}
@@ -301,7 +328,7 @@ export default function AgentOnboardingPage() {
                     type="button"
                     variant="tertiary"
                     className="flex-1"
-                    onPress={() => router.push("/login")}
+                    onPress={() => router.push("/profile")}
                   >
                     Skip for now
                   </Button>
@@ -317,9 +344,52 @@ export default function AgentOnboardingPage() {
               </div>
             )}
 
-            {/* Step 2: Specializations */}
+            {/* Step 2: Profile & Specializations */}
             {step === 2 && (
               <div className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium block">
+                    Profile Photo
+                  </label>
+                  <div className="border-2 border-dashed rounded-lg p-8 text-center hover:bg-muted/50 transition-colors cursor-pointer">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="hidden"
+                      id="profilePhoto"
+                    />
+                    <label htmlFor="profilePhoto" className="cursor-pointer">
+                      <Upload className="w-8 h-8 mx-auto mb-3 text-muted-foreground" />
+                      <div className="font-medium">
+                        {formData.profilePhoto
+                          ? formData.profilePhoto.name
+                          : "Click to upload or drag and drop"}
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        PNG, JPG up to 5MB
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium block">
+                    Professional Bio (Optional)
+                  </label>
+                  <TextArea
+                    placeholder="Tell clients about your experience and expertise..."
+                    value={formData.bio}
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                      handleInputChange("bio", e.target.value)
+                    }
+                    rows={4}
+                  />
+                  <div className="text-xs text-muted-foreground">
+                    Max 500 characters
+                  </div>
+                </div>
+
                 <div className="space-y-2">
                   <label className="text-sm font-medium block mb-4">
                     Select Your Specializations (Required)
@@ -333,9 +403,7 @@ export default function AgentOnboardingPage() {
                         <input
                           type="checkbox"
                           checked={formData.specializations.includes(spec)}
-                          onChange={() =>
-                            handleSpecializationChange(spec)
-                          }
+                          onChange={() => handleSpecializationChange(spec)}
                           className="w-4 h-4 rounded border-muted-foreground"
                         />
                         <span className="text-sm">{spec}</span>
@@ -371,7 +439,7 @@ export default function AgentOnboardingPage() {
 
                 {error && (
                   <div className="flex gap-3 p-4 bg-danger-50 border border-danger-200 rounded-lg">
-                    <AlertCircle className="w-5 h-5 text-danger flex-shrink-0 mt-0.5" />
+                    <AlertCircle className="w-5 h-5 text-danger shrink-0 mt-0.5" />
                     <p className="text-sm text-danger">{error}</p>
                   </div>
                 )}

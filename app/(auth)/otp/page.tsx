@@ -107,24 +107,25 @@ function OTPContent() {
       setIsSuccess(true);
 
       // Get user profile to determine redirect
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (user) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("user_type")
-          .eq("id", user.id)
+        const { data: userRole } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.id)
           .single();
 
-        setTimeout(() => {
-          if (profile?.user_type === "property_owner") {
-            router.push("/owner");
-          } else if (profile?.user_type === "admin") {
-            router.push("/admin");
-          } else {
-            router.push("/profile");
-          }
-          router.refresh();
-        }, 2000);
+        if (userRole?.role === "owner") {
+          router.push("/profile-setup");
+        } else if (userRole?.role === "agent") {
+          router.push("/agent-onboarding");
+        } else if (userRole?.role === "admin") {
+          router.push("/admin");
+        } else {
+          router.push("/profile");
+        }
       }
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");
@@ -227,7 +228,9 @@ function OTPContent() {
                 {otp.map((digit, index) => (
                   <input
                     key={index}
-                    ref={(el) => { inputRefs.current[index] = el; }}
+                    ref={(el) => {
+                      inputRefs.current[index] = el;
+                    }}
                     type="text"
                     inputMode="numeric"
                     maxLength={1}

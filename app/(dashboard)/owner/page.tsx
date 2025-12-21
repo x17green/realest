@@ -1,23 +1,26 @@
-import { createClient } from "@/lib/supabase/server"
-import { redirect } from "next/navigation"
-import { Header, Footer } from "@/components/layout"
-import { OwnerDashboardContent } from "@/components/dashboard"
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import { OwnerDashboardContent } from "@/components/dashboard";
 
 export default async function OwnerDashboardPage() {
-  const supabase = await createClient()
+  const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login")
+    redirect("/login");
   }
 
   // Check if user is a property owner
-  const { data: profile } = await supabase.from("profiles").select("user_type").eq("id", user.id).single()
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("user_type")
+    .eq("id", user.id)
+    .single();
 
-  if (profile?.user_type !== "property_owner") {
-    redirect("/")
+  if (profile?.user_type !== "owner") {
+    redirect("/");
   }
 
   // Fetch owner's properties
@@ -25,7 +28,7 @@ export default async function OwnerDashboardPage() {
     .from("properties")
     .select("*")
     .eq("owner_id", user.id)
-    .order("created_at", { ascending: false })
+    .order("created_at", { ascending: false });
 
   // Fetch inquiries for owner's properties
   const { data: inquiries } = await supabase
@@ -33,13 +36,15 @@ export default async function OwnerDashboardPage() {
     .select("*, properties(title), profiles(full_name, email)")
     .eq("owner_id", user.id)
     .order("created_at", { ascending: false })
-    .limit(10)
+    .limit(10);
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-      <OwnerDashboardContent user={user} properties={properties || []} inquiries={inquiries || []} />
-      <Footer />
+      <OwnerDashboardContent
+        user={user}
+        properties={properties || []}
+        inquiries={inquiries || []}
+      />
     </div>
-  )
+  );
 }

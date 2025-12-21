@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Card, Button, Chip, Avatar, Separator } from "@heroui/react";
@@ -16,6 +17,7 @@ import {
   Home,
   Building,
   TrendingUp,
+  AlertCircle,
 } from "lucide-react";
 
 interface BuyerDashboardStats {
@@ -58,24 +60,86 @@ interface SentInquiry {
   owner_response?: string;
 }
 
+interface UserProfile {
+  id: string;
+  full_name: string | null;
+  phone: string | null;
+  bio: string | null;
+  email: string;
+  user_type: string;
+}
+
 export default function BuyerDashboardPage() {
+  const router = useRouter();
   const [stats, setStats] = useState<BuyerDashboardStats | null>(null);
   const [savedProperties, setSavedProperties] = useState<SavedProperty[]>([]);
   const [recentSearches, setRecentSearches] = useState<RecentSearch[]>([]);
   const [sentInquiries, setSentInquiries] = useState<SentInquiry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'saved' | 'searches' | 'inquiries'>('saved');
+  const [activeTab, setActiveTab] = useState<
+    "saved" | "searches" | "inquiries"
+  >("saved");
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       setIsLoading(true);
-      const supabase = createClient();
+      setAuthError(null);
 
-      // Get current user
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) return;
+      try {
+        const supabase = createClient();
+
+        // Get current user
+        const {
+          data: { user },
+          error: authError,
+        } = await supabase.auth.getUser();
+
+        if (authError) {
+          console.error("Auth error:", authError);
+          setAuthError("Authentication failed. Please try logging in again.");
+          router.push("/login?redirect=/profile");
+          return;
+        }
+
+        if (!user) {
+          router.push("/login?redirect=/profile");
+          return;
+        }
+
+        // Fetch user profile
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", user.id)
+          .single();
+
+        if (profileError) {
+          console.error("Profile fetch error:", profileError);
+          setAuthError(
+            "Failed to load your profile. Please try refreshing the page.",
+          );
+          setIsLoading(false);
+          return;
+        }
+
+        if (profile) {
+          setUserProfile({
+            id: profile.id,
+            full_name: profile.full_name,
+            phone: profile.phone,
+            bio: profile.bio,
+            email: user.email || "",
+            user_type: profile.user_type,
+          });
+        } else {
+          setAuthError("Profile not found. Please contact support.");
+        }
+      } catch (err) {
+        console.error("Unexpected error:", err);
+        setAuthError("An unexpected error occurred. Please try again.");
+      }
 
       // Mock data for now - in real app, these would come from database
       setStats({
@@ -160,7 +224,7 @@ export default function BuyerDashboardPage() {
     };
 
     fetchDashboardData();
-  }, []);
+  }, [router]);
 
   if (isLoading) {
     return (
@@ -178,6 +242,36 @@ export default function BuyerDashboardPage() {
               <div className="h-96 bg-muted rounded-lg" />
             </div>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (authError) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-8">
+          <Card.Root className="max-w-2xl mx-auto">
+            <Card.Content className="py-12 text-center">
+              <AlertCircle className="w-16 h-16 text-danger mx-auto mb-6" />
+              <h1 className="text-2xl font-bold mb-4">Authentication Error</h1>
+              <p className="text-muted-foreground mb-8">{authError}</p>
+              <div className="flex gap-4 justify-center">
+                <Button
+                  variant="primary"
+                  onPress={() => router.push("/login?redirect=/profile")}
+                >
+                  Sign In
+                </Button>
+                <Button
+                  variant="secondary"
+                  onPress={() => window.location.reload()}
+                >
+                  Try Again
+                </Button>
+              </div>
+            </Card.Content>
+          </Card.Root>
         </div>
       </div>
     );
@@ -201,6 +295,44 @@ export default function BuyerDashboardPage() {
             </Link>
           </Button>
         </div>
+
+        {/* Profile Card */}
+        {userProfile && (
+          <Card.Root className="mb-8">
+            <Card.Content className="p-6">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-4">
+                  <Avatar.Root size="lg">
+                    <Avatar.Fallback>
+                      {userProfile.full_name?.charAt(0) ||
+                        userProfile.email?.charAt(0) ||
+                        "U"}
+                    </Avatar.Fallback>
+                  </Avatar.Root>
+                  <div>
+                    <h3 className="text-lg font-semibold">
+                      {userProfile.full_name || "Anonymous User"}
+                    </h3>
+                    <p className="text-muted-foreground">{userProfile.email}</p>
+                    {userProfile.phone && (
+                      <p className="text-sm text-muted-foreground">
+                        {userProfile.phone}
+                      </p>
+                    )}
+                    {userProfile.bio && (
+                      <p className="text-sm text-muted-foreground mt-2">
+                        {userProfile.bio}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <Button asChild variant="secondary" size="sm">
+                  <Link href={`/profile/${userProfile.id}`}>Edit Profile</Link>
+                </Button>
+              </div>
+            </Card.Content>
+          </Card.Root>
+        )}
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -274,25 +406,37 @@ export default function BuyerDashboardPage() {
           {/* Tab Navigation */}
           <div className="flex gap-2 border-b border-border">
             <Button
-              variant={activeTab === 'saved' ? 'primary' : 'ghost'}
-              onPress={() => setActiveTab('saved')}
-              className={activeTab === 'saved' ? 'border-b-2 border-primary rounded-b-none' : ''}
+              variant={activeTab === "saved" ? "primary" : "ghost"}
+              onPress={() => setActiveTab("saved")}
+              className={
+                activeTab === "saved"
+                  ? "border-b-2 border-primary rounded-b-none"
+                  : ""
+              }
             >
               <Heart className="w-4 h-4 mr-2" />
               Saved Properties
             </Button>
             <Button
-              variant={activeTab === 'searches' ? 'primary' : 'ghost'}
-              onPress={() => setActiveTab('searches')}
-              className={activeTab === 'searches' ? 'border-b-2 border-primary rounded-b-none' : ''}
+              variant={activeTab === "searches" ? "primary" : "ghost"}
+              onPress={() => setActiveTab("searches")}
+              className={
+                activeTab === "searches"
+                  ? "border-b-2 border-primary rounded-b-none"
+                  : ""
+              }
             >
               <Search className="w-4 h-4 mr-2" />
               Recent Searches
             </Button>
             <Button
-              variant={activeTab === 'inquiries' ? 'primary' : 'ghost'}
-              onPress={() => setActiveTab('inquiries')}
-              className={activeTab === 'inquiries' ? 'border-b-2 border-primary rounded-b-none' : ''}
+              variant={activeTab === "inquiries" ? "primary" : "ghost"}
+              onPress={() => setActiveTab("inquiries")}
+              className={
+                activeTab === "inquiries"
+                  ? "border-b-2 border-primary rounded-b-none"
+                  : ""
+              }
             >
               <MessageSquare className="w-4 h-4 mr-2" />
               My Inquiries
@@ -300,223 +444,225 @@ export default function BuyerDashboardPage() {
           </div>
 
           {/* Saved Properties Tab */}
-          {activeTab === 'saved' && (
+          {activeTab === "saved" && (
             <div className="space-y-6">
-            <Card.Root>
-              <Card.Header>
-                <Card.Title className="flex items-center gap-2">
-                  <Heart className="w-5 h-5" />
-                  Saved Properties
-                </Card.Title>
-                <Card.Description>
-                  Properties you've saved for later
-                </Card.Description>
-              </Card.Header>
-              <Card.Content>
-                {savedProperties.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Heart className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground mb-4">
-                      No saved properties yet
-                    </p>
-                    <Button asChild variant="primary" size="sm">
-                      <Link href="/search">Start Searching</Link>
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {savedProperties.map((property) => (
-                      <div
-                        key={property.id}
-                        className="flex items-center justify-between p-4 border rounded-lg"
-                      >
-                        <div className="flex items-center gap-4">
-                          <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center">
-                            <Home className="w-8 h-8 text-muted-foreground" />
-                          </div>
-                          <div>
-                            <h3 className="font-medium">{property.title}</h3>
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
-                              <MapPin className="w-4 h-4" />
-                              <span>
-                                {property.address}, {property.city}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-4 text-sm">
-                              <Chip variant="secondary">
-                                {property.property_type}
-                              </Chip>
-                              <span className="font-medium text-primary">
-                                £{property.price.toLocaleString()}
-                                {property.listing_type === "rent" && "/month"}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Button asChild variant="secondary" size="sm">
-                            <Link href={`/property/${property.id}`}>
-                              <Eye className="w-4 h-4 mr-1" />
-                              View
-                            </Link>
-                          </Button>
-                          <Button variant="ghost" size="sm">
-                            <Heart className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                    <div className="pt-4">
-                      <Button asChild variant="secondary" className="w-full">
-                        <Link href="/profile/saved">
-                          View All Saved Properties
-                        </Link>
+              <Card.Root>
+                <Card.Header>
+                  <Card.Title className="flex items-center gap-2">
+                    <Heart className="w-5 h-5" />
+                    Saved Properties
+                  </Card.Title>
+                  <Card.Description>
+                    Properties you've saved for later
+                  </Card.Description>
+                </Card.Header>
+                <Card.Content>
+                  {savedProperties.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Heart className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-muted-foreground mb-4">
+                        No saved properties yet
+                      </p>
+                      <Button asChild variant="primary" size="sm">
+                        <Link href="/search">Start Searching</Link>
                       </Button>
                     </div>
-                  </div>
-                )}
-              </Card.Content>
-            </Card.Root>
+                  ) : (
+                    <div className="space-y-4">
+                      {savedProperties.map((property) => (
+                        <div
+                          key={property.id}
+                          className="flex items-center justify-between p-4 border rounded-lg"
+                        >
+                          <div className="flex items-center gap-4">
+                            <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center">
+                              <Home className="w-8 h-8 text-muted-foreground" />
+                            </div>
+                            <div>
+                              <h3 className="font-medium">{property.title}</h3>
+                              <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
+                                <MapPin className="w-4 h-4" />
+                                <span>
+                                  {property.address}, {property.city}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-4 text-sm">
+                                <Chip variant="secondary">
+                                  {property.property_type}
+                                </Chip>
+                                <span className="font-medium text-primary">
+                                  £{property.price.toLocaleString()}
+                                  {property.listing_type === "rent" && "/month"}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button asChild variant="secondary" size="sm">
+                              <Link href={`/property/${property.id}`}>
+                                <Eye className="w-4 h-4 mr-1" />
+                                View
+                              </Link>
+                            </Button>
+                            <Button variant="ghost" size="sm">
+                              <Heart className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                      <div className="pt-4">
+                        <Button asChild variant="secondary" className="w-full">
+                          <Link href="/profile/saved">
+                            View All Saved Properties
+                          </Link>
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </Card.Content>
+              </Card.Root>
             </div>
           )}
 
           {/* Recent Searches Tab */}
-          {activeTab === 'searches' && (
+          {activeTab === "searches" && (
             <div className="space-y-6">
-            <Card.Root>
-              <Card.Header>
-                <Card.Title className="flex items-center gap-2">
-                  <Search className="w-5 h-5" />
-                  Recent Searches
-                </Card.Title>
-                <Card.Description>
-                  Your recent property searches
-                </Card.Description>
-              </Card.Header>
-              <Card.Content>
-                {recentSearches.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Search className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground mb-4">
-                      No recent searches
-                    </p>
-                    <Button asChild variant="primary" size="sm">
-                      <Link href="/search">Start Searching</Link>
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {recentSearches.map((search) => (
-                      <div key={search.id} className="p-4 border rounded-lg">
-                        <div className="flex items-center justify-between mb-2">
-                          <h3 className="font-medium">
-                            "{search.query}" in {search.location}
-                          </h3>
-                          <Chip variant="secondary">
-                            {search.results_count} results
-                          </Chip>
+              <Card.Root>
+                <Card.Header>
+                  <Card.Title className="flex items-center gap-2">
+                    <Search className="w-5 h-5" />
+                    Recent Searches
+                  </Card.Title>
+                  <Card.Description>
+                    Your recent property searches
+                  </Card.Description>
+                </Card.Header>
+                <Card.Content>
+                  {recentSearches.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Search className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-muted-foreground mb-4">
+                        No recent searches
+                      </p>
+                      <Button asChild variant="primary" size="sm">
+                        <Link href="/search">Start Searching</Link>
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {recentSearches.map((search) => (
+                        <div key={search.id} className="p-4 border rounded-lg">
+                          <div className="flex items-center justify-between mb-2">
+                            <h3 className="font-medium">
+                              "{search.query}" in {search.location}
+                            </h3>
+                            <Chip variant="secondary">
+                              {search.results_count} results
+                            </Chip>
+                          </div>
+                          <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                            <span>{search.property_type}</span>
+                            <span>{search.price_range}</span>
+                            <span>
+                              {new Date(search.created_at).toLocaleDateString()}
+                            </span>
+                          </div>
+                          <Button variant="secondary" size="sm">
+                            <Search className="w-4 h-4 mr-1" />
+                            Search Again
+                          </Button>
                         </div>
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
-                          <span>{search.property_type}</span>
-                          <span>{search.price_range}</span>
-                          <span>
-                            {new Date(search.created_at).toLocaleDateString()}
-                          </span>
-                        </div>
-                        <Button variant="secondary" size="sm">
-                          <Search className="w-4 h-4 mr-1" />
-                          Search Again
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </Card.Content>
-            </Card.Root>
+                      ))}
+                    </div>
+                  )}
+                </Card.Content>
+              </Card.Root>
             </div>
           )}
 
           {/* Inquiries Tab */}
-          {activeTab === 'inquiries' && (
+          {activeTab === "inquiries" && (
             <div className="space-y-6">
-            <Card.Root>
-              <Card.Header>
-                <Card.Title className="flex items-center gap-2">
-                  <MessageSquare className="w-5 h-5" />
-                  My Inquiries
-                </Card.Title>
-                <Card.Description>
-                  Messages you've sent to property owners
-                </Card.Description>
-              </Card.Header>
-              <Card.Content>
-                {sentInquiries.length === 0 ? (
-                  <div className="text-center py-8">
-                    <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">
-                      No inquiries sent yet
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Inquiries will appear here when you contact property
-                      owners
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {sentInquiries.map((inquiry) => (
-                      <div key={inquiry.id} className="p-4 border rounded-lg">
-                        <div className="flex items-start justify-between mb-3">
-                          <div>
-                            <h3 className="font-medium mb-1">
-                              {inquiry.property_title}
-                            </h3>
-                            <p className="text-sm text-muted-foreground">
-                              Sent{" "}
-                              {new Date(inquiry.sent_at).toLocaleDateString()}
+              <Card.Root>
+                <Card.Header>
+                  <Card.Title className="flex items-center gap-2">
+                    <MessageSquare className="w-5 h-5" />
+                    My Inquiries
+                  </Card.Title>
+                  <Card.Description>
+                    Messages you've sent to property owners
+                  </Card.Description>
+                </Card.Header>
+                <Card.Content>
+                  {sentInquiries.length === 0 ? (
+                    <div className="text-center py-8">
+                      <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-muted-foreground">
+                        No inquiries sent yet
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        Inquiries will appear here when you contact property
+                        owners
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {sentInquiries.map((inquiry) => (
+                        <div key={inquiry.id} className="p-4 border rounded-lg">
+                          <div className="flex items-start justify-between mb-3">
+                            <div>
+                              <h3 className="font-medium mb-1">
+                                {inquiry.property_title}
+                              </h3>
+                              <p className="text-sm text-muted-foreground">
+                                Sent{" "}
+                                {new Date(inquiry.sent_at).toLocaleDateString()}
+                              </p>
+                            </div>
+                            <Chip
+                              color={
+                                inquiry.status === "pending"
+                                  ? "warning"
+                                  : "success"
+                              }
+                              variant="secondary"
+                            >
+                              {inquiry.status}
+                            </Chip>
+                          </div>
+                          <div className="bg-muted p-3 rounded-lg mb-3">
+                            <p className="text-sm italic">
+                              "{inquiry.message}"
                             </p>
                           </div>
-                          <Chip
-                            color={
-                              inquiry.status === "pending"
-                                ? "warning"
-                                : "success"
-                            }
-                            variant="secondary"
-                          >
-                            {inquiry.status}
-                          </Chip>
-                        </div>
-                        <div className="bg-muted p-3 rounded-lg mb-3">
-                          <p className="text-sm italic">"{inquiry.message}"</p>
-                        </div>
-                        {inquiry.owner_response && (
-                          <div className="bg-primary-50 border border-primary-200 p-3 rounded-lg mb-3">
-                            <p className="text-sm font-medium text-primary-900 mb-1">
-                              Owner Response:
-                            </p>
-                            <p className="text-sm text-primary-800">
-                              "{inquiry.owner_response}"
-                            </p>
-                          </div>
-                        )}
-                        <div className="flex gap-2">
-                          <Button asChild variant="secondary" size="sm">
-                            <Link href={`/property/${inquiry.property_id}`}>
-                              View Property
-                            </Link>
-                          </Button>
-                          {inquiry.status === "responded" && (
-                            <Button variant="primary" size="sm">
-                              Reply
-                            </Button>
+                          {inquiry.owner_response && (
+                            <div className="bg-primary-50 border border-primary-200 p-3 rounded-lg mb-3">
+                              <p className="text-sm font-medium text-primary-900 mb-1">
+                                Owner Response:
+                              </p>
+                              <p className="text-sm text-primary-800">
+                                "{inquiry.owner_response}"
+                              </p>
+                            </div>
                           )}
+                          <div className="flex gap-2">
+                            <Button asChild variant="secondary" size="sm">
+                              <Link href={`/property/${inquiry.property_id}`}>
+                                View Property
+                              </Link>
+                            </Button>
+                            {inquiry.status === "responded" && (
+                              <Button variant="primary" size="sm">
+                                Reply
+                              </Button>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </Card.Content>
-            </Card.Root>
+                      ))}
+                    </div>
+                  )}
+                </Card.Content>
+              </Card.Root>
             </div>
           )}
         </div>

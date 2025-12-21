@@ -1,6 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
-import { Header, Footer } from "@/components/layout"
 import { AdminDashboardContent } from "@/components/dashboard"
 
 export default async function AdminDashboardPage() {
@@ -48,7 +47,6 @@ export default async function AdminDashboardPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
       <AdminDashboardContent
         user={user}
         pendingProperties={pendingProperties || []}
@@ -56,7 +54,6 @@ export default async function AdminDashboardPage() {
         verifiedCount={verifiedCount || 0}
         rejectedCount={rejectedCount || 0}
       />
-      <Footer />
     </div>
   )
 }

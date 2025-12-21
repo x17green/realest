@@ -24,23 +24,49 @@ export default function Header() {
   const [isLoading, setIsLoading] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [role, setRole] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUserSession = async () => {
       const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       setUser(user);
+
+      if (user) {
+        const { data: userRole } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.id)
+          .single();
+        setRole(userRole?.role || null);
+      } else {
+        setRole(null);
+      }
     };
 
     fetchUserSession();
 
     // Listen for auth state changes
     const supabase = createClient();
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setUser(session?.user ?? null);
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", session.user.id)
+          .single()
+          .then(({ data: userRole }) => {
+            setRole(userRole?.role || null);
+          });
+      } else {
+        setRole(null);
       }
-    );
+    });
 
     return () => subscription.unsubscribe();
   }, []);
@@ -51,6 +77,20 @@ export default function Header() {
     await supabase.auth.signOut();
     router.push("/");
     router.refresh();
+  };
+
+  const getDashboardUrl = () => {
+    switch (role) {
+      case "owner":
+        return "/owner";
+      case "agent":
+        return "/agent/dashboard";
+      case "admin":
+        return "/admin";
+      case "user":
+      default:
+        return "/profile";
+    }
   };
 
   const navigationItems = [
@@ -88,7 +128,7 @@ export default function Header() {
             <ThemeToggleCompact />
             {user ? (
               <>
-                <Link href="/owner">
+                <Link href={getDashboardUrl()}>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -169,13 +209,15 @@ export default function Header() {
               {/* Mobile Theme Toggle & Auth Buttons */}
               <div className="pt-4 border-t space-y-2">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-muted-foreground">Theme</span>
+                  <span className="text-sm font-medium text-muted-foreground">
+                    Theme
+                  </span>
                   <ThemeToggleCompact />
                 </div>
                 {user ? (
                   <>
                     <Link
-                      href="/owner"
+                      href={getDashboardUrl()}
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       <Button

@@ -26,7 +26,9 @@ function LoginForm() {
     if (verified === "true") {
       setSuccessMessage("Your email has been verified! You can now sign in.");
     } else if (reset === "true") {
-      setSuccessMessage("Your password has been reset successfully. Please sign in with your new password.");
+      setSuccessMessage(
+        "Your password has been reset successfully. Please sign in with your new password.",
+      );
     }
   }, [searchParams]);
 
@@ -63,7 +65,7 @@ function LoginForm() {
           .eq("id", data.user.id)
           .single();
 
-        if (profile?.user_type === "property_owner") {
+        if (profile?.user_type === "owner") {
           router.push("/owner");
         } else if (profile?.user_type === "admin") {
           router.push("/admin");

@@ -1,10 +1,53 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button, Card } from "@heroui/react";
 import { CheckCircle, Mail } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 export default function SignUpSuccessPage() {
+  const router = useRouter();
+  const [isRedirecting, setIsRedirecting] = useState(false);
+
+  useEffect(() => {
+    const checkUserAndRedirect = async () => {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (user) {
+        const { data: userRole } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.id)
+          .single();
+
+        if (userRole?.role) {
+          setIsRedirecting(true);
+          setTimeout(() => {
+            switch (userRole.role) {
+              case "agent":
+                router.push("/agent-onboarding");
+                break;
+              case "owner":
+                router.push("/profile-setup");
+                break;
+              case "user":
+              default:
+                router.push("/profile");
+                break;
+            }
+          }, 3000); // Redirect after 3 seconds
+        }
+      }
+    };
+
+    checkUserAndRedirect();
+  }, [router]);
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <Card.Root className="w-full max-w-md">
@@ -34,6 +77,11 @@ export default function SignUpSuccessPage() {
                 We've sent you a verification link. Please check your email and
                 click the link to activate your account.
               </p>
+              {isRedirecting && (
+                <p className="text-sm mt-2 text-primary">
+                  Redirecting you to complete your profile setup...
+                </p>
+              )}
             </div>
           </div>
 
