@@ -152,9 +152,9 @@ export default function PublicProfilePage() {
       case "buyer":
         return "secondary";
       case "admin":
-        return "warning";
+        return "tertiary";
       default:
-        return "default";
+        return "secondary";
     }
   };
 
@@ -167,14 +167,18 @@ export default function PublicProfilePage() {
           <Card.Root className="mb-8">
             <Card.Content className="p-8">
               <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-                <Avatar.Root size="xl">
+                <Avatar.Root size="lg">
                   <Avatar.Fallback className="text-2xl">
-                    {profile.full_name?.charAt(0) || profile.email?.charAt(0) || "U"}
+                    {profile.full_name?.charAt(0) ||
+                      profile.email?.charAt(0) ||
+                      "U"}
                   </Avatar.Fallback>
                 </Avatar.Root>
 
                 <div className="flex-1 text-center md:text-left">
-                  <h1 className="text-3xl font-bold mb-2">{profile.full_name}</h1>
+                  <h1 className="text-3xl font-bold mb-2">
+                    {profile.full_name}
+                  </h1>
                   <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
                     <Chip
                       variant={getUserTypeColor(profile.user_type)}
