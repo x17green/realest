@@ -2,6 +2,7 @@ import type React from "react";
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { RealEstThemeProvider } from "@/components/providers/RealEstThemeProvider";
+import { CookieBanner } from "@/components/shared";
 import "@/lib/styles/globals.css";
 
 export const metadata: Metadata = {
@@ -159,6 +160,7 @@ export default function RootLayout({
             </div>
           </noscript>
           {children}
+          <CookieBanner />
           <Analytics />
         </RealEstThemeProvider>
       </body>
