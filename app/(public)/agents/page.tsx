@@ -34,7 +34,7 @@ export default async function AgentsDirectoryPage({ searchParams }: { searchPara
         <h1 className="font-heading text-2xl">Find Verified Agents</h1>
         <form method="GET" className="flex items-center gap-2">
           <label className="text-sm">State:</label>
-          <select name="state" className="rounded-md border border-[var(--border)] bg-background px-2 py-1">
+          <select name="state" className="rounded-md border border-border bg-background px-2 py-1">
             <option value="">All</option>
             <option value="LA">Lagos</option>
             <option value="FC">FCT</option>

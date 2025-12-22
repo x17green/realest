@@ -29,21 +29,27 @@ export default async function SubAdminsPage() {
         <div>
           <h2 className="font-heading text-xl mb-4">Create New Sub-Admin</h2>
           <SubAdminForm />
+        </div>
 
         <div>
           <h2 className="font-heading text-xl mb-4">Current Admins ({admins?.length ?? 0})</h2>
           {admins && admins.length > 0 ? (
             <div className="space-y-2">
               {admins.map((admin) => (
-                <div key={admin.id} className="border border-[var(--border)] rounded-md p-3">
+                <div key={admin.id} className="border border-border rounded-md p-3">
                   <p className="font-medium">{admin.full_name}</p>
                   <p className="text-sm text-muted-foreground">{admin.email}</p>
                   <p className="text-xs text-muted-foreground mt-1">
                     Added: {new Date(admin.created_at).toLocaleDateString()}
                   </p>
+                </div>
               ))}
+            </div>
           ) : (
             <p className="text-muted-foreground">No other admins found.</p>
           )}
+        </div>
+      </div>
+    </div>
   )
 }

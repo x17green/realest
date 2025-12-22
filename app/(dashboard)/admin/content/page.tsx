@@ -74,7 +74,7 @@ export default async function ContentPage() {
           <p className="text-muted-foreground">
             Review and moderate user reviews and uploaded media
           </p>
-
+          
         <Tabs defaultValue="reviews" className="space-y-6">
           <TabsList>
             <TabsTrigger value="reviews" className="flex items-center gap-2">
@@ -113,6 +113,7 @@ export default async function ContentPage() {
                           <div className="flex items-center gap-1">
                             <span className="font-medium">{review.rating}</span>
                             <span className="text-yellow-500">★</span>
+                          </div>
                         </TableCell>
                         <TableCell className="max-w-xs truncate">{review.review}</TableCell>
                         <TableCell>{new Date(review.submittedAt).toLocaleDateString()}</TableCell>
@@ -130,6 +131,7 @@ export default async function ContentPage() {
                               <XCircle className="w-4 h-4 mr-1" />
                               Reject
                             </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -180,6 +182,7 @@ export default async function ContentPage() {
                               <XCircle className="w-4 h-4 mr-1" />
                               Reject
                             </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -189,5 +192,7 @@ export default async function ContentPage() {
             </Card>
           </TabsContent>
         </Tabs>
+      </div>
+    </>
   );
 }

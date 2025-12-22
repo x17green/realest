@@ -54,5 +54,6 @@ export default async function AdminDashboardPage() {
         verifiedCount={verifiedCount || 0}
         rejectedCount={rejectedCount || 0}
       />
+    </>
   )
 }

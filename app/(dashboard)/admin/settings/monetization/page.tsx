@@ -1,6 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-omponents/layout";/d
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -51,11 +50,16 @@ export default async function MonetizationPage() {
 
   return (
     <>
+    <div className="container mx-auto p-4">
+        {/* Page Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold">Monetization Settings</h1>
           <p className="text-muted-foreground">
             Configure fees, pricing, and payment settings
           </p>
+        </div>
+
+        {/* Settings Grid */}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Fee Settings */}
@@ -76,6 +80,7 @@ export default async function MonetizationPage() {
                   defaultValue={monetizationSettings.platformFee}
                   placeholder="Enter platform fee percentage"
                 />
+              </div>
 
               <div className="space-y-2">
                 <Label htmlFor="transactionFee">Transaction Fee (%)</Label>
@@ -86,6 +91,7 @@ export default async function MonetizationPage() {
                   defaultValue={monetizationSettings.transactionFee}
                   placeholder="Enter transaction fee percentage"
                 />
+              </div>
 
               <div className="space-y-2">
                 <Label htmlFor="withdrawalFee">Withdrawal Fee (₦)</Label>
@@ -95,6 +101,7 @@ export default async function MonetizationPage() {
                   defaultValue={monetizationSettings.withdrawalFee}
                   placeholder="Enter fixed withdrawal fee"
                 />
+              </div>
 
               <div className="space-y-2">
                 <Label htmlFor="minimumWithdrawal">Minimum Withdrawal (₦)</Label>
@@ -104,6 +111,7 @@ export default async function MonetizationPage() {
                   defaultValue={monetizationSettings.minimumWithdrawal}
                   placeholder="Enter minimum withdrawal amount"
                 />
+              </div>
             </CardContent>
           </Card>
 
@@ -124,6 +132,7 @@ export default async function MonetizationPage() {
                       <span className="text-lg font-bold">
                         ₦{plan.price.toLocaleString()}/month
                       </span>
+                    </div>
                     <ul className="text-sm text-muted-foreground space-y-1">
                       {plan.features.map((feature, idx) => (
                         <li key={idx}>• {feature}</li>
@@ -132,7 +141,9 @@ export default async function MonetizationPage() {
                     <Button variant="outline" size="sm" className="mt-3">
                       Edit Plan
                     </Button>
+                  </div>
                 ))}
+              </div>
             </CardContent>
           </Card>
 
@@ -174,11 +185,15 @@ export default async function MonetizationPage() {
             </CardContent>
           </Card>
 
-        {/* Save Button */}
-        <div className="mt-8 flex justify-end">
-          <Button size="lg">
-            <Save className="w-4 h-4 mr-2" />
-            Save Monetization Settings
-          </Button>
+          {/* Save Button */}
+          <div className="mt-8 flex justify-end">
+            <Button size="lg">
+              <Save className="w-4 h-4 mr-2" />
+              Save Monetization Settings
+            </Button>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }

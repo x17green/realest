@@ -1,6 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-omponents/layout";/d
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -42,17 +41,21 @@ export default async function CategoriesPage() {
 
   return (
     <>
+    <div className="container mx-auto p-4">
+        {/* Page Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold">Property Categories</h1>
           <p className="text-muted-foreground">
             Manage property types and categories
           </p>
+        </div>
 
         <div className="flex justify-between items-center mb-6">
           <div>
             <p className="text-sm text-muted-foreground">
               Total Categories: {categories.length} | Active: {categories.filter(c => c.isActive).length}
             </p>
+          </div>
           <Dialog>
             <DialogTrigger asChild>
               <Button>
@@ -68,13 +71,17 @@ export default async function CategoriesPage() {
                 <div className="space-y-2">
                   <Label htmlFor="categoryName">Category Name</Label>
                   <Input id="categoryName" placeholder="Enter category name" />
+                </div>
                 <div className="space-y-2">
                   <Label htmlFor="categoryDescription">Description</Label>
                   <Input id="categoryDescription" placeholder="Enter category description" />
+                </div>
                 <div className="flex items-center space-x-2">
                   <input type="checkbox" id="isActive" defaultChecked className="rounded" />
                   <Label htmlFor="isActive">Active Category</Label>
+                </div>
                 <Button className="w-full">Create Category</Button>
+              </div>
             </DialogContent>
           </Dialog>
 
@@ -123,9 +130,11 @@ export default async function CategoriesPage() {
                               <div className="space-y-2">
                                 <Label htmlFor="editName">Category Name</Label>
                                 <Input id="editName" defaultValue={category.name} />
+                              </div>
                               <div className="space-y-2">
                                 <Label htmlFor="editDescription">Description</Label>
                                 <Input id="editDescription" defaultValue={category.description} />
+                              </div>
                               <div className="flex items-center space-x-2">
                                 <input
                                   type="checkbox"
@@ -134,12 +143,15 @@ export default async function CategoriesPage() {
                                   className="rounded"
                                 />
                                 <Label htmlFor="editActive">Active Category</Label>
+                              </div>
                               <Button className="w-full">Update Category</Button>
+                            </div>
                           </DialogContent>
                         </Dialog>
                         <Button size="sm" variant="outline" className="text-red-600 hover:text-red-700">
                           <Trash2 className="w-4 h-4" />
                         </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -147,5 +159,8 @@ export default async function CategoriesPage() {
             </Table>
           </CardContent>
         </Card>
+        </div>
+      </div>
+    </>
   );
 }

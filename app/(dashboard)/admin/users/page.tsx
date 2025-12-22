@@ -1,6 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-omponents/layout";/d
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -46,11 +45,13 @@ export default async function UsersPage() {
 
   return (
     <>
+    <div className="min-h-screen bg-background">
         <div className="mb-8">
           <h1 className="text-3xl font-bold">User Management</h1>
           <p className="text-muted-foreground">
             Manage user accounts, verification status, and permissions
           </p>
+        </div>
 
         {/* User Statistics */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -61,8 +62,11 @@ export default async function UsersPage() {
                 <div>
                   <p className="text-2xl font-bold">{userStats.totalUsers}</p>
                   <p className="text-sm text-muted-foreground">Total Users</p>
+                </div>
+              </div>
             </CardContent>
           </Card>
+        </div>
 
           <Card>
             <CardContent className="pt-6">
@@ -71,6 +75,8 @@ export default async function UsersPage() {
                 <div>
                   <p className="text-2xl font-bold">{userStats.verifiedUsers}</p>
                   <p className="text-sm text-muted-foreground">Verified</p>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
@@ -81,6 +87,8 @@ export default async function UsersPage() {
                 <div>
                   <p className="text-2xl font-bold">{userStats.activeUsers}</p>
                   <p className="text-sm text-muted-foreground">Active</p>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
@@ -91,6 +99,8 @@ export default async function UsersPage() {
                 <div>
                   <p className="text-2xl font-bold">{userStats.bannedUsers}</p>
                   <p className="text-sm text-muted-foreground">Banned</p>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
@@ -103,10 +113,12 @@ export default async function UsersPage() {
                   placeholder="Search users by name or email..."
                   className="max-w-sm"
                 />
+              </div>
               <Button variant="outline">
                 <Search className="w-4 h-4 mr-2" />
                 Search
               </Button>
+            </div>
           </CardContent>
         </Card>
 
@@ -156,6 +168,7 @@ export default async function UsersPage() {
                         <Button size="sm" variant="outline">
                           {userProfile.user_type === 'banned' ? 'Unban' : 'Ban'}
                         </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 )) || (
@@ -169,5 +182,7 @@ export default async function UsersPage() {
             </Table>
           </CardContent>
         </Card>
+      </div>
+    </>
   );
 }

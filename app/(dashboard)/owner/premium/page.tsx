@@ -85,7 +85,7 @@ export default async function PremiumPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {premiumFeatures.map((feature, index) => (
                     <div key={index} className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
+                      <Check className="w-4 h-4 text-green-600 shrink-0" />
                       <span className="text-sm">{feature}</span>
                     </div>
                   ))}

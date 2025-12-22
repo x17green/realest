@@ -1,6 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-omponents/layout";/d
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -50,6 +49,7 @@ export default async function VettingPage() {
           <p className="text-muted-foreground">
             Properties requiring physical inspection and verification
           </p>
+        </div>
 
         <Card>
           <CardHeader>
@@ -100,5 +100,6 @@ export default async function VettingPage() {
             </Table>
           </CardContent>
         </Card>
+    </>
   );
 }

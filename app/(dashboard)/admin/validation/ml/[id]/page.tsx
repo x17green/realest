@@ -1,6 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
-omponents/layout";/d
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -55,6 +54,7 @@ export default async function MLReviewDetailPage({
 
   return (
     <>
+      <div className="container mx-auto px-4">
         <div className="mb-8">
           <Link
             href="/admin/validation/ml"
@@ -67,6 +67,7 @@ export default async function MLReviewDetailPage({
           <p className="text-muted-foreground">
             Review property details and ML analysis
           </p>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Property Details */}
@@ -77,6 +78,7 @@ export default async function MLReviewDetailPage({
                 <div className="flex items-center gap-2">
                   <Badge variant="secondary">ML Review</Badge>
                   <Badge variant="outline">Authenticity: {mlAnalysis.authenticityScore}%</Badge>
+                </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
@@ -85,19 +87,26 @@ export default async function MLReviewDetailPage({
                     <div>
                       <p className="text-muted-foreground">Type</p>
                       <p>{property.property_type}</p>
+                    </div>
                     <div>
                       <p className="text-muted-foreground">Price</p>
                       <p>₦{property.price?.toLocaleString()}</p>
+                    </div>
                     <div>
                       <p className="text-muted-foreground">Location</p>
                       <p>{property.location}</p>
+                    </div>
                     <div>
                       <p className="text-muted-foreground">Owner</p>
                       <p>{property.profiles?.full_name}</p>
-
+                    </div>
+                  </div>
+                </div>
+                
                 <div>
                   <h3 className="font-semibold mb-2">Description</h3>
                   <p className="text-sm">{property.description}</p>
+                </div>
               </CardContent>
             </Card>
 
@@ -124,12 +133,16 @@ export default async function MLReviewDetailPage({
                           <p className="text-sm text-muted-foreground">
                             Uploaded {new Date(doc.created_at).toLocaleDateString()}
                           </p>
+                        </div>
+                      </div>
                       <Button variant="outline" size="sm">
                         View
                       </Button>
+                    </div>
                   )) || (
                     <p className="text-muted-foreground">No documents submitted</p>
                   )}
+                </div>
               </CardContent>
             </Card>
 
@@ -147,13 +160,18 @@ export default async function MLReviewDetailPage({
                       <div
                         className="bg-green-600 h-2 rounded-full"
                         style={{ width: `${mlAnalysis.authenticityScore}%` }}
+                      ></div>
+                    </div>
                     <span className="text-sm font-medium">{mlAnalysis.authenticityScore}%</span>
+                  </div>
+                </div>
 
                 <div>
                   <p className="text-sm text-muted-foreground">Duplicate Risk</p>
                   <Badge variant={mlAnalysis.duplicateRisk === 'Low' ? 'default' : 'destructive'}>
                     {mlAnalysis.duplicateRisk}
                   </Badge>
+                </div>
 
                 <div>
                   <p className="text-sm text-muted-foreground">Flagged Issues</p>
@@ -164,10 +182,12 @@ export default async function MLReviewDetailPage({
                       </li>
                     ))}
                   </ul>
+                </div>
 
                 <div>
                   <p className="text-sm text-muted-foreground">Recommendation</p>
                   <p className="text-sm">{mlAnalysis.recommendations}</p>
+                </div>
               </CardContent>
             </Card>
 
@@ -190,11 +210,17 @@ export default async function MLReviewDetailPage({
                     <CheckCircle className="w-4 h-4 mr-2" />
                     Approve
                   </Button>
+                </div>
 
                 <Button variant="secondary" className="w-full">
                   Send to Physical Vetting
                 </Button>
               </CardContent>
             </Card>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
