@@ -1,15 +1,6 @@
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-} from "recharts";
+import { AreaChart } from "@/components/charts/AreaChart";
+import { BarChart } from "@/components/charts/BarChart";
 import { createClient } from "@/lib/supabase/server";
 
 interface MetricCardProps {
@@ -116,42 +107,7 @@ export default async function EngagementPage() {
           </p>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={400}>
-            <AreaChart data={metrics.dailyActiveUsers}>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="hsl(var(--border))"
-              />
-              <XAxis
-                dataKey="date"
-                stroke="hsl(var(--muted-foreground))"
-                fontSize={12}
-                tickFormatter={(value) =>
-                  new Date(value).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                  })
-                }
-              />
-              <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-              <Tooltip
-                labelFormatter={(value) => new Date(value).toLocaleDateString()}
-                contentStyle={{
-                  backgroundColor: "hsl(var(--background))",
-                  border: "1px solid hsl(var(--border))",
-                  borderRadius: "6px",
-                }}
-              />
-              <Area
-                type="monotone"
-                dataKey="users"
-                stroke="#ADF434"
-                fill="#ADF434"
-                fillOpacity={0.3}
-                strokeWidth={2}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
+          <AreaChart data={metrics.dailyActiveUsers} dataKey="users" />
         </CardContent>
       </Card>
 
@@ -167,28 +123,7 @@ export default async function EngagementPage() {
             </p>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={metrics.inquiryTrends}>
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="hsl(var(--border))"
-                />
-                <XAxis
-                  dataKey="month"
-                  stroke="hsl(var(--muted-foreground))"
-                  fontSize={12}
-                />
-                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "hsl(var(--background))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "6px",
-                  }}
-                />
-                <Bar dataKey="inquiries" fill="#07402F" />
-              </BarChart>
-            </ResponsiveContainer>
+            <BarChart data={metrics.inquiryTrends} dataKeys={["inquiries"]} />
           </CardContent>
         </Card>
 

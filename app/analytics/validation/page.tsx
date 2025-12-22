@@ -1,16 +1,7 @@
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-} from "recharts";
 import { createClient } from "@/lib/supabase/server";
+import { LineChart } from "@/components/charts/LineChart";
+import { BarChart } from "@/components/charts/BarChart";
 
 interface MetricCardProps {
   title: string;
@@ -113,41 +104,7 @@ export default async function ValidationPage() {
           </p>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={400}>
-            <LineChart data={metrics.mlAccuracyData}>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="hsl(var(--border))"
-              />
-              <XAxis
-                dataKey="month"
-                stroke="hsl(var(--muted-foreground))"
-                fontSize={12}
-              />
-              <YAxis
-                stroke="hsl(var(--muted-foreground))"
-                fontSize={12}
-                domain={[90, 100]}
-                tickFormatter={(value) => `${value}%`}
-              />
-              <Tooltip
-                formatter={(value: number) => [`${value}%`, "Accuracy"]}
-                contentStyle={{
-                  backgroundColor: "hsl(var(--background))",
-                  border: "1px solid hsl(var(--border))",
-                  borderRadius: "6px",
-                }}
-              />
-              <Line
-                type="monotone"
-                dataKey="accuracy"
-                stroke="#ADF434"
-                strokeWidth={3}
-                dot={{ fill: "#ADF434", strokeWidth: 2, r: 5 }}
-                activeDot={{ r: 7 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          <LineChart data={metrics.mlAccuracyData} dataKey="accuracy" />
         </CardContent>
       </Card>
 
@@ -163,45 +120,10 @@ export default async function ValidationPage() {
             </p>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={metrics.vettingPerformance}>
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="hsl(var(--border))"
-                />
-                <XAxis
-                  dataKey="category"
-                  stroke="hsl(var(--muted-foreground))"
-                  fontSize={12}
-                />
-                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "hsl(var(--background))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "6px",
-                  }}
-                />
-                <Bar
-                  dataKey="approved"
-                  stackId="a"
-                  fill="#07402F"
-                  name="Approved"
-                />
-                <Bar
-                  dataKey="rejected"
-                  stackId="a"
-                  fill="#2E322E"
-                  name="Rejected"
-                />
-                <Bar
-                  dataKey="pending"
-                  stackId="a"
-                  fill="#ADF434"
-                  name="Pending"
-                />
-              </BarChart>
-            </ResponsiveContainer>
+            <BarChart
+              data={metrics.vettingPerformance}
+              dataKeys={["approved", "rejected", "pending"]}
+            />
           </CardContent>
         </Card>
 

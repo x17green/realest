@@ -1,16 +1,6 @@
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-} from "recharts";
+import { BarChart } from "@/components/charts/BarChart";
+import { PieChart } from "@/components/charts/PieChart";
 import { createClient } from "@/lib/supabase/server";
 
 interface MetricCardProps {
@@ -108,37 +98,7 @@ export default async function MonetizationPage() {
           </p>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={400}>
-            <BarChart data={metrics.revenueData}>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="hsl(var(--border))"
-              />
-              <XAxis
-                dataKey="month"
-                stroke="hsl(var(--muted-foreground))"
-                fontSize={12}
-              />
-              <YAxis
-                stroke="hsl(var(--muted-foreground))"
-                fontSize={12}
-                tickFormatter={(value) => `₦${(value / 1000).toFixed(0)}k`}
-              />
-              <Tooltip
-                formatter={(value: number) => [
-                  `₦${value.toLocaleString()}`,
-                  "",
-                ]}
-                contentStyle={{
-                  backgroundColor: "hsl(var(--background))",
-                  border: "1px solid hsl(var(--border))",
-                  borderRadius: "6px",
-                }}
-              />
-              <Bar dataKey="revenue" fill="#07402F" name="Revenue" />
-              <Bar dataKey="fees" fill="#ADF434" name="Fees" />
-            </BarChart>
-          </ResponsiveContainer>
+          <BarChart data={metrics.revenueData} dataKeys={["revenue", "fees"]} />
         </CardContent>
       </Card>
 
@@ -154,23 +114,7 @@ export default async function MonetizationPage() {
             </p>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={metrics.feeBreakdown}
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={100}
-                  dataKey="value"
-                  label={({ name, value }) => `${name}: ${value}%`}
-                >
-                  {metrics.feeBreakdown.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
+            <PieChart data={metrics.feeBreakdown} />
           </CardContent>
         </Card>
 

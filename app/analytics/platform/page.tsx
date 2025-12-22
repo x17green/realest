@@ -1,13 +1,5 @@
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+import { LineChart } from "@/components/charts/LineChart";
 import { createClient } from "@/lib/supabase/server";
 import {
   format,
@@ -129,35 +121,9 @@ export default async function PlatformPage() {
           </p>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={400}>
-            <LineChart data={metrics.userGrowth}>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="hsl(var(--border))"
-              />
-              <XAxis
-                dataKey="date"
-                stroke="hsl(var(--muted-foreground))"
-                fontSize={12}
-              />
-              <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "hsl(var(--background))",
-                  border: "1px solid hsl(var(--border))",
-                  borderRadius: "6px",
-                }}
-              />
-              <Line
-                type="monotone"
-                dataKey="count"
-                stroke="#ADF434"
-                strokeWidth={2}
-                dot={{ fill: "#ADF434", strokeWidth: 2, r: 4 }}
-                activeDot={{ r: 6 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          <CardContent>
+            <LineChart data={metrics.userGrowth} dataKey="count" />
+          </CardContent>
         </CardContent>
       </Card>
 

@@ -1,18 +1,6 @@
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  Radar,
-} from "recharts";
+import { BarChart } from "@/components/charts/BarChart";
+import { RadarChart } from "@/components/charts/RadarChart";
 import { createClient } from "@/lib/supabase/server";
 
 interface MetricCardProps {
@@ -156,50 +144,12 @@ export default async function TeamPage() {
           </p>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={400}>
-            <BarChart data={metrics.teamPerformance}>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="hsl(var(--border))"
-              />
-              <XAxis
-                dataKey="name"
-                stroke="hsl(var(--muted-foreground))"
-                fontSize={12}
-              />
-              <YAxis
-                yAxisId="left"
-                stroke="hsl(var(--muted-foreground))"
-                fontSize={12}
-              />
-              <YAxis
-                yAxisId="right"
-                orientation="right"
-                stroke="hsl(var(--muted-foreground))"
-                fontSize={12}
-                tickFormatter={(value) => `${value}%`}
-              />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "hsl(var(--background))",
-                  border: "1px solid hsl(var(--border))",
-                  borderRadius: "6px",
-                }}
-              />
-              <Bar
-                yAxisId="left"
-                dataKey="validations"
-                fill="#07402F"
-                name="Validations"
-              />
-              <Bar
-                yAxisId="right"
-                dataKey="accuracy"
-                fill="#ADF434"
-                name="Accuracy %"
-              />
-            </BarChart>
-          </ResponsiveContainer>
+          <CardContent>
+            <BarChart
+              data={metrics.teamPerformance}
+              dataKeys={["validations", "accuracy"]}
+            />
+          </CardContent>
         </CardContent>
       </Card>
 
@@ -215,46 +165,12 @@ export default async function TeamPage() {
             </p>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <RadarChart data={metrics.teamSkills}>
-                <PolarGrid stroke="hsl(var(--border))" />
-                <PolarAngleAxis
-                  dataKey="skill"
-                  tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
-                />
-                <PolarRadiusAxis
-                  angle={90}
-                  domain={[0, 100]}
-                  tick={{ fontSize: 8, fill: "hsl(var(--muted-foreground))" }}
-                  tickFormatter={(value) => `${value}%`}
-                />
-                <Radar
-                  name="Adebayo K."
-                  dataKey="A"
-                  stroke="#07402F"
-                  fill="#07402F"
-                  fillOpacity={0.3}
-                  strokeWidth={2}
-                />
-                <Radar
-                  name="Chioma N."
-                  dataKey="B"
-                  stroke="#2E322E"
-                  fill="#2E322E"
-                  fillOpacity={0.3}
-                  strokeWidth={2}
-                />
-                <Radar
-                  name="Funmi A."
-                  dataKey="D"
-                  stroke="#ADF434"
-                  fill="#ADF434"
-                  fillOpacity={0.3}
-                  strokeWidth={2}
-                />
-                <Tooltip />
-              </RadarChart>
-            </ResponsiveContainer>
+            <CardContent>
+              <RadarChart
+                data={metrics.teamSkills}
+                dataKeys={["A", "B", "D"]}
+              />
+            </CardContent>
           </CardContent>
         </Card>
 
