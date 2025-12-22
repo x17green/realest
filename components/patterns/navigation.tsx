@@ -241,7 +241,7 @@ export function SidebarNavigation({
       { id: 'profile', label: 'Profile', icon: '👤', href: '/profile' },
     ],
     agent: [
-      { id: 'dashboard', label: 'Dashboard', icon: '🏠', href: '/agent/dashboard' },
+      { id: 'dashboard', label: 'Dashboard', icon: '🏠', href: '/agent' },
       { id: 'properties', label: 'Manage Properties', icon: '🏘️', href: '/agent/properties' },
       { id: 'clients', label: 'Clients', icon: '👥', href: '/agent/clients' },
       { id: 'leads', label: 'Leads', icon: '🎯', href: '/agent/leads' },

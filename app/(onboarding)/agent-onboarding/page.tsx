@@ -61,7 +61,7 @@ export default function AgentOnboardingPage() {
 
       if (agent) {
         // If exists, redirect to dashboard
-        router.push("/agent/dashboard");
+        router.push("/agent");
         return;
       }
     };
@@ -201,7 +201,7 @@ export default function AgentOnboardingPage() {
 
       setSuccess(true);
       setTimeout(() => {
-        router.push("/agent/dashboard");
+        router.push("/agent");
       }, 2000);
     } catch (err) {
       setError("An unexpected error occurred");

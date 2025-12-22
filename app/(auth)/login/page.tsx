@@ -70,7 +70,7 @@ function LoginForm() {
         } else if (profile?.user_type === "admin") {
           router.push("/admin");
         } else if (profile?.user_type === "agent") {
-          router.push("/agent/dashboard");
+          router.push("/agent");
         } else {
           router.push("/profile");
         }

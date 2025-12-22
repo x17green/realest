@@ -81,7 +81,7 @@ export function DashboardSidebar({
       ],
       agent: [
         {
-          href: "/agent/dashboard",
+          href: "/agent",
           label: "My Listings",
           icon: Building,
           roles: ["agent"],
@@ -152,7 +152,7 @@ export function DashboardSidebar({
   const isActive = (href: string) => {
     if (href === "/profile" && currentPath === "/profile") return true;
     if (href === "/owner" && currentPath.startsWith("/owner")) return true;
-    if (href === "/agent/dashboard" && currentPath.startsWith("/agent"))
+    if (href === "/agent" && currentPath.startsWith("/agent"))
       return true;
     if (href === "/admin" && currentPath.startsWith("/admin")) return true;
     return currentPath === href;

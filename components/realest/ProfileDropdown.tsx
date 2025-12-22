@@ -134,7 +134,7 @@ export function ProfileDropdown() {
             key="dashboard"
             id="dashboard"
             textValue="Dashboard"
-            onPress={() => router.push("/agent/dashboard")}
+            onPress={() => router.push("/agent")}
             className="hover:bg-muted rounded-md transition-colors"
           >
             <div className="flex w-full items-center justify-between gap-2">

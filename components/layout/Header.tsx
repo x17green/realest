@@ -84,7 +84,7 @@ export default function Header() {
       case "owner":
         return "/owner";
       case "agent":
-        return "/agent/dashboard";
+        return "/agent";
       case "admin":
         return "/admin";
       case "user":
