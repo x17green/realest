@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
-import { Header, Footer } from "@/components/layout";
+omponents/layout";/d
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -93,9 +93,7 @@ export default async function SupportTicketDetailPage({
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="container py-8">
+    <>
         <div className="mb-8">
           <Link
             href="/admin/support"
@@ -108,7 +106,6 @@ export default async function SupportTicketDetailPage({
           <p className="text-muted-foreground">
             {ticket.subject}
           </p>
-        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Ticket Details */}
@@ -123,13 +120,11 @@ export default async function SupportTicketDetailPage({
                   <Badge className={getStatusColor(ticket.status)}>
                     {ticket.status}
                   </Badge>
-                </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
                   <h3 className="font-semibold mb-2">Description</h3>
                   <p className="text-sm">{ticket.description}</p>
-                </div>
 
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
@@ -137,12 +132,9 @@ export default async function SupportTicketDetailPage({
                     <p>{new Date(ticket.createdAt).toLocaleDateString()} at{" "}
                       {new Date(ticket.createdAt).toLocaleTimeString()}
                     </p>
-                  </div>
                   <div>
                     <p className="text-muted-foreground">Last Updated</p>
                     <p>{new Date(ticket.replies[ticket.replies.length - 1]?.timestamp || ticket.createdAt).toLocaleDateString()}</p>
-                  </div>
-                </div>
               </CardContent>
             </Card>
 
@@ -176,15 +168,11 @@ export default async function SupportTicketDetailPage({
                               Admin
                             </Badge>
                           )}
-                        </div>
                         <p className="text-sm">{reply.message}</p>
                         <p className="text-xs opacity-70 mt-2">
                           {new Date(reply.timestamp).toLocaleString()}
                         </p>
-                      </div>
-                    </div>
                   ))}
-                </div>
               </CardContent>
             </Card>
 
@@ -212,11 +200,9 @@ export default async function SupportTicketDetailPage({
                     <Button type="button" variant="outline">
                       Close Ticket
                     </Button>
-                  </div>
                 </form>
               </CardContent>
             </Card>
-          </div>
 
           {/* Customer Information */}
           <div className="space-y-6">
@@ -228,7 +214,6 @@ export default async function SupportTicketDetailPage({
                 <div>
                   <p className="text-sm text-muted-foreground">Name</p>
                   <p className="font-medium">{ticket.userName}</p>
-                </div>
 
                 <div>
                   <p className="text-sm text-muted-foreground">Email</p>
@@ -240,13 +225,10 @@ export default async function SupportTicketDetailPage({
                     >
                       {ticket.userEmail}
                     </a>
-                  </div>
-                </div>
 
                 <div>
                   <p className="text-sm text-muted-foreground">Ticket ID</p>
                   <p className="font-mono text-sm">{ticket.id}</p>
-                </div>
               </CardContent>
             </Card>
 
@@ -266,10 +248,5 @@ export default async function SupportTicketDetailPage({
                 </Button>
               </CardContent>
             </Card>
-          </div>
-        </div>
-      </main>
-      <Footer />
-    </div>
   );
 }

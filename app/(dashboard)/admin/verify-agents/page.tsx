@@ -36,6 +36,5 @@ export default async function VerifyAgentsPage() {
     <div className="space-y-6">
       <h1 className="font-heading text-2xl">Verify Agents</h1>
       <VerifyAgentsList initialAgents={items} />
-    </div>
   )
 }

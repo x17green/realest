@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { Header, Footer } from "@/components/layout";
+omponents/layout";/d
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -52,9 +52,7 @@ export default async function WaitlistManagementPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="container py-8">
+    <>
         <div className="mb-8">
           <Link
             href="/admin/cms"
@@ -66,7 +64,6 @@ export default async function WaitlistManagementPage() {
           <p className="text-muted-foreground">
             Manage waitlist subscribers and communications
           </p>
-        </div>
 
         {/* Statistics */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -79,8 +76,6 @@ export default async function WaitlistManagementPage() {
                     {waitlistStats.totalSubscribers.toLocaleString()}
                   </p>
                   <p className="text-sm text-muted-foreground">Total Subscribers</p>
-                </div>
-              </div>
             </CardContent>
           </Card>
 
@@ -91,8 +86,6 @@ export default async function WaitlistManagementPage() {
                 <div>
                   <p className="text-2xl font-bold">{waitlistStats.newThisWeek}</p>
                   <p className="text-sm text-muted-foreground">New This Week</p>
-                </div>
-              </div>
             </CardContent>
           </Card>
 
@@ -103,8 +96,6 @@ export default async function WaitlistManagementPage() {
                 <div>
                   <p className="text-2xl font-bold">{waitlistStats.conversionRate}%</p>
                   <p className="text-sm text-muted-foreground">Conversion Rate</p>
-                </div>
-              </div>
             </CardContent>
           </Card>
 
@@ -115,11 +106,8 @@ export default async function WaitlistManagementPage() {
                 <div>
                   <p className="text-2xl font-bold">{waitlistStats.averagePosition}</p>
                   <p className="text-sm text-muted-foreground">Avg Position</p>
-                </div>
-              </div>
             </CardContent>
           </Card>
-        </div>
 
         {/* Actions */}
         <div className="flex gap-4 mb-6">
@@ -138,7 +126,6 @@ export default async function WaitlistManagementPage() {
                 <div className="space-y-2">
                   <Label htmlFor="campaignSubject">Subject</Label>
                   <Input id="campaignSubject" placeholder="Enter email subject" />
-                </div>
                 <div className="space-y-2">
                   <Label htmlFor="campaignMessage">Message</Label>
                   <Textarea
@@ -146,7 +133,6 @@ export default async function WaitlistManagementPage() {
                     placeholder="Enter your message..."
                     className="min-h-32"
                   />
-                </div>
                 <div className="flex gap-2">
                   <Button className="flex-1">
                     <Send className="w-4 h-4 mr-2" />
@@ -155,8 +141,6 @@ export default async function WaitlistManagementPage() {
                   <Button variant="outline" className="flex-1">
                     Send Test Email
                   </Button>
-                </div>
-              </div>
             </DialogContent>
           </Dialog>
 
@@ -164,7 +148,6 @@ export default async function WaitlistManagementPage() {
             <Download className="w-4 h-4 mr-2" />
             Export List
           </Button>
-        </div>
 
         {/* Search */}
         <Card className="mb-6">
@@ -175,12 +158,10 @@ export default async function WaitlistManagementPage() {
                   placeholder="Search subscribers by name or email..."
                   className="max-w-sm"
                 />
-              </div>
               <Button variant="outline">
                 <Search className="w-4 h-4 mr-2" />
                 Search
               </Button>
-            </div>
           </CardContent>
         </Card>
 
@@ -227,7 +208,6 @@ export default async function WaitlistManagementPage() {
                         <Button size="sm" variant="outline" className="text-red-600 hover:text-red-700">
                           <Trash2 className="w-4 h-4" />
                         </Button>
-                      </div>
                     </TableCell>
                   </TableRow>
                 )) || (
@@ -241,8 +221,5 @@ export default async function WaitlistManagementPage() {
             </Table>
           </CardContent>
         </Card>
-      </main>
-      <Footer />
-    </div>
   );
 }

@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { Header, Footer } from "@/components/layout";
+omponents/layout";/d
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -82,9 +82,7 @@ export default async function CMSEmailsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="container py-8">
+    <>
         <div className="mb-8">
           <Link
             href="/admin/cms"
@@ -96,7 +94,6 @@ export default async function CMSEmailsPage() {
           <p className="text-muted-foreground">
             Create and manage email campaigns and communications
           </p>
-        </div>
 
         {/* Email Statistics */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4 mb-8">
@@ -106,7 +103,6 @@ export default async function CMSEmailsPage() {
                 <Send className="w-6 h-6 text-blue-600 mx-auto mb-2" />
                 <p className="text-xl font-bold">{emailStats.totalSent.toLocaleString()}</p>
                 <p className="text-xs text-muted-foreground">Total Sent</p>
-              </div>
             </CardContent>
           </Card>
 
@@ -116,7 +112,6 @@ export default async function CMSEmailsPage() {
                 <CheckCircle className="w-6 h-6 text-green-600 mx-auto mb-2" />
                 <p className="text-xl font-bold">{emailStats.delivered.toLocaleString()}</p>
                 <p className="text-xs text-muted-foreground">Delivered</p>
-              </div>
             </CardContent>
           </Card>
 
@@ -126,7 +121,6 @@ export default async function CMSEmailsPage() {
                 <Eye className="w-6 h-6 text-purple-600 mx-auto mb-2" />
                 <p className="text-xl font-bold">{emailStats.opened.toLocaleString()}</p>
                 <p className="text-xs text-muted-foreground">Opened</p>
-              </div>
             </CardContent>
           </Card>
 
@@ -136,10 +130,8 @@ export default async function CMSEmailsPage() {
                 <Mail className="w-6 h-6 text-orange-600 mx-auto mb-2" />
                 <p className="text-xl font-bold">{emailStats.clicked.toLocaleString()}</p>
                 <p className="text-xs text-muted-foreground">Clicked</p>
-              </div>
             </CardContent>
           </Card>
-        </div>
 
         {/* Quick Actions */}
         <div className="flex gap-4 mb-6">
@@ -158,11 +150,9 @@ export default async function CMSEmailsPage() {
                 <div className="space-y-2">
                   <Label htmlFor="campaignName">Campaign Name</Label>
                   <Input id="campaignName" placeholder="Enter campaign name" />
-                </div>
                 <div className="space-y-2">
                   <Label htmlFor="campaignSubject">Subject Line</Label>
                   <Input id="campaignSubject" placeholder="Enter email subject" />
-                </div>
                 <div className="space-y-2">
                   <Label htmlFor="recipientGroup">Recipient Group</Label>
                   <Select>
@@ -177,7 +167,6 @@ export default async function CMSEmailsPage() {
                       <SelectItem value="verified">Verified Users</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
                 <div className="space-y-2">
                   <Label htmlFor="campaignContent">Email Content</Label>
                   <Textarea
@@ -185,12 +174,9 @@ export default async function CMSEmailsPage() {
                     placeholder="Enter your email content..."
                     className="min-h-32"
                   />
-                </div>
                 <div className="flex gap-2">
                   <Button className="flex-1">Save as Draft</Button>
                   <Button className="flex-1">Send Now</Button>
-                </div>
-              </div>
             </DialogContent>
           </Dialog>
 
@@ -198,7 +184,6 @@ export default async function CMSEmailsPage() {
             <Mail className="w-4 h-4 mr-2" />
             Send Test Email
           </Button>
-        </div>
 
         {/* Email Campaigns */}
         <Tabs defaultValue="campaigns" className="space-y-6">
@@ -235,7 +220,6 @@ export default async function CMSEmailsPage() {
                             <p className="text-sm text-muted-foreground">
                               {campaign.subject}
                             </p>
-                          </div>
                         </TableCell>
                         <TableCell>
                           <Badge
@@ -271,7 +255,6 @@ export default async function CMSEmailsPage() {
                                 <Send className="w-4 h-4" />
                               </Button>
                             )}
-                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -292,7 +275,6 @@ export default async function CMSEmailsPage() {
                   <p className="text-sm text-muted-foreground">
                     Create reusable email templates for common communications
                   </p>
-                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -324,7 +306,6 @@ export default async function CMSEmailsPage() {
                       <Search className="w-4 h-4 mr-2" />
                       Search
                     </Button>
-                  </div>
 
                   <div className="text-center py-12">
                     <Clock className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
@@ -334,14 +315,9 @@ export default async function CMSEmailsPage() {
                     <p className="text-sm text-muted-foreground mt-2">
                       Track delivery status, opens, clicks, and bounces
                     </p>
-                  </div>
-                </div>
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
-      </main>
-      <Footer />
-    </div>
   );
 }

@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
-import { Header, Footer } from "@/components/layout";
+omponents/layout";/d
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -57,9 +57,7 @@ export default async function UserEditPage({
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="container py-8">
+    <>
         <div className="mb-8">
           <Link
             href="/admin/users"
@@ -72,7 +70,6 @@ export default async function UserEditPage({
           <p className="text-muted-foreground">
             View and manage user account details
           </p>
-        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* User Profile */}
@@ -93,7 +90,6 @@ export default async function UserEditPage({
                       defaultValue={userProfile.full_name || ""}
                       placeholder="Enter full name"
                     />
-                  </div>
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
                     <Input
@@ -102,7 +98,6 @@ export default async function UserEditPage({
                       defaultValue={userProfile.email || ""}
                       placeholder="Enter email"
                     />
-                  </div>
                   <div className="space-y-2">
                     <Label htmlFor="phone">Phone</Label>
                     <Input
@@ -110,7 +105,6 @@ export default async function UserEditPage({
                       defaultValue={userProfile.phone || ""}
                       placeholder="Enter phone number"
                     />
-                  </div>
                   <div className="space-y-2">
                     <Label htmlFor="user_type">User Type</Label>
                     <Select defaultValue={userProfile.user_type}>
@@ -125,8 +119,6 @@ export default async function UserEditPage({
                         <SelectItem value="banned">Banned</SelectItem>
                       </SelectContent>
                     </Select>
-                  </div>
-                </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="bio">Bio/About</Label>
@@ -136,7 +128,6 @@ export default async function UserEditPage({
                     placeholder="User bio or additional information"
                     className="min-h-24"
                   />
-                </div>
 
                 <div className="flex items-center space-x-2">
                   <input
@@ -146,7 +137,6 @@ export default async function UserEditPage({
                     className="rounded"
                   />
                   <Label htmlFor="is_verified">Verified Account</Label>
-                </div>
 
                 <div className="flex items-center space-x-2">
                   <input
@@ -156,7 +146,6 @@ export default async function UserEditPage({
                     className="rounded"
                   />
                   <Label htmlFor="is_premium">Premium Member</Label>
-                </div>
               </CardContent>
             </Card>
 
@@ -170,25 +159,19 @@ export default async function UserEditPage({
                   <div className="text-center">
                     <p className="text-2xl font-bold">{userStats.totalProperties}</p>
                     <p className="text-sm text-muted-foreground">Properties</p>
-                  </div>
                   <div className="text-center">
                     <p className="text-2xl font-bold">{userStats.activeListings}</p>
                     <p className="text-sm text-muted-foreground">Active Listings</p>
-                  </div>
                   <div className="text-center">
                     <p className="text-2xl font-bold">{userStats.totalInquiries}</p>
                     <p className="text-sm text-muted-foreground">Inquiries</p>
-                  </div>
                   <div className="text-center">
                     <p className="text-2xl font-bold">
                       {new Date(userStats.joinDate).getFullYear()}
                     </p>
                     <p className="text-sm text-muted-foreground">Joined</p>
-                  </div>
-                </div>
               </CardContent>
             </Card>
-          </div>
 
           {/* Actions & Status */}
           <div className="space-y-6">
@@ -202,14 +185,12 @@ export default async function UserEditPage({
                   <Badge variant={userProfile.user_type === 'banned' ? 'destructive' : 'default'}>
                     {userProfile.user_type}
                   </Badge>
-                </div>
 
                 <div>
                   <p className="text-sm text-muted-foreground">Verification</p>
                   <Badge variant={userProfile.is_verified ? 'default' : 'secondary'}>
                     {userProfile.is_verified ? 'Verified' : 'Unverified'}
                   </Badge>
-                </div>
 
                 <div>
                   <p className="text-sm text-muted-foreground">Last Login</p>
@@ -217,7 +198,6 @@ export default async function UserEditPage({
                     {new Date(userStats.lastLogin).toLocaleDateString()} at{" "}
                     {new Date(userStats.lastLogin).toLocaleTimeString()}
                   </p>
-                </div>
               </CardContent>
             </Card>
 
@@ -251,10 +231,5 @@ export default async function UserEditPage({
                 </Button>
               </CardContent>
             </Card>
-          </div>
-        </div>
-      </main>
-      <Footer />
-    </div>
   );
 }

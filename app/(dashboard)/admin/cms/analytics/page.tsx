@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { Header, Footer } from "@/components/layout";
+omponents/layout";/d
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -81,9 +81,7 @@ export default async function CMSAnalyticsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="container py-8">
+    <>
         <div className="mb-8">
           <Link
             href="/admin/cms"
@@ -95,7 +93,6 @@ export default async function CMSAnalyticsPage() {
           <p className="text-muted-foreground">
             Comprehensive insights into platform performance and user behavior
           </p>
-        </div>
 
         {/* Overview Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
@@ -106,8 +103,6 @@ export default async function CMSAnalyticsPage() {
                 <div>
                   <p className="text-2xl font-bold">{analyticsData.overview.totalUsers.toLocaleString()}</p>
                   <p className="text-sm text-muted-foreground">Total Users</p>
-                </div>
-              </div>
             </CardContent>
           </Card>
 
@@ -118,8 +113,6 @@ export default async function CMSAnalyticsPage() {
                 <div>
                   <p className="text-2xl font-bold">{analyticsData.overview.totalProperties.toLocaleString()}</p>
                   <p className="text-sm text-muted-foreground">Properties</p>
-                </div>
-              </div>
             </CardContent>
           </Card>
 
@@ -130,8 +123,6 @@ export default async function CMSAnalyticsPage() {
                 <div>
                   <p className="text-2xl font-bold">{analyticsData.overview.totalInquiries.toLocaleString()}</p>
                   <p className="text-sm text-muted-foreground">Inquiries</p>
-                </div>
-              </div>
             </CardContent>
           </Card>
 
@@ -142,8 +133,6 @@ export default async function CMSAnalyticsPage() {
                 <div>
                   <p className="text-2xl font-bold">₦{analyticsData.overview.totalRevenue.toLocaleString()}</p>
                   <p className="text-sm text-muted-foreground">Revenue</p>
-                </div>
-              </div>
             </CardContent>
           </Card>
 
@@ -154,11 +143,8 @@ export default async function CMSAnalyticsPage() {
                 <div>
                   <p className="text-2xl font-bold">{analyticsData.overview.growthRate}%</p>
                   <p className="text-sm text-muted-foreground">Growth</p>
-                </div>
-              </div>
             </CardContent>
           </Card>
-        </div>
 
         {/* Controls */}
         <div className="flex gap-4 mb-6">
@@ -183,7 +169,6 @@ export default async function CMSAnalyticsPage() {
             <Download className="w-4 h-4 mr-2" />
             Export Report
           </Button>
-        </div>
 
         {/* Detailed Analytics */}
         <Tabs defaultValue="users" className="space-y-6">
@@ -206,18 +191,14 @@ export default async function CMSAnalyticsPage() {
                     <div className="flex justify-between items-center">
                       <span>This Month</span>
                       <span className="font-bold">{analyticsData.userGrowth.thisMonth}</span>
-                    </div>
                     <div className="flex justify-between items-center">
                       <span>Last Month</span>
                       <span className="font-bold">{analyticsData.userGrowth.lastMonth}</span>
-                    </div>
                     <div className="flex justify-between items-center pt-2 border-t">
                       <span>Growth Rate</span>
                       <Badge variant="default" className="bg-green-600">
                         +{analyticsData.userGrowth.growth}%
                       </Badge>
-                    </div>
-                  </div>
                 </CardContent>
               </Card>
 
@@ -230,19 +211,14 @@ export default async function CMSAnalyticsPage() {
                     <div className="flex justify-between">
                       <span>Property Owners</span>
                       <span className="font-bold">45%</span>
-                    </div>
                     <div className="flex justify-between">
                       <span>Agents</span>
                       <span className="font-bold">30%</span>
-                    </div>
                     <div className="flex justify-between">
                       <span>Regular Users</span>
                       <span className="font-bold">25%</span>
-                    </div>
-                  </div>
                 </CardContent>
               </Card>
-            </div>
           </TabsContent>
 
           <TabsContent value="properties">
@@ -256,20 +232,15 @@ export default async function CMSAnalyticsPage() {
                     <div className="flex justify-between">
                       <span>Active Listings</span>
                       <span className="font-bold">{analyticsData.propertyStats.activeListings}</span>
-                    </div>
                     <div className="flex justify-between">
                       <span>Pending Verification</span>
                       <span className="font-bold">{analyticsData.propertyStats.pendingVerification}</span>
-                    </div>
                     <div className="flex justify-between">
                       <span>Verified Today</span>
                       <span className="font-bold text-green-600">{analyticsData.propertyStats.verifiedToday}</span>
-                    </div>
                     <div className="flex justify-between pt-2 border-t">
                       <span>Average Price</span>
                       <span className="font-bold">₦{analyticsData.propertyStats.averagePrice.toLocaleString()}</span>
-                    </div>
-                  </div>
                 </CardContent>
               </Card>
 
@@ -282,23 +253,17 @@ export default async function CMSAnalyticsPage() {
                     <div className="flex justify-between">
                       <span>Houses</span>
                       <span className="font-bold">35%</span>
-                    </div>
                     <div className="flex justify-between">
                       <span>Apartments</span>
                       <span className="font-bold">28%</span>
-                    </div>
                     <div className="flex justify-between">
                       <span>Commercial</span>
                       <span className="font-bold">20%</span>
-                    </div>
                     <div className="flex justify-between">
                       <span>Land</span>
                       <span className="font-bold">17%</span>
-                    </div>
-                  </div>
                 </CardContent>
               </Card>
-            </div>
           </TabsContent>
 
           <TabsContent value="engagement">
@@ -312,20 +277,15 @@ export default async function CMSAnalyticsPage() {
                     <div className="flex justify-between">
                       <span>Daily Active Users</span>
                       <span className="font-bold">{analyticsData.engagement.dailyActiveUsers}</span>
-                    </div>
                     <div className="flex justify-between">
                       <span>Weekly Active Users</span>
                       <span className="font-bold">{analyticsData.engagement.weeklyActiveUsers}</span>
-                    </div>
                     <div className="flex justify-between">
                       <span>Monthly Active Users</span>
                       <span className="font-bold">{analyticsData.engagement.monthlyActiveUsers}</span>
-                    </div>
                     <div className="flex justify-between pt-2 border-t">
                       <span>Avg Session Duration</span>
                       <span className="font-bold">{analyticsData.engagement.averageSessionDuration}</span>
-                    </div>
-                  </div>
                 </CardContent>
               </Card>
 
@@ -338,23 +298,17 @@ export default async function CMSAnalyticsPage() {
                     <div className="flex justify-between">
                       <span>Property Search</span>
                       <span className="font-bold">45%</span>
-                    </div>
                     <div className="flex justify-between">
                       <span>Property Details</span>
                       <span className="font-bold">28%</span>
-                    </div>
                     <div className="flex justify-between">
                       <span>Dashboard</span>
                       <span className="font-bold">15%</span>
-                    </div>
                     <div className="flex justify-between">
                       <span>Profile</span>
                       <span className="font-bold">12%</span>
-                    </div>
-                  </div>
                 </CardContent>
               </Card>
-            </div>
           </TabsContent>
 
           <TabsContent value="revenue">
@@ -368,18 +322,14 @@ export default async function CMSAnalyticsPage() {
                     <div className="flex justify-between">
                       <span>This Month</span>
                       <span className="font-bold">₦{analyticsData.revenue.thisMonth.toLocaleString()}</span>
-                    </div>
                     <div className="flex justify-between">
                       <span>Last Month</span>
                       <span className="font-bold">₦{analyticsData.revenue.lastMonth.toLocaleString()}</span>
-                    </div>
                     <div className="flex justify-between pt-2 border-t">
                       <span>Growth Rate</span>
                       <Badge variant="default" className="bg-green-600">
                         +{analyticsData.revenue.growth}%
                       </Badge>
-                    </div>
-                  </div>
                 </CardContent>
               </Card>
 
@@ -392,7 +342,6 @@ export default async function CMSAnalyticsPage() {
                   <p className="text-muted-foreground">Generated ₦850,000 this month</p>
                 </CardContent>
               </Card>
-            </div>
           </TabsContent>
 
           <TabsContent value="activity">
@@ -408,17 +357,11 @@ export default async function CMSAnalyticsPage() {
                       <div className="flex-1">
                         <p className="font-medium">{activity.event}</p>
                         <p className="text-sm text-muted-foreground">{activity.details}</p>
-                      </div>
                       <p className="text-sm text-muted-foreground">{activity.time}</p>
-                    </div>
                   ))}
-                </div>
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
-      </main>
-      <Footer />
-    </div>
   );
 }

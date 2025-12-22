@@ -46,7 +46,7 @@ export default async function AdminDashboardPage() {
     .eq("verification_status", "rejected")
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
       <AdminDashboardContent
         user={user}
         pendingProperties={pendingProperties || []}
@@ -54,6 +54,5 @@ export default async function AdminDashboardPage() {
         verifiedCount={verifiedCount || 0}
         rejectedCount={rejectedCount || 0}
       />
-    </div>
   )
 }

@@ -1,6 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { Header, Footer } from "@/components/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -69,15 +68,12 @@ export default async function ContentPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="container py-8">
+    <>
         <div className="mb-8">
           <h1 className="text-3xl font-bold">Content Moderation</h1>
           <p className="text-muted-foreground">
             Review and moderate user reviews and uploaded media
           </p>
-        </div>
 
         <Tabs defaultValue="reviews" className="space-y-6">
           <TabsList>
@@ -117,7 +113,6 @@ export default async function ContentPage() {
                           <div className="flex items-center gap-1">
                             <span className="font-medium">{review.rating}</span>
                             <span className="text-yellow-500">★</span>
-                          </div>
                         </TableCell>
                         <TableCell className="max-w-xs truncate">{review.review}</TableCell>
                         <TableCell>{new Date(review.submittedAt).toLocaleDateString()}</TableCell>
@@ -135,7 +130,6 @@ export default async function ContentPage() {
                               <XCircle className="w-4 h-4 mr-1" />
                               Reject
                             </Button>
-                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -186,7 +180,6 @@ export default async function ContentPage() {
                               <XCircle className="w-4 h-4 mr-1" />
                               Reject
                             </Button>
-                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -196,8 +189,5 @@ export default async function ContentPage() {
             </Card>
           </TabsContent>
         </Tabs>
-      </main>
-      <Footer />
-    </div>
   );
 }

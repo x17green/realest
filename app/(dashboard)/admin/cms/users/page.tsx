@@ -1,14 +1,6 @@
-<file_path>
-realest\app\(dashboard)\admin\cms\users\page.tsx
-</file_path>
-
-<edit_description>
-Create detailed user management page for CMS
-</edit_description>
-
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { Header, Footer } from "@/components/layout";
+omponents/layout";/d
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -76,9 +68,7 @@ export default async function CMSUsersPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="container py-8">
+    <>
         <div className="mb-8">
           <Link
             href="/admin/cms"
@@ -90,7 +80,6 @@ export default async function CMSUsersPage() {
           <p className="text-muted-foreground">
             Comprehensive user overview and management
           </p>
-        </div>
 
         {/* Statistics Overview */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-8">
@@ -100,7 +89,6 @@ export default async function CMSUsersPage() {
                 <Users className="w-6 h-6 text-blue-600 mx-auto mb-2" />
                 <p className="text-xl font-bold">{userStats.totalUsers}</p>
                 <p className="text-xs text-muted-foreground">Total</p>
-              </div>
             </CardContent>
           </Card>
 
@@ -110,7 +98,6 @@ export default async function CMSUsersPage() {
                 <UserCheck className="w-6 h-6 text-green-600 mx-auto mb-2" />
                 <p className="text-xl font-bold">{userStats.activeUsers}</p>
                 <p className="text-xs text-muted-foreground">Active</p>
-              </div>
             </CardContent>
           </Card>
 
@@ -120,7 +107,6 @@ export default async function CMSUsersPage() {
                 <CheckCircle className="w-6 h-6 text-purple-600 mx-auto mb-2" />
                 <p className="text-xl font-bold">{userStats.verifiedUsers}</p>
                 <p className="text-xs text-muted-foreground">Verified</p>
-              </div>
             </CardContent>
           </Card>
 
@@ -130,7 +116,6 @@ export default async function CMSUsersPage() {
                 <Home className="w-6 h-6 text-orange-600 mx-auto mb-2" />
                 <p className="text-xl font-bold">{userStats.owners}</p>
                 <p className="text-xs text-muted-foreground">Owners</p>
-              </div>
             </CardContent>
           </Card>
 
@@ -140,7 +125,6 @@ export default async function CMSUsersPage() {
                 <MessageSquare className="w-6 h-6 text-indigo-600 mx-auto mb-2" />
                 <p className="text-xl font-bold">{userStats.agents}</p>
                 <p className="text-xs text-muted-foreground">Agents</p>
-              </div>
             </CardContent>
           </Card>
 
@@ -150,7 +134,6 @@ export default async function CMSUsersPage() {
                 <Users className="w-6 h-6 text-gray-600 mx-auto mb-2" />
                 <p className="text-xl font-bold">{userStats.regularUsers}</p>
                 <p className="text-xs text-muted-foreground">Users</p>
-              </div>
             </CardContent>
           </Card>
 
@@ -160,10 +143,8 @@ export default async function CMSUsersPage() {
                 <UserX className="w-6 h-6 text-red-600 mx-auto mb-2" />
                 <p className="text-xl font-bold">{userStats.bannedUsers}</p>
                 <p className="text-xs text-muted-foreground">Banned</p>
-              </div>
             </CardContent>
           </Card>
-        </div>
 
         {/* Filters and Search */}
         <Card className="mb-6">
@@ -174,7 +155,6 @@ export default async function CMSUsersPage() {
                   placeholder="Search users by name, email, or phone..."
                   className="max-w-md"
                 />
-              </div>
               <div className="flex gap-2">
                 <Select>
                   <SelectTrigger className="w-32">
@@ -205,8 +185,6 @@ export default async function CMSUsersPage() {
                   <Filter className="w-4 h-4 mr-2" />
                   Apply
                 </Button>
-              </div>
-            </div>
           </CardContent>
         </Card>
 
@@ -249,7 +227,6 @@ export default async function CMSUsersPage() {
                             <p className="text-sm text-muted-foreground">
                               {userProfile.email}
                             </p>
-                          </div>
                         </TableCell>
                         <TableCell>
                           <Badge variant="outline">{userProfile.user_type}</Badge>
@@ -266,12 +243,10 @@ export default async function CMSUsersPage() {
                                 Banned
                               </Badge>
                             )}
-                          </div>
                         </TableCell>
                         <TableCell>
                           <div className="text-sm">
                             <p>Last login: {userProfile.last_login_at ? new Date(userProfile.last_login_at).toLocaleDateString() : 'Never'}</p>
-                          </div>
                         </TableCell>
                         <TableCell className="text-center">
                           {userProfile.properties?.[0]?.count || 0}
@@ -298,7 +273,6 @@ export default async function CMSUsersPage() {
                             >
                               {userProfile.user_type === 'banned' ? 'Unban' : 'Ban'}
                             </Button>
-                          </div>
                         </TableCell>
                       </TableRow>
                     )) || (
@@ -345,8 +319,5 @@ export default async function CMSUsersPage() {
             </Card>
           </TabsContent>
         </Tabs>
-      </main>
-      <Footer />
-    </div>
   );
 }

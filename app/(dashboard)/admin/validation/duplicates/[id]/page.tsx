@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
-import { Header, Footer } from "@/components/layout";
+omponents/layout";/d
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -66,9 +66,7 @@ export default async function DuplicateResolutionPage({
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="container py-8">
+    <>
         <div className="mb-8">
           <Link
             href="/admin/validation/duplicates"
@@ -81,7 +79,6 @@ export default async function DuplicateResolutionPage({
           <p className="text-muted-foreground">
             Review potential duplicate listings
           </p>
-        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Current Property */}
@@ -96,31 +93,24 @@ export default async function DuplicateResolutionPage({
               <div>
                 <h3 className="font-semibold text-lg">{property.title}</h3>
                 <p className="text-muted-foreground">{property.location}</p>
-              </div>
 
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <p className="text-muted-foreground">Price</p>
                   <p className="font-medium">₦{property.price?.toLocaleString()}</p>
-                </div>
                 <div>
                   <p className="text-muted-foreground">Type</p>
                   <p>{property.property_type}</p>
-                </div>
                 <div>
                   <p className="text-muted-foreground">Owner</p>
                   <p>{property.profiles?.full_name}</p>
-                </div>
                 <div>
                   <p className="text-muted-foreground">Submitted</p>
                   <p>{new Date(property.created_at).toLocaleDateString()}</p>
-                </div>
-              </div>
 
               <div>
                 <p className="text-muted-foreground text-sm">Description</p>
                 <p className="text-sm mt-1">{property.description}</p>
-              </div>
             </CardContent>
           </Card>
 
@@ -139,21 +129,16 @@ export default async function DuplicateResolutionPage({
                     <div className="flex items-start justify-between">
                       <h4 className="font-medium">{dup.title}</h4>
                       <Badge variant="destructive">{dup.similarity}% match</Badge>
-                    </div>
                     <p className="text-sm text-muted-foreground">{dup.location}</p>
                     <div className="flex justify-between text-sm">
                       <span>₦{dup.price.toLocaleString()}</span>
                       <span>Owner: {dup.owner}</span>
-                    </div>
                     <Button variant="outline" size="sm" className="w-full">
                       Compare Details
                     </Button>
-                  </div>
                 ))}
-              </div>
             </CardContent>
           </Card>
-        </div>
 
         {/* Resolution Actions */}
         <Card className="mt-6">
@@ -175,7 +160,6 @@ export default async function DuplicateResolutionPage({
                 <CheckCircle className="w-4 h-4 mr-2" />
                 Not a Duplicate - Approve Listing
               </Button>
-            </div>
 
             <div className="flex gap-4">
               <Button variant="secondary" className="flex-1">
@@ -184,11 +168,7 @@ export default async function DuplicateResolutionPage({
               <Button variant="ghost" className="flex-1">
                 Escalate to Senior Admin
               </Button>
-            </div>
           </CardContent>
         </Card>
-      </main>
-      <Footer />
-    </div>
   );
 }

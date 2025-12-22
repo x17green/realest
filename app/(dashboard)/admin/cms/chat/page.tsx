@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { Header, Footer } from "@/components/layout";
+omponents/layout";/d
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -73,9 +73,7 @@ export default async function CMSChatPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="container py-8">
+    <>
         <div className="mb-8">
           <Link
             href="/admin/cms"
@@ -87,7 +85,6 @@ export default async function CMSChatPage() {
           <p className="text-muted-foreground">
             Manage real-time customer support conversations
           </p>
-        </div>
 
         {/* Chat Statistics */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
@@ -98,8 +95,6 @@ export default async function CMSChatPage() {
                 <div>
                   <p className="text-2xl font-bold">{chatStats.activeChats}</p>
                   <p className="text-sm text-muted-foreground">Active Chats</p>
-                </div>
-              </div>
             </CardContent>
           </Card>
 
@@ -110,8 +105,6 @@ export default async function CMSChatPage() {
                 <div>
                   <p className="text-2xl font-bold">{chatStats.waitingUsers}</p>
                   <p className="text-sm text-muted-foreground">Waiting</p>
-                </div>
-              </div>
             </CardContent>
           </Card>
 
@@ -122,8 +115,6 @@ export default async function CMSChatPage() {
                 <div>
                   <p className="text-2xl font-bold">{chatStats.averageResponseTime}</p>
                   <p className="text-sm text-muted-foreground">Avg Response</p>
-                </div>
-              </div>
             </CardContent>
           </Card>
 
@@ -134,11 +125,8 @@ export default async function CMSChatPage() {
                 <div>
                   <p className="text-2xl font-bold">{chatStats.resolvedToday}</p>
                   <p className="text-sm text-muted-foreground">Resolved Today</p>
-                </div>
-              </div>
             </CardContent>
           </Card>
-        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Active Chats List */}
@@ -165,27 +153,21 @@ export default async function CMSChatPage() {
                             <div>
                               <p className="font-medium text-sm">{chat.userName}</p>
                               <p className="text-xs text-muted-foreground">{chat.userEmail}</p>
-                            </div>
-                          </div>
                           {chat.unreadCount > 0 && (
                             <Badge variant="destructive" className="text-xs">
                               {chat.unreadCount}
                             </Badge>
                           )}
-                        </div>
                         <p className="text-sm text-muted-foreground line-clamp-1">
                           {chat.lastMessage}
                         </p>
                         <p className="text-xs text-muted-foreground mt-1">
                           {new Date(chat.lastMessageTime).toLocaleTimeString()}
                         </p>
-                      </div>
                     ))}
-                  </div>
                 </ScrollArea>
               </CardContent>
             </Card>
-          </div>
 
           {/* Chat Interface */}
           <div className="lg:col-span-2">
@@ -201,8 +183,6 @@ export default async function CMSChatPage() {
                     <div>
                       <p className="font-medium">{activeChats[0]?.userName}</p>
                       <p className="text-sm text-muted-foreground">{activeChats[0]?.userEmail}</p>
-                    </div>
-                  </div>
                   <div className="flex gap-2">
                     <Button size="sm" variant="outline">
                       <Phone className="w-4 h-4" />
@@ -213,8 +193,6 @@ export default async function CMSChatPage() {
                     <Button size="sm" variant="outline">
                       End Chat
                     </Button>
-                  </div>
-                </div>
               </CardHeader>
               <CardContent className="p-0 flex flex-col h-[500px]">
                 {/* Messages */}
@@ -236,10 +214,7 @@ export default async function CMSChatPage() {
                           <p className="text-xs opacity-70 mt-1">
                             {new Date(message.timestamp).toLocaleTimeString()}
                           </p>
-                        </div>
-                      </div>
                     ))}
-                  </div>
                 </ScrollArea>
 
                 {/* Message Input */}
@@ -252,7 +227,6 @@ export default async function CMSChatPage() {
                     <Button>
                       <Send className="w-4 h-4" />
                     </Button>
-                  </div>
                   <div className="flex gap-2 mt-2">
                     <Button size="sm" variant="outline">
                       Quick Reply
@@ -263,12 +237,8 @@ export default async function CMSChatPage() {
                     <Button size="sm" variant="outline">
                       Canned Response
                     </Button>
-                  </div>
-                </div>
               </CardContent>
             </Card>
-          </div>
-        </div>
 
         {/* Quick Actions */}
         <div className="mt-8 flex gap-4">
@@ -281,9 +251,5 @@ export default async function CMSChatPage() {
           <Button variant="outline">
             Chat Settings
           </Button>
-        </div>
-      </main>
-      <Footer />
-    </div>
   );
 }

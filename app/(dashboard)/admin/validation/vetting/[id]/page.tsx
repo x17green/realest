@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
-import { Header, Footer } from "@/components/layout";
+omponents/layout";/d
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -58,9 +58,7 @@ export default async function VettingReportPage({
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="container py-8">
+    <>
         <div className="mb-8">
           <Link
             href="/admin/validation/vetting"
@@ -73,7 +71,6 @@ export default async function VettingReportPage({
           <p className="text-muted-foreground">
             Review physical inspection results for this property
           </p>
-        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Property Details */}
@@ -87,7 +84,6 @@ export default async function VettingReportPage({
                     <MapPin className="w-3 h-3" />
                     {vettingReport.locationVerified ? "Location Verified" : "Location Issue"}
                   </Badge>
-                </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
@@ -96,26 +92,19 @@ export default async function VettingReportPage({
                     <div>
                       <p className="text-muted-foreground">Type</p>
                       <p>{property.property_type}</p>
-                    </div>
                     <div>
                       <p className="text-muted-foreground">Price</p>
                       <p>₦{property.price?.toLocaleString()}</p>
-                    </div>
                     <div>
                       <p className="text-muted-foreground">Location</p>
                       <p>{property.location}</p>
-                    </div>
                     <div>
                       <p className="text-muted-foreground">Owner</p>
                       <p>{property.profiles?.full_name}</p>
-                    </div>
-                  </div>
-                </div>
 
                 <div>
                   <h3 className="font-semibold mb-2">Description</h3>
                   <p className="text-sm">{property.description}</p>
-                </div>
               </CardContent>
             </Card>
 
@@ -133,15 +122,12 @@ export default async function VettingReportPage({
                   {Array.from({ length: vettingReport.photosTaken }, (_, i) => (
                     <div key={i} className="aspect-square bg-gray-200 rounded-lg flex items-center justify-center">
                       <Camera className="w-8 h-8 text-gray-400" />
-                    </div>
                   ))}
-                </div>
                 <Button variant="outline" className="mt-4">
                   View All Photos
                 </Button>
               </CardContent>
             </Card>
-          </div>
 
           {/* Vetting Report & Actions */}
           <div className="space-y-6">
@@ -153,34 +139,28 @@ export default async function VettingReportPage({
                 <div>
                   <p className="text-sm text-muted-foreground">Inspector</p>
                   <p className="font-medium">{vettingReport.inspectorName}</p>
-                </div>
 
                 <div>
                   <p className="text-sm text-muted-foreground">Inspection Date</p>
                   <p>{vettingReport.inspectionDate}</p>
-                </div>
 
                 <div>
                   <p className="text-sm text-muted-foreground">Property Condition</p>
                   <Badge variant="default">{vettingReport.propertyCondition}</Badge>
-                </div>
 
                 <div>
                   <p className="text-sm text-muted-foreground">Documents Verified</p>
                   <Badge variant={vettingReport.documentsVerified ? "default" : "destructive"}>
                     {vettingReport.documentsVerified ? "Verified" : "Issues Found"}
                   </Badge>
-                </div>
 
                 <div>
                   <p className="text-sm text-muted-foreground">Inspector Notes</p>
                   <p className="text-sm bg-muted p-3 rounded-lg">{vettingReport.notes}</p>
-                </div>
 
                 <div>
                   <p className="text-sm text-muted-foreground">Recommendations</p>
                   <p className="text-sm font-medium">{vettingReport.recommendations}</p>
-                </div>
               </CardContent>
             </Card>
 
@@ -203,17 +183,11 @@ export default async function VettingReportPage({
                     <CheckCircle className="w-4 h-4 mr-2" />
                     Approve Listing
                   </Button>
-                </div>
 
                 <Button variant="secondary" className="w-full">
                   Request Additional Info
                 </Button>
               </CardContent>
             </Card>
-          </div>
-        </div>
-      </main>
-      <Footer />
-    </div>
   );
 }

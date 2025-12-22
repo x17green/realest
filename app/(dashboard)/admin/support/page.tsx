@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { Header, Footer } from "@/components/layout";
+omponents/layout";/d
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -95,15 +95,12 @@ export default async function SupportPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="container py-8">
+    <>
         <div className="mb-8">
           <h1 className="text-3xl font-bold">Support Tickets</h1>
           <p className="text-muted-foreground">
             Manage customer support requests and inquiries
           </p>
-        </div>
 
         {/* Statistics */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -114,8 +111,6 @@ export default async function SupportPage() {
                 <div>
                   <p className="text-2xl font-bold">{supportTickets.open.length}</p>
                   <p className="text-sm text-muted-foreground">Open Tickets</p>
-                </div>
-              </div>
             </CardContent>
           </Card>
 
@@ -126,8 +121,6 @@ export default async function SupportPage() {
                 <div>
                   <p className="text-2xl font-bold">{supportTickets.resolved.length}</p>
                   <p className="text-sm text-muted-foreground">Resolved</p>
-                </div>
-              </div>
             </CardContent>
           </Card>
 
@@ -140,8 +133,6 @@ export default async function SupportPage() {
                     {supportTickets.open.filter(t => t.priority === "High").length}
                   </p>
                   <p className="text-sm text-muted-foreground">High Priority</p>
-                </div>
-              </div>
             </CardContent>
           </Card>
 
@@ -154,11 +145,8 @@ export default async function SupportPage() {
                     {supportTickets.open.length + supportTickets.resolved.length}
                   </p>
                   <p className="text-sm text-muted-foreground">Total Tickets</p>
-                </div>
-              </div>
             </CardContent>
           </Card>
-        </div>
 
         <Tabs defaultValue="open" className="space-y-6">
           <TabsList>
@@ -196,7 +184,6 @@ export default async function SupportPage() {
                           <div>
                             <p className="font-medium">{ticket.userName}</p>
                             <p className="text-sm text-muted-foreground">{ticket.userEmail}</p>
-                          </div>
                         </TableCell>
                         <TableCell>
                           <Badge className={getPriorityColor(ticket.priority)}>
@@ -221,7 +208,6 @@ export default async function SupportPage() {
                             <Button size="sm" variant="outline">
                               Close
                             </Button>
-                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -257,7 +243,6 @@ export default async function SupportPage() {
                           <div>
                             <p className="font-medium">{ticket.userName}</p>
                             <p className="text-sm text-muted-foreground">{ticket.userEmail}</p>
-                          </div>
                         </TableCell>
                         <TableCell>
                           <Badge className={getPriorityColor(ticket.priority)}>
@@ -286,8 +271,5 @@ export default async function SupportPage() {
             </Card>
           </TabsContent>
         </Tabs>
-      </main>
-      <Footer />
-    </div>
   );
 }

@@ -29,7 +29,6 @@ export default async function SubAdminsPage() {
         <div>
           <h2 className="font-heading text-xl mb-4">Create New Sub-Admin</h2>
           <SubAdminForm />
-        </div>
 
         <div>
           <h2 className="font-heading text-xl mb-4">Current Admins ({admins?.length ?? 0})</h2>
@@ -42,14 +41,9 @@ export default async function SubAdminsPage() {
                   <p className="text-xs text-muted-foreground mt-1">
                     Added: {new Date(admin.created_at).toLocaleDateString()}
                   </p>
-                </div>
               ))}
-            </div>
           ) : (
             <p className="text-muted-foreground">No other admins found.</p>
           )}
-        </div>
-      </div>
-    </div>
   )
 }

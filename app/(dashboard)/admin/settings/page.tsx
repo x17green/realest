@@ -44,14 +44,12 @@ export default async function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <main className="container py-8">
+    <>
         <div className="mb-8">
           <h1 className="text-3xl font-bold">System Settings</h1>
           <p className="text-muted-foreground">
             Configure global system settings and preferences
           </p>
-        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* General Settings */}
@@ -70,7 +68,6 @@ export default async function SettingsPage() {
                   defaultValue={systemSettings.siteName}
                   placeholder="Enter site name"
                 />
-              </div>
 
               <div className="space-y-2">
                 <Label htmlFor="siteDescription">Site Description</Label>
@@ -80,7 +77,6 @@ export default async function SettingsPage() {
                   placeholder="Enter site description"
                   className="min-h-20"
                 />
-              </div>
 
               <div className="space-y-2">
                 <Label htmlFor="contactEmail">Contact Email</Label>
@@ -90,7 +86,6 @@ export default async function SettingsPage() {
                   defaultValue={systemSettings.contactEmail}
                   placeholder="Enter contact email"
                 />
-              </div>
 
               <div className="space-y-2">
                 <Label htmlFor="maxUploadSize">Max Upload Size (MB)</Label>
@@ -100,7 +95,6 @@ export default async function SettingsPage() {
                   defaultValue={systemSettings.maxUploadSize}
                   placeholder="Enter max upload size"
                 />
-              </div>
             </CardContent>
           </Card>
 
@@ -119,9 +113,7 @@ export default async function SettingsPage() {
                   <p className="text-sm text-muted-foreground">
                     Put site in maintenance mode
                   </p>
-                </div>
                 <Switch defaultChecked={systemSettings.maintenanceMode} />
-              </div>
 
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
@@ -129,9 +121,7 @@ export default async function SettingsPage() {
                   <p className="text-sm text-muted-foreground">
                     Allow new user registrations
                   </p>
-                </div>
                 <Switch defaultChecked={systemSettings.allowRegistrations} />
-              </div>
 
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
@@ -139,9 +129,7 @@ export default async function SettingsPage() {
                   <p className="text-sm text-muted-foreground">
                     Send system email notifications
                   </p>
-                </div>
                 <Switch defaultChecked={systemSettings.emailNotifications} />
-              </div>
             </CardContent>
           </Card>
 
@@ -162,11 +150,9 @@ export default async function SettingsPage() {
                       {currency}
                     </Badge>
                   ))}
-                </div>
                 <p className="text-sm text-muted-foreground">
                   Add or remove supported currencies
                 </p>
-              </div>
 
               <div className="space-y-2">
                 <Label htmlFor="defaultCurrency">Default Currency</Label>
@@ -181,7 +167,6 @@ export default async function SettingsPage() {
                     </option>
                   ))}
                 </select>
-              </div>
             </CardContent>
           </Card>
 
@@ -200,7 +185,6 @@ export default async function SettingsPage() {
                   id="smtpHost"
                   placeholder="smtp.example.com"
                 />
-              </div>
 
               <div className="space-y-2">
                 <Label htmlFor="smtpPort">SMTP Port</Label>
@@ -208,7 +192,6 @@ export default async function SettingsPage() {
                   id="smtpPort"
                   placeholder="587"
                 />
-              </div>
 
               <div className="space-y-2">
                 <Label htmlFor="smtpUser">SMTP Username</Label>
@@ -216,7 +199,6 @@ export default async function SettingsPage() {
                   id="smtpUser"
                   placeholder="noreply@example.com"
                 />
-              </div>
 
               <div className="space-y-2">
                 <Label htmlFor="smtpPass">SMTP Password</Label>
@@ -225,10 +207,8 @@ export default async function SettingsPage() {
                   type="password"
                   placeholder="Enter SMTP password"
                 />
-              </div>
             </CardContent>
           </Card>
-        </div>
 
         {/* Save Button */}
         <div className="mt-8 flex justify-end">
@@ -236,8 +216,5 @@ export default async function SettingsPage() {
             <Save className="w-4 h-4 mr-2" />
             Save All Settings
           </Button>
-        </div>
-      </main>
-    </div>
   );
 }

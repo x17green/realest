@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { Header, Footer } from "@/components/layout";
+omponents/layout";/d
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -42,22 +42,18 @@ export default async function AmenitiesPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="container py-8">
+    <>
         <div className="mb-8">
           <h1 className="text-3xl font-bold">Property Amenities</h1>
           <p className="text-muted-foreground">
             Manage property features and amenities
           </p>
-        </div>
 
         <div className="flex justify-between items-center mb-6">
           <div>
             <p className="text-sm text-muted-foreground">
               Total Amenities: {amenities.length} | Active: {amenities.filter(a => a.isActive).length}
             </p>
-          </div>
           <Dialog>
             <DialogTrigger asChild>
               <Button>
@@ -73,7 +69,6 @@ export default async function AmenitiesPage() {
                 <div className="space-y-2">
                   <Label htmlFor="amenityName">Amenity Name</Label>
                   <Input id="amenityName" placeholder="Enter amenity name" />
-                </div>
                 <div className="space-y-2">
                   <Label htmlFor="amenityCategory">Category</Label>
                   <select
@@ -88,16 +83,12 @@ export default async function AmenitiesPage() {
                     <option value="Utilities">Utilities</option>
                     <option value="Comfort">Comfort</option>
                   </select>
-                </div>
                 <div className="flex items-center space-x-2">
                   <input type="checkbox" id="isActive" defaultChecked className="rounded" />
                   <Label htmlFor="isActive">Active Amenity</Label>
-                </div>
                 <Button className="w-full">Create Amenity</Button>
-              </div>
             </DialogContent>
           </Dialog>
-        </div>
 
         <Card>
           <CardHeader>
@@ -146,7 +137,6 @@ export default async function AmenitiesPage() {
                               <div className="space-y-2">
                                 <Label htmlFor="editName">Amenity Name</Label>
                                 <Input id="editName" defaultValue={amenity.name} />
-                              </div>
                               <div className="space-y-2">
                                 <Label htmlFor="editCategory">Category</Label>
                                 <select
@@ -161,7 +151,6 @@ export default async function AmenitiesPage() {
                                   <option value="Utilities">Utilities</option>
                                   <option value="Comfort">Comfort</option>
                                 </select>
-                              </div>
                               <div className="flex items-center space-x-2">
                                 <input
                                   type="checkbox"
@@ -170,15 +159,12 @@ export default async function AmenitiesPage() {
                                   className="rounded"
                                 />
                                 <Label htmlFor="editActive">Active Amenity</Label>
-                              </div>
                               <Button className="w-full">Update Amenity</Button>
-                            </div>
                           </DialogContent>
                         </Dialog>
                         <Button size="sm" variant="outline" className="text-red-600 hover:text-red-700">
                           <Trash2 className="w-4 h-4" />
                         </Button>
-                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -186,8 +172,5 @@ export default async function AmenitiesPage() {
             </Table>
           </CardContent>
         </Card>
-      </main>
-      <Footer />
-    </div>
   );
 }

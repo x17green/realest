@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { Header, Footer } from "@/components/layout";
+omponents/layout";/d
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -37,9 +37,7 @@ export default async function DuplicatesPage() {
     .order("created_at", { ascending: true });
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="container py-8">
+    <>
         <div className="mb-8">
           <Link
             href="/admin/validation"
@@ -52,7 +50,6 @@ export default async function DuplicatesPage() {
           <p className="text-muted-foreground">
             Review properties flagged as potential duplicates
           </p>
-        </div>
 
         <Card>
           <CardHeader>
@@ -105,8 +102,5 @@ export default async function DuplicatesPage() {
             </Table>
           </CardContent>
         </Card>
-      </main>
-      <Footer />
-    </div>
   );
 }
