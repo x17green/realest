@@ -30,7 +30,7 @@ export function ProfileDropdown() {
   };
 
   const handleSettingsClick = () => {
-    router.push("/settings");
+    router.push("/admin/settings");
   };
 
   const handleLogoutClick = async () => {

@@ -122,7 +122,7 @@ export default async function MLReviewDetailPage({
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {property.property_documents?.map((doc) => (
+                  {property.property_documents?.map((doc: any) => (
                     <div key={doc.id} className="flex items-center justify-between p-3 border rounded-lg">
                       <div className="flex items-center gap-3">
                         {doc.document_type === 'image' ? (

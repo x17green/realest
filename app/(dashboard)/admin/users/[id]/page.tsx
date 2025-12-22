@@ -1,4 +1,3 @@
-realest\app\(dashboard)\admin\users\[id]\page.tsx
 import { createClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
 import { Header, Footer } from "@/components/layout";

@@ -1,14 +1,6 @@
-<file_path>
-realest\app\(dashboard)\admin\settings\page.tsx
-</file_path>
-
-<edit_description>
-Create system settings page for admins
-</edit_description>
-
+import { Badge } from "@/components/ui/badge";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { Header, Footer } from "@/components/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -53,7 +45,6 @@ export default async function SettingsPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
       <main className="container py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold">System Settings</h1>
@@ -247,7 +238,6 @@ export default async function SettingsPage() {
           </Button>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }
