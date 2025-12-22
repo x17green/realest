@@ -1,12 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, Button, Checkbox } from "@heroui/react";
+import { Checkbox } from "@heroui/react";
+import { Button, Card, CardContent } from "../ui";
+
 import Link from "next/link";
 import {
   Cookie,
   Settings,
   X,
+  ThumbsUpIcon,
   Shield,
   BarChart3,
   Target,
@@ -97,38 +100,42 @@ export default function CookieBanner() {
   };
 
   const updatePreference = (type: keyof CookiePreferences, value: boolean) => {
-    if (type === 'essential') return; // Essential cookies cannot be disabled
-    setPreferences(prev => ({ ...prev, [type]: value }));
+    if (type === "essential") return; // Essential cookies cannot be disabled
+    setPreferences((prev) => ({ ...prev, [type]: value }));
   };
 
   if (!isVisible) return null;
 
   const cookieTypes = [
     {
-      key: 'essential' as const,
-      title: 'Essential Cookies',
-      description: 'Required for the website to function properly. These cannot be disabled.',
+      key: "essential" as const,
+      title: "Essential Cookies",
+      description:
+        "Required for the website to function properly. These cannot be disabled.",
       icon: Shield,
       required: true,
     },
     {
-      key: 'analytics' as const,
-      title: 'Analytics Cookies',
-      description: 'Help us understand how visitors interact with our website to improve performance.',
+      key: "analytics" as const,
+      title: "Analytics Cookies",
+      description:
+        "Help us understand how visitors interact with our website to improve performance.",
       icon: BarChart3,
       required: false,
     },
     {
-      key: 'functional' as const,
-      title: 'Functional Cookies',
-      description: 'Enable enhanced functionality and personalization features.',
+      key: "functional" as const,
+      title: "Functional Cookies",
+      description:
+        "Enable enhanced functionality and personalization features.",
       icon: Settings,
       required: false,
     },
     {
-      key: 'marketing' as const,
-      title: 'Marketing Cookies',
-      description: 'Used to deliver relevant advertisements and track campaign effectiveness.',
+      key: "marketing" as const,
+      title: "Marketing Cookies",
+      description:
+        "Used to deliver relevant advertisements and track campaign effectiveness.",
       icon: Target,
       required: false,
     },
@@ -137,10 +144,10 @@ export default function CookieBanner() {
   return (
     <>
       {/* Cookie Banner */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-background/95 backdrop-blur-lg border-t border-border/50 shadow-lg">
+      <div className="fixed bottom-0 left-0 right-0 z-50 p-4">
         <div className="max-w-6xl mx-auto">
-          <Card.Root className="bg-background/80 backdrop-blur-lg border border-border/50 rounded-2xl p-6">
-            <Card.Content className="space-y-4">
+          <Card className="bg-background/80 backdrop-blur-lg border border-border/50 rounded-2xl p-6">
+            <CardContent className="space-y-4">
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
                   <Cookie className="w-6 h-6 text-primary" />
@@ -148,9 +155,13 @@ export default function CookieBanner() {
                 <div className="flex-1 space-y-3">
                   <h3 className="text-lg font-semibold">We use cookies</h3>
                   <p className="text-muted-foreground text-sm leading-relaxed">
-                    We use cookies to enhance your experience, analyze site traffic, and personalize content.
-                    By continuing to use our site, you agree to our use of cookies.
-                    <Link href="/legal/cookies" className="text-primary hover:underline ml-1">
+                    We use cookies to enhance your experience, analyze site
+                    traffic, and personalize content. By continuing to use our
+                    site, you agree to our use of cookies.
+                    <Link
+                      href="/cookies"
+                      className="text-primary hover:underline ml-1"
+                    >
                       Learn more about our cookie policy
                     </Link>
                   </p>
@@ -169,6 +180,7 @@ export default function CookieBanner() {
                   onClick={handleAcceptAll}
                   className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 rounded-xl font-medium"
                 >
+                  <ThumbsUpIcon className="w-4 h-4" />
                   Accept All Cookies
                 </Button>
                 <Button
@@ -187,17 +199,17 @@ export default function CookieBanner() {
                   Reject All
                 </Button>
               </div>
-            </Card.Content>
-          </Card.Root>
+            </CardContent>
+          </Card>
         </div>
       </div>
 
       {/* Cookie Preferences Modal */}
       {showPreferences && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
           <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <Card.Root className="bg-background border border-border/50 rounded-2xl shadow-2xl">
-              <Card.Content className="p-6 space-y-6">
+            <Card className="bg-background border border-border/50 rounded-2xl shadow-2xl">
+              <CardContent className="p-6 space-y-6">
                 {/* Header */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -227,11 +239,11 @@ export default function CookieBanner() {
                     const isChecked = preferences[cookieType.key];
 
                     return (
-                      <Card.Root
+                      <Card
                         key={cookieType.key}
                         className="bg-muted/30 border border-border/30 rounded-xl p-4"
                       >
-                        <Card.Content className="space-y-3">
+                        <CardContent className="space-y-3">
                           <div className="flex items-start gap-3">
                             <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center shrink-0 mt-0.5">
                               <Icon className="w-4 h-4 text-primary" />
@@ -254,21 +266,21 @@ export default function CookieBanner() {
                             <Checkbox
                               isSelected={isChecked}
                               isDisabled={cookieType.required}
-                              onValueChange={(checked) =>
-                                updatePreference(cookieType.key, checked)
+                              onChange={(isSelected) =>
+                                updatePreference(cookieType.key, isSelected)
                               }
                               className="shrink-0"
                             />
                           </div>
-                        </Card.Content>
-                      </Card.Root>
+                        </CardContent>
+                      </Card>
                     );
                   })}
                 </div>
 
                 {/* Info Section */}
-                <Card.Root className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
-                  <Card.Content>
+                <Card className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
+                  <CardContent>
                     <div className="flex gap-3">
                       <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
                       <div className="space-y-1">
@@ -276,12 +288,13 @@ export default function CookieBanner() {
                           Essential cookies cannot be disabled
                         </p>
                         <p className="text-xs text-blue-700 dark:text-blue-300">
-                          These cookies are necessary for the website to function properly and provide basic services.
+                          These cookies are necessary for the website to
+                          function properly and provide basic services.
                         </p>
                       </div>
                     </div>
-                  </Card.Content>
-                </Card.Root>
+                  </CardContent>
+                </Card>
 
                 {/* Links */}
                 <div className="flex flex-col sm:flex-row gap-3 text-sm">
@@ -323,8 +336,8 @@ export default function CookieBanner() {
                     Reject All
                   </Button>
                 </div>
-              </Card.Content>
-            </Card.Root>
+              </CardContent>
+            </Card>
           </div>
         </div>
       )}
