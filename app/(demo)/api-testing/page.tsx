@@ -49,9 +49,16 @@ interface ApiResponse {
 export default function ApiTestingPage() {
   const [activeTab, setActiveTab] = useState("auth");
   const [authToken, setAuthToken] = useState("");
-  const [userType, setUserType] = useState<"user" | "owner" | "agent" | "admin">("user");
+  const [userType, setUserType] = useState<
+    "user" | "owner" | "agent" | "admin"
+  >("user");
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<ApiResponse | null>(null);
+  const [customUrl, setCustomUrl] = useState("");
+  const [customMethod, setCustomMethod] = useState<
+    "GET" | "POST" | "PUT" | "DELETE"
+  >("GET");
+  const [customBody, setCustomBody] = useState("");
 
   // Form states for different endpoints
   const [propertyForm, setPropertyForm] = useState({
@@ -215,6 +222,23 @@ export default function ApiTestingPage() {
     );
   };
 
+  const testCustomUrl = () => {
+    if (!customUrl) return;
+    let data = null;
+    if (customMethod === "POST" || customMethod === "PUT") {
+      try {
+        data = customBody ? JSON.parse(customBody) : {};
+      } catch (error) {
+        setResponse({
+          success: false,
+          error: "Invalid JSON in request body",
+        });
+        return;
+      }
+    }
+    makeApiCall(customMethod, customUrl, data, !!authToken);
+  };
+
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -280,6 +304,52 @@ export default function ApiTestingPage() {
                   Test Auth
                 </Button>
               </div>
+            </div>
+            <div className="mt-4 space-y-4">
+              <div>
+                <label className="text-sm font-medium">Custom API URL</label>
+                <div className="flex gap-2 mt-1">
+                  <Select
+                    value={customMethod}
+                    onValueChange={(value: any) => setCustomMethod(value)}
+                  >
+                    <SelectTrigger className="w-24">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="GET">GET</SelectItem>
+                      <SelectItem value="POST">POST</SelectItem>
+                      <SelectItem value="PUT">PUT</SelectItem>
+                      <SelectItem value="DELETE">DELETE</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Input
+                    placeholder="/api/properties"
+                    value={customUrl}
+                    onChange={(e) => setCustomUrl(e.target.value)}
+                    className="flex-1"
+                  />
+                  <Button
+                    onClick={testCustomUrl}
+                    disabled={loading || !customUrl}
+                  >
+                    Test URL
+                  </Button>
+                </div>
+              </div>
+              {(customMethod === "POST" || customMethod === "PUT") && (
+                <div>
+                  <label className="text-sm font-medium">
+                    Request Body (JSON)
+                  </label>
+                  <Textarea
+                    placeholder='{"key": "value"}'
+                    value={customBody}
+                    onChange={(e) => setCustomBody(e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -1018,8 +1088,8 @@ export default function ApiTestingPage() {
               <li>Test different endpoints using the tabs above</li>
               <li>Check the API Response section for results</li>
               <li>
-                Use different user types (user/owner/agent/admin) to test role-based
-                access
+                Use different user types (user/owner/agent/admin) to test
+                role-based access
               </li>
             </ol>
           </AlertDescription>
