@@ -27,7 +27,8 @@ yarn-error.log*
 next-env.d.ts
 
 # Backups
-/backups/*
+/backup*
+
 
 # Zed IDE - Include configuration files for team consistency
 # Include .zed/ directory for project configuration

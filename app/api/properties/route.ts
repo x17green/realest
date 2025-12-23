@@ -8,7 +8,7 @@ const createPropertySchema = z.object({
   title: z.string().min(10, "Title must be at least 10 characters"),
   description: z.string().min(50, "Description must be at least 50 characters"),
   price: z.number().positive("Price must be positive"),
-  currency: z.string().default("NGN"),
+  country: z.string().default("NGN"),
   address: z.string().min(10, "Address is required"),
   city: z.string().min(2, "City is required"),
   state: z.string().min(2, "State is required"),
@@ -265,9 +265,9 @@ export async function POST(request: NextRequest) {
       .eq("id", user.id)
       .single();
 
-    if (profileError || profile?.user_type !== "owner") {
+    if (profileError || !["owner", "agent"].includes(profile?.user_type)) {
       return NextResponse.json(
-        { error: "Only property owners can create listings" },
+        { error: "Only agents and property owners can create listings" },
         { status: 403 },
       );
     }
@@ -299,7 +299,7 @@ export async function POST(request: NextRequest) {
         title: validatedData.title,
         description: validatedData.description,
         price: validatedData.price,
-        currency: validatedData.currency,
+        country: validatedData.country,
         address: validatedData.address,
         city: validatedData.city,
         state: validatedData.state,

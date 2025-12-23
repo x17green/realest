@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
       .eq("id", user.id)
       .single();
 
-    if (profileError || profile?.user_type !== "owner") {
+    if (profileError ||  !["owner", "agent"].includes(profile?.user_type)) {
       return NextResponse.json(
         { error: "Only property owners can access this endpoint" },
         { status: 403 },
