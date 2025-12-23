@@ -4,7 +4,6 @@ import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button, Input, Card } from "@heroui/react";
-import { createClient } from "@/lib/supabase/client";
 import { getCurrentUser, resetPassword, signOut } from "@/lib/auth";
 import {
   Eye,
@@ -38,99 +37,20 @@ function ResetPasswordContent() {
   // Check for auth parameters in URL and handle session
   useEffect(() => {
     const initializeSession = async () => {
-      const accessToken = searchParams.get("access_token");
-      const refreshToken = searchParams.get("refresh_token");
-      const code = searchParams.get("code");
-      const error = searchParams.get("error");
-      const errorDescription = searchParams.get("error_description");
+      const { handlePasswordResetSession } = await import("@/lib/auth");
+      const result = await handlePasswordResetSession(searchParams);
 
-      console.log("Reset password params:", {
-        accessToken,
-        refreshToken,
-        code,
-        error,
-      });
-
-      // Handle error responses from Supabase
-      if (error) {
-        console.error("Auth error:", error, errorDescription);
-        setError(
-          errorDescription ||
-            "Invalid reset link. Please request a new password reset.",
-        );
-        setTimeout(() => {
-          router.push("/forgot-password");
-        }, 5000);
-        return;
-      }
-
-      // Check for PKCE code parameter (modern Supabase flow)
-      if (code) {
-        try {
-          const supabase = createClient();
-          const { data, error: exchangeError } =
-            await supabase.auth.exchangeCodeForSession(code);
-
-          if (exchangeError) {
-            console.error("Code exchange error:", exchangeError);
-            setError(
-              "Invalid or expired reset link. Please request a new password reset.",
-            );
-            setTimeout(() => {
-              router.push("/forgot-password");
-            }, 5000);
-          } else if (data.session) {
-            console.log("Successfully exchanged code for session");
-            setError(""); // Clear any previous errors
-          }
-        } catch (err) {
-          console.error("Error exchanging code:", err);
-          setError("Failed to initialize password reset. Please try again.");
+      if (!result.success) {
+        setError(result.error || "Failed to initialize password reset");
+        if (result.redirectTo && result.redirectDelay) {
           setTimeout(() => {
-            router.push("/forgot-password");
-          }, 3000);
+            router.push(result.redirectTo!);
+          }, result.redirectDelay);
         }
-        return;
+      } else {
+        // Successfully initialized session, clear any previous errors
+        setError("");
       }
-
-      // Legacy flow: If we have access token and refresh token, set the session
-      if (accessToken && refreshToken) {
-        try {
-          const supabase = createClient();
-          const { error: sessionError } = await supabase.auth.setSession({
-            access_token: accessToken,
-            refresh_token: refreshToken,
-          });
-
-          if (sessionError) {
-            console.error("Session error:", sessionError);
-            setError(
-              "Invalid or expired reset link. Please request a new password reset.",
-            );
-            setTimeout(() => {
-              router.push("/forgot-password");
-            }, 5000);
-          } else {
-            // Successfully set session, clear any previous errors
-            setError("");
-          }
-        } catch (err) {
-          console.error("Error setting session:", err);
-          setError("Failed to initialize password reset. Please try again.");
-          setTimeout(() => {
-            router.push("/forgot-password");
-          }, 3000);
-        }
-        return;
-      }
-
-      // If no tokens or code, redirect to forgot password
-      setError(
-        "No reset token found. Please check your email link or request a new password reset.",
-      );
-      setTimeout(() => {
-        router.push("/forgot-password");
-      }, 3000);
     };
 
     initializeSession();

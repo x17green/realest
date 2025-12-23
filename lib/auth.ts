@@ -406,6 +406,128 @@ export function isValidEmail(email: string): boolean {
 }
 
 /**
+ * Handle password reset session initialization from URL parameters
+ */
+export async function handlePasswordResetSession(
+  searchParams: URLSearchParams,
+): Promise<{
+  success: boolean;
+  error?: string;
+  redirectTo?: string;
+  redirectDelay?: number;
+}> {
+  try {
+    const accessToken = searchParams.get("access_token");
+    const refreshToken = searchParams.get("refresh_token");
+    const code = searchParams.get("code");
+    const error = searchParams.get("error");
+    const errorDescription = searchParams.get("error_description");
+
+    console.log("Reset password params:", {
+      accessToken,
+      refreshToken,
+      code,
+      error,
+    });
+
+    // Handle error responses from Supabase
+    if (error) {
+      console.error("Auth error:", error, errorDescription);
+      return {
+        success: false,
+        error:
+          errorDescription ||
+          "Invalid reset link. Please request a new password reset.",
+        redirectTo: "/forgot-password",
+        redirectDelay: 5000,
+      };
+    }
+
+    // Check for PKCE code parameter (modern Supabase flow)
+    if (code) {
+      try {
+        const supabase = createClient();
+        const { data, error: exchangeError } =
+          await supabase.auth.exchangeCodeForSession(code);
+
+        if (exchangeError) {
+          console.error("Code exchange error:", exchangeError);
+          return {
+            success: false,
+            error:
+              "Invalid or expired reset link. Please request a new password reset.",
+            redirectTo: "/forgot-password",
+            redirectDelay: 5000,
+          };
+        } else if (data.session) {
+          console.log("Successfully exchanged code for session");
+          return { success: true };
+        }
+      } catch (err) {
+        console.error("Error exchanging code:", err);
+        return {
+          success: false,
+          error: "Failed to initialize password reset. Please try again.",
+          redirectTo: "/forgot-password",
+          redirectDelay: 3000,
+        };
+      }
+      return { success: false };
+    }
+
+    // Legacy flow: If we have access token and refresh token, set the session
+    if (accessToken && refreshToken) {
+      try {
+        const supabase = createClient();
+        const { error: sessionError } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        });
+
+        if (sessionError) {
+          console.error("Session error:", sessionError);
+          return {
+            success: false,
+            error:
+              "Invalid or expired reset link. Please request a new password reset.",
+            redirectTo: "/forgot-password",
+            redirectDelay: 5000,
+          };
+        } else {
+          // Successfully set session
+          return { success: true };
+        }
+      } catch (err) {
+        console.error("Error setting session:", err);
+        return {
+          success: false,
+          error: "Failed to initialize password reset. Please try again.",
+          redirectTo: "/forgot-password",
+          redirectDelay: 3000,
+        };
+      }
+    }
+
+    // If no tokens or code, redirect to forgot password
+    return {
+      success: false,
+      error:
+        "No reset token found. Please check your email link or request a new password reset.",
+      redirectTo: "/forgot-password",
+      redirectDelay: 3000,
+    };
+  } catch (err) {
+    console.error("Unexpected error in handlePasswordResetSession:", err);
+    return {
+      success: false,
+      error: "An unexpected error occurred. Please try again.",
+      redirectTo: "/forgot-password",
+      redirectDelay: 3000,
+    };
+  }
+}
+
+/**
  * Generate secure session timeout
  */
 export function getSessionTimeout(): number {
