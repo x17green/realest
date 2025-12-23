@@ -1,19 +1,21 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
 
 // GET /api/agents/[id] - Get agent details
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const supabase = await createClient()
-    const agentId = params.id
+    const supabase = await createClient();
+    const { id } = await params;
+    const agentId = id;
 
     // Get agent profile
     const { data: agent, error: agentError } = await supabase
-      .from('profiles')
-      .select(`
+      .from("profiles")
+      .select(
+        `
         id,
         full_name,
         email,
@@ -36,30 +38,29 @@ export async function GET(
         agent_company_name,
         agent_website,
         agent_social_links
-      `)
-      .eq('id', agentId)
-      .eq('user_type', 'agent')
-      .single()
+      `,
+      )
+      .eq("id", agentId)
+      .eq("user_type", "agent")
+      .single();
 
     if (agentError || !agent) {
-      return NextResponse.json(
-        { error: 'Agent not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: "Agent not found" }, { status: 404 });
     }
 
     // Only return verified agents publicly
-    if (agent.agent_verification_status !== 'verified') {
+    if (agent.agent_verification_status !== "verified") {
       return NextResponse.json(
-        { error: 'Agent profile not available' },
-        { status: 404 }
-      )
+        { error: "Agent profile not available" },
+        { status: 404 },
+      );
     }
 
     // Get agent's properties (live only)
     const { data: properties, error: propertiesError } = await supabase
-      .from('properties')
-      .select(`
+      .from("properties")
+      .select(
+        `
         id,
         title,
         price,
@@ -77,20 +78,22 @@ export async function GET(
           file_url,
           is_primary
         )
-      `)
-      .eq('owner_id', agentId)
-      .eq('status', 'live')
-      .order('created_at', { ascending: false })
-      .limit(6) // Show recent 6 properties
+      `,
+      )
+      .eq("owner_id", agentId)
+      .eq("status", "live")
+      .order("created_at", { ascending: false })
+      .limit(6); // Show recent 6 properties
 
     if (propertiesError) {
-      console.error('Properties fetch error:', propertiesError)
+      console.error("Properties fetch error:", propertiesError);
     }
 
     // Get agent reviews
     const { data: reviews, error: reviewsError } = await supabase
-      .from('reviews')
-      .select(`
+      .from("reviews")
+      .select(
+        `
         id,
         rating,
         comment,
@@ -100,28 +103,33 @@ export async function GET(
           full_name,
           avatar_url
         )
-      `)
-      .eq('target_id', agentId)
-      .eq('target_type', 'agent')
-      .order('created_at', { ascending: false })
-      .limit(5)
+      `,
+      )
+      .eq("target_id", agentId)
+      .eq("target_type", "agent")
+      .order("created_at", { ascending: false })
+      .limit(5);
 
     if (reviewsError) {
-      console.error('Reviews fetch error:', reviewsError)
+      console.error("Reviews fetch error:", reviewsError);
     }
 
     // Calculate review statistics
     let reviewStats = {
       average_rating: agent.agent_rating || 0,
       total_reviews: agent.agent_total_reviews || 0,
-      rating_distribution: {}
-    }
+      rating_distribution: {},
+    };
 
     if (reviews && reviews.length > 0) {
       // Recalculate from actual reviews
-      const totalRating = reviews.reduce((sum: number, review: any) => sum + review.rating, 0)
-      reviewStats.average_rating = Math.round((totalRating / reviews.length) * 10) / 10
-      reviewStats.total_reviews = reviews.length
+      const totalRating = reviews.reduce(
+        (sum: number, review: any) => sum + review.rating,
+        0,
+      );
+      reviewStats.average_rating =
+        Math.round((totalRating / reviews.length) * 10) / 10;
+      reviewStats.total_reviews = reviews.length;
 
       // Rating distribution
       reviewStats.rating_distribution = {
@@ -129,8 +137,8 @@ export async function GET(
         4: reviews.filter((r: any) => r.rating === 4).length,
         3: reviews.filter((r: any) => r.rating === 3).length,
         2: reviews.filter((r: any) => r.rating === 2).length,
-        1: reviews.filter((r: any) => r.rating === 1).length
-      }
+        1: reviews.filter((r: any) => r.rating === 1).length,
+      };
     }
 
     // Format response
@@ -140,7 +148,7 @@ export async function GET(
       email: agent.email,
       phone: agent.phone,
       avatar_url: agent.avatar_url,
-      verified: agent.agent_verification_status === 'verified',
+      verified: agent.agent_verification_status === "verified",
       verified_at: agent.agent_verified_at,
       member_since: agent.created_at,
       about: agent.agent_about,
@@ -156,16 +164,15 @@ export async function GET(
       social_links: agent.agent_social_links,
       reviews: reviewStats,
       recent_reviews: reviews || [],
-      recent_properties: properties || []
-    }
+      recent_properties: properties || [],
+    };
 
-    return NextResponse.json({ data: agentProfile })
-
+    return NextResponse.json({ data: agentProfile });
   } catch (error) {
-    console.error('API error:', error)
+    console.error("API error:", error);
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

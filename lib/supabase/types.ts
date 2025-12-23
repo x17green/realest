@@ -658,3 +658,31 @@ export interface Database {
     };
   };
 }
+
+// Zod schemas for validation
+import { z } from 'zod'
+
+export const propertyListingSchema = z.object({
+  property_type: z.enum(['house', 'apartment', 'land', 'commercial', 'event_center', 'hotel', 'shop', 'office']),
+  title: z.string().min(10).max(100),
+  description: z.string().min(50).max(2000),
+  address: z.string().min(10),
+  state: z.string().length(2),
+  lga: z.string().min(3),
+  landmark: z.string().optional(),
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180),
+  price: z.number().min(1000),
+  price_frequency: z.enum(['sale', 'annual', 'monthly', 'nightly']),
+  bedrooms: z.number().min(0).max(20).optional(),
+  bathrooms: z.number().min(0).max(20).optional(),
+  size_sqm: z.number().min(1).optional(),
+  has_bq: z.boolean().default(false),
+  nepa_status: z.enum(['stable', 'intermittent', 'poor', 'none', 'generator_only']),
+  water_source: z.enum(['borehole', 'public_water', 'well', 'water_vendor', 'none']),
+  internet_type: z.enum(['fiber', 'starlink', '4g', '3g', 'none']),
+  security_type: z.array(z.enum(['gated_community', 'security_post', 'cctv', 'perimeter_fence', 'security_dogs', 'none'])),
+  is_duplicate: z.boolean().optional()
+})
+
+export type PropertyListingInput = z.infer<typeof propertyListingSchema>
