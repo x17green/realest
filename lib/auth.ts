@@ -307,6 +307,27 @@ export async function verifyOTP(
 }
 
 /**
+ * Verify email using token hash from verification link
+ */
+export async function verifyEmail(tokenHash: string): Promise<AuthResponse> {
+  try {
+    const supabase = createClient();
+    const { data, error } = await supabase.auth.verifyOtp({
+      token_hash: tokenHash,
+      type: "email",
+    });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, user: data.user || undefined };
+  } catch (err) {
+    return { success: false, error: "Failed to verify email" };
+  }
+}
+
+/**
  * Resend email verification
  */
 export async function resendEmailVerification(

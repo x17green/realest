@@ -4,8 +4,11 @@ import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button, Card } from "@heroui/react";
-import { createClient } from "@/lib/supabase/client";
-import { getCurrentUser, resendEmailVerification } from "@/lib/auth";
+import {
+  getCurrentUser,
+  resendEmailVerification,
+  verifyEmail,
+} from "@/lib/auth";
 import { CheckCircle, Mail, AlertCircle, RefreshCw } from "lucide-react";
 
 function VerifyEmailContent() {
@@ -20,10 +23,8 @@ function VerifyEmailContent() {
   const [email, setEmail] = useState("");
 
   useEffect(() => {
-    const verifyEmail = async () => {
+    const handleEmailVerification = async () => {
       try {
-        const supabase = createClient();
-
         // Get current user
         const userResponse = await getCurrentUser();
         if (userResponse.success && userResponse.user?.email) {
@@ -36,18 +37,15 @@ function VerifyEmailContent() {
         const type = searchParams.get("type");
 
         if (accessToken && refreshToken && type === "email") {
-          // Verify the email - using direct supabase call since lib function expects different params
-          const { error: verifyError } = await supabase.auth.verifyOtp({
-            token_hash: accessToken,
-            type: "email",
-          });
+          // Verify the email using centralized function
+          const verifyResponse = await verifyEmail(accessToken);
 
-          if (verifyError) {
-            if (verifyError.message.includes("expired")) {
+          if (!verifyResponse.success) {
+            if (verifyResponse.error?.includes("expired")) {
               setVerificationStatus("expired");
             } else {
               setVerificationStatus("error");
-              setError(verifyError.message);
+              setError(verifyResponse.error || "Email verification failed");
             }
           } else {
             setVerificationStatus("success");
@@ -76,7 +74,7 @@ function VerifyEmailContent() {
       }
     };
 
-    verifyEmail();
+    handleEmailVerification();
   }, [searchParams, router]);
 
   const handleResendVerification = async () => {
