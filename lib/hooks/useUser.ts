@@ -6,7 +6,7 @@ import type { User } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/types";
 
 // Base user types
-export type UserRole = "user" | "owner" | "agent" | "admin";
+export type UserRole = "user" | "owner" | "agent" | "admin" | "system_owner";
 
 export interface BaseUserProfile {
   id: string;
@@ -65,6 +65,15 @@ export interface AdminProfile extends BaseUserProfile {
   };
 }
 
+export interface SystemOwnerProfile extends BaseUserProfile {
+  user_type: "system_owner";
+  system_owner_details: {
+    // System owner has ultimate control
+    global_permissions: string[];
+    system_access_level: "ultimate";
+  };
+}
+
 export interface RegularUserProfile extends BaseUserProfile {
   user_type: "user";
 }
@@ -74,7 +83,8 @@ export type UserProfile =
   | RegularUserProfile
   | OwnerProfile
   | AgentProfile
-  | AdminProfile;
+  | AdminProfile
+  | SystemOwnerProfile;
 
 // Hook return type
 export interface UseUserReturn {
@@ -315,6 +325,15 @@ export function useUser(): UseUserReturn {
               system_permissions: ["all"], // Default admin permissions
             },
           } as AdminProfile;
+        } else if (userRole === "system_owner") {
+          completeProfile = {
+            ...basicProfile,
+            user_type: "system_owner",
+            system_owner_details: {
+              global_permissions: ["ultimate_control"],
+              system_access_level: "ultimate",
+            },
+          } as SystemOwnerProfile;
         } else {
           completeProfile = {
             ...basicProfile,
@@ -530,6 +549,11 @@ export function useAdminProfile(): AdminProfile | null {
 export function useRegularUserProfile(): RegularUserProfile | null {
   const { profile } = useUser();
   return profile?.user_type === "user" ? profile : null;
+}
+
+export function useSystemOwnerProfile(): SystemOwnerProfile | null {
+  const { profile } = useUser();
+  return profile?.user_type === "system_owner" ? profile : null;
 }
 
 // Hook for checking specific roles
