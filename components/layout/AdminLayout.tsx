@@ -7,6 +7,14 @@ import { AdminSidebar } from "./AdminSidebar";
 import { AdminFooter } from "./AdminFooter";
 import { Card, Button } from "@heroui/react";
 import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import {
   AlertTriangle,
   CheckCircle,
   Clock,
@@ -31,6 +39,46 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     activeProperties: 456,
     systemHealth: "healthy" as "healthy" | "warning" | "critical",
   });
+
+  // Generate breadcrumbs based on current path
+  const generateBreadcrumbs = () => {
+    const pathSegments = pathname.split("/").filter(Boolean);
+    const breadcrumbs = [{ label: "Admin Dashboard", href: "/admin" }];
+
+    if (pathSegments.length > 1) {
+      const currentPath = `/${pathSegments.join("/")}`;
+
+      // Map paths to breadcrumb labels
+      const pathMap: Record<string, string> = {
+        "/admin/validation": "Property Verification",
+        "/admin/agents": "Agent Verification",
+        "/admin/users": "User Management",
+        "/admin/cms/analytics": "System Analytics",
+        "/admin/settings": "Settings",
+        "/admin/subadmins": "Sub-Admin Management",
+        "/admin/support": "Support Center",
+        "/admin/content": "Content Management",
+      };
+
+      const label = pathMap[currentPath];
+      if (label) {
+        breadcrumbs.push({ label, href: currentPath });
+      } else {
+        // For unknown paths, create a generic breadcrumb
+        const lastSegment = pathSegments[pathSegments.length - 1];
+        breadcrumbs.push({
+          label:
+            lastSegment.charAt(0).toUpperCase() +
+            lastSegment.slice(1).replace(/-/g, " "),
+          href: currentPath,
+        });
+      }
+    }
+
+    return breadcrumbs;
+  };
+
+  const breadcrumbs = generateBreadcrumbs();
 
   if (isLoading) {
     return (
@@ -70,6 +118,28 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         {/* Main content */}
         <main className="flex-1 ml-80">
           <div className="min-h-screen">
+            {/* Breadcrumbs */}
+            <div className="bg-background border-b border-border px-6 py-3">
+              <Breadcrumb>
+                <BreadcrumbList>
+                  {breadcrumbs.map((item, index) => (
+                    <div key={index} className="flex items-center">
+                      {index > 0 && <BreadcrumbSeparator />}
+                      <BreadcrumbItem>
+                        {index === breadcrumbs.length - 1 ? (
+                          <BreadcrumbPage>{item.label}</BreadcrumbPage>
+                        ) : (
+                          <BreadcrumbLink href={item.href}>
+                            {item.label}
+                          </BreadcrumbLink>
+                        )}
+                      </BreadcrumbItem>
+                    </div>
+                  ))}
+                </BreadcrumbList>
+              </Breadcrumb>
+            </div>
+
             {/* System Status Bar */}
             <div className="bg-background border-b border-border px-6 py-4">
               <div className="flex items-center justify-between">
