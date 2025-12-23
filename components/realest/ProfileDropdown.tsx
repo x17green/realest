@@ -34,8 +34,8 @@ export function ProfileDropdown() {
   };
 
   const handleLogoutClick = async () => {
-    await logout();
-    router.push("/");
+    // await logout();
+    router.push("/logout");
   };
 
   // Dynamic menu items based on user role

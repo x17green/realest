@@ -24,16 +24,16 @@ export function AdminHeader() {
             <Link href="/admin" className="flex items-center group">
               <HeaderLogo />
             </Link>
-
-            {/* Admin Badge */}
-            <div className="flex items-center gap-2 px-3 py-1 bg-danger/10 text-danger rounded-full text-sm font-medium">
-              <Shield className="w-4 h-4" />
-              Administrator
-            </div>
           </div>
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center gap-3">
+            {/* Admin Badge */}
+            <div className="flex items-center gap-2 px-3 py-1 border border-primary bg-primary/10 text-danger rounded-full text-sm font-medium">
+              <Shield className="w-4 h-4" />
+              Administrator
+            </div>
+            
             <ThemeToggleCompact />
 
             {/* System Alerts */}
