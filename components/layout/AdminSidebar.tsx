@@ -16,14 +16,25 @@ import {
   AlertTriangle,
   CheckCircle,
   MenuSquare,
+  FileText,
+  SettingsIcon,
+  Users2,
+  UserCheck2,
+  Layout,
+  HelpCircle,
 } from "lucide-react";
 
 interface AdminSidebarProps {
   currentPath: string;
+  isCollapsed: boolean;
+  onToggle: (collapsed: boolean) => void;
 }
 
-export function AdminSidebar({ currentPath }: AdminSidebarProps) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+export function AdminSidebar({
+  currentPath,
+  isCollapsed,
+  onToggle,
+}: AdminSidebarProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isButtonHovered, setIsButtonHovered] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -72,6 +83,36 @@ export function AdminSidebar({ currentPath }: AdminSidebarProps) {
       label: "System Analytics",
       icon: BarChart3,
       description: "Platform statistics",
+    },
+    {
+      href: "/admin/content",
+      label: "Content Managemen",
+      icon: FileText,
+      description: "Manage platform content",
+    },
+    {
+      href: "/admin/settings",
+      label: "Admin Settings",
+      icon: SettingsIcon,
+      description: "System configurations",
+    },
+    {
+      href: "/admin/subadmins",
+      label: "Sub-Admins",
+      icon: UserCheck2,
+      description: "Manage sub-admin accounts",
+    },
+    {
+      href: "/admin/cms",
+      label: "CMS Dashboard",
+      icon: Layout,
+      description: "Content management overview",
+    },
+    {
+      href: "/admin/suport",
+      label: "Support Center",
+      icon: HelpCircle,
+      description: "Support tickets and inquiries",
     },
   ];
 
@@ -134,7 +175,7 @@ export function AdminSidebar({ currentPath }: AdminSidebarProps) {
             <Button
               variant="ghost"
               size="sm"
-              onPress={() => setIsCollapsed(!isCollapsed)}
+              onPress={() => onToggle(!isCollapsed)}
               onMouseEnter={() => setIsButtonHovered(true)}
               onMouseLeave={() => setIsButtonHovered(false)}
               className="flex items-center justify-center ml-auto"
@@ -175,12 +216,14 @@ export function AdminSidebar({ currentPath }: AdminSidebarProps) {
                   />
                   {!shouldCollapse && (
                     <div className="flex flex-col items-start">
-                      <span className={`font-medium animate-text-slide-in ${
+                      <span
+                        className={`font-medium animate-text-slide-in ${
                           active
                             ? "text-primary-foreground"
                             : "text-muted-foreground"
                         }
-                        `}>
+                        `}
+                      >
                         {item.label}
                       </span>
                       <span

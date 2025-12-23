@@ -29,7 +29,7 @@ export function AdminHeader() {
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center gap-3">
             {/* Admin Badge */}
-            <div className="flex items-center gap-2 px-3 py-1 border border-primary bg-primary/10 text-danger rounded-full text-sm font-medium">
+            <div className="flex items-center gap-2 px-3 py-1 bg-error/10 text-error border border-error/20 shadow-sm rounded-full text-sm font-medium">
               <Shield className="w-4 h-4" />
               Administrator
             </div>

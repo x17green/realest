@@ -33,6 +33,7 @@ interface AdminLayoutProps {
 export function AdminLayout({ children }: AdminLayoutProps) {
   const pathname = usePathname();
   const { role: userRole, isLoading } = useUser();
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const [systemStats] = useState({
     totalUsers: 1250,
     pendingVerifications: 23,
@@ -53,6 +54,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         "/admin/validation": "Property Verification",
         "/admin/agents": "Agent Verification",
         "/admin/users": "User Management",
+        "/admin/cms": "CMS Dashboard",
         "/admin/cms/analytics": "System Analytics",
         "/admin/settings": "Settings",
         "/admin/subadmins": "Sub-Admin Management",
@@ -113,10 +115,18 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       <AdminHeader />
 
       <div className="flex">
-        <AdminSidebar currentPath={pathname} />
+        <AdminSidebar
+          currentPath={pathname}
+          isCollapsed={isCollapsed}
+          onToggle={setIsCollapsed}
+        />
 
         {/* Main content */}
-        <main className="flex-1 ml-65">
+        <main
+          className={`flex-1 transition-all duration-300 ease-out ${
+            isCollapsed ? "ml-15" : "ml-65"
+          }`}
+        >
           <div className="min-h-screen">
             {/* Breadcrumbs */}
             <div className="bg-background border-b border-accent/20 px-6 py-3">
@@ -225,10 +235,9 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             {/* Page Content */}
             <div className="p-6">{children}</div>
           </div>
+          <AdminFooter />
         </main>
       </div>
-
-      <AdminFooter />
     </div>
   );
 }
