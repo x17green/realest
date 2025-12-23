@@ -4,6 +4,14 @@ import { useState, useEffect } from "react";
 import { Card, Button } from "@heroui/react";
 import { Badge } from "@/components/ui/badge";
 import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import {
   Activity,
   Globe,
   TrendingUp,
@@ -108,6 +116,11 @@ const navigationItems = [
   },
 ];
 
+const breadcrumbItems = [
+  { label: "Dashboard", href: "/admin" },
+  { label: "RealEST Global Control", href: "/setting", isActive: true },
+];
+
 export default function SettingPage() {
   const [activeSection, setActiveSection] = useState("overview");
   const [systemData, setSystemData] = useState(mockSystemData);
@@ -159,6 +172,28 @@ export default function SettingPage() {
       {/* Header */}
       <header className="border-b border-gray-800 bg-gray-900/50 backdrop-blur-sm">
         <div className="px-6 py-4">
+          {/* Breadcrumbs */}
+          <div className="mb-4">
+            <Breadcrumb>
+              <BreadcrumbList>
+                {breadcrumbItems.map((item, index) => (
+                  <div key={index} className="flex items-center">
+                    {index > 0 && <BreadcrumbSeparator />}
+                    <BreadcrumbItem>
+                      {item.isActive ? (
+                        <BreadcrumbPage>{item.label}</BreadcrumbPage>
+                      ) : (
+                        <BreadcrumbLink href={item.href}>
+                          {item.label}
+                        </BreadcrumbLink>
+                      )}
+                    </BreadcrumbItem>
+                  </div>
+                ))}
+              </BreadcrumbList>
+            </Breadcrumb>
+          </div>
+
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-3">
@@ -207,21 +242,49 @@ export default function SettingPage() {
       <div className="flex">
         {/* Sidebar */}
         <aside className="w-64 bg-gray-900/30 border-r border-gray-800">
-          <nav className="p-4 space-y-2">
-            {navigationItems.map((item) => (
-              <a
-                key={item.id}
-                href={item.href}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all ${
-                  item.active
-                    ? "bg-brand-accent/20 text-brand-accent border border-brand-accent/30"
-                    : "text-gray-400 hover:text-white hover:bg-gray-800/50"
-                }`}
-              >
-                <item.icon className="w-4 h-4" />
-                <span className="font-medium">{item.label}</span>
-              </a>
-            ))}
+          <nav className="p-4">
+            <div className="mb-6">
+              <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                Control Modules
+              </h2>
+              <div className="space-y-1">
+                {navigationItems.map((item) => (
+                  <a
+                    key={item.id}
+                    href={item.href}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all ${
+                      item.active
+                        ? "bg-brand-accent/20 text-brand-accent border border-brand-accent/30"
+                        : "text-gray-400 hover:text-white hover:bg-gray-800/50"
+                    }`}
+                  >
+                    <item.icon className="w-4 h-4" />
+                    <span className="font-medium">{item.label}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {/* Quick Actions Sidebar */}
+            <div>
+              <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                Quick Actions
+              </h2>
+              <div className="space-y-1">
+                <button className="w-full flex items-center gap-3 px-3 py-2 text-left text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all">
+                  <Zap className="w-4 h-4" />
+                  <span className="text-sm">Emergency Controls</span>
+                </button>
+                <button className="w-full flex items-center gap-3 px-3 py-2 text-left text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all">
+                  <Settings className="w-4 h-4" />
+                  <span className="text-sm">System Config</span>
+                </button>
+                <button className="w-full flex items-center gap-3 px-3 py-2 text-left text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all">
+                  <BarChart3 className="w-4 h-4" />
+                  <span className="text-sm">Analytics</span>
+                </button>
+              </div>
+            </div>
           </nav>
         </aside>
 
@@ -479,26 +542,51 @@ export default function SettingPage() {
             </div>
           </Card>
 
-          {/* Quick Actions Footer */}
+          {/* Navigation Actions */}
           <div className="flex gap-4 pt-6">
-            <Button className="bg-brand-accent hover:bg-brand-accent-hover text-gray-900 font-semibold">
-              <Zap className="w-4 h-4 mr-2" />
-              Emergency Controls
-            </Button>
-            <Button
-              variant="ghost"
-              className="border-brand-violet text-brand-violet hover:bg-brand-violet/20"
-            >
-              <Settings className="w-4 h-4 mr-2" />
-              System Configuration
-            </Button>
-            <Button
-              variant="ghost"
-              className="border-gray-600 text-gray-400 hover:bg-gray-800"
-            >
-              <BarChart3 className="w-4 h-4 mr-2" />
-              Detailed Analytics
-            </Button>
+            <div className="flex gap-3">
+              <Button
+                className="bg-brand-accent hover:bg-brand-accent-hover text-gray-900 font-semibold"
+                onClick={() => (window.location.href = "/setting/validation")}
+              >
+                <Shield className="w-4 h-4 mr-2" />
+                Validation Control
+              </Button>
+              <Button
+                variant="ghost"
+                className="border-brand-violet text-brand-violet hover:bg-brand-violet/20"
+                onClick={() => (window.location.href = "/setting/financials")}
+              >
+                <DollarSign className="w-4 h-4 mr-2" />
+                Financial Overview
+              </Button>
+              <Button
+                variant="ghost"
+                className="border-gray-600 text-gray-400 hover:bg-gray-800"
+                onClick={() => (window.location.href = "/setting/security")}
+              >
+                <Shield className="w-4 h-4 mr-2" />
+                Security Center
+              </Button>
+            </div>
+            <div className="flex gap-3 ml-auto">
+              <Button
+                variant="ghost"
+                className="border-gray-600 text-gray-400 hover:bg-gray-800"
+                onClick={() => (window.location.href = "/setting/data-lab")}
+              >
+                <Database className="w-4 h-4 mr-2" />
+                Data Lab
+              </Button>
+              <Button
+                variant="ghost"
+                className="border-gray-600 text-gray-400 hover:bg-gray-800"
+                onClick={() => (window.location.href = "/admin")}
+              >
+                <BarChart3 className="w-4 h-4 mr-2" />
+                Admin Dashboard
+              </Button>
+            </div>
           </div>
         </main>
       </div>

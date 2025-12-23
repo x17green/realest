@@ -5,6 +5,14 @@ import { Card, Button } from "@heroui/react";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import {
   DollarSign,
   TrendingUp,
   TrendingDown,
@@ -17,6 +25,10 @@ import {
   RefreshCw,
   Calculator,
   Zap,
+  Globe,
+  Shield,
+  Lock,
+  Database,
 } from "lucide-react";
 
 // Mock data for financial metrics
@@ -105,6 +117,54 @@ const financialData = {
   ],
 };
 
+const navigationItems = [
+  {
+    id: "overview",
+    label: "Global View",
+    icon: Globe,
+    href: "/setting",
+    active: false,
+  },
+  {
+    id: "validation",
+    label: "Validation Control",
+    icon: Shield,
+    href: "/setting/validation",
+    active: false,
+  },
+  {
+    id: "financials",
+    label: "Financials & Revenue",
+    icon: DollarSign,
+    href: "/setting/financials",
+    active: true,
+  },
+  {
+    id: "security",
+    label: "Security & Access",
+    icon: Lock,
+    href: "/setting/security",
+    active: false,
+  },
+  {
+    id: "data-lab",
+    label: "Data & ML Oversight",
+    icon: Database,
+    href: "/setting/data-lab",
+    active: false,
+  },
+];
+
+const breadcrumbItems = [
+  { label: "Dashboard", href: "/admin" },
+  { label: "RealEST Global Control", href: "/setting" },
+  {
+    label: "Financials & Revenue",
+    href: "/setting/financials",
+    isActive: true,
+  },
+];
+
 export default function FinancialsPage() {
   const [data, setData] = useState(financialData);
 
@@ -151,6 +211,28 @@ export default function FinancialsPage() {
       {/* Header */}
       <header className="border-b border-gray-800 bg-gray-900/50 backdrop-blur-sm">
         <div className="px-6 py-4">
+          {/* Breadcrumbs */}
+          <div className="mb-4">
+            <Breadcrumb>
+              <BreadcrumbList>
+                {breadcrumbItems.map((item, index) => (
+                  <div key={index} className="flex items-center">
+                    {index > 0 && <BreadcrumbSeparator />}
+                    <BreadcrumbItem>
+                      {item.isActive ? (
+                        <BreadcrumbPage>{item.label}</BreadcrumbPage>
+                      ) : (
+                        <BreadcrumbLink href={item.href}>
+                          {item.label}
+                        </BreadcrumbLink>
+                      )}
+                    </BreadcrumbItem>
+                  </div>
+                ))}
+              </BreadcrumbList>
+            </Breadcrumb>
+          </div>
+
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-3">
@@ -199,11 +281,49 @@ export default function FinancialsPage() {
       <div className="flex">
         {/* Sidebar */}
         <aside className="w-64 bg-gray-900/30 border-r border-gray-800">
-          <nav className="p-4 space-y-2">
-            <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all text-gray-400 hover:text-white hover:bg-gray-800/50">
-              <DollarSign className="w-4 h-4" />
-              <span className="font-medium">Financials & Revenue</span>
-            </button>
+          <nav className="p-4">
+            <div className="mb-6">
+              <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                Control Modules
+              </h2>
+              <div className="space-y-1">
+                {navigationItems.map((item) => (
+                  <a
+                    key={item.id}
+                    href={item.href}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all ${
+                      item.active
+                        ? "bg-brand-accent/20 text-brand-accent border border-brand-accent/30"
+                        : "text-gray-400 hover:text-white hover:bg-gray-800/50"
+                    }`}
+                  >
+                    <item.icon className="w-4 h-4" />
+                    <span className="font-medium">{item.label}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {/* Quick Actions Sidebar */}
+            <div>
+              <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                Quick Actions
+              </h2>
+              <div className="space-y-1">
+                <button className="w-full flex items-center gap-3 px-3 py-2 text-left text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all">
+                  <Calculator className="w-4 h-4" />
+                  <span className="text-sm">Run Pricing Simulation</span>
+                </button>
+                <button className="w-full flex items-center gap-3 px-3 py-2 text-left text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all">
+                  <BarChart3 className="w-4 h-4" />
+                  <span className="text-sm">Export Report</span>
+                </button>
+                <button className="w-full flex items-center gap-3 px-3 py-2 text-left text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all">
+                  <Target className="w-4 h-4" />
+                  <span className="text-sm">Adjust Tiers</span>
+                </button>
+              </div>
+            </div>
           </nav>
         </aside>
 
