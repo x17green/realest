@@ -193,7 +193,7 @@ export function AdminSidebar({
 
         {/* Navigation */}
         <nav
-          className={`flex-1 px-2 my-4 space-y-2 ${!shouldCollapse ? "animate-content-stagger-1" : ""}`}
+          className={`flex-1 px-2 my-4 space-y-2 sidebar-nav overflow-y-auto ${!shouldCollapse ? "animate-content-stagger-1" : ""}`}
         >
           {navigationItems.map((item, index) => {
             const Icon = item.icon;
@@ -310,6 +310,14 @@ export function AdminSidebar({
           </Link>
         </div>
       </div>
+      <style>{`
+        .sidebar-nav::-webkit-scrollbar {
+          display: none;
+        }
+        .sidebar-nav {
+          scrollbar-width: none;
+        }
+      `}</style>
     </aside>
   );
 }
