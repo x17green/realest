@@ -64,13 +64,13 @@ export function AdminSidebar({ currentPath }: AdminSidebarProps) {
   return (
     <aside
       className={`fixed left-0 top-16 h-[calc(100vh-4rem)] bg-background border-r border-border transition-all duration-300 z-40 ${
-        isCollapsed ? "w-16" : "w-80"
+        isCollapsed ? "w-10" : "w-80"
       }`}
     >
       <div className="flex flex-col h-full">
         {/* Header */}
         <div className="p-4 border-b border-border">
-          <div className="flex items-center justify-between">
+          <div className="flex px-0 items-center justify-between">
             {!isCollapsed && (
               <div>
                 <h2 className="text-lg font-semibold">Admin Panel</h2>
@@ -95,7 +95,7 @@ export function AdminSidebar({ currentPath }: AdminSidebarProps) {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-2">
+        <nav className="flex-1 py-4 space-y-2">
           {navigationItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.href);
@@ -104,12 +104,12 @@ export function AdminSidebar({ currentPath }: AdminSidebarProps) {
               <Link key={item.href} href={item.href}>
                 <Button
                   variant={active ? "primary" : "ghost"}
-                  className={`w-full justify-start gap-3 h-auto p-3 ${
+                  className={`w-full flex items-center justify-start gap-3 h-auto p-3 ${
                     isCollapsed ? "px-2" : ""
                   } ${active ? "bg-primary text-primary-foreground" : ""}`}
                 >
                   <Icon
-                    className={`w-5 h-5 flex-shrink-0 ${active ? "text-primary-foreground" : ""}`}
+                  className={`w-5 h-5 shrink-0 ${active ? "text-primary-foreground" : ""}`}
                   />
                   {!isCollapsed && (
                     <div className="flex flex-col items-start">
@@ -128,14 +128,14 @@ export function AdminSidebar({ currentPath }: AdminSidebarProps) {
         {/* Quick Actions */}
         {!isCollapsed && (
           <div className="p-4 border-t border-border">
-            <div className="space-y-2">
+            <div className="flex flex-col justify-start space-y-2">
               <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                 Quick Actions
               </div>
               <Button
                 variant="ghost"
                 size="sm"
-                className="w-full justify-start gap-2 text-warning hover:text-warning hover:bg-warning/10"
+                className="w-full flex items-center justify-start gap-2 text-warning hover:text-warning hover:bg-warning/10"
               >
                 <AlertTriangle className="w-4 h-4" />
                 System Alerts
@@ -143,7 +143,7 @@ export function AdminSidebar({ currentPath }: AdminSidebarProps) {
               <Button
                 variant="ghost"
                 size="sm"
-                className="w-full justify-start gap-2 text-success hover:text-success hover:bg-success/10"
+                className="w-full flex items-center justify-start gap-2 text-success hover:text-success hover:bg-success/10"
               >
                 <CheckCircle className="w-4 h-4" />
                 Health Check
