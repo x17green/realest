@@ -116,10 +116,10 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         <AdminSidebar currentPath={pathname} />
 
         {/* Main content */}
-        <main className="flex-1 ml-80">
+        <main className="flex-1 ml-65">
           <div className="min-h-screen">
             {/* Breadcrumbs */}
-            <div className="bg-background border-b border-border px-6 py-3">
+            <div className="bg-background border-b border-accent/20 px-6 py-3">
               <Breadcrumb>
                 <BreadcrumbList>
                   {breadcrumbs.map((item, index) => (
@@ -141,7 +141,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             </div>
 
             {/* System Status Bar */}
-            <div className="bg-background border-b border-border px-6 py-4">
+            <div className="bg-background border-b border-accent/20 px-6 py-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2">
@@ -174,9 +174,9 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             </div>
 
             {/* Quick Stats */}
-            <div className="px-6 py-4 border-b border-border bg-muted/20">
+            <div className="px-6 py-4 border-b border-accent/20 bg-muted/20">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="flex items-center gap-3 p-3 bg-background rounded-lg border">
+                <div className="flex items-center gap-3 p-3 bg-background rounded-lg border border-accent/10">
                   <Users className="w-8 h-8 text-primary" />
                   <div>
                     <div className="text-2xl font-bold">
@@ -188,7 +188,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 p-3 bg-background rounded-lg border">
+                <div className="flex items-center gap-3 p-3 bg-background rounded-lg border border-accent/10">
                   <Building className="w-8 h-8 text-primary" />
                   <div>
                     <div className="text-2xl font-bold">
@@ -200,7 +200,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 p-3 bg-background rounded-lg border">
+                <div className="flex items-center gap-3 p-3 bg-background rounded-lg border border-accent/10">
                   <AlertTriangle className="w-8 h-8 text-warning" />
                   <div>
                     <div className="text-2xl font-bold">
@@ -212,7 +212,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 p-3 bg-background rounded-lg border">
+                <div className="flex items-center gap-3 p-3 bg-background rounded-lg border border-accent/10">
                   <BarChart3 className="w-8 h-8 text-success" />
                   <div>
                     <div className="text-2xl font-bold">98.5%</div>

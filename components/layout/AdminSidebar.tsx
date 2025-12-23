@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@heroui/react";
 import {
   Home,
@@ -12,8 +12,10 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
+  Lock,
   AlertTriangle,
   CheckCircle,
+  MenuSquare,
 } from "lucide-react";
 
 interface AdminSidebarProps {
@@ -22,6 +24,18 @@ interface AdminSidebarProps {
 
 export function AdminSidebar({ currentPath }: AdminSidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isButtonHovered, setIsButtonHovered] = useState(false);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const navigationItems = [
     {
@@ -61,17 +75,37 @@ export function AdminSidebar({ currentPath }: AdminSidebarProps) {
     return currentPath.startsWith(href) && href !== "/admin";
   };
 
+  // Handle mouse enter - expand immediately
+  const handleMouseEnter = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+    setIsHovered(true);
+  };
+
+  // Handle mouse leave - collapse after delay if manually collapsed
+  const handleMouseLeave = () => {
+    hoverTimeoutRef.current = setTimeout(() => {
+      setIsHovered(false);
+    }, 150); // 300ms delay to prevent flickering
+  };
+
+  // Determine if sidebar should be collapsed (manual collapse + not hovered)
+  const shouldCollapse = isCollapsed && !isHovered;
+
   return (
     <aside
-      className={`fixed left-0 top-16 h-[calc(100vh-4rem)] bg-background border-r border-border transition-all duration-300 z-40 ${
-        isCollapsed ? "w-10" : "w-80"
+      className={`fixed left-0 top-16 h-[calc(100vh-4rem)] bg-background border-r border-accent/20 transition-all duration-300 z-40 ${
+        shouldCollapse ? "w-15" : "w-65"
       }`}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <div className="flex flex-col h-full">
         {/* Header */}
-        <div className="p-4 border-b border-border">
+        <div className="p-4 -mb-2 border-b border-accent/20">
           <div className="flex px-0 items-center justify-between">
-            {!isCollapsed && (
+            {!shouldCollapse && (
               <div>
                 <h2 className="text-lg font-semibold">Admin Panel</h2>
                 <p className="text-xs text-muted-foreground">
@@ -83,19 +117,23 @@ export function AdminSidebar({ currentPath }: AdminSidebarProps) {
               variant="ghost"
               size="sm"
               onPress={() => setIsCollapsed(!isCollapsed)}
+              onMouseEnter={() => setIsButtonHovered(true)}
+              onMouseLeave={() => setIsButtonHovered(false)}
               className="flex items-center justify-center ml-auto"
             >
-              {isCollapsed ? (
-                <ChevronRight className="w-4 h-4" />
+              {isCollapsed && !isHovered ? (
+                <MenuSquare className="w-5 h-5" />
+              ) : isButtonHovered ? (
+                <ChevronLeft className="w-5 h-5" />
               ) : (
-                <ChevronLeft className="w-4 h-4" />
+                <Lock className="w-5 h-5" />
               )}
             </Button>
           </div>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 py-4 space-y-2">
+        <nav className="flex-1 px-2 my-4 space-y-2">
           {navigationItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.href);
@@ -105,16 +143,26 @@ export function AdminSidebar({ currentPath }: AdminSidebarProps) {
                 <Button
                   variant={active ? "primary" : "ghost"}
                   className={`w-full flex items-center justify-start gap-3 h-auto p-3 ${
-                    isCollapsed ? "px-2" : ""
-                  } ${active ? "bg-primary text-primary-foreground" : ""}`}
+                    shouldCollapse ? "p-3" : ""
+                  } ${active ? "bg-primary text-primary-foreground" : ""} ${
+                    shouldCollapse ? "rounded-sm" : "rounded-md"
+                  } `}
                 >
                   <Icon
-                  className={`w-5 h-5 shrink-0 ${active ? "text-primary-foreground" : ""}`}
+                    className={`w-5 h-5 shrink-0 ${
+                      active ? "text-primary-foreground" : ""
+                    }`}
                   />
-                  {!isCollapsed && (
+                  {!shouldCollapse && (
                     <div className="flex flex-col items-start">
                       <span className="font-medium">{item.label}</span>
-                      <span className="text-xs text-muted-foreground">
+                      <span
+                        className={`text-xs ${
+                          active
+                            ? "text-primary-foreground"
+                            : "text-muted-foreground"
+                        }`}
+                      >
                         {item.description}
                       </span>
                     </div>
@@ -126,8 +174,8 @@ export function AdminSidebar({ currentPath }: AdminSidebarProps) {
         </nav>
 
         {/* Quick Actions */}
-        {!isCollapsed && (
-          <div className="p-4 border-t border-border">
+        {!shouldCollapse && (
+          <div className="p-4 border-t border-accent/20">
             <div className="flex flex-col justify-start space-y-2">
               <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                 Quick Actions
@@ -153,16 +201,16 @@ export function AdminSidebar({ currentPath }: AdminSidebarProps) {
         )}
 
         {/* Settings */}
-        <div className="p-4 border-t border-border">
+        <div className="py-4 border-t border-accent/20">
           <Link href="/settings">
             <Button
               variant="ghost"
-              className={`w-full justify-start gap-3 h-10 ${
-                isCollapsed ? "px-2" : "px-3"
+              className={`w-full flex items-center justify-start gap-3 h-10 ${
+                shouldCollapse ? "p-6" : "px-3"
               }`}
             >
-              <Settings className="w-4 h-4 flex-shrink-0" />
-              {!isCollapsed && <span>Settings</span>}
+              <Settings className="w-4 h-4 shrink-0" />
+              {!shouldCollapse && <span>Settings</span>}
             </Button>
           </Link>
         </div>
