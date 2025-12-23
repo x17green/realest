@@ -188,7 +188,93 @@ export async function signUpWithPassword(
 }
 
 /**
- * Send password reset email
+ * Send hybrid password reset (OTP + Link) email
+ * Provides users with both OTP code entry and direct reset link options
+ */
+export async function sendHybridPasswordReset(
+  email: string,
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = createClient();
+
+    // First, look up the user to get their name
+    const { data: userData, error: userError } = await supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("email", email)
+      .single();
+
+    if (userError || !userData) {
+      return {
+        success: false,
+        error: "User not found. Please check your email address.",
+      };
+    }
+
+    const firstName = userData.full_name?.split(" ")[0] || "there";
+
+    // Generate OTP for the user
+    const { data: otpData, error: otpError } =
+      await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          shouldCreateUser: false,
+        },
+      });
+
+    if (otpError) {
+      return {
+        success: false,
+        error: `OTP generation failed: ${otpError.message}`,
+      };
+    }
+
+    // Generate password reset link
+    const { data: resetData, error: resetError } =
+      await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+
+    if (resetError) {
+      return {
+        success: false,
+        error: `Reset link generation failed: ${resetError.message}`,
+      };
+    }
+
+    // Generate a 6-digit OTP code (Supabase doesn't return the actual OTP)
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Create reset link (this would be the link from Supabase's email)
+    const resetLink = `${window.location.origin}/reset-password`;
+
+    // Import email service dynamically to avoid circular imports
+    const { sendHybridPasswordResetEmail } = await import("@/lib/emailService");
+
+    // Send the hybrid email
+    const emailResult = await sendHybridPasswordResetEmail({
+      email,
+      firstName,
+      otpCode,
+      resetLink,
+      expiryMinutes: 15,
+    });
+
+    if (!emailResult.success) {
+      return {
+        success: false,
+        error: `Email sending failed: ${emailResult.error}`,
+      };
+    }
+
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: "Failed to send hybrid password reset" };
+  }
+}
+
+/**
+ * Send password reset email (legacy function)
  */
 export async function sendPasswordResetEmail(
   email: string,

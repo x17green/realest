@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Button, Input, Card } from "@heroui/react";
-import { sendPasswordResetEmail } from "@/lib/auth";
+import { sendHybridPasswordReset } from "@/lib/auth";
 import { Mail, ArrowLeft, CheckCircle } from "lucide-react";
 
 export default function ForgotPasswordPage() {
@@ -18,7 +18,7 @@ export default function ForgotPasswordPage() {
     setError("");
 
     try {
-      const response = await sendPasswordResetEmail(email);
+      const response = await sendHybridPasswordReset(email);
 
       if (!response.success) {
         setError(response.error || "Failed to send reset email");
@@ -45,7 +45,7 @@ export default function ForgotPasswordPage() {
               Check Your Email
             </Card.Title>
             <Card.Description>
-              We've sent you a password reset link
+              We've sent you password reset options
             </Card.Description>
           </Card.Header>
 
@@ -62,8 +62,14 @@ export default function ForgotPasswordPage() {
 
               <div className="bg-muted p-4 rounded-lg">
                 <p className="text-sm">
-                  Click the link in your email to reset your password. The link
-                  will expire in 24 hours.
+                  You have two options to reset your password:
+                </p>
+                <ul className="text-sm mt-2 space-y-1">
+                  <li>• Enter the 6-digit code on our website</li>
+                  <li>• Click the direct reset link in your email</li>
+                </ul>
+                <p className="text-sm mt-2 text-muted-foreground">
+                  Both options expire in 15 minutes.
                 </p>
               </div>
             </div>
@@ -97,8 +103,8 @@ export default function ForgotPasswordPage() {
             Forgot Password?
           </Card.Title>
           <Card.Description>
-            Enter your email address and we'll send you a link to reset your
-            password
+            Enter your email address and we'll send you secure password reset
+            options
           </Card.Description>
         </Card.Header>
 
@@ -137,7 +143,7 @@ export default function ForgotPasswordPage() {
               className="w-full"
               isDisabled={isLoading || !email.trim()}
             >
-              {isLoading ? "Sending Reset Link..." : "Send Reset Link"}
+              {isLoading ? "Sending Reset Options..." : "Send Reset Options"}
             </Button>
           </form>
 

@@ -10,7 +10,7 @@ import Link from "next/link";
 export default async function MLReviewDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const supabase = await createClient();
   const {
@@ -36,7 +36,7 @@ export default async function MLReviewDetailPage({
   const { data: property } = await supabase
     .from("properties")
     .select("*, profiles(full_name, email, phone), property_documents(*)")
-    .eq("id", params.id)
+    .eq("id", (await params).id)
     .eq("verification_status", "ml_review")
     .single();
 

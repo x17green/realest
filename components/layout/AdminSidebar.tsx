@@ -31,7 +31,7 @@ export function AdminSidebar({ currentPath }: AdminSidebarProps) {
       description: "System overview",
     },
     {
-      href: "/admin/properties",
+      href: "/admin/validation",
       label: "Property Verification",
       icon: Building,
       description: "Review property listings",
@@ -49,7 +49,7 @@ export function AdminSidebar({ currentPath }: AdminSidebarProps) {
       description: "Manage user accounts",
     },
     {
-      href: "/admin/analytics",
+      href: "/admin/cms/analytics",
       label: "System Analytics",
       icon: BarChart3,
       description: "Platform statistics",

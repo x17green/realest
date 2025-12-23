@@ -21,6 +21,14 @@ export interface AdminNotificationData extends WaitlistEmailData {
   signupDate?: string;
 }
 
+export interface PasswordResetEmailData {
+  email: string;
+  firstName: string;
+  otpCode: string; // 6-digit OTP code
+  resetLink: string; // Direct reset link URL
+  expiryMinutes?: number; // Default 15 minutes
+}
+
 export interface EmailConfig {
   companyName: string;
   tagline: string;
@@ -51,22 +59,25 @@ export interface TemplateContext {
 }
 
 // Email template function signature
-export type EmailTemplateFunction<T = any> = (data: T, context?: Partial<TemplateContext>) => EmailTemplate;
+export type EmailTemplateFunction<T = any> = (
+  data: T,
+  context?: Partial<TemplateContext>,
+) => EmailTemplate;
 
 // RealEST Brand-aligned email styles
 export interface EmailStyles {
   colors: {
     // Brand colors (matching design-system.ts)
-    brandDark: string;           // #07402F - foundation (60%)
-    brandAccent: string;         // #ADF434 - accent (10%)
-    brandNeutral: string;        // #2E322E - secondary (30%)
-    brandLight: string;          // #F8F9F7 - backgrounds
+    brandDark: string; // #07402F - foundation (60%)
+    brandAccent: string; // #ADF434 - accent (10%)
+    brandNeutral: string; // #2E322E - secondary (30%)
+    brandLight: string; // #F8F9F7 - backgrounds
 
     // Semantic colors
-    success: string;             // Verified properties
-    warning: string;             // Pending verification
-    error: string;               // Rejected/Issues
-    info: string;                // Informational
+    success: string; // Verified properties
+    warning: string; // Pending verification
+    error: string; // Rejected/Issues
+    info: string; // Informational
 
     // UI colors
     text: string;
@@ -76,18 +87,18 @@ export interface EmailStyles {
     border: string;
   };
   fonts: {
-    display: string;             // Lufga for hero text
-    heading: string;             // Neulis Neue for headings
-    body: string;                // Space Grotesk for body
-    mono: string;                // JetBrains Mono for code
+    display: string; // Lufga for hero text
+    heading: string; // Neulis Neue for headings
+    body: string; // Space Grotesk for body
+    mono: string; // JetBrains Mono for code
   };
   spacing: {
-    xs: string;                  // 4px
-    sm: string;                  // 8px
-    md: string;                  // 16px
-    lg: string;                  // 24px
-    xl: string;                  // 32px
-    xxl: string;                 // 48px
+    xs: string; // 4px
+    sm: string; // 8px
+    md: string; // 16px
+    lg: string; // 24px
+    xl: string; // 32px
+    xxl: string; // 48px
   };
 }
 
@@ -95,23 +106,23 @@ export interface EmailStyles {
 export const realestEmailStyles: EmailStyles = {
   colors: {
     // Brand colors from design-system.ts
-    brandDark: '#07402F',        // Primary foundation color
-    brandAccent: '#ADF434',      // Acid green accent
-    brandNeutral: '#2E322E',     // Deep neutral
-    brandLight: '#F8F9F7',       // Off-white
+    brandDark: "#07402F", // Primary foundation color
+    brandAccent: "#ADF434", // Acid green accent
+    brandNeutral: "#2E322E", // Deep neutral
+    brandLight: "#F8F9F7", // Off-white
 
     // Semantic colors (OKLCH converted to hex for email compatibility)
-    success: '#5CB85C',          // oklch(0.72 0.18 145) - verified
-    warning: '#F0AD4E',          // oklch(0.82 0.18 85) - pending
-    error: '#D9534F',            // oklch(0.62 0.22 25) - error
-    info: '#5BC0DE',             // oklch(0.70 0.12 220) - info
+    success: "#5CB85C", // oklch(0.72 0.18 145) - verified
+    warning: "#F0AD4E", // oklch(0.82 0.18 85) - pending
+    error: "#D9534F", // oklch(0.62 0.22 25) - error
+    info: "#5BC0DE", // oklch(0.70 0.12 220) - info
 
     // UI colors
-    text: '#2E322E',             // Deep neutral for readability
-    textMuted: '#6B7280',        // Muted gray
-    background: '#F8F9F7',       // Off-white background
-    cardBackground: '#FFFFFF',   // Pure white cards
-    border: '#E5E7EB',           // Light border
+    text: "#2E322E", // Deep neutral for readability
+    textMuted: "#6B7280", // Muted gray
+    background: "#F8F9F7", // Off-white background
+    cardBackground: "#FFFFFF", // Pure white cards
+    border: "#E5E7EB", // Light border
   },
   fonts: {
     display: '"Lufga", "Playfair Display", serif',
@@ -120,11 +131,11 @@ export const realestEmailStyles: EmailStyles = {
     mono: '"JetBrains Mono", "SF Mono", "Monaco", monospace',
   },
   spacing: {
-    xs: '4px',
-    sm: '8px',
-    md: '16px',
-    lg: '24px',
-    xl: '32px',
-    xxl: '48px',
-  }
+    xs: "4px",
+    sm: "8px",
+    md: "16px",
+    lg: "24px",
+    xl: "32px",
+    xxl: "48px",
+  },
 };

@@ -113,7 +113,7 @@ export function DashboardSidebar({
           roles: ["admin"],
         },
         {
-          href: "/admin/properties",
+          href: "/admin/validation",
           label: "Property Verification",
           icon: Building,
           roles: ["admin"],
@@ -131,7 +131,7 @@ export function DashboardSidebar({
           roles: ["admin"],
         },
         {
-          href: "/admin/analytics",
+          href: "/admin/cms/analytics",
           label: "System Analytics",
           icon: BarChart3,
           roles: ["admin"],

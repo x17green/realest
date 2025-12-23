@@ -4,18 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Avatar, Dropdown } from "@heroui/react";
-import {
-  Menu,
-  X,
-  Bell,
-  Settings,
-  LogOut,
-  User,
-  Shield,
-  BarChart3,
-  Users,
-  Building,
-} from "lucide-react";
+import { Menu, X, Bell, Settings, LogOut, User, Shield } from "lucide-react";
 import { HeaderLogo } from "@/components/ui/RealEstLogo";
 import { ThemeToggleCompact } from "@/components/ui/theme-toggle-wrapper";
 import { useUser } from "@/lib/hooks/useUser";
@@ -52,47 +41,6 @@ export function AdminHeader() {
               <Bell className="w-4 h-4" />
               <span className="absolute -top-1 -right-1 w-2 h-2 bg-danger rounded-full"></span>
             </Button>
-
-            {/* Quick Admin Actions */}
-            <Dropdown>
-              <Dropdown.Trigger>
-                <Button variant="ghost" size="sm">
-                  <BarChart3 className="w-4 h-4" />
-                </Button>
-              </Dropdown.Trigger>
-              <Dropdown.Menu>
-                <Dropdown.Item
-                  id="properties"
-                  textValue="Property Verification"
-                  onPress={() => router.push("/admin/properties")}
-                >
-                  <div className="flex w-full items-center gap-2">
-                    <Building className="w-4 h-4" />
-                    <span>Property Verification</span>
-                  </div>
-                </Dropdown.Item>
-                <Dropdown.Item
-                  id="agents"
-                  textValue="Agent Verification"
-                  onPress={() => router.push("/admin/agents")}
-                >
-                  <div className="flex w-full items-center gap-2">
-                    <Users className="w-4 h-4" />
-                    <span>Agent Verification</span>
-                  </div>
-                </Dropdown.Item>
-                <Dropdown.Item
-                  id="analytics"
-                  textValue="System Analytics"
-                  onPress={() => router.push("/admin/analytics")}
-                >
-                  <div className="flex w-full items-center gap-2">
-                    <BarChart3 className="w-4 h-4" />
-                    <span>System Analytics</span>
-                  </div>
-                </Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
 
             {/* User Menu */}
             <ProfileDropdown />
@@ -140,45 +88,6 @@ export function AdminHeader() {
                     {user?.email}
                   </div>
                 </div>
-              </div>
-
-              {/* Mobile Quick Actions */}
-              <div className="space-y-2">
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start gap-3"
-                  onPress={() => {
-                    setIsMobileMenuOpen(false);
-                    router.push("/admin/properties");
-                  }}
-                >
-                  <Building className="w-4 h-4" />
-                  Property Verification
-                </Button>
-
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start gap-3"
-                  onPress={() => {
-                    setIsMobileMenuOpen(false);
-                    router.push("/admin/agents");
-                  }}
-                >
-                  <Users className="w-4 h-4" />
-                  Agent Verification
-                </Button>
-
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start gap-3"
-                  onPress={() => {
-                    setIsMobileMenuOpen(false);
-                    router.push("/admin/analytics");
-                  }}
-                >
-                  <BarChart3 className="w-4 h-4" />
-                  System Analytics
-                </Button>
               </div>
 
               {/* Mobile Actions */}

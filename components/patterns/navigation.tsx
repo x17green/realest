@@ -252,7 +252,7 @@ export function SidebarNavigation({
     ],
     admin: [
       { id: 'dashboard', label: 'Admin Dashboard', icon: '⚙️', href: '/admin' },
-      { id: 'properties', label: 'All Properties', icon: '🏘️', href: '/admin/properties' },
+      { id: 'properties', label: 'All Properties', icon: '🏘️', href: '/admin/validation' },
       { id: 'users', label: 'Users', icon: '👥', href: '/admin/users' },
       { id: 'agents', label: 'Agents', icon: '🤵', href: '/admin/agents' },
       { id: 'verification', label: 'Verification Queue', icon: '✅', href: '/admin/verification' },

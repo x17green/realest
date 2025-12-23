@@ -44,8 +44,44 @@ export function ProfileDropdown() {
 
     switch (role) {
       case "admin":
-        // Admin gets settings + profile + logout
+        // Admin gets quick actions, settings + profile + logout
         items.push(
+          <Dropdown.Item
+            key="properties"
+            id="properties"
+            textValue="Property Verification"
+            onPress={() => router.push("/admin/validation")}
+            className="hover:bg-muted rounded-md transition-colors"
+          >
+            <div className="flex w-full items-center justify-between gap-2">
+              <Label>Property Verification</Label>
+              <Building className="size-3.5 text-muted-foreground" />
+            </div>
+          </Dropdown.Item>,
+          <Dropdown.Item
+            key="agents"
+            id="agents"
+            textValue="Agent Verification"
+            onPress={() => router.push("/admin/agents")}
+            className="hover:bg-muted rounded-md transition-colors"
+          >
+            <div className="flex w-full items-center justify-between gap-2">
+              <Label>Agent Verification</Label>
+              <Users className="size-3.5 text-muted-foreground" />
+            </div>
+          </Dropdown.Item>,
+          <Dropdown.Item
+            key="analytics"
+            id="analytics"
+            textValue="System Analytics"
+            onPress={() => router.push("/admin/cms/analytics")}
+            className="hover:bg-muted rounded-md transition-colors"
+          >
+            <div className="flex w-full items-center justify-between gap-2">
+              <Label>System Analytics</Label>
+              <BarChart3 className="size-3.5 text-muted-foreground" />
+            </div>
+          </Dropdown.Item>,
           <Dropdown.Item
             key="settings"
             id="settings"
