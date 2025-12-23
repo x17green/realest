@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Button, Input, Card } from "@heroui/react";
-import { createClient } from "@/lib/supabase/client";
+import { sendPasswordResetEmail } from "@/lib/auth";
 import { Mail, ArrowLeft, CheckCircle } from "lucide-react";
 
 export default function ForgotPasswordPage() {
@@ -18,16 +18,10 @@ export default function ForgotPasswordPage() {
     setError("");
 
     try {
-      const supabase = createClient();
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(
-        email,
-        {
-          redirectTo: `${window.location.origin}/reset-password`,
-        }
-      );
+      const response = await sendPasswordResetEmail(email);
 
-      if (resetError) {
-        setError(resetError.message);
+      if (!response.success) {
+        setError(response.error || "Failed to send reset email");
         return;
       }
 
@@ -68,7 +62,8 @@ export default function ForgotPasswordPage() {
 
               <div className="bg-muted p-4 rounded-lg">
                 <p className="text-sm">
-                  Click the link in your email to reset your password. The link will expire in 24 hours.
+                  Click the link in your email to reset your password. The link
+                  will expire in 24 hours.
                 </p>
               </div>
             </div>
@@ -102,7 +97,8 @@ export default function ForgotPasswordPage() {
             Forgot Password?
           </Card.Title>
           <Card.Description>
-            Enter your email address and we'll send you a link to reset your password
+            Enter your email address and we'll send you a link to reset your
+            password
           </Card.Description>
         </Card.Header>
 
@@ -147,10 +143,7 @@ export default function ForgotPasswordPage() {
 
           <div className="flex items-center gap-2 text-center">
             <ArrowLeft className="w-4 h-4" />
-            <Link
-              href="/login"
-              className="text-sm font-medium hover:underline"
-            >
+            <Link href="/login" className="text-sm font-medium hover:underline">
               Back to Sign In
             </Link>
           </div>

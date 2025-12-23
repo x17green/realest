@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button, Card } from "@heroui/react";
-import { createClient } from "@/lib/supabase/client";
+import { signOut } from "@/lib/auth";
 import { LogOut, CheckCircle, RefreshCw, AlertCircle } from "lucide-react";
 
 function LogoutContent() {
@@ -30,13 +30,10 @@ function LogoutContent() {
     setError("");
 
     try {
-      const supabase = createClient();
+      const signOutResponse = await signOut();
 
-      // Clear user session
-      const { error: signOutError } = await supabase.auth.signOut();
-
-      if (signOutError) {
-        setError(signOutError.message);
+      if (!signOutResponse.success) {
+        setError(signOutResponse.error || "Failed to sign out");
         return;
       }
 
@@ -47,7 +44,6 @@ function LogoutContent() {
         router.push("/");
         router.refresh();
       }, 2000);
-
     } catch (err) {
       setError("An unexpected error occurred during logout.");
     } finally {
@@ -75,7 +71,8 @@ function LogoutContent() {
             <div className="text-center space-y-4">
               <div className="bg-success-50 border border-success-200 p-4 rounded-lg">
                 <p className="text-sm text-success-700">
-                  Your session has been terminated and all authentication data has been cleared.
+                  Your session has been terminated and all authentication data
+                  has been cleared.
                 </p>
               </div>
 
@@ -138,9 +135,7 @@ function LogoutContent() {
           <div className="flex justify-center mb-4">
             <LogOut className="w-12 h-12 text-primary" />
           </div>
-          <Card.Title className="text-2xl font-bold">
-            Sign Out
-          </Card.Title>
+          <Card.Title className="text-2xl font-bold">Sign Out</Card.Title>
           <Card.Description>
             Are you sure you want to sign out of your RealEST account?
           </Card.Description>
@@ -155,9 +150,7 @@ function LogoutContent() {
           )}
 
           <div className="bg-muted p-4 rounded-lg">
-            <p className="text-sm text-muted-foreground">
-              Signing out will:
-            </p>
+            <p className="text-sm text-muted-foreground">Signing out will:</p>
             <ul className="text-sm text-muted-foreground mt-2 space-y-1">
               <li className="flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground" />
@@ -175,11 +168,7 @@ function LogoutContent() {
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <Button
-              variant="ghost"
-              className="w-full"
-              asChild
-            >
+            <Button variant="ghost" className="w-full" asChild>
               <Link href="/owner">Cancel</Link>
             </Button>
 

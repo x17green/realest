@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button, Card } from "@heroui/react";
-import { createClient } from "@/lib/supabase/client";
+import { verifyOTP, getCurrentUser, getUserProfile, sendOTP } from "@/lib/auth";
 import { CheckCircle, Shield, RefreshCw, AlertTriangle } from "lucide-react";
 
 function OTPContent() {
@@ -89,15 +89,10 @@ function OTPContent() {
     setError("");
 
     try {
-      const supabase = createClient();
-      const { error: verifyError } = await supabase.auth.verifyOtp({
-        email: email,
-        token: otpCode,
-        type: "email",
-      });
+      const verifyResponse = await verifyOTP(email, otpCode);
 
-      if (verifyError) {
-        setError(verifyError.message);
+      if (!verifyResponse.success) {
+        setError(verifyResponse.error || "Invalid OTP code");
         // Clear OTP on error
         setOtp(["", "", "", "", "", ""]);
         inputRefs.current[0]?.focus();
@@ -107,22 +102,22 @@ function OTPContent() {
       setIsSuccess(true);
 
       // Get user profile to determine redirect
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (user) {
-        const { data: userRole } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", user.id)
-          .single();
+      const userResponse = await getCurrentUser();
+      if (userResponse.success && userResponse.user) {
+        const profileResponse = await getUserProfile(userResponse.user.id);
 
-        if (userRole?.role === "owner") {
-          router.push("/profile-setup");
-        } else if (userRole?.role === "agent") {
-          router.push("/agent-onboarding");
-        } else if (userRole?.role === "admin") {
-          router.push("/admin");
+        if (profileResponse.success && profileResponse.profile) {
+          const userType = profileResponse.profile.user_type;
+
+          if (userType === "owner") {
+            router.push("/profile-setup");
+          } else if (userType === "agent") {
+            router.push("/agent-onboarding");
+          } else if (userType === "admin") {
+            router.push("/admin");
+          } else {
+            router.push("/profile");
+          }
         } else {
           router.push("/profile");
         }
@@ -141,13 +136,10 @@ function OTPContent() {
     setError("");
 
     try {
-      const supabase = createClient();
-      const { error: resendError } = await supabase.auth.signInWithOtp({
-        email: email,
-      });
+      const resendResponse = await sendOTP(email);
 
-      if (resendError) {
-        setError(resendError.message);
+      if (!resendResponse.success) {
+        setError(resendResponse.error || "Failed to resend OTP");
       } else {
         setTimeLeft(300); // Reset timer
         setOtp(["", "", "", "", "", ""]);

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button, Card } from "@heroui/react";
 import { CheckCircle, Mail } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser, getUserProfile } from "@/lib/auth";
 
 export default function SignUpSuccessPage() {
   const router = useRouter();
@@ -13,22 +13,16 @@ export default function SignUpSuccessPage() {
 
   useEffect(() => {
     const checkUserAndRedirect = async () => {
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const userResponse = await getCurrentUser();
 
-      if (user) {
-        const { data: userRole } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", user.id)
-          .single();
+      if (userResponse.success && userResponse.user) {
+        const profileResponse = await getUserProfile(userResponse.user.id);
 
-        if (userRole?.role) {
+        if (profileResponse.success && profileResponse.profile) {
+          const userType = profileResponse.profile.user_type;
           setIsRedirecting(true);
           setTimeout(() => {
-            switch (userRole.role) {
+            switch (userType) {
               case "agent":
                 router.push("/agent-onboarding");
                 break;

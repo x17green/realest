@@ -5,7 +5,15 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button, Input, Card } from "@heroui/react";
 import { createClient } from "@/lib/supabase/client";
-import { Eye, EyeOff, Lock, CheckCircle, Shield, RefreshCw } from "lucide-react";
+import { getCurrentUser, resetPassword, signOut } from "@/lib/auth";
+import {
+  Eye,
+  EyeOff,
+  Lock,
+  CheckCircle,
+  Shield,
+  RefreshCw,
+} from "lucide-react";
 
 function ResetPasswordContent() {
   const router = useRouter();
@@ -30,20 +38,28 @@ function ResetPasswordContent() {
   // Check for auth parameters in URL and handle session
   useEffect(() => {
     const initializeSession = async () => {
-      const accessToken = searchParams.get('access_token');
-      const refreshToken = searchParams.get('refresh_token');
-      const code = searchParams.get('code');
-      const error = searchParams.get('error');
-      const errorDescription = searchParams.get('error_description');
+      const accessToken = searchParams.get("access_token");
+      const refreshToken = searchParams.get("refresh_token");
+      const code = searchParams.get("code");
+      const error = searchParams.get("error");
+      const errorDescription = searchParams.get("error_description");
 
-      console.log('Reset password params:', { accessToken, refreshToken, code, error });
+      console.log("Reset password params:", {
+        accessToken,
+        refreshToken,
+        code,
+        error,
+      });
 
       // Handle error responses from Supabase
       if (error) {
-        console.error('Auth error:', error, errorDescription);
-        setError(errorDescription || 'Invalid reset link. Please request a new password reset.');
+        console.error("Auth error:", error, errorDescription);
+        setError(
+          errorDescription ||
+            "Invalid reset link. Please request a new password reset.",
+        );
         setTimeout(() => {
-          router.push('/forgot-password');
+          router.push("/forgot-password");
         }, 5000);
         return;
       }
@@ -52,23 +68,26 @@ function ResetPasswordContent() {
       if (code) {
         try {
           const supabase = createClient();
-          const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+          const { data, error: exchangeError } =
+            await supabase.auth.exchangeCodeForSession(code);
 
           if (exchangeError) {
-            console.error('Code exchange error:', exchangeError);
-            setError('Invalid or expired reset link. Please request a new password reset.');
+            console.error("Code exchange error:", exchangeError);
+            setError(
+              "Invalid or expired reset link. Please request a new password reset.",
+            );
             setTimeout(() => {
-              router.push('/forgot-password');
+              router.push("/forgot-password");
             }, 5000);
           } else if (data.session) {
-            console.log('Successfully exchanged code for session');
-            setError(''); // Clear any previous errors
+            console.log("Successfully exchanged code for session");
+            setError(""); // Clear any previous errors
           }
         } catch (err) {
-          console.error('Error exchanging code:', err);
-          setError('Failed to initialize password reset. Please try again.');
+          console.error("Error exchanging code:", err);
+          setError("Failed to initialize password reset. Please try again.");
           setTimeout(() => {
-            router.push('/forgot-password');
+            router.push("/forgot-password");
           }, 3000);
         }
         return;
@@ -84,29 +103,33 @@ function ResetPasswordContent() {
           });
 
           if (sessionError) {
-            console.error('Session error:', sessionError);
-            setError('Invalid or expired reset link. Please request a new password reset.');
+            console.error("Session error:", sessionError);
+            setError(
+              "Invalid or expired reset link. Please request a new password reset.",
+            );
             setTimeout(() => {
-              router.push('/forgot-password');
+              router.push("/forgot-password");
             }, 5000);
           } else {
             // Successfully set session, clear any previous errors
-            setError('');
+            setError("");
           }
         } catch (err) {
-          console.error('Error setting session:', err);
-          setError('Failed to initialize password reset. Please try again.');
+          console.error("Error setting session:", err);
+          setError("Failed to initialize password reset. Please try again.");
           setTimeout(() => {
-            router.push('/forgot-password');
+            router.push("/forgot-password");
           }, 3000);
         }
         return;
       }
 
       // If no tokens or code, redirect to forgot password
-      setError('No reset token found. Please check your email link or request a new password reset.');
+      setError(
+        "No reset token found. Please check your email link or request a new password reset.",
+      );
       setTimeout(() => {
-        router.push('/forgot-password');
+        router.push("/forgot-password");
       }, 3000);
     };
 
@@ -151,64 +174,62 @@ function ResetPasswordContent() {
     }
 
     try {
-      const supabase = createClient();
-
-      // Get current session to verify user is authenticated
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-
-      if (sessionError || !session) {
-        setError('Your session has expired. Please request a new password reset link.');
-        setTimeout(() => {
-          router.push('/forgot-password');
-        }, 3000);
-        return;
-      }
-
       // Verify user is still authenticated before updating password
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      const userResponse = await getCurrentUser();
 
-      if (userError || !user) {
-        setError('Session expired. Please request a new password reset link.');
+      if (!userResponse.success || !userResponse.user) {
+        setError("Session expired. Please request a new password reset link.");
         setTimeout(() => {
-          router.push('/forgot-password');
+          router.push("/forgot-password");
         }, 3000);
         return;
       }
 
       // Update password
-      const { error: updateError } = await supabase.auth.updateUser({
-        password: formData.password
-      });
+      const resetResponse = await resetPassword(formData.password);
 
-      if (updateError) {
-        console.error('Password update error:', updateError);
+      if (!resetResponse.success) {
+        console.error("Password update error:", resetResponse.error);
         // Handle specific error types
-        if (updateError.message.includes('session') || updateError.message.includes('expired') || updateError.message.includes('unauthorized')) {
-          setError('Your reset session has expired. Please request a new password reset link.');
+        if (
+          resetResponse.error?.includes("session") ||
+          resetResponse.error?.includes("expired") ||
+          resetResponse.error?.includes("unauthorized")
+        ) {
+          setError(
+            "Your reset session has expired. Please request a new password reset link.",
+          );
           setTimeout(() => {
-            router.push('/forgot-password');
+            router.push("/forgot-password");
           }, 3000);
-        } else if (updateError.message.includes('same_password') || updateError.message.includes('password')) {
-          setError('New password must be different from your current password or does not meet requirements.');
+        } else if (
+          resetResponse.error?.includes("same_password") ||
+          resetResponse.error?.includes("password")
+        ) {
+          setError(
+            "New password must be different from your current password or does not meet requirements.",
+          );
         } else {
-          setError(updateError.message || 'Failed to update password. Please try again.');
+          setError(
+            resetResponse.error ||
+              "Failed to update password. Please try again.",
+          );
         }
         return;
       }
 
-      console.log('Password updated successfully');
+      console.log("Password updated successfully");
       setIsSuccess(true);
 
       // Sign out after password reset for security
-      await supabase.auth.signOut();
+      await signOut();
 
       // Redirect to login after 3 seconds
       setTimeout(() => {
-        router.push('/login?reset=true');
+        router.push("/login?reset=true");
       }, 3000);
-
     } catch (err) {
-      console.error('Password reset error:', err);
+      console.error("Password reset error:", err);
       setError("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
@@ -242,8 +263,8 @@ function ResetPasswordContent() {
             <div className="text-center space-y-4">
               <div className="bg-success-50 border border-success-200 p-4 rounded-lg">
                 <p className="text-sm text-success-700">
-                  Your password has been securely updated. For security, you have been signed out.
-                  Please sign in with your new password.
+                  Your password has been securely updated. For security, you
+                  have been signed out. Please sign in with your new password.
                 </p>
               </div>
 
@@ -291,7 +312,9 @@ function ResetPasswordContent() {
                   type={showPassword ? "text" : "password"}
                   placeholder="Create a new password"
                   value={formData.password}
-                  onChange={(e) => handleInputChange("password", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("password", e.target.value)
+                  }
                   className="pl-10 pr-10"
                   required
                 />
@@ -311,26 +334,48 @@ function ResetPasswordContent() {
               {/* Password Validation */}
               {formData.password && (
                 <div className="bg-muted p-3 rounded-lg space-y-2">
-                  <p className="text-xs font-medium text-muted-foreground">Password Requirements:</p>
+                  <p className="text-xs font-medium text-muted-foreground">
+                    Password Requirements:
+                  </p>
                   <div className="grid grid-cols-1 gap-1 text-xs">
-                    <div className={`flex items-center gap-2 ${passwordValidation.minLength ? 'text-success' : 'text-muted-foreground'}`}>
-                      <div className={`w-1.5 h-1.5 rounded-full ${passwordValidation.minLength ? 'bg-success' : 'bg-muted-foreground'}`} />
+                    <div
+                      className={`flex items-center gap-2 ${passwordValidation.minLength ? "text-success" : "text-muted-foreground"}`}
+                    >
+                      <div
+                        className={`w-1.5 h-1.5 rounded-full ${passwordValidation.minLength ? "bg-success" : "bg-muted-foreground"}`}
+                      />
                       At least 8 characters
                     </div>
-                    <div className={`flex items-center gap-2 ${passwordValidation.hasUppercase ? 'text-success' : 'text-muted-foreground'}`}>
-                      <div className={`w-1.5 h-1.5 rounded-full ${passwordValidation.hasUppercase ? 'bg-success' : 'bg-muted-foreground'}`} />
+                    <div
+                      className={`flex items-center gap-2 ${passwordValidation.hasUppercase ? "text-success" : "text-muted-foreground"}`}
+                    >
+                      <div
+                        className={`w-1.5 h-1.5 rounded-full ${passwordValidation.hasUppercase ? "bg-success" : "bg-muted-foreground"}`}
+                      />
                       One uppercase letter
                     </div>
-                    <div className={`flex items-center gap-2 ${passwordValidation.hasLowercase ? 'text-success' : 'text-muted-foreground'}`}>
-                      <div className={`w-1.5 h-1.5 rounded-full ${passwordValidation.hasLowercase ? 'bg-success' : 'bg-muted-foreground'}`} />
+                    <div
+                      className={`flex items-center gap-2 ${passwordValidation.hasLowercase ? "text-success" : "text-muted-foreground"}`}
+                    >
+                      <div
+                        className={`w-1.5 h-1.5 rounded-full ${passwordValidation.hasLowercase ? "bg-success" : "bg-muted-foreground"}`}
+                      />
                       One lowercase letter
                     </div>
-                    <div className={`flex items-center gap-2 ${passwordValidation.hasNumber ? 'text-success' : 'text-muted-foreground'}`}>
-                      <div className={`w-1.5 h-1.5 rounded-full ${passwordValidation.hasNumber ? 'bg-success' : 'bg-muted-foreground'}`} />
+                    <div
+                      className={`flex items-center gap-2 ${passwordValidation.hasNumber ? "text-success" : "text-muted-foreground"}`}
+                    >
+                      <div
+                        className={`w-1.5 h-1.5 rounded-full ${passwordValidation.hasNumber ? "bg-success" : "bg-muted-foreground"}`}
+                      />
                       One number
                     </div>
-                    <div className={`flex items-center gap-2 ${passwordValidation.hasSpecialChar ? 'text-success' : 'text-muted-foreground'}`}>
-                      <div className={`w-1.5 h-1.5 rounded-full ${passwordValidation.hasSpecialChar ? 'bg-success' : 'bg-muted-foreground'}`} />
+                    <div
+                      className={`flex items-center gap-2 ${passwordValidation.hasSpecialChar ? "text-success" : "text-muted-foreground"}`}
+                    >
+                      <div
+                        className={`w-1.5 h-1.5 rounded-full ${passwordValidation.hasSpecialChar ? "bg-success" : "bg-muted-foreground"}`}
+                      />
                       One special character
                     </div>
                   </div>
@@ -349,7 +394,9 @@ function ResetPasswordContent() {
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="Confirm your new password"
                   value={formData.confirmPassword}
-                  onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("confirmPassword", e.target.value)
+                  }
                   className="pl-10 pr-10"
                   required
                 />
@@ -368,20 +415,23 @@ function ResetPasswordContent() {
 
               {/* Password Match Indicator */}
               {formData.confirmPassword && (
-                <div className={`text-xs flex items-center gap-2 ${
-                  formData.password === formData.confirmPassword
-                    ? 'text-success'
-                    : 'text-danger'
-                }`}>
-                  <div className={`w-1.5 h-1.5 rounded-full ${
+                <div
+                  className={`text-xs flex items-center gap-2 ${
                     formData.password === formData.confirmPassword
-                      ? 'bg-success'
-                      : 'bg-danger'
-                  }`} />
+                      ? "text-success"
+                      : "text-danger"
+                  }`}
+                >
+                  <div
+                    className={`w-1.5 h-1.5 rounded-full ${
+                      formData.password === formData.confirmPassword
+                        ? "bg-success"
+                        : "bg-danger"
+                    }`}
+                  />
                   {formData.password === formData.confirmPassword
-                    ? 'Passwords match'
-                    : 'Passwords do not match'
-                  }
+                    ? "Passwords match"
+                    : "Passwords do not match"}
                 </div>
               )}
             </div>

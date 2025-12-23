@@ -4,7 +4,11 @@ import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button, Input, Card } from "@heroui/react";
-import { createClient } from "@/lib/supabase/client";
+import {
+  signInWithPassword,
+  getUserProfile,
+  formatAuthError,
+} from "@/lib/auth";
 import { Eye, EyeOff, Mail, Lock, CheckCircle } from "lucide-react";
 
 function LoginForm() {
@@ -44,37 +48,40 @@ function LoginForm() {
     setError("");
 
     try {
-      const supabase = createClient();
-      const { data, error: authError } = await supabase.auth.signInWithPassword(
-        {
-          email: formData.email,
-          password: formData.password,
-        },
+      const response = await signInWithPassword(
+        formData.email,
+        formData.password,
       );
 
-      if (authError) {
-        setError(authError.message);
+      if (!response.success) {
+        setError(
+          formatAuthError(response.error || "An unexpected error occurred"),
+        );
         return;
       }
 
-      if (data.user) {
+      if (response.user) {
         // Get user profile to determine redirect
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("user_type")
-          .eq("id", data.user.id)
-          .single();
+        const profileResponse = await getUserProfile(response.user.id);
 
-        if (profile?.user_type === "owner") {
-          router.push("/owner");
-        } else if (profile?.user_type === "admin") {
-          router.push("/admin");
-        } else if (profile?.user_type === "agent") {
-          router.push("/agent");
+        if (profileResponse.success && profileResponse.profile) {
+          const userType = profileResponse.profile.user_type;
+
+          if (userType === "owner") {
+            router.push("/owner");
+          } else if (userType === "admin") {
+            router.push("/admin");
+          } else if (userType === "agent") {
+            router.push("/agent");
+          } else {
+            router.push("/profile");
+          }
+          router.refresh();
         } else {
+          // Fallback to profile if profile fetch fails
           router.push("/profile");
+          router.refresh();
         }
-        router.refresh();
       }
     } catch (err) {
       setError("An unexpected error occurred");

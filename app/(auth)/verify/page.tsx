@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button, Card } from "@heroui/react";
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUser, resendEmailVerification } from "@/lib/auth";
 import { CheckCircle, Mail, AlertCircle, RefreshCw } from "lucide-react";
 
 function VerifyEmailContent() {
@@ -12,7 +13,9 @@ function VerifyEmailContent() {
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(true);
   const [isResending, setIsResending] = useState(false);
-  const [verificationStatus, setVerificationStatus] = useState<'verifying' | 'success' | 'error' | 'expired'>('verifying');
+  const [verificationStatus, setVerificationStatus] = useState<
+    "verifying" | "success" | "error" | "expired"
+  >("verifying");
   const [error, setError] = useState("");
   const [email, setEmail] = useState("");
 
@@ -22,50 +25,52 @@ function VerifyEmailContent() {
         const supabase = createClient();
 
         // Get current user
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user?.email) {
-          setEmail(user.email);
+        const userResponse = await getCurrentUser();
+        if (userResponse.success && userResponse.user?.email) {
+          setEmail(userResponse.user.email);
         }
 
         // Check for verification tokens in URL
-        const accessToken = searchParams.get('access_token');
-        const refreshToken = searchParams.get('refresh_token');
-        const type = searchParams.get('type');
+        const accessToken = searchParams.get("access_token");
+        const refreshToken = searchParams.get("refresh_token");
+        const type = searchParams.get("type");
 
-        if (accessToken && refreshToken && type === 'email') {
-          // Verify the email
+        if (accessToken && refreshToken && type === "email") {
+          // Verify the email - using direct supabase call since lib function expects different params
           const { error: verifyError } = await supabase.auth.verifyOtp({
             token_hash: accessToken,
-            type: 'email'
+            type: "email",
           });
 
           if (verifyError) {
-            if (verifyError.message.includes('expired')) {
-              setVerificationStatus('expired');
+            if (verifyError.message.includes("expired")) {
+              setVerificationStatus("expired");
             } else {
-              setVerificationStatus('error');
+              setVerificationStatus("error");
               setError(verifyError.message);
             }
           } else {
-            setVerificationStatus('success');
+            setVerificationStatus("success");
 
             // Redirect to login after successful verification
             setTimeout(() => {
-              router.push('/login?verified=true');
+              router.push("/login?verified=true");
             }, 3000);
           }
         } else {
           // No verification tokens, show manual resend option
-          if (user?.email_confirmed_at) {
-            setVerificationStatus('success');
+          if (userResponse.success && userResponse.user?.email_confirmed_at) {
+            setVerificationStatus("success");
           } else {
-            setVerificationStatus('error');
-            setError('No verification token found. Please check your email or resend verification.');
+            setVerificationStatus("error");
+            setError(
+              "No verification token found. Please check your email or resend verification.",
+            );
           }
         }
       } catch (err) {
-        setVerificationStatus('error');
-        setError('An unexpected error occurred during verification.');
+        setVerificationStatus("error");
+        setError("An unexpected error occurred during verification.");
       } finally {
         setIsLoading(false);
       }
@@ -76,7 +81,7 @@ function VerifyEmailContent() {
 
   const handleResendVerification = async () => {
     if (!email) {
-      setError('No email address found. Please sign up again.');
+      setError("No email address found. Please sign up again.");
       return;
     }
 
@@ -84,21 +89,17 @@ function VerifyEmailContent() {
     setError("");
 
     try {
-      const supabase = createClient();
-      const { error: resendError } = await supabase.auth.resend({
-        type: 'signup',
-        email: email,
-      });
+      const resendResponse = await resendEmailVerification(email);
 
-      if (resendError) {
-        setError(resendError.message);
+      if (!resendResponse.success) {
+        setError(resendResponse.error || "Failed to resend verification email");
       } else {
         // Show success message
-        setError('');
-        alert('Verification email sent! Please check your inbox.');
+        setError("");
+        alert("Verification email sent! Please check your inbox.");
       }
     } catch (err) {
-      setError('Failed to resend verification email. Please try again.');
+      setError("Failed to resend verification email. Please try again.");
     } finally {
       setIsResending(false);
     }
@@ -124,7 +125,7 @@ function VerifyEmailContent() {
     );
   }
 
-  if (verificationStatus === 'success') {
+  if (verificationStatus === "success") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background px-4">
         <Card.Root className="w-full max-w-md">
@@ -144,7 +145,8 @@ function VerifyEmailContent() {
             <div className="text-center space-y-4">
               <div className="bg-success-50 border border-success-200 p-4 rounded-lg">
                 <p className="text-sm text-success-700">
-                  Welcome to RealEST! Your account is now active and you can access all features.
+                  Welcome to RealEST! Your account is now active and you can
+                  access all features.
                 </p>
               </div>
 
@@ -159,7 +161,10 @@ function VerifyEmailContent() {
               </Button>
 
               <div className="text-center">
-                <Link href="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <Link
+                  href="/"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
                   Back to Homepage
                 </Link>
               </div>
@@ -170,7 +175,7 @@ function VerifyEmailContent() {
     );
   }
 
-  if (verificationStatus === 'expired') {
+  if (verificationStatus === "expired") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background px-4">
         <Card.Root className="w-full max-w-md">
@@ -178,9 +183,7 @@ function VerifyEmailContent() {
             <div className="flex justify-center mb-4">
               <AlertCircle className="w-12 h-12 text-warning" />
             </div>
-            <Card.Title className="text-2xl font-bold">
-              Link Expired
-            </Card.Title>
+            <Card.Title className="text-2xl font-bold">Link Expired</Card.Title>
             <Card.Description>
               Your verification link has expired
             </Card.Description>
@@ -190,7 +193,8 @@ function VerifyEmailContent() {
             <div className="text-center space-y-4">
               <div className="bg-warning-50 border border-warning-200 p-4 rounded-lg">
                 <p className="text-sm text-warning-700">
-                  The verification link you clicked has expired. Please request a new one to verify your email.
+                  The verification link you clicked has expired. Please request
+                  a new one to verify your email.
                 </p>
               </div>
 
@@ -215,11 +219,17 @@ function VerifyEmailContent() {
               </Button>
 
               <div className="text-center space-y-2">
-                <Link href="/register" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <Link
+                  href="/register"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
                   Sign up with different email
                 </Link>
                 <br />
-                <Link href="/login" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <Link
+                  href="/login"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
                   Back to Sign In
                 </Link>
               </div>
@@ -277,11 +287,17 @@ function VerifyEmailContent() {
             )}
 
             <div className="text-center space-y-2">
-              <Link href="/register" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <Link
+                href="/register"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
                 Sign up again
               </Link>
               <br />
-              <Link href="/login" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <Link
+                href="/login"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
                 Back to Sign In
               </Link>
             </div>
