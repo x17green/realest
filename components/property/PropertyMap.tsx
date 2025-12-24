@@ -40,21 +40,23 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { LatLngExpression, LatLngBounds } from "leaflet";
-import { usePropertyMap } from "../../lib/hooks/usePropertyMap";
+import { usePropertyMap } from "@/lib/hooks/usePropertyMap";
 import {
   formatMapPrice,
   createMarkerIconHTML,
   leafletBoundsToBounds,
   isValidCoordinates,
   NIGERIAN_STATES,
+  LAGOS_LGAS,
   INFRASTRUCTURE_FILTERS,
   getPropertyTypeColor,
   getPropertyTypeIcon,
-} from "../../lib/utils/mapUtils";
+} from "@/lib/utils/mapUtils";
 import {
   getDefaultMapCenter,
   getDefaultMapBounds,
-} from "../../lib/utils/nigerianLocations";
+} from "@/lib/utils/nigerianLocations";
+import { PropertyMapMarkerCluster } from "./PropertyMapMarkerCluster";
 
 // Dynamic imports for SSR compatibility
 const MapContainer = dynamic(
@@ -73,11 +75,38 @@ const Popup = dynamic(() => import("react-leaflet").then((mod) => mod.Popup), {
   ssr: false,
 });
 
-// Simplified bounds handling - will be enhanced in Phase 2
+import { useMapEvents } from "react-leaflet";
+
+// Map bounds handling with event synchronization
 function useMapBounds() {
   const [bounds, setBounds] = useState(getDefaultMapBounds());
 
   return { bounds, setBounds };
+}
+
+// Component to handle map events and update bounds
+function MapEventHandler({
+  onBoundsChange,
+}: {
+  onBoundsChange: (bounds: {
+    north: number;
+    south: number;
+    east: number;
+    west: number;
+  }) => void;
+}) {
+  useMapEvents({
+    moveend: (e: any) => {
+      const leafletBounds = e.target.getBounds();
+      onBoundsChange(leafletBoundsToBounds(leafletBounds));
+    },
+    zoomend: (e: any) => {
+      const leafletBounds = e.target.getBounds();
+      onBoundsChange(leafletBoundsToBounds(leafletBounds));
+    },
+  });
+
+  return null;
 }
 
 interface PropertyMapProps {
@@ -117,7 +146,7 @@ export function PropertyMap({
     securityTypes: [] as string[],
   });
 
-  const { bounds } = useMapBounds();
+  const { bounds, setBounds } = useMapBounds();
 
   // Fetch properties with current filters and bounds
   const { properties, isLoading, error } = usePropertyMap({
@@ -260,56 +289,16 @@ export function PropertyMap({
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        {filteredProperties.map((property) => {
-          if (!isValidCoordinates(property.latitude, property.longitude))
-            return null;
+        <MapEventHandler onBoundsChange={setBounds} />
 
-          return (
-            <Marker
-              key={property.id}
-              position={[property.latitude!, property.longitude!]}
-              icon={createCustomIcon(property)}
-              eventHandlers={{
-                click: () => {
-                  setSelectedProperty(property);
-                  setCurrentImageIndex(0);
-                },
-              }}
-            >
-              {selectedProperty && selectedProperty.id === property.id && (
-                <Popup>
-                  <div className="p-4 min-w-[280px]">
-                    <h3 className="text-lg font-bold mb-2">{property.title}</h3>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      {property.address}, {property.city}, {property.state}
-                    </p>
-                    <p className="text-xl font-bold text-primary mb-2">
-                      {formatMapPrice(property.price, property.currency)} for{" "}
-                      {property.listing_type}
-                    </p>
-                    {property.property_details && (
-                      <div className="flex gap-4 text-sm text-muted-foreground">
-                        {property.property_details.bedrooms && (
-                          <span>{property.property_details.bedrooms} beds</span>
-                        )}
-                        {property.property_details.bathrooms && (
-                          <span>
-                            {property.property_details.bathrooms} baths
-                          </span>
-                        )}
-                        {property.property_details.square_feet && (
-                          <span>
-                            {property.property_details.square_feet} sqft
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </Popup>
-              )}
-            </Marker>
-          );
-        })}
+        <PropertyMapMarkerCluster
+          properties={filteredProperties}
+          onPropertyClick={(property) => {
+            setSelectedProperty(property);
+            setCurrentImageIndex(0);
+          }}
+          selectedPropertyId={selectedProperty?.id}
+        />
       </MapContainer>
 
       {/* Header Overlay */}

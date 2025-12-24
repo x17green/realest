@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { Database } from "@/lib/supabase/types";
+import type { RealtimeChannel } from "@supabase/supabase-js";
 
-type Property = Database["public"]["Tables"]["properties"]["Row"] & {
+export type Property = Database["public"]["Tables"]["properties"]["Row"] & {
   property_details:
     | Database["public"]["Tables"]["property_details"]["Row"]
     | null;
@@ -171,6 +172,28 @@ export function usePropertyMap({
   useEffect(() => {
     fetchProperties();
   }, [bounds, filters, limit, enabled]);
+
+  // Real-time updates
+  useEffect(() => {
+    if (!enabled) return;
+
+    const supabase = createClient();
+    const channel: RealtimeChannel = supabase
+      .channel("properties-updates")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "properties" },
+        () => {
+          // Refetch properties when any change occurs
+          fetchProperties();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [enabled]);
 
   return {
     properties,
