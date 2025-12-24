@@ -38,6 +38,9 @@ import {
   Wifi,
   Shield,
   Bookmark,
+  Flame,
+  DollarSign,
+  TrendingUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { LatLngExpression, LatLngBounds } from "leaflet";
@@ -94,6 +97,33 @@ const Popup = dynamic(() => import("react-leaflet").then((mod) => mod.Popup), {
 });
 
 import { useMapEvents, useMap } from "react-leaflet";
+
+// Heatmap Layer Component
+function HeatmapLayer({
+  points,
+  options,
+}: {
+  points: [number, number, number][];
+  options: any;
+}) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!map || !points.length) return;
+
+    // @ts-ignore
+    const heatLayer = (window as any).L.heatLayer(points, options);
+    map.addLayer(heatLayer);
+
+    return () => {
+      if (map.hasLayer(heatLayer)) {
+        map.removeLayer(heatLayer);
+      }
+    };
+  }, [map, points, options]);
+
+  return null;
+}
 
 // Map bounds handling with event synchronization
 function useMapBounds() {
@@ -179,6 +209,11 @@ export function PropertyMap({
   const [savedSearches, setSavedSearches] = useState<any[]>([]);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [saveSearchName, setSaveSearchName] = useState("");
+  const [heatmapType, setHeatmapType] = useState<
+    "density" | "price" | "demand" | null
+  >(null);
+  const [showDirections, setShowDirections] = useState(false);
+  const [directionsProperty, setDirectionsProperty] = useState<any>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Filter states
@@ -320,6 +355,12 @@ export function PropertyMap({
         //   const data = await response.json();
         //   setSavedSearches(data);
         // }
+
+        // Load Leaflet Heatmap
+        const heatmapScript = document.createElement("script");
+        heatmapScript.src =
+          "https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js";
+        document.head.appendChild(heatmapScript);
       }
     };
     loadLeafletCSS();
@@ -372,6 +413,36 @@ export function PropertyMap({
     [filters.state],
   );
 
+  // Generate heatmap data
+  const heatmapData = useMemo(() => {
+    if (!heatmapType || !properties.length) return [];
+
+    return properties
+      .filter((property) =>
+        isValidCoordinates(property.latitude, property.longitude),
+      )
+      .map((property): [number, number, number] => {
+        let intensity = 1;
+
+        if (heatmapType === "price") {
+          // Normalize price to 0-1 scale (assuming max price is 1B)
+          intensity = Math.min(property.price / 1000000000, 1);
+        } else if (heatmapType === "demand") {
+          // Simulate demand based on property age and verification
+          // In production, use actual inquiry data
+          intensity = property.verification_status === "verified" ? 0.8 : 0.4;
+          if (property.created_at) {
+            const daysOld =
+              (Date.now() - new Date(property.created_at).getTime()) /
+              (1000 * 60 * 60 * 24);
+            intensity *= Math.max(0.3, 1 - daysOld / 365); // Newer properties have higher intensity
+          }
+        }
+
+        return [property.latitude!, property.longitude!, intensity];
+      });
+  }, [properties, heatmapType]);
+
   // Handle filter changes
   const updateFilter = (key: string, value: any) => {
     setFilters((prev) => {
@@ -415,6 +486,43 @@ export function PropertyMap({
     setBounds(search.bounds);
     setRadiusSearch(search.radiusSearch);
     setSearchQuery(search.searchQuery);
+  };
+
+  // Apply filter preset
+  const applyFilterPreset = (preset: string) => {
+    const presets = {
+      "family-friendly": {
+        hasBq: true,
+        bedrooms: 3,
+        bathrooms: 2,
+        propertyType: "",
+        listingType: "",
+      },
+      "power-stable": {
+        nepaStatus: "stable",
+        propertyType: "",
+        listingType: "",
+      },
+      "gated-communities": {
+        securityTypes: ["gated_community"],
+        propertyType: "",
+        listingType: "",
+      },
+    };
+
+    if (presets[preset as keyof typeof presets]) {
+      setFilters((prev) => ({
+        ...prev,
+        ...presets[preset as keyof typeof presets],
+      }));
+    }
+  };
+
+  // Get directions URL
+  const getDirectionsUrl = (property: any) => {
+    const origin = `${center.lat},${center.lng}`;
+    const destination = `${property.latitude},${property.longitude}`;
+    return `https://www.google.com/maps/dir/${origin}/${destination}`;
   };
 
   // Reset filters
@@ -566,6 +674,35 @@ export function PropertyMap({
               opacity: 0.8,
               fillColor: "#84CC16",
               fillOpacity: 0.2,
+            }}
+          />
+        )}
+
+        {/* Heatmap Layer */}
+        {heatmapType && heatmapData.length > 0 && (
+          <HeatmapLayer
+            points={heatmapData}
+            options={{
+              radius: 25,
+              blur: 15,
+              maxZoom: 11,
+              max: heatmapType === "price" ? 1 : 1,
+              gradient:
+                heatmapType === "price"
+                  ? {
+                      0.2: "blue",
+                      0.4: "lime",
+                      0.6: "yellow",
+                      0.8: "orange",
+                      1.0: "red",
+                    }
+                  : {
+                      0.2: "blue",
+                      0.4: "cyan",
+                      0.6: "lime",
+                      0.8: "yellow",
+                      1.0: "red",
+                    },
             }}
           />
         )}
@@ -926,6 +1063,86 @@ export function PropertyMap({
                 </div>
               </div>
 
+              {/* Filter Presets */}
+              <div>
+                <Label className="text-sm font-medium mb-3 block">
+                  Quick Filters
+                </Label>
+                <div className="grid grid-cols-1 gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => applyFilterPreset("family-friendly")}
+                    className="justify-start"
+                  >
+                    <Home className="h-4 w-4 mr-2" />
+                    Family-Friendly
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => applyFilterPreset("power-stable")}
+                    className="justify-start"
+                  >
+                    <Zap className="h-4 w-4 mr-2" />
+                    Power Stable
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => applyFilterPreset("gated-communities")}
+                    className="justify-start"
+                  >
+                    <Shield className="h-4 w-4 mr-2" />
+                    Gated Communities
+                  </Button>
+                </div>
+              </div>
+
+              {/* Heatmap Controls */}
+              <div>
+                <Label className="text-sm font-medium mb-3 block">
+                  Data Visualization
+                </Label>
+                <div className="grid grid-cols-1 gap-2">
+                  <Button
+                    variant={heatmapType === "density" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() =>
+                      setHeatmapType(
+                        heatmapType === "density" ? null : "density",
+                      )
+                    }
+                    className="justify-start"
+                  >
+                    <Flame className="h-4 w-4 mr-2" />
+                    Property Density
+                  </Button>
+                  <Button
+                    variant={heatmapType === "price" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() =>
+                      setHeatmapType(heatmapType === "price" ? null : "price")
+                    }
+                    className="justify-start"
+                  >
+                    <DollarSign className="h-4 w-4 mr-2" />
+                    Price Heatmap
+                  </Button>
+                  <Button
+                    variant={heatmapType === "demand" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() =>
+                      setHeatmapType(heatmapType === "demand" ? null : "demand")
+                    }
+                    className="justify-start"
+                  >
+                    <TrendingUp className="h-4 w-4 mr-2" />
+                    Demand Heatmap
+                  </Button>
+                </div>
+              </div>
+
               {/* Saved Searches */}
               <div>
                 <Label className="text-sm font-medium mb-3 block">
@@ -1245,8 +1462,16 @@ export function PropertyMap({
               {/* Action Buttons */}
               <div className="flex gap-2 pt-2">
                 <Button className="flex-1">View Details</Button>
-                <Button variant="outline" className="flex-1">
-                  Contact Owner
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => {
+                    setDirectionsProperty(selectedProperty);
+                    setShowDirections(true);
+                  }}
+                >
+                  <Navigation className="h-4 w-4 mr-2" />
+                  Get Directions
                 </Button>
               </div>
             </div>
@@ -1286,6 +1511,57 @@ export function PropertyMap({
             })}
           </div>
         </Card>
+      )}
+
+      {/* Directions Dialog */}
+      {showDirections && directionsProperty && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <Card className="p-6 w-[500px] mx-4">
+            <h3 className="text-lg font-semibold mb-4">Get Directions</h3>
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm text-muted-foreground mb-2">
+                  Get directions to {directionsProperty.title}
+                </p>
+                <p className="text-sm">
+                  {directionsProperty.address}, {directionsProperty.city},{" "}
+                  {directionsProperty.state}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  className="flex-1"
+                  onClick={() =>
+                    window.open(getDirectionsUrl(directionsProperty), "_blank")
+                  }
+                >
+                  <Navigation className="h-4 w-4 mr-2" />
+                  Driving
+                </Button>
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() =>
+                    window.open(
+                      `${getDirectionsUrl(directionsProperty)}&dirflg=w`,
+                      "_blank",
+                    )
+                  }
+                >
+                  Walking
+                </Button>
+              </div>
+              <div className="flex gap-2 justify-end">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowDirections(false)}
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+          </Card>
+        </div>
       )}
 
       {/* Save Search Dialog */}
