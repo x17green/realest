@@ -77,6 +77,7 @@ export function formatMapPrice(price: number, currency: string = "₦"): string 
 export function createMarkerIconHTML(
   propertyType: string,
   isVerified: boolean = false,
+  hasBq: boolean = false,
 ): string {
   const color = getPropertyTypeColor(propertyType);
   const borderColor = isVerified ? "#10B981" : "#FFFFFF";
@@ -129,8 +130,55 @@ export function createMarkerIconHTML(
       `
           : ""
       }
+      ${
+        hasBq
+          ? `
+        <div style="
+          position: absolute;
+          bottom: -5px;
+          left: -5px;
+          width: 16px;
+          height: 16px;
+          background-color: #F59E0B;
+          border-radius: 50%;
+          border: 2px solid white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        ">
+          <span style="
+            color: white;
+            font-size: 8px;
+            font-weight: bold;
+          ">BQ</span>
+        </div>
+      `
+          : ""
+      }
     </div>
   `;
+}
+
+/**
+ * Get price context information
+ */
+export function getPriceContext(
+  price: number,
+  propertyType: string,
+  state: string,
+): string {
+  // Placeholder logic - in production, this would query market averages
+  const basePrices: Record<string, Record<string, number>> = {
+    house: { LA: 15000000, FC: 25000000, KN: 8000000 },
+    apartment: { LA: 8000000, FC: 12000000, KN: 4000000 },
+    land: { LA: 5000000, FC: 8000000, KN: 2000000 },
+  };
+
+  const avgPrice = basePrices[propertyType]?.[state] || 10000000;
+
+  if (price > avgPrice * 1.2) return "Above market average";
+  if (price < avgPrice * 0.8) return "Below market average";
+  return "At market average";
 }
 
 /**
@@ -280,6 +328,79 @@ export function calculateDistance(
  */
 function toRadians(degrees: number): number {
   return degrees * (Math.PI / 180);
+}
+
+/**
+ * Get the dominant property type in a cluster
+ */
+export function getDominantPropertyType(properties: any[]): string {
+  if (!properties.length) return "house";
+
+  const typeCounts = properties.reduce(
+    (acc, prop) => {
+      const type = prop.property_type || "house";
+      acc[type] = (acc[type] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
+
+  const dominantType = Object.entries(typeCounts).reduce((a, b) =>
+    typeCounts[a[0]] > typeCounts[b[0]] ? a : b,
+  )[0];
+
+  return dominantType;
+}
+
+/**
+ * Create cluster icon HTML with dominant type and count
+ */
+export function createClusterIconHTML(
+  dominantType: string,
+  count: number,
+  sizeClass: string,
+): string {
+  const color = getPropertyTypeColor(dominantType);
+  const size = sizeClass === "large" ? 40 : sizeClass === "medium" ? 35 : 30;
+
+  return `
+    <div style="
+      width: ${size}px;
+      height: ${size}px;
+      background-color: ${color};
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    ">
+      <span style="
+        color: white;
+        font-size: ${sizeClass === "large" ? 16 : sizeClass === "medium" ? 14 : 12}px;
+        font-weight: bold;
+      ">${count}</span>
+      <div style="
+        position: absolute;
+        bottom: -2px;
+        right: -2px;
+        width: 12px;
+        height: 12px;
+        background-color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      ">
+        <span style="
+          font-size: 8px;
+          color: ${color};
+          font-weight: bold;
+        ">₦</span>
+      </div>
+    </div>
+  `;
 }
 
 // Re-export location data

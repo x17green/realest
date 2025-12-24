@@ -21,6 +21,7 @@ export interface PropertyFilters {
   propertyType?: string;
   listingType?: "sale" | "rent" | "lease";
   state?: string;
+  lga?: string;
   minPrice?: number;
   maxPrice?: number;
   bedrooms?: number;
@@ -114,6 +115,9 @@ export function usePropertyMap({
         }
         if (filters.state) {
           query = query.eq("state", filters.state);
+        }
+        if (filters.lga) {
+          query = query.eq("lga", filters.lga);
         }
         if (filters.minPrice !== undefined) {
           query = query.gte("price", filters.minPrice);

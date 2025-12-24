@@ -408,6 +408,90 @@ export const LAGOS_LGAS: NigerianLGA[] = [
   },
 ];
 
+// LGA data for key states
+export const STATE_LGAS: Record<string, NigerianLGA[]> = {
+  LA: LAGOS_LGAS,
+  FC: [
+    { name: "Abaji", state: "FC" },
+    { name: "Abuja Municipal", state: "FC" },
+    { name: "Bwari", state: "FC" },
+    { name: "Gwagwalada", state: "FC" },
+    { name: "Kuje", state: "FC" },
+    { name: "Kwali", state: "FC" },
+  ],
+  KN: [
+    { name: "Ajingi", state: "KN" },
+    { name: "Albasu", state: "KN" },
+    { name: "Bagwai", state: "KN" },
+    { name: "Bebeji", state: "KN" },
+    { name: "Bichi", state: "KN" },
+    { name: "Bunkure", state: "KN" },
+    { name: "Dala", state: "KN" },
+    { name: "Dambatta", state: "KN" },
+    { name: "Dawakin Kudu", state: "KN" },
+    { name: "Dawakin Tofa", state: "KN" },
+    { name: "Doguwa", state: "KN" },
+    { name: "Fagge", state: "KN" },
+    { name: "Gabasawa", state: "KN" },
+    { name: "Garko", state: "KN" },
+    { name: "Garun Mallam", state: "KN" },
+    { name: "Gaya", state: "KN" },
+    { name: "Gezawa", state: "KN" },
+    { name: "Gwale", state: "KN" },
+    { name: "Gwarzo", state: "KN" },
+    { name: "Kabo", state: "KN" },
+    { name: "Kano Municipal", state: "KN" },
+    { name: "Karaye", state: "KN" },
+    { name: "Kibiya", state: "KN" },
+    { name: "Kiru", state: "KN" },
+    { name: "Kumbotso", state: "KN" },
+    { name: "Kunchi", state: "KN" },
+    { name: "Kura", state: "KN" },
+    { name: "Madobi", state: "KN" },
+    { name: "Makoda", state: "KN" },
+    { name: "Minjibir", state: "KN" },
+    { name: "Nasarawa", state: "KN" },
+    { name: "Rano", state: "KN" },
+    { name: "Rimin Gado", state: "KN" },
+    { name: "Rogo", state: "KN" },
+    { name: "Shanono", state: "KN" },
+    { name: "Sumaila", state: "KN" },
+    { name: "Takai", state: "KN" },
+    { name: "Tarauni", state: "KN" },
+    { name: "Tofa", state: "KN" },
+    { name: "Tsanyawa", state: "KN" },
+    { name: "Tudun Wada", state: "KN" },
+    { name: "Ungogo", state: "KN" },
+    { name: "Warawa", state: "KN" },
+    { name: "Wudil", state: "KN" },
+  ],
+  RI: [
+    { name: "Abua/Odual", state: "RI" },
+    { name: "Ahoada East", state: "RI" },
+    { name: "Ahoada West", state: "RI" },
+    { name: "Akuku-Toru", state: "RI" },
+    { name: "Andoni", state: "RI" },
+    { name: "Asari-Toru", state: "RI" },
+    { name: "Bonny", state: "RI" },
+    { name: "Degema", state: "RI" },
+    { name: "Eleme", state: "RI" },
+    { name: "Emuoha", state: "RI" },
+    { name: "Etche", state: "RI" },
+    { name: "Gokana", state: "RI" },
+    { name: "Ikwerre", state: "RI" },
+    { name: "Khana", state: "RI" },
+    { name: "Obio/Akpor", state: "RI" },
+    { name: "Ogba/Egbema/Ndoni", state: "RI" },
+    { name: "Ogu/Bolo", state: "RI" },
+    { name: "Okrika", state: "RI" },
+    { name: "Omuma", state: "RI" },
+    { name: "Opobo/Nkoro", state: "RI" },
+    { name: "Oyigbo", state: "RI" },
+    { name: "Port Harcourt", state: "RI" },
+    { name: "Tai", state: "RI" },
+  ],
+};
+
 // Popular Lagos neighborhoods with coordinates
 export const LAGOS_NEIGHBORHOODS: NigerianNeighborhood[] = [
   // Lekki
@@ -549,7 +633,7 @@ export function getStateByName(name: string): NigerianState | undefined {
 }
 
 export function getLGAsByState(stateCode: string): NigerianLGA[] {
-  return LAGOS_LGAS.filter((lga) => lga.state === stateCode);
+  return STATE_LGAS[stateCode] || [];
 }
 
 export function getNeighborhoodsByLGA(lgaName: string): NigerianNeighborhood[] {

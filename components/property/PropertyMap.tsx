@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -50,6 +50,11 @@ const GeoJSON = dynamic(
   () => import("react-leaflet").then((mod) => mod.GeoJSON),
   { ssr: false },
 );
+
+const MarkerClusterGroup = dynamic(
+  () => import("react-leaflet-markercluster").then((mod) => mod.default),
+  { ssr: false },
+) as any;
 import { usePropertyMap } from "@/lib/hooks/usePropertyMap";
 import {
   formatMapPrice,
@@ -66,8 +71,10 @@ import {
 import {
   getDefaultMapCenter,
   getDefaultMapBounds,
+  getLGAsByState,
 } from "@/lib/utils/nigerianLocations";
-import { PropertyMapMarkerCluster } from "./PropertyMapMarkerCluster";
+import { PropertyMapMarker } from "./PropertyMapMarker";
+import { useMapClustering } from "@/lib/hooks/useMapClustering";
 
 // Dynamic imports for SSR compatibility
 const MapContainer = dynamic(
@@ -162,6 +169,12 @@ export function PropertyMap({
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [leafletLoaded, setLeafletLoaded] = useState(false);
   const [showStateBoundaries, setShowStateBoundaries] = useState(false);
+  const [showInfraOverlays, setShowInfraOverlays] = useState({
+    nepa: false,
+    water: false,
+    internet: false,
+    security: false,
+  });
   const [stateGeoJson, setStateGeoJson] = useState<any>(null);
   const [savedSearches, setSavedSearches] = useState<any[]>([]);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
@@ -173,6 +186,7 @@ export function PropertyMap({
     propertyType: "",
     listingType: "",
     state: "",
+    lga: "",
     minPrice: 0,
     maxPrice: 100000000, // 100M Naira
     bedrooms: 0,
@@ -191,6 +205,7 @@ export function PropertyMap({
   });
 
   const { bounds, setBounds } = useMapBounds();
+  const clusterOptions = useMapClustering();
 
   // Compute center from current bounds
   const center = {
@@ -208,6 +223,7 @@ export function PropertyMap({
       listingType:
         (filters.listingType as "sale" | "rent" | "lease") || undefined,
       state: filters.state || undefined,
+      lga: filters.lga || undefined,
       minPrice: filters.minPrice || undefined,
       maxPrice: filters.maxPrice < 100000000 ? filters.maxPrice : undefined,
       bedrooms: filters.bedrooms || undefined,
@@ -350,9 +366,22 @@ export function PropertyMap({
       )
     : searchFilteredProperties;
 
+  // Get available LGAs for selected state
+  const availableLGAs = useMemo(
+    () => getLGAsByState(filters.state),
+    [filters.state],
+  );
+
   // Handle filter changes
   const updateFilter = (key: string, value: any) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+    setFilters((prev) => {
+      const newFilters = { ...prev, [key]: value };
+      // Reset LGA when state changes
+      if (key === "state") {
+        newFilters.lga = "";
+      }
+      return newFilters;
+    });
   };
 
   // Save current search
@@ -394,6 +423,7 @@ export function PropertyMap({
       propertyType: "",
       listingType: "",
       state: "",
+      lga: "",
       minPrice: 0,
       maxPrice: 100000000,
       bedrooms: 0,
@@ -460,11 +490,8 @@ export function PropertyMap({
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-
         <MapEventHandler onBoundsChange={setBounds} />
-
         <MapController bounds={bounds} />
-
         <EditControl
           position="topright"
           onCreated={(e: any) => {
@@ -482,7 +509,6 @@ export function PropertyMap({
             circlemarker: false,
           }}
         />
-
         {showStateBoundaries && stateGeoJson && (
           <GeoJSON
             data={stateGeoJson}
@@ -494,15 +520,69 @@ export function PropertyMap({
             }}
           />
         )}
+        {/* Infrastructure Overlays */}
+        {showInfraOverlays.nepa && stateGeoJson && (
+          <GeoJSON
+            data={stateGeoJson}
+            style={{
+              color: "#10B981",
+              weight: 2,
+              opacity: 0.8,
+              fillColor: "#10B981",
+              fillOpacity: 0.2,
+            }}
+          />
+        )}
+        {showInfraOverlays.water && stateGeoJson && (
+          <GeoJSON
+            data={stateGeoJson}
+            style={{
+              color: "#3B82F6",
+              weight: 2,
+              opacity: 0.8,
+              fillColor: "#3B82F6",
+              fillOpacity: 0.2,
+            }}
+          />
+        )}
+        {showInfraOverlays.internet && stateGeoJson && (
+          <GeoJSON
+            data={stateGeoJson}
+            style={{
+              color: "#8B5CF6",
+              weight: 2,
+              opacity: 0.8,
+              fillColor: "#8B5CF6",
+              fillOpacity: 0.2,
+            }}
+          />
+        )}
+        {showInfraOverlays.security && stateGeoJson && (
+          <GeoJSON
+            data={stateGeoJson}
+            style={{
+              color: "#84CC16",
+              weight: 2,
+              opacity: 0.8,
+              fillColor: "#84CC16",
+              fillOpacity: 0.2,
+            }}
+          />
+        )}
 
-        <PropertyMapMarkerCluster
-          properties={filteredProperties}
-          onPropertyClick={(property) => {
-            setSelectedProperty(property);
-            setCurrentImageIndex(0);
-          }}
-          selectedPropertyId={selectedProperty?.id}
-        />
+        <MarkerClusterGroup {...clusterOptions}>
+          {filteredProperties.map((property: any) => (
+            <PropertyMapMarker
+              key={property.id}
+              property={property}
+              onPropertyClick={(property) => {
+                setSelectedProperty(property);
+                setCurrentImageIndex(0);
+              }}
+              selectedPropertyId={selectedProperty?.id}
+            />
+          ))}
+        </MarkerClusterGroup>
       </MapContainer>
 
       {/* Header Overlay */}
@@ -603,6 +683,24 @@ export function PropertyMap({
                   ))}
                 </SelectContent>
               </Select>
+
+              <Select
+                value={filters.lga}
+                onValueChange={(value) => updateFilter("lga", value)}
+                disabled={!filters.state}
+              >
+                <SelectTrigger className="w-[120px] bg-background/95 backdrop-blur-sm">
+                  <SelectValue placeholder="LGA" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">All LGAs</SelectItem>
+                  {availableLGAs.map((lga: any) => (
+                    <SelectItem key={lga.name} value={lga.name}>
+                      {lga.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           )}
         </div>
@@ -636,6 +734,75 @@ export function PropertyMap({
                 <Button variant="ghost" size="sm" onClick={resetFilters}>
                   Reset All
                 </Button>
+              </div>
+
+              {/* Infrastructure Overlays */}
+              <div>
+                <Label className="text-sm font-medium mb-2 block">
+                  Infrastructure Overlays
+                </Label>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="nepa-overlay"
+                      checked={showInfraOverlays.nepa}
+                      onCheckedChange={(checked) =>
+                        setShowInfraOverlays((prev) => ({
+                          ...prev,
+                          nepa: !!checked,
+                        }))
+                      }
+                    />
+                    <Label htmlFor="nepa-overlay" className="text-xs">
+                      NEPA Zones
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="water-overlay"
+                      checked={showInfraOverlays.water}
+                      onCheckedChange={(checked) =>
+                        setShowInfraOverlays((prev) => ({
+                          ...prev,
+                          water: !!checked,
+                        }))
+                      }
+                    />
+                    <Label htmlFor="water-overlay" className="text-xs">
+                      Water Sources
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="internet-overlay"
+                      checked={showInfraOverlays.internet}
+                      onCheckedChange={(checked) =>
+                        setShowInfraOverlays((prev) => ({
+                          ...prev,
+                          internet: !!checked,
+                        }))
+                      }
+                    />
+                    <Label htmlFor="internet-overlay" className="text-xs">
+                      Internet Coverage
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="security-overlay"
+                      checked={showInfraOverlays.security}
+                      onCheckedChange={(checked) =>
+                        setShowInfraOverlays((prev) => ({
+                          ...prev,
+                          security: !!checked,
+                        }))
+                      }
+                    />
+                    <Label htmlFor="security-overlay" className="text-xs">
+                      Security Areas
+                    </Label>
+                  </div>
+                </div>
               </div>
             </div>
 
