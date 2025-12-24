@@ -47,11 +47,23 @@ export function ProfileDropdown() {
         // Admin gets quick actions, settings + profile + logout
         items.push(
           <Dropdown.Item
+            key="dashboard"
+            id="dashboard"
+            textValue="Admin Dashboard"
+            onPress={() => router.push("/admin")}
+            className="hover:bg-muted px-2 rounded-xs transition-colors"
+          >
+            <div className="flex w-full items-center justify-between gap-2">
+              <Label>Dashboard</Label>
+              <Home className="size-3.5 text-muted-foreground" />
+            </div>
+          </Dropdown.Item>,
+          <Dropdown.Item
             key="properties"
             id="properties"
             textValue="Property Verification"
             onPress={() => router.push("/admin/validation")}
-            className="hover:bg-muted rounded-md transition-colors"
+            className="hover:bg-muted px-2 rounded-xs transition-colors"
           >
             <div className="flex w-full items-center justify-between gap-2">
               <Label>Property Verification</Label>
@@ -63,7 +75,7 @@ export function ProfileDropdown() {
             id="agents"
             textValue="Agent Verification"
             onPress={() => router.push("/admin/agents")}
-            className="hover:bg-muted rounded-md transition-colors"
+            className="hover:bg-muted px-2 rounded-xs transition-colors"
           >
             <div className="flex w-full items-center justify-between gap-2">
               <Label>Agent Verification</Label>
@@ -75,7 +87,7 @@ export function ProfileDropdown() {
             id="analytics"
             textValue="System Analytics"
             onPress={() => router.push("/admin/cms/analytics")}
-            className="hover:bg-muted rounded-md transition-colors"
+            className="hover:bg-muted px-2 rounded-xs transition-colors"
           >
             <div className="flex w-full items-center justify-between gap-2">
               <Label>System Analytics</Label>
@@ -87,7 +99,7 @@ export function ProfileDropdown() {
             id="settings"
             textValue="Settings"
             onPress={handleSettingsClick}
-            className="hover:bg-muted rounded-md transition-colors"
+            className="hover:bg-muted px-2 rounded-xs transition-colors"
           >
             <div className="flex w-full items-center justify-between gap-2">
               <Label>Settings</Label>
@@ -105,7 +117,7 @@ export function ProfileDropdown() {
             id="list-property"
             textValue="List Property"
             onPress={() => router.push("/owner/list-property")}
-            className="hover:bg-muted rounded-md transition-colors"
+            className="hover:bg-muted px-2 rounded-xs transition-colors"
           >
             <div className="flex w-full items-center justify-between gap-2">
               <Label>List Property</Label>
@@ -117,7 +129,7 @@ export function ProfileDropdown() {
             id="my-listings"
             textValue="My Listings"
             onPress={() => router.push("/owner")}
-            className="hover:bg-muted rounded-md transition-colors"
+            className="hover:bg-muted px-2 rounded-xs transition-colors"
           >
             <div className="flex w-full items-center justify-between gap-2">
               <Label>My Listings</Label>
@@ -129,7 +141,7 @@ export function ProfileDropdown() {
             id="inquiries"
             textValue="Inquiries"
             onPress={() => router.push("/owner/inquiries")}
-            className="hover:bg-muted rounded-md transition-colors"
+            className="hover:bg-muted px-2 rounded-xs transition-colors"
           >
             <div className="flex w-full items-center justify-between gap-2">
               <Label>Inquiries</Label>
@@ -147,7 +159,7 @@ export function ProfileDropdown() {
             id="list-property"
             textValue="List Property"
             onPress={() => router.push("/agent/list-property")}
-            className="hover:bg-muted rounded-md transition-colors"
+            className="hover:bg-muted px-2 rounded-xs transition-colors"
           >
             <div className="flex w-full items-center justify-between gap-2">
               <Label>List Property</Label>
@@ -159,7 +171,7 @@ export function ProfileDropdown() {
             id="properties"
             textValue="My Properties"
             onPress={() => router.push("/agent/properties")}
-            className="hover:bg-muted rounded-md transition-colors"
+            className="hover:bg-muted px-2 rounded-xs transition-colors"
           >
             <div className="flex w-full items-center justify-between gap-2">
               <Label>My Properties</Label>
@@ -171,7 +183,7 @@ export function ProfileDropdown() {
             id="dashboard"
             textValue="Dashboard"
             onPress={() => router.push("/agent")}
-            className="hover:bg-muted rounded-md transition-colors"
+            className="hover:bg-muted px-2 rounded-xs transition-colors"
           >
             <div className="flex w-full items-center justify-between gap-2">
               <Label>Dashboard</Label>
@@ -192,7 +204,7 @@ export function ProfileDropdown() {
 
   return (
     <Dropdown>
-      <Dropdown.Trigger className="rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+      <Dropdown.Trigger className="rounded-full focus:ring-2 focus:ring-offset-2 focus:ring-primary">
         <Avatar>
           {avatarUrl && (
             <Avatar.Image
@@ -235,7 +247,7 @@ export function ProfileDropdown() {
             </div>
           </div>
         </div>
-        <Dropdown.Menu className="mt-4 divide-y divide-border/20 pt-0 p-4 space-y-4 font-medium text-sm">
+        <Dropdown.Menu className="mt-4 divide-y divide-border/20 pb-4 pt-0 p-2 space-y-4 font-medium text-sm">
           {/* Dynamic menu items based on user role */}
           {getDynamicMenuItems()}
 
@@ -244,7 +256,7 @@ export function ProfileDropdown() {
             id="profile"
             textValue="Profile"
             onPress={handleProfileClick}
-            className="hover:bg-muted rounded-md transition-colors"
+            className="hover:bg-muted px-2 rounded-xs transition-colors"
           >
             <Label>Profile</Label>
           </Dropdown.Item>
@@ -255,7 +267,7 @@ export function ProfileDropdown() {
             textValue="Logout"
             variant="danger"
             onPress={handleLogoutClick}
-            className="hover:bg-destructive/10 rounded-md transition-colors"
+            className="hover:bg-destructive/10 px-2 rounded-xs transition-colors"
           >
             <div className="flex w-full items-center justify-between gap-2 text-red-500">
               <Label>Log Out</Label>
