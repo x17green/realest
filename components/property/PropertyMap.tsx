@@ -41,6 +41,10 @@ import {
   Flame,
   DollarSign,
   TrendingUp,
+  WifiOff,
+  Keyboard,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { LatLngExpression, LatLngBounds } from "leaflet";
@@ -79,6 +83,7 @@ import {
 import { PropertyMapMarker } from "./PropertyMapMarker";
 import { PropertyMapLegend } from "./PropertyMapLegend";
 import { useMapClustering } from "@/lib/hooks/useMapClustering";
+import { useOfflineCache, offlineTileCache } from "@/lib/utils/offlineCache";
 
 // Dynamic imports for SSR compatibility
 const MapContainer = dynamic(
@@ -136,6 +141,7 @@ function useMapBounds() {
 // Component to handle map events and update bounds
 function MapEventHandler({
   onBoundsChange,
+  onZoomChange,
 }: {
   onBoundsChange: (bounds: {
     north: number;
@@ -143,6 +149,7 @@ function MapEventHandler({
     east: number;
     west: number;
   }) => void;
+  onZoomChange?: (zoom: number) => void;
 }) {
   useMapEvents({
     moveend: (e: any) => {
@@ -151,7 +158,9 @@ function MapEventHandler({
     },
     zoomend: (e: any) => {
       const leafletBounds = e.target.getBounds();
+      const currentZoom = e.target.getZoom();
       onBoundsChange(leafletBoundsToBounds(leafletBounds));
+      onZoomChange?.(currentZoom);
     },
   });
 
@@ -215,7 +224,15 @@ export function PropertyMap({
   >(null);
   const [showDirections, setShowDirections] = useState(false);
   const [directionsProperty, setDirectionsProperty] = useState<any>(null);
+  const [zoom, setZoom] = useState(initialZoom); // Track current zoom level
+  const [highContrast, setHighContrast] = useState(false); // Accessibility: high contrast mode
+  const [keyboardMode, setKeyboardMode] = useState(false); // Accessibility: keyboard navigation
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const mapRef = useRef<any>(null);
+
+  // Offline cache hook
+  const { isOnline, cacheStats, updateStats, preCacheTiles } =
+    useOfflineCache();
 
   // Filter states
   const [filters, setFilters] = useState({
@@ -254,6 +271,7 @@ export function PropertyMap({
     bounds: radiusSearch.enabled ? undefined : bounds,
     center: radiusSearch.enabled ? center : undefined,
     radius: radiusSearch.enabled ? radiusSearch.radius : undefined,
+    zoom: zoom, // Pass zoom level for progressive loading
     filters: {
       propertyType: filters.propertyType || undefined,
       listingType:
@@ -362,11 +380,57 @@ export function PropertyMap({
         heatmapScript.src =
           "https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js";
         document.head.appendChild(heatmapScript);
+
+        // Detect high contrast mode
+        if (window.matchMedia) {
+          const highContrastQuery = window.matchMedia(
+            "(prefers-contrast: high)",
+          );
+          setHighContrast(highContrastQuery.matches);
+
+          highContrastQuery.addEventListener("change", (e) => {
+            setHighContrast(e.matches);
+          });
+        }
+
+        // Keyboard navigation detection
+        const handleKeyDown = (e: KeyboardEvent) => {
+          if (e.key === "Tab") {
+            setKeyboardMode(true);
+          }
+        };
+
+        const handleMouseDown = () => {
+          setKeyboardMode(false);
+        };
+
+        document.addEventListener("keydown", handleKeyDown);
+        document.addEventListener("mousedown", handleMouseDown);
+
+        return () => {
+          document.removeEventListener("keydown", handleKeyDown);
+          document.removeEventListener("mousedown", handleMouseDown);
+        };
       }
     };
     loadLeafletCSS();
   }, []);
- 
+
+  // Pre-cache tiles when online and bounds change
+  useEffect(() => {
+    if (isOnline && leafletLoaded && mapRef.current) {
+      const leafletMap = mapRef.current;
+      const currentBounds = leafletMap.getBounds();
+      const currentZoom = leafletMap.getZoom();
+
+      // Pre-cache tiles for current viewport
+      preCacheTiles(currentBounds, currentZoom, {
+        getTileUrl: ({ x, y, z }: { x: number; y: number; z: number }) =>
+          `https://{s}.tile.openstreetmap.org/${z}/${x}/${y}.png`,
+      });
+    }
+  }, [bounds, zoom, isOnline, leafletLoaded, preCacheTiles]);
+
   // Filter properties by search query
   const searchFilteredProperties = properties.filter((property) => {
     if (!searchQuery) return true;
@@ -571,20 +635,129 @@ export function PropertyMap({
     );
   }
 
+  // Keyboard navigation handlers
+  const handleKeyNavigation = useCallback(
+    (e: KeyboardEvent) => {
+      if (!keyboardMode) return;
+
+      const step = 0.01; // Small movement step
+      switch (e.key) {
+        case "ArrowUp":
+          e.preventDefault();
+          setBounds((prev) => ({
+            ...prev,
+            north: prev.north + step,
+            south: prev.south + step,
+          }));
+          break;
+        case "ArrowDown":
+          e.preventDefault();
+          setBounds((prev) => ({
+            ...prev,
+            north: prev.north - step,
+            south: prev.south - step,
+          }));
+          break;
+        case "ArrowLeft":
+          e.preventDefault();
+          setBounds((prev) => ({
+            ...prev,
+            east: prev.east - step,
+            west: prev.west - step,
+          }));
+          break;
+        case "ArrowRight":
+          e.preventDefault();
+          setBounds((prev) => ({
+            ...prev,
+            east: prev.east + step,
+            west: prev.west + step,
+          }));
+          break;
+        case "+":
+        case "=":
+          e.preventDefault();
+          setZoom((prev) => Math.min(prev + 1, 18));
+          break;
+        case "-":
+          e.preventDefault();
+          setZoom((prev) => Math.max(prev - 1, 1));
+          break;
+      }
+    },
+    [keyboardMode],
+  );
+
+  useEffect(() => {
+    if (keyboardMode) {
+      document.addEventListener("keydown", handleKeyNavigation);
+      return () => document.removeEventListener("keydown", handleKeyNavigation);
+    }
+  }, [keyboardMode, handleKeyNavigation]);
+
   return (
     <div className="relative h-screen w-full overflow-hidden">
+      {/* Accessibility Status Bar */}
+      <div className="absolute top-0 left-0 right-0 z-20 bg-background/90 backdrop-blur-sm border-b border-border/50 px-4 py-2">
+        <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center gap-4">
+            {/* Online/Offline Status */}
+            <div
+              className={cn(
+                "flex items-center gap-2 px-2 py-1 rounded-md",
+                isOnline
+                  ? "bg-green-100 text-green-800"
+                  : "bg-red-100 text-red-800",
+              )}
+            >
+              {isOnline ? (
+                <Wifi className="h-4 w-4" />
+              ) : (
+                <WifiOff className="h-4 w-4" />
+              )}
+              <span className="sr-only">{isOnline ? "Online" : "Offline"}</span>
+              <span className="hidden sm:inline">
+                {isOnline ? "Online" : "Offline"} • Cache: {cacheStats.size}{" "}
+                tiles ({cacheStats.sizeMB}MB)
+              </span>
+            </div>
+
+            {/* Accessibility Indicators */}
+            {keyboardMode && (
+              <div className="flex items-center gap-2 px-2 py-1 bg-blue-100 text-blue-800 rounded-md">
+                <Keyboard className="h-4 w-4" />
+                <span className="sr-only">Keyboard navigation active</span>
+                <span className="hidden sm:inline">Keyboard Mode</span>
+              </div>
+            )}
+
+            {highContrast && (
+              <div className="flex items-center gap-2 px-2 py-1 bg-purple-100 text-purple-800 rounded-md">
+                <Eye className="h-4 w-4" />
+                <span className="sr-only">High contrast mode active</span>
+                <span className="hidden sm:inline">High Contrast</span>
+              </div>
+            )}
+          </div>
+
+          {/* Zoom Level Indicator */}
+          <div className="text-muted-foreground">Zoom: {zoom}</div>
+        </div>
+      </div>
+
       <MapContainer
         center={initialCenter}
         zoom={initialZoom}
         style={{ height: "100%", width: "100%" }}
-        className="z-0"
-        aria-label="Interactive property map"
+        className={cn("z-0", highContrast && "high-contrast")}
+        aria-label="Interactive property map - use arrow keys for navigation when focused"
+        ref={mapRef}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <MapEventHandler onBoundsChange={setBounds} />
+        <MapEventHandler onBoundsChange={setBounds} onZoomChange={setZoom} />
         <MapController bounds={bounds} />
         <EditControl
           position="topright"
@@ -708,60 +881,85 @@ export function PropertyMap({
         </MarkerClusterGroup>
       </MapContainer>
 
-      {/* Header Overlay */}
-      <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/70 to-transparent p-6">
+      {/* Header Overlay - Adjusted for status bar */}
+      <div className="absolute top-12 left-0 right-0 z-10 bg-gradient-to-b from-black/70 to-transparent p-4 sm:p-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-3xl font-bold text-white">
+              <h1 className="text-2xl sm:text-3xl font-bold text-white">
                 RealEST Property Map
               </h1>
-              <p className="text-white/80 text-sm">
+              <p className="text-white/80 text-xs sm:text-sm">
                 Discover verified properties across Nigeria
               </p>
             </div>
-            <div className="flex items-center gap-4 text-white">
+            <div className="flex items-center gap-2 sm:gap-4 text-white">
+              {/* Mobile Filter Menu Toggle */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="sm:hidden bg-black/20 hover:bg-black/40 text-white border border-white/20 h-10 w-10"
+                onClick={() => setShowFilterPanel(!showFilterPanel)}
+                aria-label="Toggle mobile filter menu"
+                aria-expanded={showFilterPanel}
+              >
+                <SlidersHorizontal className="h-5 w-5" />
+              </Button>
               <div className="text-right">
-                <p className="text-2xl font-bold">
+                <p className="text-xl sm:text-2xl font-bold">
                   {filteredProperties.length}
                 </p>
-                <p className="text-sm text-white/80">Properties Found</p>
+                <p className="text-xs sm:text-sm text-white/80">
+                  Properties Found
+                </p>
               </div>
             </div>
           </div>
 
           {/* Search Bar */}
           <div className="relative mb-4">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <Search className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
               ref={searchInputRef}
               placeholder="Search by location, property type, or features..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12 pr-12 h-12 bg-background/95 backdrop-blur-sm border-border/50"
+              className={cn(
+                "pl-10 sm:pl-12 pr-10 sm:pr-12 h-11 sm:h-12 bg-background/95 backdrop-blur-sm border-border/50 text-base", // Larger touch target
+                highContrast && "border-2 border-white",
+              )}
               aria-label="Search properties by location, type, or features"
             />
             {showFilters && (
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute right-2 top-1/2 -translate-y-1/2"
+                className={cn(
+                  "absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 sm:h-10 sm:w-10", // Larger touch target
+                  highContrast && "border-2 border-white",
+                )}
                 onClick={() => setShowFilterPanel(!showFilterPanel)}
                 aria-label="Toggle filters panel"
+                aria-expanded={showFilterPanel}
               >
                 <SlidersHorizontal className="h-5 w-5" />
               </Button>
             )}
           </div>
 
-          {/* Quick Filters */}
+          {/* Quick Filters - Mobile optimized */}
           {showFilters && (
             <div className="flex flex-wrap gap-2">
               <Select
                 value={filters.propertyType}
                 onValueChange={(value) => updateFilter("propertyType", value)}
               >
-                <SelectTrigger className="w-[140px] bg-background/95 backdrop-blur-sm">
+                <SelectTrigger
+                  className={cn(
+                    "w-full sm:w-[140px] bg-background/95 backdrop-blur-sm h-11", // Full width on mobile, larger touch target
+                    highContrast && "border-2 border-white",
+                  )}
+                >
                   <SelectValue placeholder="Property Type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -779,7 +977,12 @@ export function PropertyMap({
                 value={filters.listingType}
                 onValueChange={(value) => updateFilter("listingType", value)}
               >
-                <SelectTrigger className="w-[120px] bg-background/95 backdrop-blur-sm">
+                <SelectTrigger
+                  className={cn(
+                    "w-full sm:w-[120px] bg-background/95 backdrop-blur-sm h-11", // Full width on mobile
+                    highContrast && "border-2 border-white",
+                  )}
+                >
                   <SelectValue placeholder="Listing Type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -794,7 +997,12 @@ export function PropertyMap({
                 value={filters.state}
                 onValueChange={(value) => updateFilter("state", value)}
               >
-                <SelectTrigger className="w-[120px] bg-background/95 backdrop-blur-sm">
+                <SelectTrigger
+                  className={cn(
+                    "w-full sm:w-[120px] bg-background/95 backdrop-blur-sm h-11", // Full width on mobile
+                    highContrast && "border-2 border-white",
+                  )}
+                >
                   <SelectValue placeholder="State" />
                 </SelectTrigger>
                 <SelectContent>
@@ -812,7 +1020,12 @@ export function PropertyMap({
                 onValueChange={(value) => updateFilter("lga", value)}
                 disabled={!filters.state}
               >
-                <SelectTrigger className="w-[120px] bg-background/95 backdrop-blur-sm">
+                <SelectTrigger
+                  className={cn(
+                    "w-full sm:w-[120px] bg-background/95 backdrop-blur-sm h-11", // Full width on mobile
+                    highContrast && "border-2 border-white",
+                  )}
+                >
                   <SelectValue placeholder="LGA" />
                 </SelectTrigger>
                 <SelectContent>
@@ -829,424 +1042,447 @@ export function PropertyMap({
         </div>
       </div>
 
-      {/* Filter Panel */}
+      {/* Filter Panel - Mobile optimized */}
       {showFilterPanel && (
-        <Card
-          className="absolute top-24 left-6 w-[320px] max-h-[calc(100vh-8rem)] overflow-y-auto z-20 bg-background/95 backdrop-blur-sm border-border/50"
-          role="dialog"
-          aria-labelledby="filter-title"
-        >
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 id="filter-title" className="text-lg font-semibold">
-                Filters
-              </h3>
-              <div className="flex gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowStateBoundaries(!showStateBoundaries)}
-                  className={cn(
-                    "text-sm",
-                    showStateBoundaries && "bg-primary/10 text-primary",
-                  )}
-                >
-                  <Layers className="h-4 w-4 mr-1" />
-                  State Boundaries
-                </Button>
-                <Button variant="ghost" size="sm" onClick={resetFilters}>
-                  Reset All
-                </Button>
-              </div>
-
-              {/* Infrastructure Overlays */}
-              <div>
-                <Label className="text-sm font-medium mb-2 block">
-                  Infrastructure Overlays
-                </Label>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="nepa-overlay"
-                      checked={showInfraOverlays.nepa}
-                      onCheckedChange={(checked) =>
-                        setShowInfraOverlays((prev) => ({
-                          ...prev,
-                          nepa: !!checked,
-                        }))
-                      }
-                    />
-                    <Label htmlFor="nepa-overlay" className="text-xs">
-                      NEPA Zones
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="water-overlay"
-                      checked={showInfraOverlays.water}
-                      onCheckedChange={(checked) =>
-                        setShowInfraOverlays((prev) => ({
-                          ...prev,
-                          water: !!checked,
-                        }))
-                      }
-                    />
-                    <Label htmlFor="water-overlay" className="text-xs">
-                      Water Sources
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="internet-overlay"
-                      checked={showInfraOverlays.internet}
-                      onCheckedChange={(checked) =>
-                        setShowInfraOverlays((prev) => ({
-                          ...prev,
-                          internet: !!checked,
-                        }))
-                      }
-                    />
-                    <Label htmlFor="internet-overlay" className="text-xs">
-                      Internet Coverage
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="security-overlay"
-                      checked={showInfraOverlays.security}
-                      onCheckedChange={(checked) =>
-                        setShowInfraOverlays((prev) => ({
-                          ...prev,
-                          security: !!checked,
-                        }))
-                      }
-                    />
-                    <Label htmlFor="security-overlay" className="text-xs">
-                      Security Areas
-                    </Label>
-                  </div>
+        <>
+          {/* Mobile Overlay Backdrop */}
+          <div
+            className="fixed inset-0 bg-black/50 z-15 sm:hidden"
+            onClick={() => setShowFilterPanel(false)}
+            aria-hidden="true"
+          />
+          <Card
+            className={cn(
+              "fixed sm:absolute top-32 sm:top-32 left-2 sm:left-6 right-2 sm:right-auto w-auto sm:w-[320px] h-[calc(100vh-8rem)] sm:h-auto max-h-[calc(100vh-12rem)] overflow-y-auto z-20 bg-background/95 backdrop-blur-sm border-border/50 sm:max-h-[calc(100vh-10rem)]",
+              highContrast && "border-2 border-white",
+            )}
+            role="dialog"
+            aria-labelledby="filter-title"
+          >
+            <div className="p-4 sm:p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 id="filter-title" className="text-lg font-semibold">
+                  Filters
+                </h3>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowStateBoundaries(!showStateBoundaries)}
+                    className={cn(
+                      "text-xs sm:text-sm h-8 w-8 sm:h-9 sm:w-auto px-2 sm:px-3", // Smaller on mobile
+                      showStateBoundaries && "bg-primary/10 text-primary",
+                    )}
+                  >
+                    <Layers className="h-4 w-4 sm:mr-1" />
+                    <span className="hidden sm:inline">State Boundaries</span>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={resetFilters}
+                    className="text-xs sm:text-sm h-8 px-2 sm:px-3"
+                  >
+                    Reset All
+                  </Button>
                 </div>
-              </div>
-            </div>
 
-            <div className="space-y-6">
-              {/* Price Range */}
-              <div>
-                <Label className="text-sm font-medium mb-2 block">
-                  Price Range (₦)
-                </Label>
-                <div className="px-2">
-                  <Slider
-                    value={[filters.minPrice, filters.maxPrice]}
-                    onValueChange={([min, max]) => {
-                      updateFilter("minPrice", min);
-                      updateFilter("maxPrice", max);
-                    }}
-                    max={100000000}
-                    step={1000000}
-                    className="w-full"
-                  />
-                  <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                    <span>{formatMapPrice(filters.minPrice)}</span>
-                    <span>{formatMapPrice(filters.maxPrice)}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Bedrooms/Bathrooms */}
-              <div className="grid grid-cols-2 gap-4">
+                {/* Infrastructure Overlays */}
                 <div>
                   <Label className="text-sm font-medium mb-2 block">
-                    Min Bedrooms
+                    Infrastructure Overlays
                   </Label>
-                  <Select
-                    value={filters.bedrooms.toString()}
-                    onValueChange={(value) =>
-                      updateFilter("bedrooms", parseInt(value))
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="0">Any</SelectItem>
-                      <SelectItem value="1">1+</SelectItem>
-                      <SelectItem value="2">2+</SelectItem>
-                      <SelectItem value="3">3+</SelectItem>
-                      <SelectItem value="4">4+</SelectItem>
-                      <SelectItem value="5">5+</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium mb-2 block">
-                    Min Bathrooms
-                  </Label>
-                  <Select
-                    value={filters.bathrooms.toString()}
-                    onValueChange={(value) =>
-                      updateFilter("bathrooms", parseInt(value))
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="0">Any</SelectItem>
-                      <SelectItem value="1">1+</SelectItem>
-                      <SelectItem value="2">2+</SelectItem>
-                      <SelectItem value="3">3+</SelectItem>
-                      <SelectItem value="4">4+</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              {/* Radius Search */}
-              <div>
-                <Label className="text-sm font-medium mb-3 block">
-                  Location Search
-                </Label>
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="radiusSearch"
-                      checked={radiusSearch.enabled}
-                      onCheckedChange={(checked) =>
-                        setRadiusSearch((prev) => ({
-                          ...prev,
-                          enabled: !!checked,
-                        }))
-                      }
-                    />
-                    <Label htmlFor="radiusSearch" className="text-sm">
-                      Search within radius of map center
-                    </Label>
-                  </div>
-
-                  {radiusSearch.enabled && (
-                    <div>
-                      <Slider
-                        value={[radiusSearch.radius]}
-                        onValueChange={([value]) =>
-                          setRadiusSearch((prev) => ({
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="nepa-overlay"
+                        checked={showInfraOverlays.nepa}
+                        onCheckedChange={(checked) =>
+                          setShowInfraOverlays((prev) => ({
                             ...prev,
-                            radius: value,
+                            nepa: !!checked,
                           }))
                         }
-                        min={1}
-                        max={50}
-                        step={1}
-                        className="w-full"
                       />
-                      <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                        <span>1 km</span>
-                        <span>{radiusSearch.radius} km</span>
-                        <span>50 km</span>
-                      </div>
+                      <Label htmlFor="nepa-overlay" className="text-xs">
+                        NEPA Zones
+                      </Label>
                     </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Filter Presets */}
-              <div>
-                <Label className="text-sm font-medium mb-3 block">
-                  Quick Filters
-                </Label>
-                <div className="grid grid-cols-1 gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => applyFilterPreset("family-friendly")}
-                    className="justify-start"
-                  >
-                    <Home className="h-4 w-4 mr-2" />
-                    Family-Friendly
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => applyFilterPreset("power-stable")}
-                    className="justify-start"
-                  >
-                    <Zap className="h-4 w-4 mr-2" />
-                    Power Stable
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => applyFilterPreset("gated-communities")}
-                    className="justify-start"
-                  >
-                    <Shield className="h-4 w-4 mr-2" />
-                    Gated Communities
-                  </Button>
-                </div>
-              </div>
-
-              {/* Heatmap Controls */}
-              <div>
-                <Label className="text-sm font-medium mb-3 block">
-                  Data Visualization
-                </Label>
-                <div className="grid grid-cols-1 gap-2">
-                  <Button
-                    variant={heatmapType === "density" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() =>
-                      setHeatmapType(
-                        heatmapType === "density" ? null : "density",
-                      )
-                    }
-                    className="justify-start"
-                  >
-                    <Flame className="h-4 w-4 mr-2" />
-                    Property Density
-                  </Button>
-                  <Button
-                    variant={heatmapType === "price" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() =>
-                      setHeatmapType(heatmapType === "price" ? null : "price")
-                    }
-                    className="justify-start"
-                  >
-                    <DollarSign className="h-4 w-4 mr-2" />
-                    Price Heatmap
-                  </Button>
-                  <Button
-                    variant={heatmapType === "demand" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() =>
-                      setHeatmapType(heatmapType === "demand" ? null : "demand")
-                    }
-                    className="justify-start"
-                  >
-                    <TrendingUp className="h-4 w-4 mr-2" />
-                    Demand Heatmap
-                  </Button>
-                </div>
-              </div>
-
-              {/* Saved Searches */}
-              <div>
-                <Label className="text-sm font-medium mb-3 block">
-                  Saved Searches
-                </Label>
-                <div className="space-y-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowSaveDialog(true)}
-                    className="w-full"
-                  >
-                    <Bookmark className="h-4 w-4 mr-2" />
-                    Save Current Search
-                  </Button>
-
-                  {savedSearches.length > 0 && (
-                    <div className="space-y-1">
-                      {savedSearches.map((search) => (
-                        <Button
-                          key={search.id}
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => loadSavedSearch(search)}
-                          className="w-full justify-start text-left"
-                        >
-                          <Bookmark className="h-4 w-4 mr-2" />
-                          {search.name}
-                        </Button>
-                      ))}
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="water-overlay"
+                        checked={showInfraOverlays.water}
+                        onCheckedChange={(checked) =>
+                          setShowInfraOverlays((prev) => ({
+                            ...prev,
+                            water: !!checked,
+                          }))
+                        }
+                      />
+                      <Label htmlFor="water-overlay" className="text-xs">
+                        Water Sources
+                      </Label>
                     </div>
-                  )}
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="internet-overlay"
+                        checked={showInfraOverlays.internet}
+                        onCheckedChange={(checked) =>
+                          setShowInfraOverlays((prev) => ({
+                            ...prev,
+                            internet: !!checked,
+                          }))
+                        }
+                      />
+                      <Label htmlFor="internet-overlay" className="text-xs">
+                        Internet Coverage
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="security-overlay"
+                        checked={showInfraOverlays.security}
+                        onCheckedChange={(checked) =>
+                          setShowInfraOverlays((prev) => ({
+                            ...prev,
+                            security: !!checked,
+                          }))
+                        }
+                      />
+                      <Label htmlFor="security-overlay" className="text-xs">
+                        Security Areas
+                      </Label>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* Nigerian Infrastructure */}
-              <div>
-                <Label className="text-sm font-medium mb-3 block">
-                  Infrastructure
-                </Label>
-                <div className="space-y-3">
-                  <div>
-                    <Label className="text-xs text-muted-foreground mb-2 block">
-                      Power (NEPA)
-                    </Label>
-                    <Select
-                      value={filters.nepaStatus}
-                      onValueChange={(value) =>
-                        updateFilter("nepaStatus", value)
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Any power status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="">Any</SelectItem>
-                        {INFRASTRUCTURE_FILTERS.nepa_status.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label className="text-xs text-muted-foreground mb-2 block">
-                      Water Source
-                    </Label>
-                    <Select
-                      value={filters.waterSource}
-                      onValueChange={(value) =>
-                        updateFilter("waterSource", value)
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Any water source" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="">Any</SelectItem>
-                        {INFRASTRUCTURE_FILTERS.water_source.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="hasBq"
-                      checked={filters.hasBq}
-                      onCheckedChange={(checked) =>
-                        updateFilter("hasBq", checked)
-                      }
+              <div className="space-y-6">
+                {/* Price Range */}
+                <div>
+                  <Label className="text-sm font-medium mb-2 block">
+                    Price Range (₦)
+                  </Label>
+                  <div className="px-2">
+                    <Slider
+                      value={[filters.minPrice, filters.maxPrice]}
+                      onValueChange={([min, max]) => {
+                        updateFilter("minPrice", min);
+                        updateFilter("maxPrice", max);
+                      }}
+                      max={100000000}
+                      step={1000000}
+                      className="w-full"
                     />
-                    <Label htmlFor="hasBq" className="text-sm">
-                      Has Boys Quarters (BQ)
+                    <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                      <span>{formatMapPrice(filters.minPrice)}</span>
+                      <span>{formatMapPrice(filters.maxPrice)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bedrooms/Bathrooms */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-medium mb-2 block">
+                      Min Bedrooms
                     </Label>
+                    <Select
+                      value={filters.bedrooms.toString()}
+                      onValueChange={(value) =>
+                        updateFilter("bedrooms", parseInt(value))
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="0">Any</SelectItem>
+                        <SelectItem value="1">1+</SelectItem>
+                        <SelectItem value="2">2+</SelectItem>
+                        <SelectItem value="3">3+</SelectItem>
+                        <SelectItem value="4">4+</SelectItem>
+                        <SelectItem value="5">5+</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium mb-2 block">
+                      Min Bathrooms
+                    </Label>
+                    <Select
+                      value={filters.bathrooms.toString()}
+                      onValueChange={(value) =>
+                        updateFilter("bathrooms", parseInt(value))
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="0">Any</SelectItem>
+                        <SelectItem value="1">1+</SelectItem>
+                        <SelectItem value="2">2+</SelectItem>
+                        <SelectItem value="3">3+</SelectItem>
+                        <SelectItem value="4">4+</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {/* Radius Search */}
+                <div>
+                  <Label className="text-sm font-medium mb-3 block">
+                    Location Search
+                  </Label>
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="radiusSearch"
+                        checked={radiusSearch.enabled}
+                        onCheckedChange={(checked) =>
+                          setRadiusSearch((prev) => ({
+                            ...prev,
+                            enabled: !!checked,
+                          }))
+                        }
+                      />
+                      <Label htmlFor="radiusSearch" className="text-sm">
+                        Search within radius of map center
+                      </Label>
+                    </div>
+
+                    {radiusSearch.enabled && (
+                      <div>
+                        <Slider
+                          value={[radiusSearch.radius]}
+                          onValueChange={([value]) =>
+                            setRadiusSearch((prev) => ({
+                              ...prev,
+                              radius: value,
+                            }))
+                          }
+                          min={1}
+                          max={50}
+                          step={1}
+                          className="w-full"
+                        />
+                        <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                          <span>1 km</span>
+                          <span>{radiusSearch.radius} km</span>
+                          <span>50 km</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Filter Presets */}
+                <div>
+                  <Label className="text-sm font-medium mb-3 block">
+                    Quick Filters
+                  </Label>
+                  <div className="grid grid-cols-1 gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => applyFilterPreset("family-friendly")}
+                      className="justify-start"
+                    >
+                      <Home className="h-4 w-4 mr-2" />
+                      Family-Friendly
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => applyFilterPreset("power-stable")}
+                      className="justify-start"
+                    >
+                      <Zap className="h-4 w-4 mr-2" />
+                      Power Stable
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => applyFilterPreset("gated-communities")}
+                      className="justify-start"
+                    >
+                      <Shield className="h-4 w-4 mr-2" />
+                      Gated Communities
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Heatmap Controls */}
+                <div>
+                  <Label className="text-sm font-medium mb-3 block">
+                    Data Visualization
+                  </Label>
+                  <div className="grid grid-cols-1 gap-2">
+                    <Button
+                      variant={
+                        heatmapType === "density" ? "default" : "outline"
+                      }
+                      size="sm"
+                      onClick={() =>
+                        setHeatmapType(
+                          heatmapType === "density" ? null : "density",
+                        )
+                      }
+                      className="justify-start"
+                    >
+                      <Flame className="h-4 w-4 mr-2" />
+                      Property Density
+                    </Button>
+                    <Button
+                      variant={heatmapType === "price" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() =>
+                        setHeatmapType(heatmapType === "price" ? null : "price")
+                      }
+                      className="justify-start"
+                    >
+                      <DollarSign className="h-4 w-4 mr-2" />
+                      Price Heatmap
+                    </Button>
+                    <Button
+                      variant={heatmapType === "demand" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() =>
+                        setHeatmapType(
+                          heatmapType === "demand" ? null : "demand",
+                        )
+                      }
+                      className="justify-start"
+                    >
+                      <TrendingUp className="h-4 w-4 mr-2" />
+                      Demand Heatmap
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Saved Searches */}
+                <div>
+                  <Label className="text-sm font-medium mb-3 block">
+                    Saved Searches
+                  </Label>
+                  <div className="space-y-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowSaveDialog(true)}
+                      className="w-full"
+                    >
+                      <Bookmark className="h-4 w-4 mr-2" />
+                      Save Current Search
+                    </Button>
+
+                    {savedSearches.length > 0 && (
+                      <div className="space-y-1">
+                        {savedSearches.map((search) => (
+                          <Button
+                            key={search.id}
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => loadSavedSearch(search)}
+                            className="w-full justify-start text-left"
+                          >
+                            <Bookmark className="h-4 w-4 mr-2" />
+                            {search.name}
+                          </Button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Nigerian Infrastructure */}
+                <div>
+                  <Label className="text-sm font-medium mb-3 block">
+                    Infrastructure
+                  </Label>
+                  <div className="space-y-3">
+                    <div>
+                      <Label className="text-xs text-muted-foreground mb-2 block">
+                        Power (NEPA)
+                      </Label>
+                      <Select
+                        value={filters.nepaStatus}
+                        onValueChange={(value) =>
+                          updateFilter("nepaStatus", value)
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Any power status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">Any</SelectItem>
+                          {INFRASTRUCTURE_FILTERS.nepa_status.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label className="text-xs text-muted-foreground mb-2 block">
+                        Water Source
+                      </Label>
+                      <Select
+                        value={filters.waterSource}
+                        onValueChange={(value) =>
+                          updateFilter("waterSource", value)
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Any water source" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">Any</SelectItem>
+                          {INFRASTRUCTURE_FILTERS.water_source.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="hasBq"
+                        checked={filters.hasBq}
+                        onCheckedChange={(checked) =>
+                          updateFilter("hasBq", checked)
+                        }
+                      />
+                      <Label htmlFor="hasBq" className="text-sm">
+                        Has Boys Quarters (BQ)
+                      </Label>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </Card>
+          </Card>
+        </>
       )}
 
-      {/* Property Details Card */}
+      {/* Property Details Card - Mobile optimized */}
       {selectedProperty && (
         <Card
-          className="absolute right-6 top-24 w-[400px] max-h-[calc(100vh-8rem)] overflow-y-auto z-20 bg-background/95 backdrop-blur-sm border-border/50"
+          className={cn(
+            "absolute right-2 sm:right-6 top-32 left-2 sm:left-auto w-auto sm:w-[400px] max-h-[calc(100vh-12rem)] overflow-y-auto z-20 bg-background/95 backdrop-blur-sm border-border/50",
+            highContrast && "border-2 border-white",
+          )}
           role="dialog"
           aria-labelledby="property-title"
         >
           <div className="relative">
             {/* Property Images */}
-            <div className="relative h-64 overflow-hidden rounded-t-lg">
+            <div className="relative h-48 sm:h-64 overflow-hidden rounded-t-lg">
               <img
                 src={getCurrentImageUrl(selectedProperty)}
                 alt={selectedProperty.title}
@@ -1259,20 +1495,20 @@ export function PropertyMap({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white"
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white h-10 w-10 sm:h-12 sm:w-12" // Larger touch targets
                     onClick={prevImage}
                     aria-label="Previous property image"
                   >
-                    <ChevronLeft className="h-6 w-6" />
+                    <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white h-10 w-10 sm:h-12 sm:w-12" // Larger touch targets
                     onClick={nextImage}
                     aria-label="Next property image"
                   >
-                    <ChevronRight className="h-6 w-6" />
+                    <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
                   </Button>
 
                   {/* Image Indicators */}
@@ -1296,7 +1532,7 @@ export function PropertyMap({
 
               {/* Verification Badge */}
               {selectedProperty.verification_status === "verified" && (
-                <Badge className="absolute top-3 left-3 bg-green-600 hover:bg-green-700">
+                <Badge className="absolute top-3 left-3 bg-green-600 hover:bg-green-700 text-sm">
                   ✓ Verified
                 </Badge>
               )}
@@ -1305,7 +1541,7 @@ export function PropertyMap({
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute top-3 right-3 bg-black/50 hover:bg-black/70 text-white"
+                className="absolute top-3 right-3 bg-black/50 hover:bg-black/70 text-white h-10 w-10 sm:h-12 sm:w-12" // Larger touch target
                 onClick={() => setSelectedProperty(null)}
                 aria-label="Close property details"
               >
@@ -1314,7 +1550,7 @@ export function PropertyMap({
             </div>
 
             {/* Property Details */}
-            <div className="p-6 space-y-4">
+            <div className="p-4 sm:p-6 space-y-4">
               <div>
                 <div className="flex items-start justify-between mb-2">
                   <h3 id="property-title" className="text-2xl font-bold">
@@ -1445,18 +1681,20 @@ export function PropertyMap({
                 </div>
               )}
 
-              {/* Action Buttons */}
-              <div className="flex gap-2 pt-2">
-                <Button className="flex-1">View Details</Button>
+              {/* Action Buttons - Mobile optimized */}
+              <div className="flex flex-col sm:flex-row gap-2 pt-2">
+                <Button className="flex-1 h-12 text-base font-semibold">
+                  View Details
+                </Button>
                 <Button
                   variant="outline"
-                  className="flex-1"
+                  className="flex-1 h-12 text-base"
                   onClick={() => {
                     setDirectionsProperty(selectedProperty);
                     setShowDirections(true);
                   }}
                 >
-                  <Navigation className="h-4 w-4 mr-2" />
+                  <Navigation className="h-5 w-5 mr-2" />
                   Get Directions
                 </Button>
               </div>
@@ -1469,6 +1707,27 @@ export function PropertyMap({
         showLegend={showLegend}
         filteredProperties={filteredProperties}
       />
+
+      {/* Keyboard Navigation Instructions - Mobile hidden */}
+      {keyboardMode && (
+        <Card className="absolute bottom-32 left-2 sm:left-6 p-3 sm:p-4 z-20 bg-background/95 backdrop-blur-sm border-border/50 max-w-sm hidden sm:block">
+          <h4 className="font-semibold mb-2">Keyboard Navigation</h4>
+          <div className="text-sm space-y-1">
+            <p>
+              <kbd className="px-1 py-0.5 bg-muted rounded text-xs">↑↓←→</kbd>{" "}
+              Move map
+            </p>
+            <p>
+              <kbd className="px-1 py-0.5 bg-muted rounded text-xs">+/-</kbd>{" "}
+              Zoom in/out
+            </p>
+            <p>
+              <kbd className="px-1 py-0.5 bg-muted rounded text-xs">Tab</kbd>{" "}
+              Navigate controls
+            </p>
+          </div>
+        </Card>
+      )}
 
       {/* Directions Dialog */}
       {showDirections && directionsProperty && (
@@ -1577,6 +1836,24 @@ export function PropertyMap({
           </Card>
         </div>
       )}
+
+      {/* High Contrast Styles */}
+      <style jsx>{`
+        .high-contrast {
+          filter: contrast(1.5) brightness(0.9);
+        }
+        .high-contrast .leaflet-popup-content-wrapper {
+          background: #000 !important;
+          color: #fff !important;
+          border: 2px solid #fff !important;
+        }
+        .high-contrast .leaflet-popup-tip {
+          background: #000 !important;
+        }
+        .high-contrast .custom-marker {
+          filter: brightness(1.2) contrast(1.3);
+        }
+      `}</style>
     </div>
   );
 }

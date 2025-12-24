@@ -47,6 +47,7 @@ interface UsePropertyMapOptions {
   radius?: number; // in kilometers
   filters?: PropertyFilters;
   limit?: number;
+  zoom?: number; // Map zoom level for progressive loading
   enabled?: boolean;
 }
 
@@ -62,12 +63,25 @@ export function usePropertyMap({
   center,
   radius,
   filters,
-  limit = radius ? 500 : 100, // Increase limit for radius search
+  limit,
+  zoom = 11,
   enabled = true,
 }: UsePropertyMapOptions = {}): UsePropertyMapReturn {
   const [properties, setProperties] = useState<Property[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Progressive loading: adjust limit based on zoom level
+  const getProgressiveLimit = (zoomLevel: number, baseLimit?: number) => {
+    if (baseLimit) return baseLimit;
+
+    // At low zoom (zoomed out), load fewer properties
+    if (zoomLevel <= 8) return 50;
+    if (zoomLevel <= 10) return 100;
+    if (zoomLevel <= 12) return 200;
+    // At high zoom (zoomed in), load more properties
+    return 500;
+  };
 
   const fetchProperties = async () => {
     if (!enabled) return;
@@ -77,6 +91,8 @@ export function usePropertyMap({
 
     try {
       const supabase = createClient();
+
+      const progressiveLimit = getProgressiveLimit(zoom, limit);
 
       let query = supabase
         .from("properties")
@@ -94,7 +110,7 @@ export function usePropertyMap({
         .eq("status", "active")
         .eq("verification_status", "verified")
         .order("created_at", { ascending: false })
-        .limit(limit);
+        .limit(progressiveLimit);
 
       // Apply geospatial bounds filtering
       if (bounds) {
@@ -182,7 +198,7 @@ export function usePropertyMap({
 
   useEffect(() => {
     fetchProperties();
-  }, [bounds, center, radius, filters, limit, enabled]);
+  }, [bounds, center, radius, filters, limit, zoom, enabled]);
 
   // Real-time updates
   useEffect(() => {
