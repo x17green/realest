@@ -194,7 +194,7 @@ export async function PUT(
     // Check ownership
     const { data: property, error: propertyError } = await supabase
       .from("properties")
-      .select("owner_id, status, verification_status")
+      .select("owner_id, agent_id, status, verification_status")
       .eq("id", propertyId)
       .single();
 
