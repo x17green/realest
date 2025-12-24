@@ -622,19 +622,6 @@ export function PropertyMap({
     return "/placeholder-property.jpg";
   };
 
-  if (!leafletLoaded) {
-    return (
-      <div className="relative h-screen w-full overflow-hidden flex items-center justify-center bg-background">
-        <Card className="p-8 max-w-md text-center">
-          <h2 className="text-2xl font-bold mb-4">Loading Map...</h2>
-          <p className="text-muted-foreground">
-            Please wait while we initialize the property map.
-          </p>
-        </Card>
-      </div>
-    );
-  }
-
   // Keyboard navigation handlers
   const handleKeyNavigation = useCallback(
     (e: KeyboardEvent) => {
@@ -694,6 +681,19 @@ export function PropertyMap({
       return () => document.removeEventListener("keydown", handleKeyNavigation);
     }
   }, [keyboardMode, handleKeyNavigation]);
+
+  if (!leafletLoaded) {
+    return (
+      <div className="relative h-screen w-full overflow-hidden flex items-center justify-center bg-background">
+        <Card className="p-8 max-w-md text-center">
+          <h2 className="text-2xl font-bold mb-4">Loading Map...</h2>
+          <p className="text-muted-foreground">
+            Please wait while we initialize the property map.
+          </p>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="relative h-screen w-full overflow-hidden">
