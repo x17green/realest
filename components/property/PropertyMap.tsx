@@ -37,6 +37,7 @@ import {
   Droplets,
   Wifi,
   Shield,
+  Bookmark,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { LatLngExpression, LatLngBounds } from "leaflet";
@@ -55,6 +56,7 @@ import {
   createMarkerIconHTML,
   leafletBoundsToBounds,
   isValidCoordinates,
+  calculateDistance,
   NIGERIAN_STATES,
   LAGOS_LGAS,
   INFRASTRUCTURE_FILTERS,
@@ -161,6 +163,9 @@ export function PropertyMap({
   const [leafletLoaded, setLeafletLoaded] = useState(false);
   const [showStateBoundaries, setShowStateBoundaries] = useState(false);
   const [stateGeoJson, setStateGeoJson] = useState<any>(null);
+  const [savedSearches, setSavedSearches] = useState<any[]>([]);
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [saveSearchName, setSaveSearchName] = useState("");
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Filter states
@@ -179,11 +184,25 @@ export function PropertyMap({
     securityTypes: [] as string[],
   });
 
+  // Radius search state
+  const [radiusSearch, setRadiusSearch] = useState({
+    enabled: false,
+    radius: 5,
+  });
+
   const { bounds, setBounds } = useMapBounds();
+
+  // Compute center from current bounds
+  const center = {
+    lat: (bounds.north + bounds.south) / 2,
+    lng: (bounds.east + bounds.west) / 2,
+  };
 
   // Fetch properties with current filters and bounds
   const { properties, isLoading, error } = usePropertyMap({
-    bounds,
+    bounds: radiusSearch.enabled ? undefined : bounds,
+    center: radiusSearch.enabled ? center : undefined,
+    radius: radiusSearch.enabled ? radiusSearch.radius : undefined,
     filters: {
       propertyType: filters.propertyType || undefined,
       listingType:
@@ -276,6 +295,15 @@ export function PropertyMap({
               console.warn("Failed to load Google Maps API:", error);
             });
         }
+
+        // Load saved searches (assuming user is logged in)
+        // TODO: Replace with actual API call
+        // const user = getCurrentUser();
+        // if (user) {
+        //   const response = await fetch('/api/saved-searches');
+        //   const data = await response.json();
+        //   setSavedSearches(data);
+        // }
       }
     };
     loadLeafletCSS();
@@ -297,7 +325,7 @@ export function PropertyMap({
   }, []);
 
   // Filter properties by search query
-  const filteredProperties = properties.filter((property) => {
+  const searchFilteredProperties = properties.filter((property) => {
     if (!searchQuery) return true;
 
     const query = searchQuery.toLowerCase();
@@ -309,9 +337,55 @@ export function PropertyMap({
     );
   });
 
+  // Filter by radius if enabled
+  const filteredProperties = radiusSearch.enabled
+    ? searchFilteredProperties.filter(
+        (property) =>
+          calculateDistance(
+            property.latitude!,
+            property.longitude!,
+            center.lat,
+            center.lng,
+          ) <= radiusSearch.radius,
+      )
+    : searchFilteredProperties;
+
   // Handle filter changes
   const updateFilter = (key: string, value: any) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
+  };
+
+  // Save current search
+  const saveCurrentSearch = async () => {
+    if (!saveSearchName.trim()) return;
+
+    const searchData = {
+      name: saveSearchName,
+      filters,
+      bounds,
+      radiusSearch,
+      searchQuery,
+    };
+
+    // TODO: Replace with actual API call
+    // await fetch('/api/saved-searches', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify(searchData),
+    // });
+
+    // For now, add to local state
+    setSavedSearches((prev) => [...prev, { id: Date.now(), ...searchData }]);
+    setShowSaveDialog(false);
+    setSaveSearchName("");
+  };
+
+  // Load saved search
+  const loadSavedSearch = (search: any) => {
+    setFilters(search.filters);
+    setBounds(search.bounds);
+    setRadiusSearch(search.radiusSearch);
+    setSearchQuery(search.searchQuery);
   };
 
   // Reset filters
@@ -635,6 +709,88 @@ export function PropertyMap({
                       <SelectItem value="4">4+</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+              </div>
+
+              {/* Radius Search */}
+              <div>
+                <Label className="text-sm font-medium mb-3 block">
+                  Location Search
+                </Label>
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="radiusSearch"
+                      checked={radiusSearch.enabled}
+                      onCheckedChange={(checked) =>
+                        setRadiusSearch((prev) => ({
+                          ...prev,
+                          enabled: !!checked,
+                        }))
+                      }
+                    />
+                    <Label htmlFor="radiusSearch" className="text-sm">
+                      Search within radius of map center
+                    </Label>
+                  </div>
+
+                  {radiusSearch.enabled && (
+                    <div>
+                      <Slider
+                        value={[radiusSearch.radius]}
+                        onValueChange={([value]) =>
+                          setRadiusSearch((prev) => ({
+                            ...prev,
+                            radius: value,
+                          }))
+                        }
+                        min={1}
+                        max={50}
+                        step={1}
+                        className="w-full"
+                      />
+                      <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                        <span>1 km</span>
+                        <span>{radiusSearch.radius} km</span>
+                        <span>50 km</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Saved Searches */}
+              <div>
+                <Label className="text-sm font-medium mb-3 block">
+                  Saved Searches
+                </Label>
+                <div className="space-y-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowSaveDialog(true)}
+                    className="w-full"
+                  >
+                    <Bookmark className="h-4 w-4 mr-2" />
+                    Save Current Search
+                  </Button>
+
+                  {savedSearches.length > 0 && (
+                    <div className="space-y-1">
+                      {savedSearches.map((search) => (
+                        <Button
+                          key={search.id}
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => loadSavedSearch(search)}
+                          className="w-full justify-start text-left"
+                        >
+                          <Bookmark className="h-4 w-4 mr-2" />
+                          {search.name}
+                        </Button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -963,6 +1119,43 @@ export function PropertyMap({
             })}
           </div>
         </Card>
+      )}
+
+      {/* Save Search Dialog */}
+      {showSaveDialog && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <Card className="p-6 w-[400px] mx-4">
+            <h3 className="text-lg font-semibold mb-4">Save Search</h3>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="searchName" className="text-sm font-medium">
+                  Search Name
+                </Label>
+                <Input
+                  id="searchName"
+                  value={saveSearchName}
+                  onChange={(e) => setSaveSearchName(e.target.value)}
+                  placeholder="Enter a name for this search"
+                  className="mt-1"
+                />
+              </div>
+              <div className="flex gap-2 justify-end">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowSaveDialog(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={saveCurrentSearch}
+                  disabled={!saveSearchName.trim()}
+                >
+                  Save
+                </Button>
+              </div>
+            </div>
+          </Card>
+        </div>
       )}
 
       {/* Loading/Error States */}

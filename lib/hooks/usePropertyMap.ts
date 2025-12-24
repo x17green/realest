@@ -39,6 +39,11 @@ interface UsePropertyMapOptions {
     east: number;
     west: number;
   };
+  center?: {
+    lat: number;
+    lng: number;
+  };
+  radius?: number; // in kilometers
   filters?: PropertyFilters;
   limit?: number;
   enabled?: boolean;
@@ -53,8 +58,10 @@ interface UsePropertyMapReturn {
 
 export function usePropertyMap({
   bounds,
+  center,
+  radius,
   filters,
-  limit = 100,
+  limit = radius ? 500 : 100, // Increase limit for radius search
   enabled = true,
 }: UsePropertyMapOptions = {}): UsePropertyMapReturn {
   const [properties, setProperties] = useState<Property[]>([]);
@@ -171,7 +178,7 @@ export function usePropertyMap({
 
   useEffect(() => {
     fetchProperties();
-  }, [bounds, filters, limit, enabled]);
+  }, [bounds, center, radius, filters, limit, enabled]);
 
   // Real-time updates
   useEffect(() => {
