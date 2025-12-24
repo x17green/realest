@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import dynamic from "next/dynamic";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -40,6 +40,15 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { LatLngExpression, LatLngBounds } from "leaflet";
+import { Loader } from "@googlemaps/js-api-loader";
+const EditControl = dynamic(
+  () => import("react-leaflet-draw").then((mod) => mod.EditControl),
+  { ssr: false },
+);
+const GeoJSON = dynamic(
+  () => import("react-leaflet").then((mod) => mod.GeoJSON),
+  { ssr: false },
+);
 import { usePropertyMap } from "@/lib/hooks/usePropertyMap";
 import {
   formatMapPrice,
@@ -75,7 +84,7 @@ const Popup = dynamic(() => import("react-leaflet").then((mod) => mod.Popup), {
   ssr: false,
 });
 
-import { useMapEvents } from "react-leaflet";
+import { useMapEvents, useMap } from "react-leaflet";
 
 // Map bounds handling with event synchronization
 function useMapBounds() {
@@ -109,6 +118,27 @@ function MapEventHandler({
   return null;
 }
 
+// Component to control map view programmatically
+function MapController({
+  bounds,
+}: {
+  bounds: { north: number; south: number; east: number; west: number };
+}) {
+  const leafletMap = useMap();
+
+  useEffect(() => {
+    if (leafletMap) {
+      const leafletBounds = new (window as any).L.LatLngBounds(
+        [bounds.south, bounds.west],
+        [bounds.north, bounds.east],
+      );
+      leafletMap.fitBounds(leafletBounds);
+    }
+  }, [bounds, leafletMap]);
+
+  return null;
+}
+
 interface PropertyMapProps {
   className?: string;
   initialCenter?: LatLngExpression;
@@ -129,6 +159,9 @@ export function PropertyMap({
   const [showFilterPanel, setShowFilterPanel] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [leafletLoaded, setLeafletLoaded] = useState(false);
+  const [showStateBoundaries, setShowStateBoundaries] = useState(false);
+  const [stateGeoJson, setStateGeoJson] = useState<any>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Filter states
   const [filters, setFilters] = useState({
@@ -170,7 +203,7 @@ export function PropertyMap({
     limit: 200,
   });
 
-  // Load Leaflet CSS
+  // Load Leaflet CSS, Google Maps API, and state boundaries
   useEffect(() => {
     const loadLeafletCSS = async () => {
       if (typeof window !== "undefined") {
@@ -178,7 +211,71 @@ export function PropertyMap({
         link.rel = "stylesheet";
         link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
         document.head.appendChild(link);
+
+        // Load Leaflet Draw CSS
+        const drawLink = document.createElement("link");
+        drawLink.rel = "stylesheet";
+        drawLink.href =
+          "https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css";
+        document.head.appendChild(drawLink);
         setLeafletLoaded(true);
+
+        // Fetch Nigerian states GeoJSON
+        try {
+          const response = await fetch(
+            "https://raw.githubusercontent.com/codefornigeria/nigeria-geojson/master/ng-states.geojson",
+          );
+          const data = await response.json();
+          setStateGeoJson(data);
+        } catch (error) {
+          console.warn("Failed to load state boundaries:", error);
+        }
+
+        // Load Google Maps API for autocomplete
+        const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+        if (googleMapsApiKey) {
+          const loader = new Loader({
+            apiKey: googleMapsApiKey,
+            version: "weekly",
+            libraries: ["places"],
+          });
+
+          (loader as any)
+            .load()
+            .then(() => {
+              if (searchInputRef.current && (window as any).google) {
+                const autocomplete = new (
+                  window as any
+                ).google.maps.places.Autocomplete(searchInputRef.current, {
+                  componentRestrictions: { country: "ng" },
+                  fields: ["geometry", "formatted_address"],
+                });
+
+                autocomplete.addListener("place_changed", () => {
+                  const place = autocomplete.getPlace();
+                  if (place.geometry?.location) {
+                    const lat = place.geometry.location.lat();
+                    const lng = place.geometry.location.lng();
+
+                    // Center map on selected location with small bounds
+                    const newBounds = {
+                      north: lat + 0.01,
+                      south: lat - 0.01,
+                      east: lng + 0.01,
+                      west: lng - 0.01,
+                    };
+                    setBounds(newBounds);
+
+                    // Update search query with formatted address
+                    setSearchQuery(place.formatted_address || "");
+                  }
+                });
+              }
+            })
+            .catch((error: any) => {
+              console.warn("Failed to load Google Maps API:", error);
+            });
+        }
       }
     };
     loadLeafletCSS();
@@ -283,6 +380,7 @@ export function PropertyMap({
         zoom={initialZoom}
         style={{ height: "100%", width: "100%" }}
         className="z-0"
+        aria-label="Interactive property map"
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -290,6 +388,38 @@ export function PropertyMap({
         />
 
         <MapEventHandler onBoundsChange={setBounds} />
+
+        <MapController bounds={bounds} />
+
+        <EditControl
+          position="topright"
+          onCreated={(e: any) => {
+            const layer = e.layer;
+            const bounds = layer.getBounds();
+            const newBounds = leafletBoundsToBounds(bounds);
+            setBounds(newBounds);
+          }}
+          draw={{
+            rectangle: true,
+            polygon: true,
+            circle: false,
+            marker: false,
+            polyline: false,
+            circlemarker: false,
+          }}
+        />
+
+        {showStateBoundaries && stateGeoJson && (
+          <GeoJSON
+            data={stateGeoJson}
+            style={{
+              color: "#374151",
+              weight: 2,
+              opacity: 0.6,
+              fillOpacity: 0.1,
+            }}
+          />
+        )}
 
         <PropertyMapMarkerCluster
           properties={filteredProperties}
@@ -327,10 +457,12 @@ export function PropertyMap({
           <div className="relative mb-4">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
+              ref={searchInputRef}
               placeholder="Search by location, property type, or features..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-12 pr-12 h-12 bg-background/95 backdrop-blur-sm border-border/50"
+              aria-label="Search properties by location, type, or features"
             />
             {showFilters && (
               <Button
@@ -338,6 +470,7 @@ export function PropertyMap({
                 size="icon"
                 className="absolute right-2 top-1/2 -translate-y-1/2"
                 onClick={() => setShowFilterPanel(!showFilterPanel)}
+                aria-label="Toggle filters panel"
               >
                 <SlidersHorizontal className="h-5 w-5" />
               </Button>
@@ -403,13 +536,33 @@ export function PropertyMap({
 
       {/* Filter Panel */}
       {showFilterPanel && (
-        <Card className="absolute top-24 left-6 w-[320px] max-h-[calc(100vh-8rem)] overflow-y-auto z-20 bg-background/95 backdrop-blur-sm border-border/50">
+        <Card
+          className="absolute top-24 left-6 w-[320px] max-h-[calc(100vh-8rem)] overflow-y-auto z-20 bg-background/95 backdrop-blur-sm border-border/50"
+          role="dialog"
+          aria-labelledby="filter-title"
+        >
           <div className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Filters</h3>
-              <Button variant="ghost" size="sm" onClick={resetFilters}>
-                Reset All
-              </Button>
+              <h3 id="filter-title" className="text-lg font-semibold">
+                Filters
+              </h3>
+              <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowStateBoundaries(!showStateBoundaries)}
+                  className={cn(
+                    "text-sm",
+                    showStateBoundaries && "bg-primary/10 text-primary",
+                  )}
+                >
+                  <Layers className="h-4 w-4 mr-1" />
+                  State Boundaries
+                </Button>
+                <Button variant="ghost" size="sm" onClick={resetFilters}>
+                  Reset All
+                </Button>
+              </div>
             </div>
 
             <div className="space-y-6">
@@ -560,7 +713,11 @@ export function PropertyMap({
 
       {/* Property Details Card */}
       {selectedProperty && (
-        <Card className="absolute right-6 top-24 w-[400px] max-h-[calc(100vh-8rem)] overflow-y-auto z-20 bg-background/95 backdrop-blur-sm border-border/50">
+        <Card
+          className="absolute right-6 top-24 w-[400px] max-h-[calc(100vh-8rem)] overflow-y-auto z-20 bg-background/95 backdrop-blur-sm border-border/50"
+          role="dialog"
+          aria-labelledby="property-title"
+        >
           <div className="relative">
             {/* Property Images */}
             <div className="relative h-64 overflow-hidden rounded-t-lg">
@@ -578,6 +735,7 @@ export function PropertyMap({
                     size="icon"
                     className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white"
                     onClick={prevImage}
+                    aria-label="Previous property image"
                   >
                     <ChevronLeft className="h-6 w-6" />
                   </Button>
@@ -586,6 +744,7 @@ export function PropertyMap({
                     size="icon"
                     className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white"
                     onClick={nextImage}
+                    aria-label="Next property image"
                   >
                     <ChevronRight className="h-6 w-6" />
                   </Button>
@@ -622,6 +781,7 @@ export function PropertyMap({
                 size="icon"
                 className="absolute top-3 right-3 bg-black/50 hover:bg-black/70 text-white"
                 onClick={() => setSelectedProperty(null)}
+                aria-label="Close property details"
               >
                 <X className="h-5 w-5" />
               </Button>
@@ -631,7 +791,7 @@ export function PropertyMap({
             <div className="p-6 space-y-4">
               <div>
                 <div className="flex items-start justify-between mb-2">
-                  <h3 className="text-2xl font-bold">
+                  <h3 id="property-title" className="text-2xl font-bold">
                     {selectedProperty.title}
                   </h3>
                   <Badge
