@@ -77,6 +77,7 @@ import {
   getLGAsByState,
 } from "@/lib/utils/nigerianLocations";
 import { PropertyMapMarker } from "./PropertyMapMarker";
+import { PropertyMapLegend } from "./PropertyMapLegend";
 import { useMapClustering } from "@/lib/hooks/useMapClustering";
 
 // Dynamic imports for SSR compatibility
@@ -365,22 +366,7 @@ export function PropertyMap({
     };
     loadLeafletCSS();
   }, []);
-
-  // Create custom marker icons
-  const createCustomIcon = useCallback((property: any) => {
-    if (typeof window === "undefined") return null;
-
-    const isVerified = property.verification_status === "verified";
-    const iconHtml = createMarkerIconHTML(property.property_type, isVerified);
-
-    return new (window as any).L.DivIcon({
-      html: iconHtml,
-      className: "custom-marker",
-      iconSize: [40, 40],
-      iconAnchor: [20, 40],
-    });
-  }, []);
-
+ 
   // Filter properties by search query
   const searchFilteredProperties = properties.filter((property) => {
     if (!searchQuery) return true;
@@ -1479,39 +1465,10 @@ export function PropertyMap({
         </Card>
       )}
 
-      {/* Legend */}
-      {showLegend && (
-        <Card className="absolute bottom-6 right-6 p-4 z-10 bg-background/95 backdrop-blur-sm border-border/50">
-          <h4 className="font-semibold mb-3 text-sm">Property Types</h4>
-          <div className="space-y-2">
-            {[
-              { type: "house", label: "House", icon: Home },
-              { type: "apartment", label: "Apartment", icon: Building2 },
-              { type: "land", label: "Land", icon: Square },
-              { type: "commercial", label: "Commercial", icon: Building2 },
-              { type: "event_center", label: "Event Center", icon: Calendar },
-              { type: "hotel", label: "Hotel", icon: Hotel },
-            ].map(({ type, label, icon: Icon }) => {
-              const count = filteredProperties.filter(
-                (p) => p.property_type === type,
-              ).length;
-              return (
-                <div key={type} className="flex items-center gap-2 text-sm">
-                  <div
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: getPropertyTypeColor(type) }}
-                  />
-                  <Icon className="h-4 w-4" />
-                  <span className="capitalize">{label}</span>
-                  <span className="text-muted-foreground ml-auto">
-                    ({count})
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        </Card>
-      )}
+      <PropertyMapLegend
+        showLegend={showLegend}
+        filteredProperties={filteredProperties}
+      />
 
       {/* Directions Dialog */}
       {showDirections && directionsProperty && (
