@@ -10,11 +10,7 @@ export type Property = Database["public"]["Tables"]["properties"]["Row"] & {
     | Database["public"]["Tables"]["property_details"]["Row"]
     | null;
   property_media: Database["public"]["Tables"]["property_media"]["Row"][];
-  owners:
-    | (Database["public"]["Tables"]["owners"]["Row"] & {
-        profiles: Database["public"]["Tables"]["profiles"]["Row"] | null;
-      })
-    | null;
+  profiles: Database["public"]["Tables"]["profiles"]["Row"] | null;
 };
 
 export interface PropertyFilters {
@@ -101,11 +97,11 @@ export function usePropertyMap({
           *,
           property_details (*),
           property_media (*),
-          owners (profiles (*))
+          profiles (*)
         `,
         )
-        .eq("status", "live")
-        .eq("verification_status", "verified")
+        .eq("status", "active")
+        .eq("verification_status", "pending")
         .order("created_at", { ascending: false })
         .limit(progressiveLimit);
 
