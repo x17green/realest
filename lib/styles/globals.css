@@ -827,3 +827,74 @@
     font-size: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);
   }
 }
+
+/* ================================================================
+   MARKER CLUSTER STYLES
+   Custom styles for Leaflet marker clustering
+   ================================================================ */
+
+.marker-cluster-small {
+  background-color: rgba(16, 185, 129, 0.6);
+  border: 2px solid rgba(16, 185, 129, 0.8);
+}
+
+.marker-cluster-small div {
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: #065f46;
+  font-size: 12px;
+}
+
+.marker-cluster-medium {
+  background-color: rgba(245, 158, 11, 0.6);
+  border: 2px solid rgba(245, 158, 11, 0.8);
+}
+
+.marker-cluster-medium div {
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: #92400e;
+  font-size: 14px;
+}
+
+.marker-cluster-large {
+  background-color: rgba(239, 68, 68, 0.6);
+  border: 2px solid rgba(239, 68, 68, 0.8);
+}
+
+.marker-cluster-large div {
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: #991b1b;
+  font-size: 16px;
+}
+
+.marker-cluster {
+  border-radius: 50%;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+.marker-cluster:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}

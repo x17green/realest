@@ -20,15 +20,15 @@ export default async function HomePage() {
     user = userData.user
 
     // Redirect to dashboard if user is logged in and we're in full site mode
-    if (user && showFullSite) {
-      const { data: profile } = await supabase.from("profiles").select("user_type").eq("id", user.id).single()
+    // if (user && showFullSite) {
+    //   const { data: profile } = await supabase.from("profiles").select("user_type").eq("id", user.id).single()
 
-      if (profile?.user_type === "owner") {
-        redirect("/owner")
-      } else if (profile?.user_type === "admin") {
-        redirect("/admin")
-      }
-    }
+    //   if (profile?.user_type === "owner") {
+    //     redirect("/owner")
+    //   } else if (profile?.user_type === "admin") {
+    //     redirect("/admin")
+    //   }
+    // }
   }
 
   // Branch-aware rendering: Show coming soon if not full site mode

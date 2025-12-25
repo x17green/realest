@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Button } from "@heroui/react";
+import { Button } from "@/components/ui/button";
 import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { HeaderLogo } from "@/components/ui/RealEstLogo";
 import { ThemeToggleCompact } from "@/components/ui/theme-toggle-wrapper";
+import { ProfileDropdown } from "@/components/realest/ProfileDropdown";
 
 export default function Header() {
   const router = useRouter();
@@ -127,35 +128,14 @@ export default function Header() {
           <div className="hidden md:flex items-center gap-3">
             <ThemeToggleCompact />
             {user ? (
-              <>
-                <Link href={getDashboardUrl()}>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="flex flex-wrap justify-center items-center hover:bg-primary/50 p-1 rounded-sm font-semibold gap-2 hover:shadow-sm transition-all duration-200"
-                  >
-                    <UserIcon className="w-4 h-4" />
-                    Dashboard
-                  </Button>
-                </Link>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onPress={handleLogout}
-                  isDisabled={isLoading}
-                  className="flex flex-wrap justify-center items-center hover:text-error/90 hover:bg-error/40 p-1 rounded-sm font-semibold gap-2 hover:shadow-sm transition-all duration-200 text-error"
-                >
-                  <LogOut className="w-4 h-4" />
-                  {isLoading ? "Logging out..." : "Logout"}
-                </Button>
-              </>
+              <ProfileDropdown />
             ) : (
               <>
                 <Link href="/login">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="hover:bg-primary/10"
+                    className="hover:bg-accent"
                   >
                     Log In
                   </Button>
@@ -177,7 +157,7 @@ export default function Header() {
             variant="ghost"
             size="sm"
             className="md:hidden"
-            onPress={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? (
               <X className="w-5 h-5" />
@@ -231,11 +211,11 @@ export default function Header() {
                     <Button
                       variant="ghost"
                       className="w-full justify-start gap-3 text-error hover:text-error hover:bg-error/10"
-                      onPress={() => {
+                      onClick={() => {
                         setIsMobileMenuOpen(false);
                         handleLogout();
                       }}
-                      isDisabled={isLoading}
+                      disabled={isLoading}
                     >
                       <LogOut className="w-4 h-4" />
                       {isLoading ? "Logging out..." : "Logout"}
