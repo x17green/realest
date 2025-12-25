@@ -266,13 +266,9 @@ export function PropertyMap({
     lng: (bounds.east + bounds.west) / 2,
   };
 
-  // Fetch properties with current filters and bounds
-  const { properties, isLoading, error } = usePropertyMap({
-    bounds: radiusSearch.enabled ? undefined : bounds,
-    center: radiusSearch.enabled ? center : undefined,
-    radius: radiusSearch.enabled ? radiusSearch.radius : undefined,
-    zoom: zoom, // Pass zoom level for progressive loading
-    filters: {
+  // Memoize filters to prevent infinite re-renders
+  const memoizedFilters = useMemo(
+    () => ({
       propertyType: filters.propertyType || undefined,
       listingType:
         (filters.listingType as "sale" | "rent" | "lease") || undefined,
@@ -288,7 +284,31 @@ export function PropertyMap({
       internetType: filters.internetType || undefined,
       securityTypes:
         filters.securityTypes.length > 0 ? filters.securityTypes : undefined,
-    },
+    }),
+    [
+      filters.propertyType,
+      filters.listingType,
+      filters.state,
+      filters.lga,
+      filters.minPrice,
+      filters.maxPrice,
+      filters.bedrooms,
+      filters.bathrooms,
+      filters.hasBq,
+      filters.nepaStatus,
+      filters.waterSource,
+      filters.internetType,
+      filters.securityTypes,
+    ]
+  );
+
+  // Fetch properties with current filters and bounds
+  const { properties, isLoading, error } = usePropertyMap({
+    bounds: radiusSearch.enabled ? undefined : bounds,
+    center: radiusSearch.enabled ? center : undefined,
+    radius: radiusSearch.enabled ? radiusSearch.radius : undefined,
+    zoom: zoom, // Pass zoom level for progressive loading
+    filters: memoizedFilters,
     limit: 200,
   });
 
@@ -312,7 +332,7 @@ export function PropertyMap({
         // Fetch Nigerian states GeoJSON
         try {
           const response = await fetch(
-            "https://raw.githubusercontent.com/codefornigeria/nigeria-geojson/master/ng-states.geojson",
+            "https://raw.githubusercontent.com/codefornigeria/popumap/master/static/geo/state.geojson",
           );
           const data = await response.json();
           setStateGeoJson(data);
@@ -963,7 +983,7 @@ export function PropertyMap({
                   <SelectValue placeholder="Property Type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Types</SelectItem>
+                  <SelectItem value="all">All Types</SelectItem>
                   <SelectItem value="house">House</SelectItem>
                   <SelectItem value="apartment">Apartment</SelectItem>
                   <SelectItem value="land">Land</SelectItem>
@@ -986,7 +1006,7 @@ export function PropertyMap({
                   <SelectValue placeholder="Listing Type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Listings</SelectItem>
+                  <SelectItem value="all">All Listings</SelectItem>
                   <SelectItem value="sale">For Sale</SelectItem>
                   <SelectItem value="rent">For Rent</SelectItem>
                   <SelectItem value="lease">For Lease</SelectItem>
@@ -1006,7 +1026,7 @@ export function PropertyMap({
                   <SelectValue placeholder="State" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All States</SelectItem>
+                  <SelectItem value="all">All States</SelectItem>
                   {NIGERIAN_STATES.map((state: any) => (
                     <SelectItem key={state.code} value={state.code}>
                       {state.name}
@@ -1029,7 +1049,7 @@ export function PropertyMap({
                   <SelectValue placeholder="LGA" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All LGAs</SelectItem>
+                  <SelectItem value="all">All LGAs</SelectItem>
                   {availableLGAs.map((lga: any) => (
                     <SelectItem key={lga.name} value={lga.name}>
                       {lga.name}
@@ -1416,7 +1436,7 @@ export function PropertyMap({
                           <SelectValue placeholder="Any power status" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Any</SelectItem>
+                          <SelectItem value="all">Any</SelectItem>
                           {INFRASTRUCTURE_FILTERS.nepa_status.map((option) => (
                             <SelectItem key={option.value} value={option.value}>
                               {option.label}
@@ -1440,7 +1460,7 @@ export function PropertyMap({
                           <SelectValue placeholder="Any water source" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Any</SelectItem>
+                          <SelectItem value="all">Any</SelectItem>
                           {INFRASTRUCTURE_FILTERS.water_source.map((option) => (
                             <SelectItem key={option.value} value={option.value}>
                               {option.label}

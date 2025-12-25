@@ -1,0 +1,17 @@
+{
+	"servers": {
+		"supabase-mcp": {
+			"url": "https://mcp.supabase.com/mcp",
+			"type": "http"
+		},
+		"heroui": {
+			"command": "npx",
+			"args": ["-y", "@heroui/react-mcp@latest"],
+			"env": {}
+		},
+		"supabase-realest": {
+			"type": "http",
+			"url": "https://mcp.supabase.com/mcp?project_ref=rzclzcermmfrbvvjegwg"
+		},
+	}
+}

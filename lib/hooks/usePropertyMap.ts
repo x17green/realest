@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { Database } from "@/lib/supabase/types";
 import type { RealtimeChannel } from "@supabase/supabase-js";
@@ -83,7 +83,7 @@ export function usePropertyMap({
     return 500;
   };
 
-  const fetchProperties = async () => {
+  const fetchProperties = useCallback(async () => {
     if (!enabled) return;
 
     setIsLoading(true);
@@ -101,13 +101,10 @@ export function usePropertyMap({
           *,
           property_details (*),
           property_media (*),
-          owners (
-            *,
-            profiles (*)
-          )
+          owners (profiles (*))
         `,
         )
-        .eq("status", "active")
+        .eq("status", "live")
         .eq("verification_status", "verified")
         .order("created_at", { ascending: false })
         .limit(progressiveLimit);
@@ -194,11 +191,11 @@ export function usePropertyMap({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [bounds, center, radius, filters, limit, zoom, enabled]);
 
   useEffect(() => {
     fetchProperties();
-  }, [bounds, center, radius, filters, limit, zoom, enabled]);
+  }, [fetchProperties]);
 
   // Real-time updates
   useEffect(() => {
