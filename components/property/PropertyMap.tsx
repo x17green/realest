@@ -451,7 +451,7 @@ export function PropertyMap({
       // Pre-cache tiles for current viewport
       preCacheTiles(currentBounds, currentZoom, {
         getTileUrl: ({ x, y, z }: { x: number; y: number; z: number }) =>
-          `https://{s}.tile.openstreetmap.org/${z}/${x}/${y}.png`,
+          `https://tile.openstreetmap.org/${z}/${x}/${y}.png`,
       });
     }
   }, [bounds, zoom, isOnline, leafletLoaded, preCacheTiles]);
@@ -702,10 +702,60 @@ export function PropertyMap({
 
   useEffect(() => {
     if (keyboardMode) {
-      document.addEventListener("keydown", handleKeyNavigation);
-      return () => document.removeEventListener("keydown", handleKeyNavigation);
+      // Inline the handler to avoid dependency cycle
+      const handler = (e: KeyboardEvent) => {
+        if (!keyboardMode) return;
+
+        const step = 0.01; // Small movement step
+        switch (e.key) {
+          case "ArrowUp":
+            e.preventDefault();
+            setBounds((prev) => ({
+              ...prev,
+              north: prev.north + step,
+              south: prev.south + step,
+            }));
+            break;
+          case "ArrowDown":
+            e.preventDefault();
+            setBounds((prev) => ({
+              ...prev,
+              north: prev.north - step,
+              south: prev.south - step,
+            }));
+            break;
+          case "ArrowLeft":
+            e.preventDefault();
+            setBounds((prev) => ({
+              ...prev,
+              east: prev.east - step,
+              west: prev.west - step,
+            }));
+            break;
+          case "ArrowRight":
+            e.preventDefault();
+            setBounds((prev) => ({
+              ...prev,
+              east: prev.east + step,
+              west: prev.west + step,
+            }));
+            break;
+          case "+":
+          case "=":
+            e.preventDefault();
+            setZoom((prev) => Math.min(prev + 1, 18));
+            break;
+          case "-":
+            e.preventDefault();
+            setZoom((prev) => Math.max(prev - 1, 1));
+            break;
+        }
+      };
+
+      document.addEventListener("keydown", handler);
+      return () => document.removeEventListener("keydown", handler);
     }
-  }, [keyboardMode, handleKeyNavigation]);
+  }, [keyboardMode]); // Removed handleKeyNavigation dependency
 
   if (!leafletLoaded) {
     return (
@@ -780,7 +830,7 @@ export function PropertyMap({
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <MapEventHandler onBoundsChange={setBounds} onZoomChange={setZoom} />
         <MapController bounds={bounds} />
