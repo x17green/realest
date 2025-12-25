@@ -101,6 +101,10 @@ const Marker = dynamic(
 const Popup = dynamic(() => import("react-leaflet").then((mod) => mod.Popup), {
   ssr: false,
 });
+const FeatureGroup = dynamic(
+  () => import("react-leaflet").then((mod) => mod.FeatureGroup),
+  { ssr: false },
+);
 
 import { useMapEvents, useMap } from "react-leaflet";
 
@@ -229,6 +233,7 @@ export function PropertyMap({
   const [keyboardMode, setKeyboardMode] = useState(false); // Accessibility: keyboard navigation
   const searchInputRef = useRef<HTMLInputElement>(null);
   const mapRef = useRef<any>(null);
+  const featureGroupRef = useRef<any>(null);
 
   // Offline cache hook
   const { isOnline, cacheStats, updateStats, preCacheTiles } =
@@ -779,23 +784,25 @@ export function PropertyMap({
         />
         <MapEventHandler onBoundsChange={setBounds} onZoomChange={setZoom} />
         <MapController bounds={bounds} />
-        <EditControl
-          position="topright"
-          onCreated={(e: any) => {
-            const layer = e.layer;
-            const bounds = layer.getBounds();
-            const newBounds = leafletBoundsToBounds(bounds);
-            setBounds(newBounds);
-          }}
-          draw={{
-            rectangle: true,
-            polygon: true,
-            circle: false,
-            marker: false,
-            polyline: false,
-            circlemarker: false,
-          }}
-        />
+        <FeatureGroup ref={featureGroupRef}>
+          <EditControl
+            position="topright"
+            onCreated={(e: any) => {
+              const layer = e.layer;
+              const bounds = layer.getBounds();
+              const newBounds = leafletBoundsToBounds(bounds);
+              setBounds(newBounds);
+            }}
+            draw={{
+              rectangle: true,
+              polygon: true,
+              circle: false,
+              marker: false,
+              polyline: false,
+              circlemarker: false,
+            }}
+          />
+        </FeatureGroup>
         {showStateBoundaries && stateGeoJson && (
           <GeoJSON
             data={stateGeoJson}
