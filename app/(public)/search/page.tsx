@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { RealEstButton } from "@/components/heroui/RealEstButton";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { AdvancedSearchForm } from "@/components/patterns/forms";
+import { PropertyMap } from "@/components/property/PropertyMap";
 import { Card, Input, Button, Chip } from "@heroui/react";
 import { Header, Footer } from "@/components/layout";
 import {
@@ -950,16 +951,12 @@ function SearchPageContent() {
 
           {/* Map View */}
           {viewMode === "map" && !isLoading && properties.length > 0 && (
-            <div className="h-[600px] bg-linear-to-br from-muted to-muted/50 rounded-2xl border-2 border-dashed border-border flex items-center justify-center">
-              <div className="text-center">
-                <MapIcon className="w-16 h-16 text-primary mx-auto mb-4" />
-                <h3 className="text-lg font-heading font-semibold mb-2">
-                  Interactive Map View
-                </h3>
-                <p className="text-muted-foreground">
-                  Map integration coming soon
-                </p>
-              </div>
+            <div className="h-[600px] rounded-2xl overflow-hidden border border-border">
+              <PropertyMap
+                className="w-full h-full"
+                showFilters={true}
+                showLegend={true}
+              />
             </div>
           )}
 

@@ -28,6 +28,7 @@ import {
   Star,
 } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
+import { PropertyMap } from "@/components/property/PropertyMap";
 
 interface Property {
   id: string;
@@ -444,25 +445,32 @@ export default function PropertyDetailsPage() {
                 </Card.Root>
               )}
 
-            {/* Map Placeholder */}
+            {/* Property Location Map */}
             <Card.Root>
               <Card.Header>
                 <Card.Title>Location</Card.Title>
               </Card.Header>
               <Card.Content>
-                <div className="h-64 bg-muted rounded-lg flex items-center justify-center">
-                  <div className="text-center">
-                    <MapPin className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                    <p className="text-muted-foreground">
-                      Interactive map would be displayed here
-                    </p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {property.latitude && property.longitude
-                        ? `Coordinates: ${property.latitude}, ${property.longitude}`
-                        : "Location coordinates not available"}
-                    </p>
+                {property.latitude && property.longitude ? (
+                  <div className="h-64 rounded-lg overflow-hidden">
+                    <PropertyMap
+                      className="w-full h-full"
+                      initialCenter={[property.latitude, property.longitude]}
+                      initialZoom={15}
+                      showFilters={false}
+                      showLegend={false}
+                    />
                   </div>
-                </div>
+                ) : (
+                  <div className="h-64 bg-muted rounded-lg flex items-center justify-center">
+                    <div className="text-center">
+                      <MapPin className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                      <p className="text-muted-foreground">
+                        Location coordinates not available
+                      </p>
+                    </div>
+                  </div>
+                )}
               </Card.Content>
             </Card.Root>
           </div>

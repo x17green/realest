@@ -128,6 +128,7 @@ export default function RootLayout({
 
         {/* Apple specific meta tags */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="RealEST Connect" />
 
@@ -145,6 +146,9 @@ export default function RootLayout({
         <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png" />
         <link rel="apple-touch-icon-precomposed" sizes="120x120" href="/apple-touch-icon-120x120-precomposed.png" />
         <link rel="manifest" href="/manifest.json" />
+
+        {/* React DevTools */}
+        <script src="http://localhost:8097"></script>
       </head>
       <body className="font-body antialiased">
         <RealEstThemeProvider defaultTheme="system" enableSystem={true}>

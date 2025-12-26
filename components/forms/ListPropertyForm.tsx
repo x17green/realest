@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { PropertyMap } from "@/components/property/PropertyMap"
 
 interface ListPropertyFormProps {
   userId: string
@@ -32,6 +33,8 @@ export default function ListPropertyForm({ userId }: ListPropertyFormProps) {
     state: "",
     postalCode: "",
     country: "UK",
+    latitude: "",
+    longitude: "",
     bedrooms: "",
     bathrooms: "",
     squareFeet: "",
@@ -69,6 +72,8 @@ export default function ListPropertyForm({ userId }: ListPropertyFormProps) {
           state: formData.state,
           postal_code: formData.postalCode,
           country: formData.country,
+          latitude: formData.latitude ? Number.parseFloat(formData.latitude) : null,
+          longitude: formData.longitude ? Number.parseFloat(formData.longitude) : null,
           bedrooms: formData.bedrooms ? Number.parseInt(formData.bedrooms) : null,
           bathrooms: formData.bathrooms ? Number.parseFloat(formData.bathrooms) : null,
           square_feet: formData.squareFeet ? Number.parseFloat(formData.squareFeet) : null,
@@ -234,6 +239,47 @@ export default function ListPropertyForm({ userId }: ListPropertyFormProps) {
                     onChange={handleChange}
                     required
                   />
+                </div>
+              </div>
+
+              {/* Location Picker Map */}
+              <div>
+                <Label>Location Picker</Label>
+                <p className="text-sm text-muted-foreground mb-2">
+                  Click on the map to set the property location coordinates
+                </p>
+                <div className="h-64 rounded-lg overflow-hidden border">
+                  <PropertyMap
+                    className="w-full h-full"
+                    initialCenter={[51.5074, -0.1278]} // London coordinates as default
+                    initialZoom={10}
+                    showFilters={false}
+                    showLegend={false}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4 mt-2">
+                  <div>
+                    <Label htmlFor="latitude">Latitude</Label>
+                    <Input
+                      id="latitude"
+                      name="latitude"
+                      placeholder="Latitude"
+                      value={formData.latitude}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="longitude">Longitude</Label>
+                    <Input
+                      id="longitude"
+                      name="longitude"
+                      placeholder="Longitude"
+                      value={formData.longitude}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
                 </div>
               </div>
             </div>
