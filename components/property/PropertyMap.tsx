@@ -180,11 +180,34 @@ function MapController({
   const leafletMap = useMap();
 
   useEffect(() => {
-    if (leafletMap) {
-      const leafletBounds = new (window as any).L.LatLngBounds(
-        [bounds.south, bounds.west],
-        [bounds.north, bounds.east],
-      );
+    if (!leafletMap) return;
+
+    const leafletBounds = new (window as any).L.LatLngBounds(
+      [bounds.south, bounds.west],
+      [bounds.north, bounds.east],
+    );
+
+    try {
+      const current = leafletMap.getBounds();
+
+      // If current bounds are effectively equal to target bounds, skip fitBounds
+      const almostEqual = (a: number, b: number, eps = 1e-6) =>
+        Math.abs(a - b) <= eps;
+
+      if (
+        current &&
+        almostEqual(current.getNorth(), leafletBounds.getNorth()) &&
+        almostEqual(current.getSouth(), leafletBounds.getSouth()) &&
+        almostEqual(current.getEast(), leafletBounds.getEast()) &&
+        almostEqual(current.getWest(), leafletBounds.getWest())
+      ) {
+        return;
+      }
+
+      // Only animate/fit when bounds meaningfully differ
+      leafletMap.fitBounds(leafletBounds);
+    } catch (err) {
+      // Fallback: call fitBounds if any unexpected error occurs
       leafletMap.fitBounds(leafletBounds);
     }
   }, [bounds, leafletMap]);
@@ -241,8 +264,8 @@ export function PropertyMap({
 
   // Filter states
   const [filters, setFilters] = useState({
-    propertyType: "",
-    listingType: "",
+    propertyType: "all",
+    listingType: "all",
     state: "",
     lga: "",
     minPrice: 0,
@@ -274,9 +297,9 @@ export function PropertyMap({
   // Memoize filters to prevent infinite re-renders
   const memoizedFilters = useMemo(
     () => ({
-      propertyType: filters.propertyType || undefined,
+      propertyType: filters.propertyType && filters.propertyType !== "all" ? filters.propertyType : undefined,
       listingType:
-        (filters.listingType as "sale" | "rent" | "lease") || undefined,
+        filters.listingType && filters.listingType !== "all" ? (filters.listingType as "sale" | "rent" | "lease") : undefined,
       state: filters.state || undefined,
       lga: filters.lga || undefined,
       minPrice: filters.minPrice || undefined,
@@ -319,6 +342,8 @@ export function PropertyMap({
 
   // Load Leaflet CSS, Google Maps API, and state boundaries
   useEffect(() => {
+    const cleanupFunctions: (() => void)[] = [];
+
     const loadLeafletCSS = async () => {
       if (typeof window !== "undefined") {
         const link = document.createElement("link");
@@ -413,8 +438,15 @@ export function PropertyMap({
           );
           setHighContrast(highContrastQuery.matches);
 
-          highContrastQuery.addEventListener("change", (e) => {
+          const handleContrastChange = (e: MediaQueryListEvent) => {
             setHighContrast(e.matches);
+          };
+
+          highContrastQuery.addEventListener("change", handleContrastChange);
+
+          // Store the cleanup function
+          cleanupFunctions.push(() => {
+            highContrastQuery.removeEventListener("change", handleContrastChange);
           });
         }
 
@@ -435,6 +467,8 @@ export function PropertyMap({
         return () => {
           document.removeEventListener("keydown", handleKeyDown);
           document.removeEventListener("mousedown", handleMouseDown);
+          // Clean up all stored cleanup functions
+          cleanupFunctions.forEach(cleanup => cleanup());
         };
       }
     };
@@ -520,6 +554,9 @@ export function PropertyMap({
 
   // Handle filter changes
   const updateFilter = (key: string, value: any) => {
+    // Debug: log filter updates to detect rapid/looping changes
+    // eslint-disable-next-line no-console
+    console.debug('[PropertyMap] updateFilter', { key, value });
     setFilters((prev) => {
       const newFilters = { ...prev, [key]: value };
       // Reset LGA when state changes
@@ -603,8 +640,8 @@ export function PropertyMap({
   // Reset filters
   const resetFilters = () => {
     setFilters({
-      propertyType: "",
-      listingType: "",
+      propertyType: "all",
+      listingType: "all",
       state: "",
       lga: "",
       minPrice: 0,
@@ -1027,7 +1064,7 @@ export function PropertyMap({
           {/* Quick Filters - Mobile optimized */}
           {showFilters && (
             <div className="flex flex-wrap gap-2">
-              <Select
+              {/* <Select
                 value={filters.propertyType}
                 onValueChange={(value) => updateFilter("propertyType", value)}
               >
@@ -1048,72 +1085,73 @@ export function PropertyMap({
                   <SelectItem value="event_center">Event Center</SelectItem>
                   <SelectItem value="hotel">Hotel</SelectItem>
                 </SelectContent>
-              </Select>
+              </Select> */}
 
-              <Select
+              {/* Temporary native select to isolate Radix */}
+              <select
+                aria-label="Property Type (temporary)"
+                value={filters.propertyType}
+                onChange={(e) => updateFilter('propertyType', e.target.value)}
+                className="w-full sm:w-[140px] bg-background/95 backdrop-blur-sm h-11 px-3"
+              >
+                <option value="all">All Types</option>
+                <option value="house">House</option>
+                <option value="apartment">Apartment</option>
+                <option value="land">Land</option>
+                <option value="commercial">Commercial</option>
+                <option value="event_center">Event Center</option>
+                <option value="hotel">Hotel</option>
+              </select>
+
+              <select
+                aria-label="Listing Type (temporary)"
                 value={filters.listingType}
-                onValueChange={(value) => updateFilter("listingType", value)}
+                onChange={(e) => updateFilter('listingType', e.target.value)}
+                className={cn(
+                  "w-full sm:w-[120px] bg-background/95 backdrop-blur-sm h-11 px-3",
+                  highContrast && "border-2 border-white",
+                )}
               >
-                <SelectTrigger
-                  className={cn(
-                    "w-full sm:w-[120px] bg-background/95 backdrop-blur-sm h-11", // Full width on mobile
-                    highContrast && "border-2 border-white",
-                  )}
-                >
-                  <SelectValue placeholder="Listing Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Listings</SelectItem>
-                  <SelectItem value="sale">For Sale</SelectItem>
-                  <SelectItem value="rent">For Rent</SelectItem>
-                  <SelectItem value="lease">For Lease</SelectItem>
-                </SelectContent>
-              </Select>
+                <option value="all">All Listings</option>
+                <option value="sale">For Sale</option>
+                <option value="rent">For Rent</option>
+                <option value="lease">For Lease</option>
+              </select>
 
-              <Select
+              <select
+                aria-label="State (temporary)"
                 value={filters.state}
-                onValueChange={(value) => updateFilter("state", value)}
+                onChange={(e) => updateFilter('state', e.target.value)}
+                className={cn(
+                  "w-full sm:w-[120px] bg-background/95 backdrop-blur-sm h-11 px-3",
+                  highContrast && "border-2 border-white",
+                )}
               >
-                <SelectTrigger
-                  className={cn(
-                    "w-full sm:w-[120px] bg-background/95 backdrop-blur-sm h-11", // Full width on mobile
-                    highContrast && "border-2 border-white",
-                  )}
-                >
-                  <SelectValue placeholder="State" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All States</SelectItem>
-                  {NIGERIAN_STATES.map((state: any) => (
-                    <SelectItem key={state.code} value={state.code}>
-                      {state.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                <option value="all">All States</option>
+                {NIGERIAN_STATES.map((state: any) => (
+                  <option key={state.code} value={state.code}>
+                    {state.name}
+                  </option>
+                ))}
+              </select>
 
-              <Select
+              <select
+                aria-label="LGA (temporary)"
                 value={filters.lga}
-                onValueChange={(value) => updateFilter("lga", value)}
+                onChange={(e) => updateFilter('lga', e.target.value)}
                 disabled={!filters.state}
+                className={cn(
+                  "w-full sm:w-[120px] bg-background/95 backdrop-blur-sm h-11 px-3",
+                  highContrast && "border-2 border-white",
+                )}
               >
-                <SelectTrigger
-                  className={cn(
-                    "w-full sm:w-[120px] bg-background/95 backdrop-blur-sm h-11", // Full width on mobile
-                    highContrast && "border-2 border-white",
-                  )}
-                >
-                  <SelectValue placeholder="LGA" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All LGAs</SelectItem>
-                  {availableLGAs.map((lga: any) => (
-                    <SelectItem key={lga.name} value={lga.name}>
-                      {lga.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                <option value="all">All LGAs</option>
+                {availableLGAs.map((lga: any) => (
+                  <option key={lga.name} value={lga.name}>
+                    {lga.name}
+                  </option>
+                ))}
+              </select>
             </div>
           )}
         </div>
@@ -1264,46 +1302,46 @@ export function PropertyMap({
                     <Label className="text-sm font-medium mb-2 block">
                       Min Bedrooms
                     </Label>
-                    <Select
+                    <select
+                      aria-label="Min Bedrooms (temporary)"
                       value={filters.bedrooms.toString()}
-                      onValueChange={(value) =>
-                        updateFilter("bedrooms", parseInt(value))
+                      onChange={(e) =>
+                        updateFilter("bedrooms", parseInt(e.target.value))
                       }
+                      className={cn(
+                        "w-full bg-background/95 backdrop-blur-sm h-11 px-3",
+                        highContrast && "border-2 border-white",
+                      )}
                     >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="0">Any</SelectItem>
-                        <SelectItem value="1">1+</SelectItem>
-                        <SelectItem value="2">2+</SelectItem>
-                        <SelectItem value="3">3+</SelectItem>
-                        <SelectItem value="4">4+</SelectItem>
-                        <SelectItem value="5">5+</SelectItem>
-                      </SelectContent>
-                    </Select>
+                      <option value="0">Any</option>
+                      <option value="1">1+</option>
+                      <option value="2">2+</option>
+                      <option value="3">3+</option>
+                      <option value="4">4+</option>
+                      <option value="5">5+</option>
+                    </select>
                   </div>
                   <div>
                     <Label className="text-sm font-medium mb-2 block">
                       Min Bathrooms
                     </Label>
-                    <Select
+                    <select
+                      aria-label="Min Bathrooms (temporary)"
                       value={filters.bathrooms.toString()}
-                      onValueChange={(value) =>
-                        updateFilter("bathrooms", parseInt(value))
+                      onChange={(e) =>
+                        updateFilter("bathrooms", parseInt(e.target.value))
                       }
+                      className={cn(
+                        "w-full bg-background/95 backdrop-blur-sm h-11 px-3",
+                        highContrast && "border-2 border-white",
+                      )}
                     >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="0">Any</SelectItem>
-                        <SelectItem value="1">1+</SelectItem>
-                        <SelectItem value="2">2+</SelectItem>
-                        <SelectItem value="3">3+</SelectItem>
-                        <SelectItem value="4">4+</SelectItem>
-                      </SelectContent>
-                    </Select>
+                      <option value="0">Any</option>
+                      <option value="1">1+</option>
+                      <option value="2">2+</option>
+                      <option value="3">3+</option>
+                      <option value="4">4+</option>
+                    </select>
                   </div>
                 </div>
 
@@ -1483,48 +1521,44 @@ export function PropertyMap({
                       <Label className="text-xs text-muted-foreground mb-2 block">
                         Power (NEPA)
                       </Label>
-                      <Select
+                      <select
+                        aria-label="Power status (temporary)"
                         value={filters.nepaStatus}
-                        onValueChange={(value) =>
-                          updateFilter("nepaStatus", value)
-                        }
+                        onChange={(e) => updateFilter("nepaStatus", e.target.value)}
+                        className={cn(
+                          "w-full bg-background/95 backdrop-blur-sm h-11 px-3",
+                          highContrast && "border-2 border-white",
+                        )}
                       >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Any power status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">Any</SelectItem>
-                          {INFRASTRUCTURE_FILTERS.nepa_status.map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                        <option value="all">Any</option>
+                        {INFRASTRUCTURE_FILTERS.nepa_status.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
                     </div>
 
                     <div>
                       <Label className="text-xs text-muted-foreground mb-2 block">
                         Water Source
                       </Label>
-                      <Select
+                      <select
+                        aria-label="Water source (temporary)"
                         value={filters.waterSource}
-                        onValueChange={(value) =>
-                          updateFilter("waterSource", value)
-                        }
+                        onChange={(e) => updateFilter("waterSource", e.target.value)}
+                        className={cn(
+                          "w-full bg-background/95 backdrop-blur-sm h-11 px-3",
+                          highContrast && "border-2 border-white",
+                        )}
                       >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Any water source" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">Any</SelectItem>
-                          {INFRASTRUCTURE_FILTERS.water_source.map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                        <option value="all">Any</option>
+                        {INFRASTRUCTURE_FILTERS.water_source.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
                     </div>
 
                     <div className="flex items-center space-x-2">
