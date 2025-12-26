@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Button, Avatar } from "@heroui/react";
+import { Avatar } from "@heroui/react";
+import { Button } from "../ui";
 import {
   Menu,
   X,
@@ -68,16 +69,22 @@ export function DashboardHeader({ userRole }: DashboardHeaderProps) {
             <Link href="/" className="flex items-center group">
               <HeaderLogo />
             </Link>
-
-            {/* Role Badge */}
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
-              <RoleIcon className="w-4 h-4" />
-              {getRoleDisplayName(userRole)}
-            </div>
           </div>
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center gap-3">
+
+            {/* Role Badge */}
+            {user ? (
+              <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
+                <RoleIcon className="w-4 h-4" />
+                {getRoleDisplayName(userRole)}
+              </div>
+            ) : (
+              <div className="hidden"></div>
+            )}
+            
+            {/* Theme Toggle */}
             <ThemeToggleCompact />
 
             {/* Notifications */}
@@ -87,7 +94,19 @@ export function DashboardHeader({ userRole }: DashboardHeaderProps) {
             </Button>
 
             {/* User Menu */}
-            <ProfileDropdown />
+            {user ? (
+              <ProfileDropdown />
+            ) : (
+              <Link href="/login">
+                <Button
+                  variant="dark"
+                  size="sm"
+                  className="hover:from-primary/90 hover:to-primary/70 shadow-lg"
+                >
+                  Log In
+                </Button>
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -95,7 +114,7 @@ export function DashboardHeader({ userRole }: DashboardHeaderProps) {
             variant="ghost"
             size="sm"
             className="md:hidden"
-            onPress={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? (
               <X className="w-5 h-5" />
@@ -141,7 +160,7 @@ export function DashboardHeader({ userRole }: DashboardHeaderProps) {
                 <Button
                   variant="ghost"
                   className="w-full justify-start gap-3"
-                  onPress={() => {
+                  onClick={() => {
                     setIsMobileMenuOpen(false);
                     window.location.href = "/profile";
                   }}
@@ -153,7 +172,7 @@ export function DashboardHeader({ userRole }: DashboardHeaderProps) {
                 <Button
                   variant="ghost"
                   className="w-full justify-start gap-3"
-                  onPress={() => {
+                  onClick={() => {
                     setIsMobileMenuOpen(false);
                     window.location.href = "/settings";
                   }}
@@ -165,7 +184,7 @@ export function DashboardHeader({ userRole }: DashboardHeaderProps) {
                 <Button
                   variant="ghost"
                   className="w-full justify-start gap-3 relative"
-                  onPress={() => setIsMobileMenuOpen(false)}
+                  onClick={() => setIsMobileMenuOpen(false)}
                 >
                   <Bell className="w-4 h-4" />
                   Notifications
@@ -185,7 +204,7 @@ export function DashboardHeader({ userRole }: DashboardHeaderProps) {
                 <Button
                   variant="ghost"
                   className="w-full justify-start gap-3 text-danger hover:text-danger hover:bg-error/10"
-                  onPress={() => {
+                  onClick={() => {
                     setIsMobileMenuOpen(false);
                     logout();
                   }}

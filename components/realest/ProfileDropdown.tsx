@@ -204,19 +204,25 @@ export function ProfileDropdown() {
 
   return (
     <Dropdown>
-      <Dropdown.Trigger className="rounded-full focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-        <Avatar>
-          {avatarUrl && (
-            <Avatar.Image
-              alt={
-                user?.role === "admin" ? "ADMIN" : profile?.full_name || "User"
-              }
-              className="rounded-full size-10"
-              src={avatarUrl}
-            />
-          )}
-          <Avatar.Fallback delayMs={600}>{getAvatarFallback()}</Avatar.Fallback>
-        </Avatar>
+      <Dropdown.Trigger className="rounded-full">
+        <div className="flex items-center h-8 w-8 m-auto justify-center border border-accent/70 rounded-full">
+          <Avatar>
+            {avatarUrl && (
+              <Avatar.Image
+                alt={
+                  user?.role === "admin" ? "ADMIN" : profile?.full_name || "User"
+                }
+                className="rounded-full size-8"
+                src={avatarUrl}
+              />
+            )}
+            <Avatar.Fallback delayMs={600}>
+              <div className="rounded-full size-6 border justify-center items-center flex bg-muted-foreground/10">
+                {getAvatarFallback()}
+              </div>
+            </Avatar.Fallback>
+          </Avatar>
+        </div>
       </Dropdown.Trigger>
       <Dropdown.Popover className="card-enhanced w-60 shadow-lg border border-border/50 rounded-xl overflow-hidden p-0">
         <div className="px-3 pt-3 pb-1">

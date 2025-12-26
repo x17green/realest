@@ -1,9 +1,5 @@
 {
 	"servers": {
-		"supabase-mcp": {
-			"url": "https://mcp.supabase.com/mcp",
-			"type": "http"
-		},
 		"heroui": {
 			"command": "npx",
 			"args": [

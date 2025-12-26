@@ -79,12 +79,6 @@ export function AdminSidebar({
       description: "Manage user accounts",
     },
     {
-      href: "/admin/cms/analytics",
-      label: "System Analytics",
-      icon: BarChart3,
-      description: "Platform statistics",
-    },
-    {
       href: "/admin/content",
       label: "Content Managemen",
       icon: FileText,

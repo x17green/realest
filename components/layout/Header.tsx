@@ -15,6 +15,7 @@ import {
   Calendar,
   User as UserIcon,
   LogOut,
+  MapPinHouse,
 } from "lucide-react";
 import { HeaderLogo } from "@/components/ui/RealEstLogo";
 import { ThemeToggleCompact } from "@/components/ui/theme-toggle-wrapper";
@@ -95,6 +96,7 @@ export default function Header() {
   };
 
   const navigationItems = [
+    { href: "/explore", label: "Explore", icon: MapPinHouse },
     { href: "/buy", label: "Buy", icon: Home },
     { href: "/rent", label: "Rent", icon: TrendingUp },
     { href: "/sell", label: "Sell", icon: Building },
@@ -128,7 +130,9 @@ export default function Header() {
           <div className="hidden md:flex items-center gap-3">
             <ThemeToggleCompact />
             {user ? (
-              <ProfileDropdown />
+              <div className="flex items-center h-8 w-8 m-auto justify-center border rounded-full">
+                <ProfileDropdown />
+              </div>
             ) : (
               <>
                 <Link href="/login">
@@ -153,18 +157,24 @@ export default function Header() {
           </div>
 
           {/* Mobile Menu Button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="md:hidden"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            {isMobileMenuOpen ? (
-              <X className="w-5 h-5" />
-            ) : (
-              <Menu className="w-5 h-5" />
-            )}
-          </Button>
+          {user ? (
+            <div className="md:hidden flex h-8 w-8 border rounded-full">
+              <ProfileDropdown />
+            </div>
+          ) : (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="md:hidden"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? (
+                <X className="w-5 h-5" />
+              ) : (
+                <Menu className="w-5 h-5" />
+              )}
+            </Button>
+          )}
         </div>
 
         {/* Mobile Menu */}
