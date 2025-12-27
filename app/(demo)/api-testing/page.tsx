@@ -170,13 +170,21 @@ export default function ApiTestingPage() {
 
   const testCreateProperty = () => {
     const data = {
-      ...propertyForm,
+      title: propertyForm.title,
+      description: propertyForm.description,
       price: parseInt(propertyForm.price),
+      address: propertyForm.address,
+      city: propertyForm.city,
+      state: propertyForm.state,
       latitude: parseFloat(propertyForm.latitude),
       longitude: parseFloat(propertyForm.longitude),
+      property_type: propertyForm.property_type,
+      listing_type: propertyForm.listing_type,
       bedrooms: parseInt(propertyForm.bedrooms),
       bathrooms: parseInt(propertyForm.bathrooms),
+      nepa_status: propertyForm.nepa_status,
       has_bq: propertyForm.has_bq === "true",
+      security_type: propertyForm.security_type,
     };
     makeApiCall("POST", "/api/properties", data, true);
   };
