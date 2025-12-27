@@ -30,17 +30,55 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // For agents, get their agent_id from the agents table
+    let agentId: string | null = null;
+    if (profile.user_type === "agent") {
+      const { data: agentData, error: agentError } = await supabase
+        .from("agents")
+        .select("id")
+        .eq("profile_id", user.id)
+        .single();
+
+      if (agentError || !agentData) {
+        return NextResponse.json(
+          { error: "Agent profile not found" },
+          { status: 404 },
+        );
+      }
+      agentId = agentData.id;
+    }
+
     // Parse pagination parameters
     const { searchParams } = new URL(request.url);
     const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
     const limit = Math.min(50, Math.max(1, parseInt(searchParams.get("limit") || "20")));
     const offset = (page - 1) * limit;
 
-    // Get total count first (efficient for pagination)
-    const { count: totalCount, error: countError } = await supabase
+    // Build query based on user type
+    let countQuery = supabase.from("properties").select("*", { count: "exact", head: true });
+    let propertiesQuery = supabase
       .from("properties")
-      .select("*", { count: "exact", head: true })
-      .eq("owner_id", user.id);
+      .select(
+        `
+        *,
+        property_details (*),
+        property_media (*),
+        property_documents (*)
+      `,
+      )
+      .order("created_at", { ascending: false })
+      .range(offset, offset + limit - 1);
+
+    if (profile.user_type === "owner") {
+      countQuery = countQuery.eq("owner_id", user.id);
+      propertiesQuery = propertiesQuery.eq("owner_id", user.id);
+    } else if (profile.user_type === "agent") {
+      countQuery = countQuery.eq("agent_id", agentId);
+      propertiesQuery = propertiesQuery.eq("agent_id", agentId);
+    }
+
+    // Get total count first (efficient for pagination)
+    const { count: totalCount, error: countError } = await countQuery;
 
     if (countError) {
       console.error("Count query error:", countError);
@@ -51,19 +89,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get paginated properties with related data
-    const { data: properties, error } = await supabase
-      .from("properties")
-      .select(
-        `
-        *,
-        property_details (*),
-        property_media (*),
-        property_documents (*)
-      `,
-      )
-      .eq("owner_id", user.id)
-      .order("created_at", { ascending: false })
-      .range(offset, offset + limit - 1);
+    const { data: properties, error } = await propertiesQuery;
 
     if (error) {
       console.error("Owner properties fetch error:", error);
@@ -80,12 +106,39 @@ export async function GET(request: NextRequest) {
     let inquiryStats: Record<string, { count: number; recent: any[] }> = {};
 
     if (propertyIds.length > 0) {
-      // Get inquiry counts per property
-      const { data: inquiryCounts, error: inquiryCountError } = await supabase
+      // Build inquiry queries based on user type
+      let inquiryCountQuery = supabase
         .from("inquiries")
         .select("property_id")
+        .in("property_id", propertyIds);
+
+      let recentInquiriesQuery = supabase
+        .from("inquiries")
+        .select(`
+          id,
+          property_id,
+          message,
+          status,
+          created_at,
+          profiles:inquiries_sender_id_fkey (
+            full_name,
+            avatar_url
+          )
+        `)
         .in("property_id", propertyIds)
-        .eq("owner_id", user.id);
+        .order("created_at", { ascending: false })
+        .limit(3 * propertyIds.length);
+
+      // For owners, inquiries are directly linked by owner_id
+      // For agents, inquiries are linked through their properties
+      if (profile.user_type === "owner") {
+        inquiryCountQuery = inquiryCountQuery.eq("owner_id", user.id);
+        recentInquiriesQuery = recentInquiriesQuery.eq("owner_id", user.id);
+      }
+      // For agents, we already filtered properties by agent_id, so inquiries will be for those properties
+
+      // Get inquiry counts per property
+      const { data: inquiryCounts, error: inquiryCountError } = await inquiryCountQuery;
 
       if (!inquiryCountError && inquiryCounts) {
         // Count inquiries per property
@@ -95,23 +148,7 @@ export async function GET(request: NextRequest) {
         });
 
         // Get recent inquiries (last 3 per property)
-        const { data: recentInquiries, error: recentError } = await supabase
-          .from("inquiries")
-          .select(`
-            id,
-            property_id,
-            message,
-            status,
-            created_at,
-            profiles:inquiries_sender_id_fkey (
-              full_name,
-              avatar_url
-            )
-          `)
-          .in("property_id", propertyIds)
-          .eq("owner_id", user.id)
-          .order("created_at", { ascending: false })
-          .limit(3 * propertyIds.length); // Get more than needed, then filter
+        const { data: recentInquiries, error: recentError } = await recentInquiriesQuery;
 
         if (!recentError && recentInquiries) {
           // Group recent inquiries by property
