@@ -353,6 +353,7 @@ export async function POST(request: NextRequest) {
       longitude: validatedData.longitude,
       property_type: validatedData.property_type,
       listing_type: dbListingType,
+      listing_source: profile.user_type === 'agent' ? 'agent' : 'owner',
       status: "draft", // Start as draft, user can publish later
       verification_status: "pending",
     };
