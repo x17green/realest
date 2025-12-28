@@ -37,15 +37,18 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       <DashboardHeader userRole={userRole} />
 
       <div className="flex">
-        <DashboardSidebar userRole={userRole} currentPath={pathname} />
+        <DashboardSidebar 
+          userRole={userRole} 
+          currentPath={pathname} 
+        />
 
         {/* Main content */}
         <main className="flex-1 ml-64">
-          <div className="min-h-screen">{children}</div>
+          <div className="min-h-screen px-4">{children}</div>
+          <DashboardFooter />
         </main>
       </div>
 
-      <DashboardFooter />
     </div>
   );
 }

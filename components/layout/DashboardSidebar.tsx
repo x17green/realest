@@ -61,7 +61,7 @@ export function DashboardSidebar({
       ],
       owner: [
         {
-          href: "/owner",
+          href: "/owner/listings",
           label: "My Listings",
           icon: Building,
           roles: ["owner"],

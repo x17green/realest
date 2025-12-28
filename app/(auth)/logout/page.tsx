@@ -3,7 +3,14 @@
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Button, Card } from "@heroui/react";
+import { 
+  Button, 
+  Card, 
+  CardHeader, 
+  CardTitle, 
+  CardDescription, 
+  CardContent 
+} from "@/components/ui";
 import { signOut } from "@/lib/auth";
 import { LogOut, CheckCircle, RefreshCw, AlertCircle } from "lucide-react";
 
@@ -54,20 +61,20 @@ function LogoutContent() {
   if (isSuccess) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background px-4">
-        <Card.Root className="w-full max-w-md">
-          <Card.Header className="text-center">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
               <CheckCircle className="w-16 h-16 text-success" />
             </div>
-            <Card.Title className="text-2xl font-bold">
+            <CardTitle className="text-2xl font-bold">
               Logged Out Successfully
-            </Card.Title>
-            <Card.Description>
+            </CardTitle>
+            <CardDescription>
               You have been securely signed out of your account
-            </Card.Description>
-          </Card.Header>
+            </CardDescription>
+          </CardHeader>
 
-          <Card.Content className="space-y-6">
+          <CardContent className="space-y-6">
             <div className="text-center space-y-4">
               <div className="bg-success-50 border border-success-200 p-4 rounded-lg">
                 <p className="text-sm text-success-700">
@@ -86,7 +93,7 @@ function LogoutContent() {
             </div>
 
             <div className="space-y-3">
-              <Button asChild variant="primary" className="w-full">
+              <Button asChild variant="default" className="w-full">
                 <Link href="/">Go to Homepage</Link>
               </Button>
 
@@ -94,8 +101,8 @@ function LogoutContent() {
                 <Link href="/login">Sign In Again</Link>
               </Button>
             </div>
-          </Card.Content>
-        </Card.Root>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -103,45 +110,45 @@ function LogoutContent() {
   if (autoLogout) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background px-4">
-        <Card.Root className="w-full max-w-md">
-          <Card.Header className="text-center">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
               <RefreshCw className="w-12 h-12 text-primary animate-spin" />
             </div>
-            <Card.Title className="text-2xl font-bold">
+            <CardTitle className="text-2xl font-bold">
               Signing You Out
-            </Card.Title>
-            <Card.Description>
+            </CardTitle>
+            <CardDescription>
               Please wait while we securely log you out
-            </Card.Description>
-          </Card.Header>
+            </CardDescription>
+          </CardHeader>
 
-          <Card.Content className="space-y-6">
+          <CardContent className="space-y-6">
             {error && (
               <div className="text-sm text-danger bg-danger-50 border border-danger-200 rounded-md p-3">
                 {error}
               </div>
             )}
-          </Card.Content>
-        </Card.Root>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <Card.Root className="w-full max-w-md">
-        <Card.Header className="text-center">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <LogOut className="w-12 h-12 text-primary" />
           </div>
-          <Card.Title className="text-2xl font-bold">Sign Out</Card.Title>
-          <Card.Description>
+          <CardTitle className="text-2xl font-bold">Sign Out</CardTitle>
+          <CardDescription>
             Are you sure you want to sign out of your RealEST account?
-          </Card.Description>
-        </Card.Header>
+          </CardDescription>
+        </CardHeader>
 
-        <Card.Content className="space-y-6">
+        <CardContent className="space-y-6">
           {error && (
             <div className="text-sm text-danger bg-danger-50 border border-danger-200 rounded-md p-3 flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0" />
@@ -173,10 +180,10 @@ function LogoutContent() {
             </Button>
 
             <Button
-              variant="primary"
-              className="w-full bg-danger hover:bg-danger/90 text-danger-foreground"
-              onPress={handleLogout}
-              isDisabled={isLoading}
+              variant="destructive"
+              className="w-full"
+              onClick={handleLogout}
+              disabled={isLoading}
             >
               {isLoading ? (
                 <>
@@ -200,8 +207,8 @@ function LogoutContent() {
               Back to Homepage
             </Link>
           </div>
-        </Card.Content>
-      </Card.Root>
+        </CardContent>
+      </Card>
     </div>
   );
 }
@@ -209,19 +216,19 @@ function LogoutContent() {
 function LogoutFallback() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <Card.Root className="w-full max-w-md">
-        <Card.Header className="text-center">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <RefreshCw className="w-12 h-12 text-primary animate-spin" />
           </div>
-          <Card.Title className="text-2xl font-bold">
+          <CardTitle className="text-2xl font-bold">
             Loading Sign Out
-          </Card.Title>
-          <Card.Description>
+          </CardTitle>
+          <CardDescription>
             Please wait while we prepare the sign out page
-          </Card.Description>
-        </Card.Header>
-      </Card.Root>
+          </CardDescription>
+        </CardHeader>
+      </Card>
     </div>
   );
 }

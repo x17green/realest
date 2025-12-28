@@ -3,7 +3,14 @@
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Button, Card } from "@heroui/react";
+import { 
+  Button, 
+  Card, 
+  CardHeader, 
+  CardTitle, 
+  CardDescription, 
+  CardContent 
+} from "@/components/ui";
 import {
   getCurrentUser,
   resendEmailVerification,
@@ -106,19 +113,19 @@ function VerifyEmailContent() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background px-4">
-        <Card.Root className="w-full max-w-md">
-          <Card.Header className="text-center">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
               <RefreshCw className="w-12 h-12 text-primary animate-spin" />
             </div>
-            <Card.Title className="text-2xl font-bold">
+            <CardTitle className="text-2xl font-bold">
               Verifying Your Email
-            </Card.Title>
-            <Card.Description>
+            </CardTitle>
+            <CardDescription>
               Please wait while we verify your email address
-            </Card.Description>
-          </Card.Header>
-        </Card.Root>
+            </CardDescription>
+          </CardHeader>
+        </Card>
       </div>
     );
   }
@@ -126,20 +133,20 @@ function VerifyEmailContent() {
   if (verificationStatus === "success") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background px-4">
-        <Card.Root className="w-full max-w-md">
-          <Card.Header className="text-center">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
               <CheckCircle className="w-16 h-16 text-success" />
             </div>
-            <Card.Title className="text-2xl font-bold">
+            <CardTitle className="text-2xl font-bold">
               Email Verified!
-            </Card.Title>
-            <Card.Description>
+            </CardTitle>
+            <CardDescription>
               Your email has been successfully verified
-            </Card.Description>
-          </Card.Header>
+            </CardDescription>
+          </CardHeader>
 
-          <Card.Content className="space-y-6">
+          <CardContent className="space-y-6">
             <div className="text-center space-y-4">
               <div className="bg-success-50 border border-success-200 p-4 rounded-lg">
                 <p className="text-sm text-success-700">
@@ -154,7 +161,7 @@ function VerifyEmailContent() {
             </div>
 
             <div className="space-y-3">
-              <Button asChild variant="primary" className="w-full">
+              <Button asChild variant="default" className="w-full">
                 <Link href="/login">Continue to Sign In</Link>
               </Button>
 
@@ -167,8 +174,8 @@ function VerifyEmailContent() {
                 </Link>
               </div>
             </div>
-          </Card.Content>
-        </Card.Root>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -176,18 +183,18 @@ function VerifyEmailContent() {
   if (verificationStatus === "expired") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background px-4">
-        <Card.Root className="w-full max-w-md">
-          <Card.Header className="text-center">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
               <AlertCircle className="w-12 h-12 text-warning" />
             </div>
-            <Card.Title className="text-2xl font-bold">Link Expired</Card.Title>
-            <Card.Description>
+            <CardTitle className="text-2xl font-bold">Link Expired</CardTitle>
+            <CardDescription>
               Your verification link has expired
-            </Card.Description>
-          </Card.Header>
+            </CardDescription>
+          </CardHeader>
 
-          <Card.Content className="space-y-6">
+          <CardContent className="space-y-6">
             <div className="text-center space-y-4">
               <div className="bg-warning-50 border border-warning-200 p-4 rounded-lg">
                 <p className="text-sm text-warning-700">
@@ -209,9 +216,9 @@ function VerifyEmailContent() {
             <div className="space-y-3">
               <Button
                 onClick={handleResendVerification}
-                variant="primary"
+                variant="default"
                 className="w-full"
-                isDisabled={isResending || !email}
+                disabled={isResending || !email}
               >
                 {isResending ? "Sending..." : "Resend Verification Email"}
               </Button>
@@ -232,8 +239,8 @@ function VerifyEmailContent() {
                 </Link>
               </div>
             </div>
-          </Card.Content>
-        </Card.Root>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -241,20 +248,20 @@ function VerifyEmailContent() {
   // Error state
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <Card.Root className="w-full max-w-md">
-        <Card.Header className="text-center">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <AlertCircle className="w-12 h-12 text-danger" />
           </div>
-          <Card.Title className="text-2xl font-bold">
+          <CardTitle className="text-2xl font-bold">
             Verification Failed
-          </Card.Title>
-          <Card.Description>
+          </CardTitle>
+          <CardDescription>
             There was a problem verifying your email
-          </Card.Description>
-        </Card.Header>
+          </CardDescription>
+        </CardHeader>
 
-        <Card.Content className="space-y-6">
+        <CardContent className="space-y-6">
           {error && (
             <div className="text-sm text-danger bg-danger-50 border border-danger-200 rounded-md p-3">
               {error}
@@ -276,9 +283,9 @@ function VerifyEmailContent() {
             {email && (
               <Button
                 onClick={handleResendVerification}
-                variant="primary"
+                variant="default"
                 className="w-full"
-                isDisabled={isResending}
+                disabled={isResending}
               >
                 {isResending ? "Sending..." : "Resend Verification Email"}
               </Button>
@@ -300,8 +307,8 @@ function VerifyEmailContent() {
               </Link>
             </div>
           </div>
-        </Card.Content>
-      </Card.Root>
+        </CardContent>
+      </Card>
     </div>
   );
 }
@@ -309,19 +316,19 @@ function VerifyEmailContent() {
 function VerifyEmailFallback() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <Card.Root className="w-full max-w-md">
-        <Card.Header className="text-center">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <RefreshCw className="w-12 h-12 text-primary animate-spin" />
           </div>
-          <Card.Title className="text-2xl font-bold">
+          <CardTitle className="text-2xl font-bold">
             Loading Verification
-          </Card.Title>
-          <Card.Description>
+          </CardTitle>
+          <CardDescription>
             Please wait while we prepare your email verification
-          </Card.Description>
-        </Card.Header>
-      </Card.Root>
+          </CardDescription>
+        </CardHeader>
+      </Card>
     </div>
   );
 }

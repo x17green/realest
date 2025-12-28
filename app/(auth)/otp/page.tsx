@@ -3,7 +3,14 @@
 import { useState, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Button, Card } from "@heroui/react";
+import { 
+  Button, 
+  Card, 
+  CardHeader, 
+  CardTitle, 
+  CardDescription, 
+  CardContent 
+} from "@/components/ui";
 import { verifyOTP, getCurrentUser, getUserProfile, sendOTP } from "@/lib/auth";
 import { CheckCircle, Shield, RefreshCw, AlertTriangle } from "lucide-react";
 
@@ -165,20 +172,20 @@ function OTPContent() {
   if (isSuccess) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background px-4">
-        <Card.Root className="w-full max-w-md">
-          <Card.Header className="text-center">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
               <CheckCircle className="w-16 h-16 text-success" />
             </div>
-            <Card.Title className="text-2xl font-bold">
+            <CardTitle className="text-2xl font-bold">
               Verification Complete!
-            </Card.Title>
-            <Card.Description>
+            </CardTitle>
+            <CardDescription>
               You have been successfully authenticated
-            </Card.Description>
-          </Card.Header>
+            </CardDescription>
+          </CardHeader>
 
-          <Card.Content className="space-y-6">
+          <CardContent className="space-y-6">
             <div className="text-center space-y-4">
               <div className="bg-success-50 border border-success-200 p-4 rounded-lg">
                 <p className="text-sm text-success-700">
@@ -190,29 +197,29 @@ function OTPContent() {
                 <RefreshCw className="w-5 h-5 text-primary animate-spin" />
               </div>
             </div>
-          </Card.Content>
-        </Card.Root>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <Card.Root className="w-full max-w-md">
-        <Card.Header className="text-center">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <Shield className="w-12 h-12 text-primary" />
           </div>
-          <Card.Title className="text-2xl font-bold">
+          <CardTitle className="text-2xl font-bold">
             Verify Your Email
-          </Card.Title>
-          <Card.Description>
+          </CardTitle>
+          <CardDescription>
             Enter the 6-digit code sent to{" "}
             <span className="font-medium">{email}</span>
-          </Card.Description>
-        </Card.Header>
+          </CardDescription>
+        </CardHeader>
 
-        <Card.Content className="space-y-6">
+        <CardContent className="space-y-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* OTP Input */}
             <div className="space-y-4">
@@ -256,9 +263,9 @@ function OTPContent() {
             {/* Submit Button */}
             <Button
               type="submit"
-              variant="primary"
+              variant="default"
               className="w-full"
-              isDisabled={isLoading || otp.join("").length !== 6}
+              disabled={isLoading || otp.join("").length !== 6}
             >
               {isLoading ? "Verifying..." : "Verify Code"}
             </Button>
@@ -275,7 +282,7 @@ function OTPContent() {
               variant="ghost"
               size="sm"
               className="text-primary hover:bg-primary/10"
-              isDisabled={isResending || timeLeft > 240} // Can resend after 1 minute
+              disabled={isResending || timeLeft > 240} // Can resend after 1 minute
             >
               {isResending ? (
                 <>
@@ -298,8 +305,8 @@ function OTPContent() {
               </Link>
             </div>
           </div>
-        </Card.Content>
-      </Card.Root>
+        </CardContent>
+      </Card>
     </div>
   );
 }
@@ -307,19 +314,19 @@ function OTPContent() {
 function OTPFallback() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <Card.Root className="w-full max-w-md">
-        <Card.Header className="text-center">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <RefreshCw className="w-12 h-12 text-primary animate-spin" />
           </div>
-          <Card.Title className="text-2xl font-bold">
+          <CardTitle className="text-2xl font-bold">
             Loading Verification
-          </Card.Title>
-          <Card.Description>
+          </CardTitle>
+          <CardDescription>
             Please wait while we prepare your OTP verification
-          </Card.Description>
-        </Card.Header>
-      </Card.Root>
+          </CardDescription>
+        </CardHeader>
+      </Card>
     </div>
   );
 }

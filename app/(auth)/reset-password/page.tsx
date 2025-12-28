@@ -3,7 +3,15 @@
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Button, Input, Card } from "@heroui/react";
+import { 
+  Button, 
+  Card, 
+  CardHeader, 
+  CardTitle, 
+  CardDescription, 
+  CardContent 
+} from "@/components/ui";
+import { Input } from "@/components/ui/input";
 import { getCurrentUser, resetPassword, signOut } from "@/lib/auth";
 import {
   Eye,
@@ -166,20 +174,20 @@ function ResetPasswordContent() {
   if (isSuccess) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background px-4">
-        <Card.Root className="w-full max-w-md">
-          <Card.Header className="text-center">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
               <CheckCircle className="w-16 h-16 text-success" />
             </div>
-            <Card.Title className="text-2xl font-bold">
+            <CardTitle className="text-2xl font-bold">
               Password Reset Complete
-            </Card.Title>
-            <Card.Description>
+            </CardTitle>
+            <CardDescription>
               Your password has been successfully updated
-            </Card.Description>
-          </Card.Header>
+            </CardDescription>
+          </CardHeader>
 
-          <Card.Content className="space-y-6">
+          <CardContent className="space-y-6">
             <div className="text-center space-y-4">
               <div className="bg-success-50 border border-success-200 p-4 rounded-lg">
                 <p className="text-sm text-success-700">
@@ -194,32 +202,32 @@ function ResetPasswordContent() {
             </div>
 
             <div className="space-y-3">
-              <Button asChild variant="primary" className="w-full">
+              <Button asChild variant="default" className="w-full">
                 <Link href="/login">Sign In Now</Link>
               </Button>
             </div>
-          </Card.Content>
-        </Card.Root>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <Card.Root className="w-full max-w-md">
-        <Card.Header className="text-center">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <Shield className="w-12 h-12 text-primary" />
           </div>
-          <Card.Title className="text-2xl font-bold">
+          <CardTitle className="text-2xl font-bold">
             Reset Your Password
-          </Card.Title>
-          <Card.Description>
+          </CardTitle>
+          <CardDescription>
             Create a new secure password for your RealEST account
-          </Card.Description>
-        </Card.Header>
+          </CardDescription>
+        </CardHeader>
 
-        <Card.Content className="space-y-6">
+        <CardContent className="space-y-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <label htmlFor="password" className="text-sm font-medium">
@@ -364,9 +372,9 @@ function ResetPasswordContent() {
 
             <Button
               type="submit"
-              variant="primary"
+              variant="default"
               className="w-full"
-              isDisabled={isLoading || !canSubmit}
+              disabled={isLoading || !canSubmit}
             >
               {isLoading ? "Updating Password..." : "Update Password"}
             </Button>
@@ -380,8 +388,8 @@ function ResetPasswordContent() {
               </Link>
             </div>
           </div>
-        </Card.Content>
-      </Card.Root>
+        </CardContent>
+      </Card>
     </div>
   );
 }
@@ -391,19 +399,19 @@ export default function ResetPasswordPage() {
     <Suspense
       fallback={
         <div className="min-h-screen flex items-center justify-center bg-background px-4">
-          <Card.Root className="w-full max-w-md">
-            <Card.Header className="text-center">
+          <Card className="w-full max-w-md">
+            <CardHeader className="text-center">
               <div className="flex justify-center mb-4">
                 <RefreshCw className="w-12 h-12 text-primary animate-spin" />
               </div>
-              <Card.Title className="text-2xl font-bold">
+              <CardTitle className="text-2xl font-bold">
                 Loading Reset Form
-              </Card.Title>
-              <Card.Description>
+              </CardTitle>
+              <CardDescription>
                 Please wait while we prepare your password reset form
-              </Card.Description>
-            </Card.Header>
-          </Card.Root>
+              </CardDescription>
+            </CardHeader>
+          </Card>
         </div>
       }
     >

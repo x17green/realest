@@ -2,7 +2,13 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Card, Chip, Button, Input } from "@heroui/react";
+import { Chip } from "@heroui/react";
+import { 
+  Card, 
+  Input,
+  CardContent,
+  Button
+} from "@/components/ui";
 import {
   Calendar,
   User,
@@ -265,7 +271,7 @@ export default function BlogPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
               {featuredPosts.map((post) => (
                 <Link key={post.id} href={`/blog/${post.slug}`}>
-                  <Card.Root className="group bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer overflow-hidden">
+                  <Card className="group bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer overflow-hidden">
                     {/* Featured Image */}
                     <div className="relative h-48 bg-muted rounded-t-2xl overflow-hidden">
                       <div className="absolute inset-0 bg-linear-to-br from-primary/20 via-accent/10 to-primary/30" />
@@ -280,7 +286,7 @@ export default function BlogPage() {
                       </div>
                     </div>
 
-                    <Card.Content className="p-6">
+                    <CardContent className="p-6">
                       <div className="flex flex-wrap gap-2 mb-3">
                         {post.tags.slice(0, 2).map((tag) => (
                           <Chip key={tag} variant="secondary" size="sm">
@@ -313,8 +319,8 @@ export default function BlogPage() {
                           <span>{post.views}</span>
                         </div>
                       </div>
-                    </Card.Content>
-                  </Card.Root>
+                    </CardContent>
+                  </Card>
                 </Link>
               ))}
             </div>
@@ -361,7 +367,7 @@ export default function BlogPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredPosts.map((post) => (
                 <Link key={post.id} href={`/blog/${post.slug}`}>
-                  <Card.Root className="group bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer overflow-hidden">
+                  <Card className="group bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer overflow-hidden">
                     {/* Post Image */}
                     <div className="relative h-48 bg-muted rounded-t-2xl overflow-hidden">
                       <div className="absolute inset-0 bg-linear-to-br from-primary/20 via-accent/10 to-primary/30" />
@@ -377,7 +383,7 @@ export default function BlogPage() {
                       )}
                     </div>
 
-                    <Card.Content className="p-6">
+                    <CardContent className="p-6">
                       <div className="flex flex-wrap gap-2 mb-3">
                         {post.tags.slice(0, 2).map((tag) => (
                           <Chip key={tag} variant="secondary" size="sm">
@@ -418,8 +424,8 @@ export default function BlogPage() {
                           <span>{post.readTime}m</span>
                         </div>
                       </div>
-                    </Card.Content>
-                  </Card.Root>
+                    </CardContent>
+                  </Card>
                 </Link>
               ))}
             </div>
@@ -442,7 +448,7 @@ export default function BlogPage() {
                 placeholder="Enter your email"
                 className="flex-1"
               />
-              <Button variant="primary">Subscribe</Button>
+              <Button variant="default">Subscribe</Button>
             </div>
           </div>
         </div>

@@ -3,7 +3,14 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Button, Card } from "@heroui/react";
+import { 
+  Button, 
+  Card, 
+  CardHeader, 
+  CardTitle, 
+  CardDescription, 
+  CardContent 
+} from "@/components/ui";
 import { CheckCircle, Mail } from "lucide-react";
 import { getCurrentUser, getUserProfile } from "@/lib/auth";
 
@@ -44,20 +51,20 @@ export default function SignUpSuccessPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <Card.Root className="w-full max-w-md">
-        <Card.Header className="text-center">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <CheckCircle className="w-16 h-16 text-success" />
           </div>
-          <Card.Title className="text-2xl font-bold">
+          <CardTitle className="text-2xl font-bold">
             Account Created!
-          </Card.Title>
-          <Card.Description>
+          </CardTitle>
+          <CardDescription>
             Welcome to RealEST - where every property is verified
-          </Card.Description>
-        </Card.Header>
+          </CardDescription>
+        </CardHeader>
 
-        <Card.Content className="space-y-6">
+        <CardContent className="space-y-6">
           <div className="text-center space-y-4">
             <div className="flex items-center justify-center gap-2 text-muted-foreground">
               <Mail className="w-4 h-4" />
@@ -80,7 +87,7 @@ export default function SignUpSuccessPage() {
           </div>
 
           <div className="space-y-3">
-            <Button asChild variant="primary" className="w-full">
+            <Button asChild variant="default" className="w-full">
               <Link href="/login">Go to Sign In</Link>
             </Button>
 
@@ -90,8 +97,8 @@ export default function SignUpSuccessPage() {
               </Link>
             </div>
           </div>
-        </Card.Content>
-      </Card.Root>
+        </CardContent>
+      </Card>
     </div>
   );
 }

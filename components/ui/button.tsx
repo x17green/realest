@@ -17,7 +17,7 @@ const buttonVariants = cva(
         secondary:
           'bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/90 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-sm',
         ghost:
-          'hover:bg-accent hover:text-accent-foreground hover:shadow-sm rounded-md',
+          'hover:bg-accent hover:text-accent-foreground hover:shadow-sm rounded-lg',
         link: 'text-primary underline-offset-4 hover:underline font-medium',
         violet: 'bg-brand-dark text-brand-light shadow-sm hover:bg-brand-dark/90 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-sm',
         neon: 'bg-brand-accent text-brand-dark shadow-sm hover:bg-brand-accent/90 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-sm font-semibold',

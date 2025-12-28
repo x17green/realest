@@ -15,6 +15,7 @@ export { Form } from './form'
 export { Field } from './field'
 export { Label } from './label'
 export { InputGroup } from './input-group'
+export { Input } from './input'
 
 // ============================================================================
 // LAYOUT & CONTAINER COMPONENTS

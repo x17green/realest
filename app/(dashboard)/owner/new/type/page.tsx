@@ -2,7 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Card, Button, Chip } from "@heroui/react";
+import { Chip } from "@heroui/react";
+import { 
+  Card, 
+  CardContent,
+  Button,
+  StatusBadge, 
+} from "@/components/ui";
 import {
   ArrowLeft,
   Home,
@@ -88,7 +94,7 @@ export default function PropertyTypeStep() {
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
               <Link href="/owner/new">
-                <Button variant="ghost" size="sm" isIconOnly>
+                <Button variant="ghost" size="sm">
                   <ArrowLeft className="w-4 h-4" />
                 </Button>
               </Link>
@@ -109,7 +115,7 @@ export default function PropertyTypeStep() {
           {/* Property Types Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             {propertyTypes.map((type) => (
-              <Card.Root
+              <Card
                 key={type.id}
                 className={`cursor-pointer transition-all duration-200 hover:shadow-lg ${
                   selectedType === type.id
@@ -118,45 +124,49 @@ export default function PropertyTypeStep() {
                 }`}
                 onClick={() => setSelectedType(type.id)}
               >
-                <Card.Content className="p-6">
-                  <div className="flex items-start gap-4">
-                    <div
-                      className={`w-12 h-12 rounded-lg flex items-center justify-center shrink-0 ${
-                        selectedType === type.id
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-primary/10 text-primary"
-                      }`}
-                    >
-                      {type.icon}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <h3 className="text-lg font-semibold">{type.name}</h3>
-                        {type.popular && (
-                          <Chip variant="secondary" size="sm">
-                            <Star className="w-3 h-3 mr-1" />
+                <CardContent className="p-4">
+                  <div className="items-start">
+                    {type.popular && (
+                      <div className="flex relative left-4 -top-4 justify-end mx-4">
+                          <StatusBadge variant="popular">
                             Popular
-                          </Chip>
-                        )}
-                        {selectedType === type.id && (
-                          <CheckCircle className="w-5 h-5 text-primary" />
-                        )}
+                          </StatusBadge>
                       </div>
-                      <p className="text-muted-foreground mb-4">
-                        {type.description}
-                      </p>
-                      <div className="space-y-2">
-                        {type.features.map((feature, index) => (
-                          <div key={index} className="flex items-center gap-2 text-sm">
-                            <div className="w-1.5 h-1.5 bg-primary rounded-full" />
-                            <span>{feature}</span>
-                          </div>
-                        ))}
+                    )}
+                    <div className={`flex justify-between ${type.popular ? "-mt-10" : "" } items-start gap-4`}>
+                      <div
+                        className={`w-12 h-12 rounded-lg flex items-center justify-center shrink-0 ${
+                          selectedType === type.id
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-primary/10 text-primary"
+                        }`}
+                      >
+                        {type.icon}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <h3 className="text-lg font-semibold">{type.name}</h3>
+                          
+                          {selectedType === type.id && (
+                            <CheckCircle className="w-5 h-5 text-primary" />
+                          )}
+                        </div>
+                        <p className="text-muted-foreground mb-4">
+                          {type.description}
+                        </p>
+                        <div className="space-y-2">
+                          {type.features.map((feature, index) => (
+                            <div key={index} className="flex items-center gap-2 text-sm">
+                              <div className="w-1.5 h-1.5 bg-primary rounded-full" />
+                              <span>{feature}</span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </Card.Content>
-              </Card.Root>
+                </CardContent>
+              </Card>
             ))}
           </div>
 
@@ -170,8 +180,8 @@ export default function PropertyTypeStep() {
             </Link>
             <Link href={`/owner/new/details?type=${selectedType}`}>
               <Button
-                variant="primary"
-                isDisabled={!selectedType}
+                variant="default"
+                disabled={!selectedType}
               >
                 Continue to Details
               </Button>

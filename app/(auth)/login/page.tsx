@@ -3,7 +3,15 @@
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Button, Input, Card } from "@heroui/react";
+import { 
+  Button, 
+  Card, 
+  CardHeader, 
+  CardTitle, 
+  CardDescription, 
+  CardContent 
+} from "@/components/ui";
+import { Input } from "@/components/ui/input";
 import {
   signInWithPassword,
   getUserProfile,
@@ -92,13 +100,12 @@ function LoginForm() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <Card.Root className="w-full max-w-md">
-        <Card.Header className="text-center">
-          <Card.Title className="text-2xl font-bold">Welcome Back</Card.Title>
-          <Card.Description>Sign in to your RealEST account</Card.Description>
-        </Card.Header>
-
-        <Card.Content className="space-y-6">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
+          <CardDescription>Sign in to your RealEST account</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium">
@@ -164,9 +171,9 @@ function LoginForm() {
 
             <Button
               type="submit"
-              variant="primary"
+              variant="default"
               className="w-full"
-              isDisabled={isLoading}
+              disabled={isLoading}
             >
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>
@@ -185,8 +192,8 @@ function LoginForm() {
               </Link>
             </div>
           </div>
-        </Card.Content>
-      </Card.Root>
+        </CardContent>
+      </Card>
     </div>
   );
 }
@@ -194,15 +201,15 @@ function LoginForm() {
 function LoginPageFallback() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <Card.Root className="w-full max-w-md">
-        <Card.Header className="text-center">
-          <Card.Title className="text-2xl font-bold">Welcome Back</Card.Title>
-          <Card.Description>Sign in to your RealEST account</Card.Description>
-        </Card.Header>
-        <Card.Content className="flex items-center justify-center py-8">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
+          <CardDescription>Sign in to your RealEST account</CardDescription>
+        </CardHeader>
+        <CardContent className="flex items-center justify-center py-8">
           <div className="text-muted-foreground">Loading...</div>
-        </Card.Content>
-      </Card.Root>
+        </CardContent>
+      </Card>
     </div>
   );
 }

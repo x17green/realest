@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Card, Button, Chip } from "@heroui/react";
+import { Chip } from "@heroui/react";
+import { 
+  Card, 
+  CardContent,
+  Button, 
+} from "@/components/ui";
 import {
   ArrowLeft,
   Home,
@@ -120,7 +125,7 @@ export default function NewListingPage() {
         <div className="relative z-10 container mx-auto px-4">
           <div className="flex items-center gap-4 mb-8">
             <Link href="/owner/listings">
-              <Button variant="ghost" size="sm" isIconOnly>
+              <Button variant="ghost" size="sm">
                 <ArrowLeft className="w-4 h-4" />
               </Button>
             </Link>
@@ -172,7 +177,7 @@ export default function NewListingPage() {
                     </div>
                   </div>
                   {index < steps.length - 1 && (
-                    <div className="flex-1 h-px bg-border mx-4 mt-[-24px]" />
+                    <div className="flex-1 h-px bg-border mx-4 -mt-6" />
                   )}
                 </div>
               ))}
@@ -183,8 +188,8 @@ export default function NewListingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-2">
-              <Card.Root className="bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl shadow-lg">
-                <Card.Content className="p-8">
+              <Card className="bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl shadow-lg">
+                <CardContent className="p-8">
                   <div className="text-center mb-8">
                     <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                       {steps[currentStep].icon}
@@ -202,11 +207,11 @@ export default function NewListingPage() {
                     <div className="space-y-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {propertyTypes.map((type) => (
-                          <Card.Root
+                          <Card
                             key={type.id}
                             className="cursor-pointer border-2 border-transparent hover:border-primary/50 transition-colors"
                           >
-                            <Card.Content className="p-6 text-center">
+                            <CardContent className="p-6 text-center">
                               <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
                                 {type.icon}
                               </div>
@@ -221,17 +226,17 @@ export default function NewListingPage() {
                                   Popular
                                 </Chip>
                               )}
-                            </Card.Content>
-                          </Card.Root>
+                            </CardContent>
+                          </Card>
                         ))}
                       </div>
 
                       <div className="flex justify-between pt-6">
-                        <Button variant="ghost" isDisabled>
+                        <Button variant="ghost" disabled>
                           Previous
                         </Button>
                         <Link href="/owner/new/type">
-                          <Button variant="primary">Continue</Button>
+                          <Button variant="default">Continue</Button>
                         </Link>
                       </div>
                     </div>
@@ -245,21 +250,21 @@ export default function NewListingPage() {
                         to proceed.
                       </p>
                       <Link href={`/owner/new/${steps[currentStep].id}`}>
-                        <Button variant="primary">
+                        <Button variant="default">
                           Go to {steps[currentStep].title}
                         </Button>
                       </Link>
                     </div>
                   )}
-                </Card.Content>
-              </Card.Root>
+                </CardContent>
+              </Card>
             </div>
 
             {/* Sidebar */}
             <div className="space-y-6">
               {/* Tips */}
-              <Card.Root className="bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl shadow-lg">
-                <Card.Content className="p-6">
+              <Card className="bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl shadow-lg">
+                <CardContent className="p-6">
                   <h3 className="font-semibold mb-4">💡 Pro Tips</h3>
                   <ul className="space-y-3 text-sm text-muted-foreground">
                     <li>• Take high-quality photos in natural lighting</li>
@@ -270,12 +275,12 @@ export default function NewListingPage() {
                     </li>
                     <li>• Respond quickly to inquiries to build trust</li>
                   </ul>
-                </Card.Content>
-              </Card.Root>
+                </CardContent>
+              </Card>
 
               {/* Quick Actions */}
-              <Card.Root className="bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl shadow-lg">
-                <Card.Content className="p-6">
+              <Card className="bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl shadow-lg">
+                <CardContent className="p-6">
                   <h3 className="font-semibold mb-4">Quick Actions</h3>
                   <div className="space-y-3">
                     <Link href="/owner/listings">
@@ -291,12 +296,12 @@ export default function NewListingPage() {
                       </Button>
                     </Link>
                   </div>
-                </Card.Content>
-              </Card.Root>
+                </CardContent>
+              </Card>
 
               {/* Support */}
-              <Card.Root className="bg-primary/5 border border-primary/20 rounded-2xl shadow-lg">
-                <Card.Content className="p-6">
+              <Card className="bg-primary/5 border border-primary/20 rounded-2xl shadow-lg">
+                <CardContent className="p-6">
                   <h3 className="font-semibold mb-4">Need Help?</h3>
                   <p className="text-sm text-muted-foreground mb-4">
                     Our support team is here to help you create the perfect
@@ -305,8 +310,8 @@ export default function NewListingPage() {
                   <Button variant="secondary" className="w-full">
                     Contact Support
                   </Button>
-                </Card.Content>
-              </Card.Root>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>

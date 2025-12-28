@@ -4,7 +4,15 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { Card, Button, Chip, Avatar, Separator } from "@heroui/react";
+import { Chip, Avatar } from "@heroui/react"
+import { 
+  Card, 
+  CardContent,
+  CardDescription,
+  CardTitle,
+  CardHeader,
+  Button
+} from "@/components/ui";
 import {
   Heart,
   Search,
@@ -251,27 +259,27 @@ export default function UserDashboardPage() {
     return (
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8">
-          <Card.Root className="max-w-2xl mx-auto">
-            <Card.Content className="py-12 text-center">
+          <Card className="max-w-2xl mx-auto">
+            <CardContent className="py-12 text-center">
               <AlertCircle className="w-16 h-16 text-danger mx-auto mb-6" />
               <h1 className="text-2xl font-bold mb-4">Authentication Error</h1>
               <p className="text-muted-foreground mb-8">{authError}</p>
               <div className="flex gap-4 justify-center">
                 <Button
-                  variant="primary"
-                  onPress={() => router.push("/login?redirect=/profile")}
+                  variant="default"
+                  onClick={() => router.push("/login?redirect=/profile")}
                 >
                   Sign In
                 </Button>
                 <Button
                   variant="secondary"
-                  onPress={() => window.location.reload()}
+                  onClick={() => window.location.reload()}
                 >
                   Try Again
                 </Button>
               </div>
-            </Card.Content>
-          </Card.Root>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
@@ -288,7 +296,7 @@ export default function UserDashboardPage() {
               Track your property searches and saved listings.
             </p>
           </div>
-          <Button asChild variant="primary">
+          <Button asChild variant="default">
             <Link href="/search">
               <Search className="w-4 h-4 mr-2" />
               Search Properties
@@ -298,8 +306,8 @@ export default function UserDashboardPage() {
 
         {/* Profile Card */}
         {userProfile && (
-          <Card.Root className="mb-8">
-            <Card.Content className="p-6">
+          <Card className="mb-8">
+            <CardContent className="p-6">
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-4">
                   <Avatar.Root size="lg">
@@ -330,14 +338,14 @@ export default function UserDashboardPage() {
                   <Link href={`/profile/${userProfile.id}`}>Edit Profile</Link>
                 </Button>
               </div>
-            </Card.Content>
-          </Card.Root>
+            </CardContent>
+          </Card>
         )}
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card.Root>
-            <Card.Content className="p-6">
+          <Card>
+            <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">
@@ -349,11 +357,11 @@ export default function UserDashboardPage() {
                 </div>
                 <Heart className="w-8 h-8 text-danger" />
               </div>
-            </Card.Content>
-          </Card.Root>
+            </CardContent>
+          </Card>
 
-          <Card.Root>
-            <Card.Content className="p-6">
+          <Card>
+            <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">
@@ -365,11 +373,11 @@ export default function UserDashboardPage() {
                 </div>
                 <Search className="w-8 h-8 text-primary" />
               </div>
-            </Card.Content>
-          </Card.Root>
+            </CardContent>
+          </Card>
 
-          <Card.Root>
-            <Card.Content className="p-6">
+          <Card>
+            <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">
@@ -381,11 +389,11 @@ export default function UserDashboardPage() {
                 </div>
                 <MessageSquare className="w-8 h-8 text-warning" />
               </div>
-            </Card.Content>
-          </Card.Root>
+            </CardContent>
+          </Card>
 
-          <Card.Root>
-            <Card.Content className="p-6">
+          <Card>
+            <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">
@@ -397,8 +405,8 @@ export default function UserDashboardPage() {
                 </div>
                 <Eye className="w-8 h-8 text-info" />
               </div>
-            </Card.Content>
-          </Card.Root>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Main Content */}
@@ -406,8 +414,8 @@ export default function UserDashboardPage() {
           {/* Tab Navigation */}
           <div className="flex gap-2 border-b border-border">
             <Button
-              variant={activeTab === "saved" ? "primary" : "ghost"}
-              onPress={() => setActiveTab("saved")}
+              variant={activeTab === "saved" ? "default" : "ghost"}
+              onClick={() => setActiveTab("saved")}
               className={
                 activeTab === "saved"
                   ? "border-b-2 border-primary rounded-b-none"
@@ -418,8 +426,8 @@ export default function UserDashboardPage() {
               Saved Properties
             </Button>
             <Button
-              variant={activeTab === "searches" ? "primary" : "ghost"}
-              onPress={() => setActiveTab("searches")}
+              variant={activeTab === "searches" ? "default" : "ghost"}
+              onClick={() => setActiveTab("searches")}
               className={
                 activeTab === "searches"
                   ? "border-b-2 border-primary rounded-b-none"
@@ -430,8 +438,8 @@ export default function UserDashboardPage() {
               Recent Searches
             </Button>
             <Button
-              variant={activeTab === "inquiries" ? "primary" : "ghost"}
-              onPress={() => setActiveTab("inquiries")}
+              variant={activeTab === "inquiries" ? "default" : "ghost"}
+              onClick={() => setActiveTab("inquiries")}
               className={
                 activeTab === "inquiries"
                   ? "border-b-2 border-primary rounded-b-none"
@@ -446,24 +454,24 @@ export default function UserDashboardPage() {
           {/* Saved Properties Tab */}
           {activeTab === "saved" && (
             <div className="space-y-6">
-              <Card.Root>
-                <Card.Header>
-                  <Card.Title className="flex items-center gap-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
                     <Heart className="w-5 h-5" />
                     Saved Properties
-                  </Card.Title>
-                  <Card.Description>
+                  </CardTitle>
+                  <CardDescription>
                     Properties you've saved for later
-                  </Card.Description>
-                </Card.Header>
-                <Card.Content>
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
                   {savedProperties.length === 0 ? (
                     <div className="text-center py-8">
                       <Heart className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                       <p className="text-muted-foreground mb-4">
                         No saved properties yet
                       </p>
-                      <Button asChild variant="primary" size="sm">
+                      <Button asChild variant="default" size="sm">
                         <Link href="/search">Start Searching</Link>
                       </Button>
                     </div>
@@ -519,32 +527,32 @@ export default function UserDashboardPage() {
                       </div>
                     </div>
                   )}
-                </Card.Content>
-              </Card.Root>
+                </CardContent>
+              </Card>
             </div>
           )}
 
           {/* Recent Searches Tab */}
           {activeTab === "searches" && (
             <div className="space-y-6">
-              <Card.Root>
-                <Card.Header>
-                  <Card.Title className="flex items-center gap-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
                     <Search className="w-5 h-5" />
                     Recent Searches
-                  </Card.Title>
-                  <Card.Description>
+                  </CardTitle>
+                  <CardDescription>
                     Your recent property searches
-                  </Card.Description>
-                </Card.Header>
-                <Card.Content>
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
                   {recentSearches.length === 0 ? (
                     <div className="text-center py-8">
                       <Search className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                       <p className="text-muted-foreground mb-4">
                         No recent searches
                       </p>
-                      <Button asChild variant="primary" size="sm">
+                      <Button asChild variant="default" size="sm">
                         <Link href="/search">Start Searching</Link>
                       </Button>
                     </div>
@@ -575,25 +583,25 @@ export default function UserDashboardPage() {
                       ))}
                     </div>
                   )}
-                </Card.Content>
-              </Card.Root>
+                </CardContent>
+              </Card>
             </div>
           )}
 
           {/* Inquiries Tab */}
           {activeTab === "inquiries" && (
             <div className="space-y-6">
-              <Card.Root>
-                <Card.Header>
-                  <Card.Title className="flex items-center gap-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
                     <MessageSquare className="w-5 h-5" />
                     My Inquiries
-                  </Card.Title>
-                  <Card.Description>
+                  </CardTitle>
+                  <CardDescription>
                     Messages you've sent to property owners
-                  </Card.Description>
-                </Card.Header>
-                <Card.Content>
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
                   {sentInquiries.length === 0 ? (
                     <div className="text-center py-8">
                       <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
@@ -652,7 +660,7 @@ export default function UserDashboardPage() {
                               </Link>
                             </Button>
                             {inquiry.status === "responded" && (
-                              <Button variant="primary" size="sm">
+                              <Button variant="default" size="sm">
                                 Reply
                               </Button>
                             )}
@@ -661,25 +669,25 @@ export default function UserDashboardPage() {
                       ))}
                     </div>
                   )}
-                </Card.Content>
-              </Card.Root>
+                </CardContent>
+              </Card>
             </div>
           )}
         </div>
 
         {/* Favorite Locations */}
         {stats?.favoriteLocations && stats.favoriteLocations.length > 0 && (
-          <Card.Root className="mt-8">
-            <Card.Header>
-              <Card.Title className="flex items-center gap-2">
+          <Card className="mt-8">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
                 <MapPin className="w-5 h-5" />
                 Favorite Locations
-              </Card.Title>
-              <Card.Description>
+              </CardTitle>
+              <CardDescription>
                 Locations you search most frequently
-              </Card.Description>
-            </Card.Header>
-            <Card.Content>
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
               <div className="flex flex-wrap gap-2">
                 {stats.favoriteLocations.map((location, index) => (
                   <Button key={index} asChild variant="secondary" size="sm">
@@ -692,8 +700,8 @@ export default function UserDashboardPage() {
                   </Button>
                 ))}
               </div>
-            </Card.Content>
-          </Card.Root>
+            </CardContent>
+          </Card>
         )}
       </div>
     </div>

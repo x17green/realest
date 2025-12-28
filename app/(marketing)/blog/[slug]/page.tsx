@@ -3,7 +3,13 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { Card, Chip, Button } from "@heroui/react";
+import { Chip } from "@heroui/react";
+import { 
+  Card, 
+  Input,
+  CardContent,
+  Button
+} from "@/components/ui";
 import {
   Calendar,
   User,
@@ -55,16 +61,16 @@ export default function BlogPostPage() {
           content: `
             <h2>The Rise of Smart Homes</h2>
             <p>Nigeria's real estate market is undergoing a digital transformation. Smart home technology is becoming increasingly accessible, with features like automated security systems, energy-efficient appliances, and remote monitoring becoming standard in new developments.</p>
-
+            <br>
             <h2>Sustainable Living</h2>
             <p>Environmental consciousness is growing among Nigerian property owners. Green building practices, solar power integration, and water conservation systems are becoming more prevalent in both residential and commercial properties.</p>
-
+            <br>
             <h2>Urban Regeneration</h2>
             <p>Cities across Nigeria are investing in urban regeneration projects, transforming older neighborhoods into modern, livable spaces. This trend is creating new opportunities for property investors and developers.</p>
-
+            <br>
             <h2>Flexible Workspaces</h2>
             <p>The rise of remote work has led to increased demand for co-working spaces and home offices. Properties that can accommodate flexible work arrangements are seeing higher demand and rental yields.</p>
-
+            <br>
             <h2>RealEST's Role</h2>
             <p>At RealEST, we're committed to staying ahead of these trends. Our platform incorporates advanced verification technologies, supports sustainable property listings, and provides tools for flexible workspace management.</p>
           `,
@@ -261,8 +267,8 @@ export default function BlogPostPage() {
           </div>
 
           {/* Author Bio */}
-          <Card.Root className="mb-12">
-            <Card.Content className="p-6">
+          <Card className="mb-12">
+            <CardContent className="p-6">
               <div className="flex items-start gap-4">
                 <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
                   <User className="w-8 h-8 text-primary" />
@@ -277,8 +283,8 @@ export default function BlogPostPage() {
                   </Button>
                 </div>
               </div>
-            </Card.Content>
-          </Card.Root>
+            </CardContent>
+          </Card>
 
           {/* Related Posts */}
           {relatedPosts.length > 0 && (
@@ -287,8 +293,8 @@ export default function BlogPostPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {relatedPosts.map((relatedPost) => (
                   <Link key={relatedPost.id} href={`/blog/${relatedPost.slug}`}>
-                    <Card.Root className="group bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer">
-                      <Card.Content className="p-6">
+                    <Card className="group bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer">
+                      <CardContent className="p-6">
                         <div className="flex flex-wrap gap-2 mb-3">
                           {relatedPost.tags.slice(0, 2).map((tag) => (
                             <Chip key={tag} variant="secondary" size="sm">
@@ -306,8 +312,8 @@ export default function BlogPostPage() {
                           <span>{relatedPost.readTime} min read</span>
                           <span>{relatedPost.views} views</span>
                         </div>
-                      </Card.Content>
-                    </Card.Root>
+                      </CardContent>
+                    </Card>
                   </Link>
                 ))}
               </div>

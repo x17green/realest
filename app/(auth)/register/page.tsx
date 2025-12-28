@@ -3,7 +3,15 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Button, Input, Card } from "@heroui/react";
+import { 
+  Button, 
+  Card, 
+  CardHeader, 
+  CardTitle, 
+  CardDescription, 
+  CardContent 
+} from "@/components/ui";
+import { Input } from "@/components/ui/input";
 import { signUpWithPassword } from "@/lib/auth";
 import {
   Eye,
@@ -79,15 +87,15 @@ export default function SignUpPage() {
   if (step === 1) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background px-4">
-        <Card.Root className="w-full max-w-md">
-          <Card.Header className="text-center">
-            <Card.Title className="text-2xl font-bold">Join RealEST</Card.Title>
-            <Card.Description>
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl font-bold">Join RealEST</CardTitle>
+            <CardDescription>
               Choose your account type to get started
-            </Card.Description>
-          </Card.Header>
+            </CardDescription>
+          </CardHeader>
 
-          <Card.Content className="space-y-6">
+          <CardContent className="space-y-6">
             <div className="space-y-4">
               <button
                 onClick={() => handleRoleSelect("user")}
@@ -143,23 +151,23 @@ export default function SignUpPage() {
                 </Link>
               </div>
             </div>
-          </Card.Content>
-        </Card.Root>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <Card.Root className="w-full max-w-md">
-        <Card.Header className="text-center">
-          <Card.Title className="text-2xl font-bold">Create Account</Card.Title>
-          <Card.Description>
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-bold">Create Account</CardTitle>
+          <CardDescription>
             Fill in your details to complete registration
-          </Card.Description>
-        </Card.Header>
+          </CardDescription>
+        </CardHeader>
 
-        <Card.Content className="space-y-6">
+        <CardContent className="space-y-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium">
@@ -239,17 +247,17 @@ export default function SignUpPage() {
             <div className="flex gap-2">
               <Button
                 type="button"
-                variant="tertiary"
-                onPress={handleBack}
+                variant="outline"
+                onClick={handleBack}
                 className="flex-1"
               >
                 Back
               </Button>
               <Button
                 type="submit"
-                variant="primary"
+                variant="default"
                 className="flex-1"
-                isDisabled={isLoading}
+                disabled={isLoading}
               >
                 {isLoading ? "Creating Account..." : "Create Account"}
               </Button>
@@ -264,8 +272,8 @@ export default function SignUpPage() {
               </Link>
             </div>
           </div>
-        </Card.Content>
-      </Card.Root>
+        </CardContent>
+      </Card>
     </div>
   );
 }

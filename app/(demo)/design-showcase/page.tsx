@@ -377,6 +377,7 @@ export default function DesignShowcasePage() {
                   <StatusBadge variant="featured" className="animate-pulse">
                     Premium
                   </StatusBadge>
+                  <StatusBadge variant="popular">Popular</StatusBadge>
                 </div>
               </div>
 

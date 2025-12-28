@@ -3,7 +3,14 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Card, Button, Spinner } from "@heroui/react";
+import { 
+  Card, 
+  CardHeader,
+  CardContent,
+  CardTitle,
+  Button, 
+  Spinner 
+} from "@/components/ui";
 import { createClient } from "@/lib/supabase/client";
 import { BarChart3, Home, MessageSquare, TrendingUp, Eye, Plus } from "lucide-react";
 
@@ -179,11 +186,11 @@ export default function AgentDashboardPage() {
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Card.Root className="w-full max-w-md">
-          <Card.Content className="py-8">
+        <Card className="w-full max-w-md">
+          <CardContent className="py-8">
             <p className="text-center text-red-500">{error}</p>
-          </Card.Content>
-        </Card.Root>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -191,17 +198,17 @@ export default function AgentDashboardPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-primary-dark text-white">
+      <div className="bg-primary-dark">
         <div className="container mx-auto px-4 py-8">
           <div className="flex items-start justify-between">
             <div>
               <h1 className="text-4xl font-bold mb-2">Welcome, {agent?.full_name}!</h1>
-              <p className="text-blue-100">
+              <p className="text-accent text-lg">
                 {agent?.agency_name} • License: {agent?.license_number}
               </p>
             </div>
             <Link href="/agent/list-property">
-              <Button className="bg-primary-accent text-black font-semibold">
+              <Button variant="accent" className="font-semibold">
                 <Plus className="w-5 h-5" />
                 List Property
               </Button>
@@ -216,8 +223,8 @@ export default function AgentDashboardPage() {
         {stats && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {/* Total Properties */}
-            <Card.Root className="rounded-xl shadow-md">
-              <Card.Content className="py-6">
+            <Card className="rounded-xl shadow-md">
+              <CardContent className="py-6">
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-muted-foreground text-sm font-medium">
@@ -230,14 +237,12 @@ export default function AgentDashboardPage() {
                   </div>
                   <Home className="w-10 h-10 text-primary-accent opacity-50" />
                 </div>
-              </Card.Content>
-            </Card.Root>
-
-
+              </CardContent>
+            </Card>
 
             {/* Inquiries */}
-            <Card.Root className="rounded-xl shadow-md">
-              <Card.Content className="py-6">
+            <Card className="rounded-xl shadow-md">
+              <CardContent className="py-6">
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-muted-foreground text-sm font-medium">
@@ -250,12 +255,12 @@ export default function AgentDashboardPage() {
                   </div>
                   <MessageSquare className="w-10 h-10 text-primary-accent opacity-50" />
                 </div>
-              </Card.Content>
-            </Card.Root>
+              </CardContent>
+            </Card>
 
             {/* Response Time */}
-            <Card.Root className="rounded-xl shadow-md">
-              <Card.Content className="py-6">
+            <Card className="rounded-xl shadow-md">
+              <CardContent className="py-6">
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-muted-foreground text-sm font-medium">
@@ -268,8 +273,8 @@ export default function AgentDashboardPage() {
                   </div>
                   <TrendingUp className="w-10 h-10 text-primary-accent opacity-50" />
                 </div>
-              </Card.Content>
-            </Card.Root>
+              </CardContent>
+            </Card>
           </div>
         )}
 
@@ -285,8 +290,8 @@ export default function AgentDashboardPage() {
           </div>
 
           {/* Properties Section */}
-          <Card.Root className="rounded-xl shadow-md">
-            <Card.Content className="py-6">
+          <Card className="rounded-xl shadow-md">
+            <CardContent className="py-6">
               {recentProperties.length === 0 ? (
                 <div className="text-center py-12">
                   <Home className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
@@ -294,7 +299,7 @@ export default function AgentDashboardPage() {
                     No properties listed yet
                   </p>
                   <Link href="/agent/list-property">
-                    <Button className="bg-primary-accent text-black">
+                    <Button variant="outline">
                       List Your First Property
                     </Button>
                   </Link>
@@ -325,7 +330,7 @@ export default function AgentDashboardPage() {
                               Edit
                             </Button>
                           </Link>
-                          <Button size="sm" variant="danger">
+                          <Button size="sm" variant="destructive">
                             Delete
                           </Button>
                         </div>
@@ -334,35 +339,35 @@ export default function AgentDashboardPage() {
                   ))}
                 </div>
               )}
-            </Card.Content>
-          </Card.Root>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Quick Actions */}
-        <Card.Root className="rounded-xl shadow-md">
-          <Card.Header>
-            <Card.Title>Quick Actions</Card.Title>
-          </Card.Header>
-          <Card.Content className="py-6">
+        <Card className="rounded-xl shadow-md">
+          <CardHeader>
+            <CardTitle>Quick Actions</CardTitle>
+          </CardHeader>
+          <CardContent className="py-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Link href="/agent/list-property" className="block">
-                <Button className="w-full bg-primary-accent text-black font-semibold">
+                <Button variant="default" className="w-full font-semibold">
                   List New Property
                 </Button>
               </Link>
               <Link href="/agent/properties" className="block">
-                <Button className="w-full bg-primary-dark text-white font-semibold">
+                <Button variant="ghost" className="w-full font-semibold">
                   View All Properties
                 </Button>
               </Link>
               <Link href="/agent/profile" className="block">
-                <Button className="w-full variant-secondary font-semibold">
+                <Button variant="secondary" className="w-full variant-secondary font-semibold">
                   Edit Profile
                 </Button>
               </Link>
             </div>
-          </Card.Content>
-        </Card.Root>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

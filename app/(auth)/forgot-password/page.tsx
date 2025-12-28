@@ -2,7 +2,15 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Button, Input, Card } from "@heroui/react";
+import { 
+  Button, 
+  Card, 
+  CardHeader, 
+  CardTitle, 
+  CardDescription, 
+  CardContent 
+} from "@/components/ui";
+import { Input } from "@/components/ui/input";
 import { sendHybridPasswordReset } from "@/lib/auth";
 import { Mail, ArrowLeft, CheckCircle } from "lucide-react";
 
@@ -36,20 +44,20 @@ export default function ForgotPasswordPage() {
   if (isSuccess) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background px-4">
-        <Card.Root className="w-full max-w-md">
-          <Card.Header className="text-center">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
               <CheckCircle className="w-16 h-16 text-success" />
             </div>
-            <Card.Title className="text-2xl font-bold">
+            <CardTitle className="text-2xl font-bold">
               Check Your Email
-            </Card.Title>
-            <Card.Description>
+            </CardTitle>
+            <CardDescription>
               We've sent you password reset options
-            </Card.Description>
-          </Card.Header>
+            </CardDescription>
+          </CardHeader>
 
-          <Card.Content className="space-y-6">
+          <CardContent className="space-y-6">
             <div className="text-center space-y-4">
               <div className="flex items-center justify-center gap-2 text-muted-foreground">
                 <Mail className="w-4 h-4" />
@@ -75,7 +83,7 @@ export default function ForgotPasswordPage() {
             </div>
 
             <div className="space-y-3">
-              <Button asChild variant="primary" className="w-full">
+              <Button asChild variant="default" className="w-full">
                 <Link href="/login">Back to Sign In</Link>
               </Button>
 
@@ -89,26 +97,25 @@ export default function ForgotPasswordPage() {
                 Try a different email address
               </button>
             </div>
-          </Card.Content>
-        </Card.Root>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <Card.Root className="w-full max-w-md">
-        <Card.Header className="text-center">
-          <Card.Title className="text-2xl font-bold">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-bold">
             Forgot Password?
-          </Card.Title>
-          <Card.Description>
+          </CardTitle>
+          <CardDescription>
             Enter your email address and we'll send you secure password reset
             options
-          </Card.Description>
-        </Card.Header>
-
-        <Card.Content className="space-y-6">
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium">
@@ -139,9 +146,9 @@ export default function ForgotPasswordPage() {
 
             <Button
               type="submit"
-              variant="primary"
+              variant="default"
               className="w-full"
-              isDisabled={isLoading || !email.trim()}
+              disabled={isLoading || !email.trim()}
             >
               {isLoading ? "Sending Reset Options..." : "Send Reset Options"}
             </Button>
@@ -162,8 +169,8 @@ export default function ForgotPasswordPage() {
               </Link>
             </div>
           </div>
-        </Card.Content>
-      </Card.Root>
+        </CardContent>
+      </Card>
     </div>
   );
 }
