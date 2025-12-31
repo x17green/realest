@@ -74,7 +74,7 @@ export default function Footer() {
               />
               <Button 
                 variant="default"
-                className="cursor-pointer"
+                className="cursor-pointer rounded-md"
               >
                 Subscribe
               </Button>
@@ -89,7 +89,9 @@ export default function Footer() {
           {/* Brand Section */}
           <div className="lg:col-span-2">
             <Link href="/" className="mb-4 inline-block">
-              <FooterLogo />
+              <FooterLogo 
+              hideTagline={true}
+              />
             </Link>
             <p className="text-muted-foreground mb-6 leading-relaxed">
               The most trusted platform for verified property listings. No

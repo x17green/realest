@@ -3,8 +3,17 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Button, Input, Card, TextArea, Checkbox } from "@heroui/react";
+import { Avatar, Chip } from "@heroui/react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader, CardTitle,
+  Button, Input,
+  Textarea,
+} from "@/components/ui";
 import { createClient } from "@/lib/supabase/client";
+import { createServiceClient } from "@/lib/supabase/service";
 import { Upload, AlertCircle, CheckCircle } from "lucide-react";
 
 export default function AgentOnboardingPage() {
@@ -94,24 +103,47 @@ export default function AgentOnboardingPage() {
   const handleProfilePhotoUpload = async (): Promise<string | null> => {
     if (!formData.profilePhoto || !userId) return null;
 
-    const supabase = createClient();
-    const fileExt = formData.profilePhoto.name.split(".").pop();
-    const fileName = `${userId}-${Date.now()}.${fileExt}`;
+    try {
+      // Get signed URL from API
+      const response = await fetch('/api/upload/signed-url', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          file_name: formData.profilePhoto.name,
+          file_type: formData.profilePhoto.type,
+          file_size: formData.profilePhoto.size,
+          bucket: 'avatars',
+        }),
+      });
 
-    const { data, error: uploadError } = await supabase.storage
-      .from("agent-profiles")
-      .upload(fileName, formData.profilePhoto);
+      if (!response.ok) {
+        console.error('Failed to get signed URL');
+        return null;
+      }
 
-    if (uploadError) {
-      console.error("Upload error:", uploadError);
+      const { signed_url, public_url } = await response.json();
+
+      // Upload file to signed URL
+      const uploadResponse = await fetch(signed_url, {
+        method: 'PUT',
+        body: formData.profilePhoto,
+        headers: {
+          'Content-Type': formData.profilePhoto.type,
+        },
+      });
+
+      if (!uploadResponse.ok) {
+        console.error('Upload failed');
+        return null;
+      }
+
+      return public_url;
+    } catch (error) {
+      console.error('Upload error:', error);
       return null;
     }
-
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from("agent-profiles").getPublicUrl(fileName);
-
-    return publicUrl;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -214,32 +246,32 @@ export default function AgentOnboardingPage() {
   if (success) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background px-4">
-        <Card.Root className="w-full max-w-md text-center">
-          <Card.Content className="py-12">
+        <Card className="w-full max-w-md text-center">
+          <CardContent className="py-12">
             <CheckCircle className="w-16 h-16 text-success mx-auto mb-6" />
             <h1 className="text-2xl font-bold mb-4">Welcome to RealEST!</h1>
             <p className="text-muted-foreground mb-8">
               Your agent profile is complete. Redirecting to your dashboard...
             </p>
-          </Card.Content>
-        </Card.Root>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4 py-8">
-      <Card.Root className="w-full max-w-2xl">
-        <Card.Header className="text-center border-b">
-          <Card.Title className="text-3xl font-bold">
+      <Card className="w-full max-w-2xl">
+        <CardHeader className="text-center border-b">
+          <CardTitle className="text-3xl font-bold">
             Complete Your Agent Profile
-          </Card.Title>
-          <Card.Description>
+          </CardTitle>
+          <CardDescription>
             Help clients get to know you better • Step {step} of 2
-          </Card.Description>
-        </Card.Header>
+          </CardDescription>
+        </CardHeader>
 
-        <Card.Content className="py-8">
+        <CardContent className="py-8">
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* Step 1: License & Agency */}
             {step === 1 && (
@@ -326,17 +358,17 @@ export default function AgentOnboardingPage() {
                 <div className="flex gap-2 pt-4">
                   <Button
                     type="button"
-                    variant="tertiary"
+                    variant="secondary"
                     className="flex-1"
-                    onPress={() => router.push("/profile")}
+                    onClick={() => router.push("/profile")}
                   >
                     Skip for now
                   </Button>
                   <Button
                     type="button"
-                    variant="primary"
+                    variant="default"
                     className="flex-1"
-                    onPress={() => setStep(2)}
+                    onClick={() => setStep(2)}
                   >
                     Continue
                   </Button>
@@ -377,7 +409,7 @@ export default function AgentOnboardingPage() {
                   <label className="text-sm font-medium block">
                     Professional Bio (Optional)
                   </label>
-                  <TextArea
+                  <Textarea
                     placeholder="Tell clients about your experience and expertise..."
                     value={formData.bio}
                     onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
@@ -447,17 +479,17 @@ export default function AgentOnboardingPage() {
                 <div className="flex gap-2 pt-4">
                   <Button
                     type="button"
-                    variant="tertiary"
+                    variant="secondary"
                     className="flex-1"
-                    onPress={() => setStep(1)}
+                    onClick={() => setStep(1)}
                   >
                     Back
                   </Button>
                   <Button
                     type="submit"
-                    variant="primary"
+                    variant="default"
                     className="flex-1"
-                    isDisabled={isLoading}
+                    disabled={isLoading}
                   >
                     {isLoading ? "Completing Setup..." : "Complete Setup"}
                   </Button>
@@ -465,8 +497,8 @@ export default function AgentOnboardingPage() {
               </div>
             )}
           </form>
-        </Card.Content>
-      </Card.Root>
+        </CardContent>
+      </Card>
     </div>
   );
 }

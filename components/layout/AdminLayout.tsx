@@ -102,7 +102,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           <p className="text-muted-foreground mb-4">
             You don't have permission to access the admin panel.
           </p>
-          <Button asChild>
+          <Button>
             <a href="/profile">Return to Dashboard</a>
           </Button>
         </Card>

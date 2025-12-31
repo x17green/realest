@@ -1,0 +1,109 @@
+import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/service";
+import { z } from "zod";
+
+export const signedUrlSchema = z.object({
+  file_name: z.string().min(1),
+  file_type: z.string().min(1),
+  file_size: z
+    .number()
+    .positive()
+    .max(10 * 1024 * 1024), // 10MB max
+  bucket: z
+    .enum(["property-media", "property-documents", "avatars"])
+    .default("property-media"),
+  user_id: z.string().uuid(),
+  property_id: z.string().uuid().optional(),
+});
+
+export type SignedUrlInput = z.infer<typeof signedUrlSchema>;
+
+export interface SignedUrlResponse {
+  signed_url: string;
+  public_url: string;
+  file_path: string;
+  token: string;
+}
+
+export async function generateSignedUrl(input: SignedUrlInput): Promise<SignedUrlResponse> {
+  const supabase = await createClient();
+  const serviceSupabase = createServiceClient();
+
+  // Validate permissions for property-related buckets
+  if (input.bucket === "property-media" || input.bucket === "property-documents") {
+    if (!input.property_id) {
+      throw new Error("Property ID required for property-related uploads");
+    }
+
+    // Check if user owns the property or is admin
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("user_type")
+      .eq("id", input.user_id)
+      .single();
+
+    if (!profile || !["owner", "agent", "admin"].includes(profile.user_type)) {
+      throw new Error("Unauthorized: Only property owners, agents or admins can upload");
+    }
+
+    // Verify property ownership (unless admin)
+    if (profile.user_type !== "admin") {
+      const { data: property } = await supabase
+        .from("properties")
+        .select("owner_id,agent_id")
+        .eq("id", input.property_id)
+        .single();
+
+      if (!property || (property.owner_id !== input.user_id && property.agent_id !== input.user_id)) {
+        throw new Error("Property not found or access denied");
+      }
+    }
+  } else if (input.bucket === "avatars") {
+    // For avatars, just verify the user exists
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("id", input.user_id)
+      .single();
+
+    if (!profile) {
+      throw new Error("User not found");
+    }
+  }
+
+  // Generate unique file path
+  const fileExtension = input.file_name.split(".").pop();
+  const timestamp = Date.now();
+  const randomId = Math.random().toString(36).substring(2, 15);
+  let filePath: string;
+
+  if (input.bucket === "avatars") {
+    filePath = `avatars/${input.user_id}/${timestamp}_${randomId}.${fileExtension}`;
+  } else if (input.bucket === "property-media" || input.bucket === "property-documents") {
+    filePath = `${input.user_id}/properties/${input.property_id}/${timestamp}_${randomId}.${fileExtension}`;
+  } else {
+    filePath = `${timestamp}_${randomId}.${fileExtension}`;
+  }
+
+  // Generate signed URL for upload
+  const { data: signedUrlData, error: signedUrlError } =
+    await serviceSupabase.storage
+      .from(input.bucket)
+      .createSignedUploadUrl(filePath);
+
+  if (signedUrlError) {
+    throw new Error(`Failed to generate upload URL: ${signedUrlError.message}`);
+  }
+
+  // Generate public URL for accessing the file after upload
+  const { data: publicUrlData } = serviceSupabase.storage
+    .from(input.bucket)
+    .getPublicUrl(filePath);
+
+  return {
+    signed_url: signedUrlData.signedUrl,
+    public_url: publicUrlData.publicUrl,
+    file_path: filePath,
+    token: signedUrlData.token,
+  };
+}

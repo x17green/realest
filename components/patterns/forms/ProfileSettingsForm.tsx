@@ -575,7 +575,7 @@ export function ProfileSettingsForm({
             <RealEstButton
               type="submit"
               isLoading={isLoading}
-              isDisabled={isLoading}
+              disabled={isLoading}
             >
               Save Changes
             </RealEstButton>

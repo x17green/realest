@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { generateSignedUrl } from "@/lib/utils/upload-utils";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -150,31 +151,35 @@ export async function POST(request: Request, { params }: RouteParams) {
       );
     }
 
-    // Generate unique filename
-    const fileExt = file.name.split(".").pop();
-    const fileName = `${propertyId}-${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-    const filePath = `properties/${propertyId}/${fileName}`;
+    // Generate signed URL for upload
+    const signedUrlResult = await generateSignedUrl({
+      bucket: "property-media",
+      file_name: file.name,
+      file_type: file.type,
+      file_size: file.size,
+      user_id: user.id,
+      property_id: propertyId,
+    });
 
-    // Upload to Supabase Storage
-    const { error: uploadError } = await supabase.storage
-      .from("property-media")
-      .upload(filePath, file, {
-        contentType: file.type,
-        upsert: false,
-      });
+    // Upload file to signed URL
+    const uploadResponse = await fetch(signedUrlResult.signed_url, {
+      method: "PUT",
+      body: file,
+      headers: {
+        "Content-Type": file.type,
+      },
+    });
 
-    if (uploadError) {
-      console.error("Storage upload error:", uploadError);
+    if (!uploadResponse.ok) {
+      console.error("Upload to signed URL failed:", uploadResponse.statusText);
       return NextResponse.json(
         { error: "Failed to upload file" },
         { status: 500 },
       );
     }
 
-    // Get public URL
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from("property-media").getPublicUrl(filePath);
+    // Use the public URL from signed URL generation
+    const publicUrl = signedUrlResult.public_url;
 
     // Generate thumbnail for videos (placeholder - would need video processing)
     let thumbnailUrl = null;
@@ -223,7 +228,7 @@ export async function POST(request: Request, { params }: RouteParams) {
     if (insertError) {
       console.error("Database insert error:", insertError);
       // Clean up uploaded file if database insert failed
-      await supabase.storage.from("property-media").remove([filePath]);
+      await supabase.storage.from("property-media").remove([signedUrlResult.file_path]);
 
       return NextResponse.json(
         { error: "Failed to save media record" },

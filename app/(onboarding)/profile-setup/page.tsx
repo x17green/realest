@@ -4,15 +4,13 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { Avatar } from "@heroui/react";
 import {
   Card,
-  Button,
-  Input,
-  TextArea,
-  Avatar,
-  RadioGroup,
-  Radio,
-} from "@heroui/react";
+  CardContent,
+  Button, Input,
+  Textarea,
+} from "@/components/ui";
 import {
   User,
   MapPin,
@@ -196,8 +194,8 @@ export default function ProfileSetupPage() {
           </div>
         </div>
 
-        <Card.Root>
-          <Card.Content className="p-8">
+        <Card>
+          <CardContent className="p-8">
             {/* Step 1: Basic Information */}
             {currentStep === 1 && (
               <div className="space-y-6">
@@ -277,7 +275,7 @@ export default function ProfileSetupPage() {
                     <label htmlFor="bio" className="text-sm font-medium">
                       Bio
                     </label>
-                    <TextArea
+                    <Textarea
                       id="bio"
                       placeholder="Tell us a bit about yourself..."
                       value={formData.bio}
@@ -358,7 +356,7 @@ export default function ProfileSetupPage() {
               {currentStep > 1 && (
                 <Button
                   variant="secondary"
-                  onPress={handleBack}
+                  onClick={handleBack}
                   className="flex-1"
                 >
                   Back
@@ -367,20 +365,20 @@ export default function ProfileSetupPage() {
 
               {currentStep < 2 ? (
                 <Button
-                  variant="primary"
-                  onPress={handleNext}
+                  variant="default"
+                  onClick={handleNext}
                   className="flex-1"
-                  isDisabled={currentStep === 1 && !formData.fullName}
+                  disabled={currentStep === 1 && !formData.fullName}
                 >
                   Next
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               ) : (
                 <Button
-                  variant="primary"
-                  onPress={handleSubmit}
+                  variant="default"
+                  onClick={handleSubmit}
                   className="flex-1"
-                  isDisabled={isLoading}
+                  disabled={isLoading}
                 >
                   {isLoading ? "Setting up..." : "Complete Setup"}
                 </Button>
@@ -392,8 +390,8 @@ export default function ProfileSetupPage() {
                 Skip for now
               </Link>
             </div>
-          </Card.Content>
-        </Card.Root>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

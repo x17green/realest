@@ -220,7 +220,7 @@ export default function PropertyDetailsPage() {
               <p className="text-muted-foreground mb-4">
                 The property you're looking for doesn't exist or has been removed.
               </p>
-              <Button asChild variant="primary">
+              <Button variant="primary">
                 <Link href="/">Back to Homepage</Link>
               </Button>
             </Card.Content>

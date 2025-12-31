@@ -1,6 +1,7 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
+import { createServiceClient } from "@/lib/supabase/service";
 import type { User } from "@supabase/supabase-js";
 
 // Auth utility types
@@ -9,6 +10,8 @@ export interface AuthResponse {
   user?: User;
   error?: string;
 }
+
+// const createClient = createServiceClient;
 
 export interface PasswordValidation {
   minLength: boolean;

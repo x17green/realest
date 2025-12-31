@@ -108,6 +108,8 @@ export default function ApiTestingPage() {
     bucket: "property-media",
   });
 
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
   const makeApiCall = async (
     method: string,
     url: string,
@@ -213,12 +215,75 @@ export default function ApiTestingPage() {
     makeApiCall("GET", "/api/notifications", null, true);
   };
 
-  const testUploadSignedUrl = () => {
-    const data = {
-      ...uploadForm,
-      file_size: parseInt(uploadForm.file_size),
-    };
-    makeApiCall("POST", "/api/upload/signed-url", data, true);
+  const testUploadSignedUrl = async () => {
+    setLoading(true);
+    setResponse(null);
+
+    if (selectedFile) {
+      // Use actual file data
+      const data = {
+        file_name: selectedFile.name,
+        file_type: selectedFile.type,
+        file_size: selectedFile.size,
+        bucket: uploadForm.bucket,
+      };
+
+      try {
+        // Get signed URL
+        const signedUrlResponse = await fetch('/api/upload/signed-url', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`,
+          },
+          body: JSON.stringify(data),
+        });
+
+        if (!signedUrlResponse.ok) {
+          setResponse({ success: false, error: 'Failed to get signed URL' });
+          setLoading(false);
+          return;
+        }
+
+        const { signed_url, public_url } = await signedUrlResponse.json();
+
+        // Upload file to signed URL
+        const uploadResponse = await fetch(signed_url, {
+          method: 'PUT',
+          body: selectedFile,
+          headers: {
+            'Content-Type': selectedFile.type,
+          },
+        });
+
+        if (!uploadResponse.ok) {
+          setResponse({ success: false, error: 'File upload failed' });
+          setLoading(false);
+          return;
+        }
+
+        setResponse({
+          success: true,
+          data: {
+            message: 'File uploaded successfully',
+            public_url,
+            bucket: uploadForm.bucket,
+          }
+        });
+      } catch (error) {
+        setResponse({ success: false, error: 'Upload error occurred' });
+      }
+    } else {
+      // Use form data for testing signed URL generation only
+      const data = {
+        ...uploadForm,
+        file_size: parseInt(uploadForm.file_size),
+      };
+      makeApiCall("POST", "/api/upload/signed-url", data, true);
+      return; // makeApiCall handles loading
+    }
+
+    setLoading(false);
   };
 
   const testAdminProperties = () => {
@@ -887,13 +952,38 @@ export default function ApiTestingPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Upload className="w-5 h-5" />
-                  File Upload
+                  File Upload Testing
                 </CardTitle>
                 <CardDescription>
-                  Get signed URL for secure file uploads
+                  Test signed URL generation and file uploads to all storage buckets
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium">Select File</label>
+                  <Input
+                    type="file"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setSelectedFile(file);
+                        setUploadForm({
+                          ...uploadForm,
+                          file_name: file.name,
+                          file_type: file.type,
+                          file_size: file.size.toString(),
+                        });
+                      }
+                    }}
+                    accept="image/*,.pdf,.doc,.docx"
+                  />
+                  {selectedFile && (
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Selected: {selectedFile.name} ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
+                    </p>
+                  )}
+                </div>
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium">File Name</label>
@@ -905,6 +995,7 @@ export default function ApiTestingPage() {
                           file_name: e.target.value,
                         })
                       }
+                      disabled={!!selectedFile}
                     />
                   </div>
                   <div>
@@ -917,6 +1008,7 @@ export default function ApiTestingPage() {
                           file_type: e.target.value,
                         })
                       }
+                      disabled={!!selectedFile}
                     />
                   </div>
                 </div>
@@ -934,6 +1026,7 @@ export default function ApiTestingPage() {
                           file_size: e.target.value,
                         })
                       }
+                      disabled={!!selectedFile}
                     />
                   </div>
                   <div>
@@ -959,18 +1052,27 @@ export default function ApiTestingPage() {
                     </Select>
                   </div>
                 </div>
-                <Button
-                  onClick={testUploadSignedUrl}
-                  disabled={loading || !authToken}
-                  className="w-full"
-                >
-                  {loading ? (
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  ) : (
-                    <Upload className="w-4 h-4 mr-2" />
-                  )}
-                  Get Signed URL
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={testUploadSignedUrl}
+                    disabled={loading || !authToken}
+                    className="flex-1"
+                  >
+                    {loading ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Upload className="w-4 h-4 mr-2" />
+                    )}
+                    {selectedFile ? 'Upload File' : 'Get Signed URL'}
+                  </Button>
+                  <Button
+                    onClick={() => setSelectedFile(null)}
+                    variant="outline"
+                    disabled={!selectedFile}
+                  >
+                    Clear File
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

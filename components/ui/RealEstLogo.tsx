@@ -32,15 +32,15 @@ const RealEstLogo: React.FC<RealEstLogoProps> = ({
     },
     sm: {
       icon: 'w-6 h-6',
-      text: 'text-base',
+      text: 'text-lg',
       container: 'gap-2',
-      tagline: 'text-xs',
+      tagline: 'text-[8px]',
     },
     md: {
       icon: 'w-8 h-8',
-      text: 'text-lg',
+      text: 'text-xl',
       container: 'gap-2',
-      tagline: 'text-xs',
+      tagline: 'text-[8px]',
     },
     lg: {
       icon: 'w-10 h-10',
