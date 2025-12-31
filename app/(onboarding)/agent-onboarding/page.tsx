@@ -14,7 +14,8 @@ import {
 } from "@/components/ui";
 import { createClient } from "@/lib/supabase/client";
 import { createServiceClient } from "@/lib/supabase/service";
-import { Upload, AlertCircle, CheckCircle } from "lucide-react";
+import { AlertCircle, CheckCircle } from "lucide-react";
+import { ProfileUpload } from "@/components/realest/ProfileUpload";
 
 export default function AgentOnboardingPage() {
   const router = useRouter();
@@ -26,12 +27,13 @@ export default function AgentOnboardingPage() {
 
   const [formData, setFormData] = useState({
     fullName: "",
+    email: "",
     licenseNumber: "",
     agencyName: "",
     phone: "",
     whatsapp: "",
     bio: "",
-    profilePhoto: null as File | null,
+    profilePhotoUrl: null as string | null,
     specializations: [] as string[],
     agreeTerms: false,
   });
@@ -60,6 +62,13 @@ export default function AgentOnboardingPage() {
       }
 
       setUserId(user.id);
+
+      // Get email from URL params
+      const urlParams = new URLSearchParams(window.location.search);
+      const emailFromUrl = urlParams.get('email');
+      if (emailFromUrl) {
+        setFormData((prev) => ({ ...prev, email: emailFromUrl }));
+      }
 
       // Check if agent profile already exists
       const { data: agent } = await supabase
@@ -91,59 +100,12 @@ export default function AgentOnboardingPage() {
     }));
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && file.size <= 5 * 1024 * 1024) {
-      setFormData((prev) => ({ ...prev, profilePhoto: file }));
-    } else {
-      setError("File size must be less than 5MB");
-    }
+  const handleProfilePhotoSuccess = (avatarUrl: string) => {
+    setFormData((prev) => ({ ...prev, profilePhotoUrl: avatarUrl }));
   };
 
-  const handleProfilePhotoUpload = async (): Promise<string | null> => {
-    if (!formData.profilePhoto || !userId) return null;
-
-    try {
-      // Get signed URL from API
-      const response = await fetch('/api/upload/signed-url', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          file_name: formData.profilePhoto.name,
-          file_type: formData.profilePhoto.type,
-          file_size: formData.profilePhoto.size,
-          bucket: 'avatars',
-        }),
-      });
-
-      if (!response.ok) {
-        console.error('Failed to get signed URL');
-        return null;
-      }
-
-      const { signed_url, public_url } = await response.json();
-
-      // Upload file to signed URL
-      const uploadResponse = await fetch(signed_url, {
-        method: 'PUT',
-        body: formData.profilePhoto,
-        headers: {
-          'Content-Type': formData.profilePhoto.type,
-        },
-      });
-
-      if (!uploadResponse.ok) {
-        console.error('Upload failed');
-        return null;
-      }
-
-      return public_url;
-    } catch (error) {
-      console.error('Upload error:', error);
-      return null;
-    }
+  const handleProfilePhotoError = (error: string) => {
+    setError(error);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -188,13 +150,6 @@ export default function AgentOnboardingPage() {
     }
 
     try {
-      let profilePhotoUrl = null;
-
-      // Upload profile photo if provided
-      if (formData.profilePhoto) {
-        profilePhotoUrl = await handleProfilePhotoUpload();
-      }
-
       const supabase = createClient();
 
       // Insert agent profile
@@ -206,7 +161,7 @@ export default function AgentOnboardingPage() {
         whatsapp: formData.whatsapp || null,
         bio: formData.bio || null,
         specialization: formData.specializations,
-        photo_url: profilePhotoUrl || null,
+        photo_url: formData.profilePhotoUrl || null,
         verified: false,
       };
 
@@ -219,10 +174,11 @@ export default function AgentOnboardingPage() {
         return;
       }
 
-      // Update profiles with full_name and user_type
+      // Update profiles with full_name, email and user_type
       const { error: profileError } = await supabase.from("profiles").upsert({
         id: userId,
         full_name: formData.fullName,
+        email: formData.email,
         user_type: "agent",
       });
 
@@ -383,26 +339,10 @@ export default function AgentOnboardingPage() {
                   <label className="text-sm font-medium block">
                     Profile Photo
                   </label>
-                  <div className="border-2 border-dashed rounded-lg p-8 text-center hover:bg-muted/50 transition-colors cursor-pointer">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileChange}
-                      className="hidden"
-                      id="profilePhoto"
-                    />
-                    <label htmlFor="profilePhoto" className="cursor-pointer">
-                      <Upload className="w-8 h-8 mx-auto mb-3 text-muted-foreground" />
-                      <div className="font-medium">
-                        {formData.profilePhoto
-                          ? formData.profilePhoto.name
-                          : "Click to upload or drag and drop"}
-                      </div>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        PNG, JPG up to 5MB
-                      </div>
-                    </label>
-                  </div>
+                  <ProfileUpload
+                    onUploadSuccess={handleProfilePhotoSuccess}
+                    onUploadError={handleProfilePhotoError}
+                  />
                 </div>
 
                 <div className="space-y-2">

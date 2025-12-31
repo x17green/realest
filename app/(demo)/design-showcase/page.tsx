@@ -10,6 +10,7 @@ import {
   NewBadge,
 } from "@/components/ui/status-badge";
 import { ProfileDropdown } from "@/components/realest";
+import { ProfileUpload } from "@/components/realest/ProfileUpload";
 
 export default function DesignShowcasePage() {
   const [darkMode, setDarkMode] = useState(false);
@@ -419,6 +420,45 @@ export default function DesignShowcasePage() {
                 inquiries), agents (dashboard, properties), and regular users
                 (profile only), plus logout for all.
               </p>
+            </div>
+          </div>
+
+          {/* Profile Upload Component */}
+          <div className="space-y-6">
+            <h3 className="font-heading text-2xl font-semibold">
+              Profile Upload (Signed-URL Integration)
+            </h3>
+            <div className="card-enhanced p-8">
+              <div className="flex flex-col items-center gap-8">
+                {/* Different sizes showcase */}
+                <div className="flex items-center gap-8">
+                  <div className="text-center">
+                    <ProfileUpload size="sm" />
+                    <p className="text-xs text-muted-foreground mt-2">Small (32px)</p>
+                  </div>
+                  <div className="text-center">
+                    <ProfileUpload size="md" />
+                    <p className="text-xs text-muted-foreground mt-2">Medium (48px)</p>
+                  </div>
+                  <div className="text-center">
+                    <ProfileUpload size="lg" />
+                    <p className="text-xs text-muted-foreground mt-2">Large (64px)</p>
+                  </div>
+                  <div className="text-center">
+                    <ProfileUpload size="xl" />
+                    <p className="text-xs text-muted-foreground mt-2">Extra Large (96px)</p>
+                  </div>
+                </div>
+
+                {/* Upload button example */}
+                <div className="text-center">
+                  <ProfileUpload size="lg" />
+                  <p className="text-sm text-muted-foreground mt-4 max-w-md">
+                    Click the avatar or use the upload button to change your profile picture.
+                    Supports secure signed-URL uploads with file validation and real-time preview.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </section>

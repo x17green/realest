@@ -19,6 +19,7 @@ import {
   CheckCircle,
   ArrowRight,
 } from "lucide-react";
+import { ProfileUpload } from "@/components/realest/ProfileUpload";
 
 export default function ProfileSetupPage() {
   const router = useRouter();
@@ -35,6 +36,7 @@ export default function ProfileSetupPage() {
     companyName: "",
     licenseNumber: "",
     experience: "",
+    profilePhotoUrl: "",
   });
 
   useEffect(() => {
@@ -63,6 +65,7 @@ export default function ProfileSetupPage() {
             companyName: "",
             licenseNumber: "",
             experience: "",
+            profilePhotoUrl: profile.avatar_url || "",
           });
         }
       }
@@ -73,6 +76,15 @@ export default function ProfileSetupPage() {
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleProfilePhotoSuccess = (avatarUrl: string) => {
+    setFormData((prev) => ({ ...prev, profilePhotoUrl: avatarUrl }));
+  };
+
+  const handleProfilePhotoError = (error: string) => {
+    console.error("Profile photo upload error:", error);
+    // Could add toast notification here
   };
 
   const handleNext = () => {
@@ -108,6 +120,7 @@ export default function ProfileSetupPage() {
         full_name: formData.fullName,
         phone: formData.phone,
         bio: formData.bio,
+        avatar_url: formData.profilePhotoUrl || null,
         user_type: profile.user_type,
         updated_at: new Date().toISOString(),
       });
@@ -200,15 +213,14 @@ export default function ProfileSetupPage() {
             {currentStep === 1 && (
               <div className="space-y-6">
                 <div className="text-center mb-6">
-                  <Avatar.Root size="lg" className="mx-auto mb-4">
-                    <Avatar.Fallback>
-                      {formData.fullName?.charAt(0) ||
-                        user?.email?.charAt(0) ||
-                        "U"}
-                    </Avatar.Fallback>
-                  </Avatar.Root>
+                  <ProfileUpload
+                    size="xl"
+                    onUploadSuccess={handleProfilePhotoSuccess}
+                    onUploadError={handleProfilePhotoError}
+                    className="mx-auto mb-4"
+                  />
                   <p className="text-sm text-muted-foreground">
-                    This is how you'll appear on RealEST
+                    Upload a profile photo to personalize your account
                   </p>
                 </div>
 

@@ -4,7 +4,6 @@ import React, { useState, useRef } from 'react'
 import { Avatar } from '@heroui/react'
 import { Camera, Upload, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { generateSignedUrl } from '@/lib/utils/upload-utils'
 import { useUser } from '@/lib/hooks/useUser'
 import { RealEstButton } from '@/components/heroui/RealEstButton'
 
@@ -83,14 +82,27 @@ export function ProfileUpload({
     setIsUploading(true)
 
     try {
-      // Generate signed URL for avatar upload
-      const { signed_url, public_url, token } = await generateSignedUrl({
-        bucket: 'avatars',
-        file_name: `${user.id}-${Date.now()}.${file.name.split('.').pop()}`,
-        file_type: file.type,
-        file_size: file.size,
-        user_id: user.id
+      // Generate signed URL via API route
+      const response = await fetch('/api/upload/signed-url', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          bucket: 'avatars',
+          file_name: `${user.id}-${Date.now()}.${file.name.split('.').pop()}`,
+          file_type: file.type,
+          file_size: file.size,
+          user_id: user.id
+        })
       })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to generate upload URL')
+      }
+
+      const { signed_url, public_url, token } = await response.json()
 
       // Upload file to signed URL
       const uploadResponse = await fetch(signed_url, {

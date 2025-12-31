@@ -28,10 +28,15 @@ export default function SignUpSuccessPage() {
         if (profileResponse.success && profileResponse.profile) {
           const userType = profileResponse.profile.user_type;
           setIsRedirecting(true);
+          
+          // Get email from URL params
+          const urlParams = new URLSearchParams(window.location.search);
+          const email = urlParams.get('email');
+          
           setTimeout(() => {
             switch (userType) {
               case "agent":
-                router.push("/agent-onboarding");
+                router.push(email ? `/agent-onboarding?email=${encodeURIComponent(email)}` : "/agent-onboarding");
                 break;
               case "owner":
                 router.push("/profile-setup");
