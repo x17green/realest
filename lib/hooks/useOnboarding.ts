@@ -51,7 +51,9 @@ export interface UseOnboardingReturn extends OnboardingState {
  * Centralized hook for onboarding logic
  * Handles data fetching, validation, and submission for both agent and owner onboarding
  */
-export function useOnboarding(options: UseOnboardingOptions): UseOnboardingReturn {
+export function useOnboarding(
+  options: UseOnboardingOptions,
+): UseOnboardingReturn {
   const { userType, redirectPath } = options;
   const router = useRouter();
   const { user, profile, isLoading: userLoading } = useUser();
@@ -82,7 +84,7 @@ export function useOnboarding(options: UseOnboardingOptions): UseOnboardingRetur
   // Initialize form data from existing profile
   useEffect(() => {
     if (profile && !userLoading) {
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         formData: {
           ...prev.formData,
@@ -98,7 +100,7 @@ export function useOnboarding(options: UseOnboardingOptions): UseOnboardingRetur
 
   // Update form data
   const updateFormData = useCallback((field: string, value: any) => {
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       formData: {
         ...prev.formData,
@@ -109,48 +111,54 @@ export function useOnboarding(options: UseOnboardingOptions): UseOnboardingRetur
   }, []);
 
   // Validate current step
-  const validateStep = useCallback((step: number): boolean => {
-    const { formData } = state;
-    let newError: string | null = null;
+  const validateStep = useCallback(
+    (step: number): boolean => {
+      const { formData } = state;
+      let newError: string | null = null;
 
-    if (step === 1) {
-      if (!formData.fullName.trim()) {
-        newError = "Full name is required";
-      } else if (!formData.email.trim()) {
-        newError = "Email is required";
-      } else if (!formData.phone.trim()) {
-        newError = "Phone number is required";
+      if (step === 1) {
+        if (!formData.fullName.trim()) {
+          newError = "Full name is required";
+        } else if (!formData.email.trim()) {
+          newError = "Email is required";
+        } else if (!formData.phone.trim()) {
+          newError = "Phone number is required";
+        }
       }
-    }
 
-    if (userType === "agent" && step === 2) {
-      if (!formData.licenseNumber?.trim()) {
-        newError = "License number is required";
-      } else if (!formData.agencyName?.trim()) {
-        newError = "Agency name is required";
-      } else if (!formData.specializations || formData.specializations.length === 0) {
-        newError = "Please select at least one specialization";
-      } else if (!formData.agreeTerms) {
-        newError = "You must agree to the terms and conditions";
+      if (userType === "agent" && (step === 2 || step === 4)) {
+        if (!formData.licenseNumber?.trim()) {
+          newError = "License number is required";
+        } else if (!formData.agencyName?.trim()) {
+          newError = "Agency name is required";
+        } else if (
+          !formData.specializations ||
+          formData.specializations.length === 0
+        ) {
+          newError = "Please select at least one specialization";
+        } else if (!formData.agreeTerms) {
+          newError = "You must agree to the terms and conditions";
+        }
       }
-    }
 
-    setState(prev => ({ ...prev, error: newError }));
-    return newError === null;
-  }, [state.formData, userType]);
+      setState((prev) => ({ ...prev, error: newError }));
+      return newError === null;
+    },
+    [state.formData, userType],
+  );
 
   // Navigation functions
   const handleNext = useCallback(() => {
     if (validateStep(state.currentStep)) {
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
-        currentStep: Math.min(prev.currentStep + 1, userType === "agent" ? 2 : 2),
+        currentStep: Math.min(prev.currentStep + 1, 4),
       }));
     }
   }, [state.currentStep, validateStep, userType]);
 
   const handleBack = useCallback(() => {
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       currentStep: Math.max(prev.currentStep - 1, 1),
     }));
@@ -160,7 +168,7 @@ export function useOnboarding(options: UseOnboardingOptions): UseOnboardingRetur
   const handleSubmit = useCallback(async () => {
     if (!user || !validateStep(state.currentStep)) return;
 
-    setState(prev => ({ ...prev, isLoading: true, error: null }));
+    setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
       const { formData } = state;
@@ -206,7 +214,9 @@ export function useOnboarding(options: UseOnboardingOptions): UseOnboardingRetur
         const ownerData = {
           profile_id: user.id,
           business_name: formData.companyName?.trim() || null,
-          years_experience: formData.experience ? parseInt(formData.experience) : null,
+          years_experience: formData.experience
+            ? parseInt(formData.experience)
+            : null,
           phone: formData.phone.trim(),
           verified: false,
         };
@@ -218,22 +228,23 @@ export function useOnboarding(options: UseOnboardingOptions): UseOnboardingRetur
         if (ownerError) throw ownerError;
       }
 
-      setState(prev => ({ ...prev, success: true }));
+      setState((prev) => ({ ...prev, success: true }));
 
       // Redirect after success
-      const redirectTo = redirectPath || (userType === "agent" ? "/agent" : "/owner");
+      const redirectTo =
+        redirectPath || (userType === "agent" ? "/agent" : "/owner");
       setTimeout(() => {
         router.push(redirectTo);
       }, 2000);
-
     } catch (error: any) {
       console.error("Onboarding submission error:", error);
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
-        error: error.message || "Failed to complete onboarding. Please try again.",
+        error:
+          error.message || "Failed to complete onboarding. Please try again.",
       }));
     } finally {
-      setState(prev => ({ ...prev, isLoading: false }));
+      setState((prev) => ({ ...prev, isLoading: false }));
     }
   }, [user, state, validateStep, userType, redirectPath, supabase, router]);
 
