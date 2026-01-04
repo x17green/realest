@@ -8,7 +8,7 @@
 ```typescript
 export interface Profile {
   id: string;                          // UUID (FK to auth.users)
-  user_type: 'user' | 'owner' | 'admin';
+  user_type: 'user' | 'agent' | 'owner' | 'admin';
   full_name: string;
   email: string;
   phone: string | null;

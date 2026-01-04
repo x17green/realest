@@ -3,13 +3,13 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { 
-  Button, 
-  Card, 
-  CardHeader, 
-  CardTitle, 
-  CardDescription, 
-  CardContent 
+import {
+  Button,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
 } from "@/components/ui";
 import { CheckCircle, Mail } from "lucide-react";
 import { getCurrentUser, getUserProfile } from "@/lib/auth";
@@ -28,18 +28,16 @@ export default function SignUpSuccessPage() {
         if (profileResponse.success && profileResponse.profile) {
           const userType = profileResponse.profile.user_type;
           setIsRedirecting(true);
-          
+
           // Get email from URL params
           const urlParams = new URLSearchParams(window.location.search);
-          const email = urlParams.get('email');
-          
+          const email = urlParams.get("email");
+
           setTimeout(() => {
             switch (userType) {
               case "agent":
-                router.push(email ? `/agent-onboarding?email=${encodeURIComponent(email)}` : "/agent-onboarding");
-                break;
               case "owner":
-                router.push("/profile-setup");
+                router.push("/onboarding");
                 break;
               case "user":
               default:
@@ -61,9 +59,7 @@ export default function SignUpSuccessPage() {
           <div className="flex justify-center mb-4">
             <CheckCircle className="w-16 h-16 text-success" />
           </div>
-          <CardTitle className="text-2xl font-bold">
-            Account Created!
-          </CardTitle>
+          <CardTitle className="text-2xl font-bold">Account Created!</CardTitle>
           <CardDescription>
             Welcome to RealEST - where every property is verified
           </CardDescription>
