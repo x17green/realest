@@ -9,6 +9,17 @@ import {
   FeaturedBadge,
   NewBadge,
 } from "@/components/ui/status-badge";
+import {
+  PropertyStatusChip,
+  AvailableChip,
+  PendingChip,
+  BookedChip,
+  FeaturedChip,
+  ExclusiveChip,
+  FreshListingChip,
+  UnderOfferChip,
+  PropertyStatusGroup,
+} from "@/components/realest/badges/PropertyStatusChip";
 import { ProfileDropdown } from "@/components/realest";
 import { ProfileUpload } from "@/components/realest/ProfileUpload";
 
@@ -405,6 +416,116 @@ export default function DesignShowcasePage() {
             </div>
           </div>
 
+          {/* Property Status Chips (RealEST Components) */}
+          <div className="space-y-6">
+            <h3 className="font-heading text-2xl font-semibold">
+              Property Status Chips (RealEST Components)
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Property Status Variants */}
+              <div className="card-enhanced p-6 space-y-4">
+                <h4 className="font-heading text-lg font-medium">
+                  Property Status Variants
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  <AvailableChip />
+                  <PendingChip />
+                  <BookedChip />
+                  <PropertyStatusChip status="unavailable" />
+                  <FeaturedChip />
+                  <FreshListingChip />
+                  <ExclusiveChip />
+                  <UnderOfferChip />
+                </div>
+              </div>
+
+              {/* Size Variations */}
+              <div className="card-enhanced p-6 space-y-4">
+                <h4 className="font-heading text-lg font-medium">
+                  Size Variations
+                </h4>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground w-12">
+                      SM:
+                    </span>
+                    <AvailableChip size="sm" />
+                    <PendingChip size="sm" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground w-12">
+                      MD:
+                    </span>
+                    <AvailableChip size="md" />
+                    <PendingChip size="md" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground w-12">
+                      LG:
+                    </span>
+                    <AvailableChip size="lg" />
+                    <PendingChip size="lg" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Advanced Features */}
+              <div className="card-enhanced p-6 space-y-4">
+                <h4 className="font-heading text-lg font-medium">
+                  Advanced Features
+                </h4>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">
+                      Priority:
+                    </span>
+                    <FeaturedChip priority="high" />
+                    <ExclusiveChip priority="medium" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">
+                      Animated:
+                    </span>
+                    <PendingChip animated={true} />
+                    <UnderOfferChip animated={true} />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">
+                      Interactive:
+                    </span>
+                    <AvailableChip interactive={true} />
+                    <FeaturedChip interactive={true} />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">
+                      No Icon:
+                    </span>
+                    <AvailableChip showIcon={false} />
+                    <PendingChip showIcon={false} />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Property Status Group Example */}
+            <div className="card-enhanced p-6">
+              <h4 className="font-heading text-lg font-medium mb-4">
+                Property Status Group (Multiple Chips)
+              </h4>
+              <PropertyStatusGroup
+                statuses={[
+                  { status: "available", size: "sm" },
+                  { status: "featured", size: "sm", priority: "high" },
+                  { status: "fresh-listing", size: "sm" },
+                  { status: "exclusive", size: "sm", priority: "high" },
+                ]}
+              />
+              <p className="text-xs text-muted-foreground mt-2">
+                Hover over chips to see tooltips with descriptions
+              </p>
+            </div>
+          </div>
+
           {/* Profile Dropdown (HeroUI) */}
           <div className="space-y-6">
             <h3 className="font-heading text-2xl font-semibold">
@@ -434,19 +555,27 @@ export default function DesignShowcasePage() {
                 <div className="flex items-center gap-8">
                   <div className="text-center">
                     <ProfileUpload size="sm" />
-                    <p className="text-xs text-muted-foreground mt-2">Small (32px)</p>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Small (32px)
+                    </p>
                   </div>
                   <div className="text-center">
                     <ProfileUpload size="md" />
-                    <p className="text-xs text-muted-foreground mt-2">Medium (48px)</p>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Medium (48px)
+                    </p>
                   </div>
                   <div className="text-center">
                     <ProfileUpload size="lg" />
-                    <p className="text-xs text-muted-foreground mt-2">Large (64px)</p>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Large (64px)
+                    </p>
                   </div>
                   <div className="text-center">
                     <ProfileUpload size="xl" />
-                    <p className="text-xs text-muted-foreground mt-2">Extra Large (96px)</p>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Extra Large (96px)
+                    </p>
                   </div>
                 </div>
 
@@ -454,8 +583,9 @@ export default function DesignShowcasePage() {
                 <div className="text-center">
                   <ProfileUpload size="lg" />
                   <p className="text-sm text-muted-foreground mt-4 max-w-md">
-                    Click the avatar or use the upload button to change your profile picture.
-                    Supports secure signed-URL uploads with file validation and real-time preview.
+                    Click the avatar or use the upload button to change your
+                    profile picture. Supports secure signed-URL uploads with
+                    file validation and real-time preview.
                   </p>
                 </div>
               </div>

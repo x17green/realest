@@ -5,14 +5,19 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import {
-  Card,
-  Button,
   Chip,
-  Input,
-  TextArea,
   Avatar,
-  Separator,
 } from "@heroui/react";
+import { 
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  Button,
+  Input,
+  Textarea,
+} from '@/components/ui'
 import {
   MapPin,
   Bed,
@@ -25,7 +30,6 @@ import {
   Share,
   Heart,
   CheckCircle,
-  Star,
 } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { PropertyMap } from "@/components/property/PropertyMap";
@@ -214,17 +218,17 @@ export default function PropertyDetailsPage() {
       <>
         <Header />
         <div className="min-h-screen bg-background flex items-center justify-center">
-          <Card.Root className="max-w-md">
-            <Card.Content className="text-center py-8">
+          <Card className="max-w-md">
+            <CardContent className="text-center py-8">
               <h2 className="text-xl font-semibold mb-2">Property Not Found</h2>
               <p className="text-muted-foreground mb-4">
                 The property you're looking for doesn't exist or has been removed.
               </p>
-              <Button variant="primary">
+              <Button variant="default">
                 <Link href="/">Back to Homepage</Link>
               </Button>
-            </Card.Content>
-          </Card.Root>
+            </CardContent>
+          </Card>
         </div>
         <Footer />
       </>
@@ -337,11 +341,11 @@ export default function PropertyDetailsPage() {
             </div>
 
             {/* Property Details */}
-            <Card.Root>
-              <Card.Header>
-                <Card.Title>Property Details</Card.Title>
-              </Card.Header>
-              <Card.Content>
+            <Card>
+              <CardHeader>
+                <CardTitle>Property Details</CardTitle>
+              </CardHeader>
+              <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {property.property_details?.bedrooms && (
                     <div className="flex items-center gap-2">
@@ -407,31 +411,31 @@ export default function PropertyDetailsPage() {
                     </div>
                   </div>
                 )}
-              </Card.Content>
-            </Card.Root>
+              </CardContent>
+            </Card>
 
             {/* Description */}
             {property.description && (
-              <Card.Root>
-                <Card.Header>
-                  <Card.Title>Description</Card.Title>
-                </Card.Header>
-                <Card.Content>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Description</CardTitle>
+                </CardHeader>
+                <CardContent>
                   <p className="text-muted-foreground whitespace-pre-wrap">
                     {property.description}
                   </p>
-                </Card.Content>
-              </Card.Root>
+                </CardContent>
+              </Card>
             )}
 
             {/* Amenities */}
             {property.property_details?.amenities &&
               property.property_details.amenities.length > 0 && (
-                <Card.Root>
-                  <Card.Header>
-                    <Card.Title>Amenities</Card.Title>
-                  </Card.Header>
-                  <Card.Content>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Amenities</CardTitle>
+                  </CardHeader>
+                  <CardContent>
                     <div className="flex flex-wrap gap-2">
                       {property.property_details.amenities.map(
                         (amenity, index) => (
@@ -441,16 +445,16 @@ export default function PropertyDetailsPage() {
                         ),
                       )}
                     </div>
-                  </Card.Content>
-                </Card.Root>
+                  </CardContent>
+                </Card>
               )}
 
             {/* Property Location Map */}
-            <Card.Root>
-              <Card.Header>
-                <Card.Title>Location</Card.Title>
-              </Card.Header>
-              <Card.Content>
+            <Card>
+              <CardHeader>
+                <CardTitle>Location</CardTitle>
+              </CardHeader>
+              <CardContent>
                 {property.latitude && property.longitude ? (
                   <div className="h-64 rounded-lg overflow-hidden">
                     <PropertyMap
@@ -471,21 +475,21 @@ export default function PropertyDetailsPage() {
                     </div>
                   </div>
                 )}
-              </Card.Content>
-            </Card.Root>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Contact Form */}
-            <Card.Root>
-              <Card.Header>
-                <Card.Title>Contact Property Owner</Card.Title>
-                <Card.Description>
+            <Card>
+              <CardHeader>
+                <CardTitle>Contact Property Owner</CardTitle>
+                <CardDescription>
                   Send an inquiry about this property
-                </Card.Description>
-              </Card.Header>
-              <Card.Content>
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
                 {inquirySent ? (
                   <div className="text-center py-8">
                     <CheckCircle className="w-12 h-12 text-success mx-auto mb-4" />
@@ -552,7 +556,7 @@ export default function PropertyDetailsPage() {
                       <label htmlFor="message" className="text-sm font-medium">
                         Message
                       </label>
-                      <TextArea
+                      <Textarea
                         id="message"
                         placeholder="Tell the owner about your interest in this property..."
                         value={inquiryForm.message}
@@ -568,23 +572,23 @@ export default function PropertyDetailsPage() {
                     </div>
                     <Button
                       type="submit"
-                      variant="primary"
+                      variant="default"
                       className="w-full"
-                      isDisabled={isSubmitting}
+                      disabled={isSubmitting}
                     >
                       {isSubmitting ? "Sending..." : "Send Inquiry"}
                     </Button>
                   </form>
                 )}
-              </Card.Content>
-            </Card.Root>
+              </CardContent>
+            </Card>
 
             {/* Owner Info */}
-            <Card.Root>
-              <Card.Header>
-                <Card.Title>Listed by</Card.Title>
-              </Card.Header>
-              <Card.Content>
+            <Card>
+              <CardHeader>
+                <CardTitle>Listed by</CardTitle>
+              </CardHeader>
+              <CardContent>
                 <div className="flex items-center gap-3 mb-4">
                   {(() => {
                     // Robust lister resolution: agent > owner > fallback
@@ -638,15 +642,15 @@ export default function PropertyDetailsPage() {
                     </div>
                   </div>
                 )}
-              </Card.Content>
-            </Card.Root>
+              </CardContent>
+            </Card>
 
             {/* Quick Stats */}
-            <Card.Root>
-              <Card.Header>
-                <Card.Title>Property Stats</Card.Title>
-              </Card.Header>
-              <Card.Content>
+            <Card>
+              <CardHeader>
+                <CardTitle>Property Stats</CardTitle>
+              </CardHeader>
+              <CardContent>
                 <div className="space-y-3">
                   <div className="flex justify-between">
                     <span className="text-sm text-muted-foreground">
@@ -680,8 +684,8 @@ export default function PropertyDetailsPage() {
                     </Chip>
                   </div>
                 </div>
-              </Card.Content>
-            </Card.Root>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
