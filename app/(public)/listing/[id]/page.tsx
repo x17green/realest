@@ -36,6 +36,46 @@ import {
 } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { PropertyMap } from "@/components/property/PropertyMap";
+import {
+  StatusBadge,
+  VerifiedBadge,
+  PendingBadge,
+  AvailableBadge,
+} from "@/components/ui/status-badge";
+import {
+  PropertyStatusChip,
+  AvailableChip,
+  PendingChip,
+  FeaturedChip,
+} from "@/components/realest/badges/PropertyStatusChip";
+import {
+  AmenityBadge,
+  PowerBadge,
+  WaterBadge,
+  SecurityBadge,
+  InternetBadge,
+  BoysQuartersBadge,
+  GeneratorBadge,
+  ParkingBadge,
+  PoolBadge,
+  GymBadge,
+  AmenityBadgeGroup,
+  createAmenityBadges,
+} from "@/components/realest/badges";
+import {
+  PropertyTypeBadge,
+  HouseBadge,
+  ApartmentBadge,
+  LandBadge,
+  CommercialBadge,
+  HotelBadge,
+  OfficeBadge,
+  DuplexBadge,
+  BungalowBadge,
+  SelfContainedBadge,
+  ResidentialLandBadge,
+  CommercialLandBadge,
+} from "@/components/realest/badges/PropertyTypeBadge";
 
 interface AgentListing {
   id: string;
@@ -55,6 +95,12 @@ interface AgentListing {
   status: string;
   verification_status: "pending" | "verified" | "rejected";
   created_at: string;
+  // Nigerian market fields (to be added to schema)
+  nepa_status?: "stable" | "intermittent" | "poor" | "none" | "generator_only";
+  water_source?: "borehole" | "public_water" | "well" | "water_vendor" | "none";
+  internet_type?: "fiber" | "starlink" | "4g" | "3g" | "none";
+  security_type?: string[];
+  has_bq?: boolean;
   property_details: {
     bedrooms: number | null;
     bathrooms: number | null;
@@ -66,6 +112,9 @@ interface AgentListing {
     pets_allowed: boolean | null;
     amenities: string[] | null;
     utilities_included: string[] | null;
+    has_generator: boolean | null;
+    has_pool: boolean | null;
+    has_gym: boolean | null;
   } | null;
   property_media: {
     id: string;
@@ -308,12 +357,10 @@ export default function ListingDetailsPage() {
                       </span>
                     </div>
                     <div className="flex gap-4 text-sm text-muted-foreground">
-                      <Chip variant="secondary">
-                        {property.property_type.replace("_", " ")}
-                      </Chip>
-                      <Chip variant="secondary">
-                        For {property.listing_type}
-                      </Chip>
+                      <PropertyTypeBadge type={property.property_type as any} />
+                      <PropertyStatusChip 
+                        status={property.status === 'active' ? 'available' : property.status === 'pending' ? 'pending' : 'unavailable'}
+                      />
                     </div>
                   </div>
                   <div className="text-right">
@@ -437,6 +484,28 @@ export default function ListingDetailsPage() {
                     </CardContent>
                   </Card>
                 )}
+
+              {/* Nigerian Market Amenities */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Infrastructure & Amenities</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <AmenityBadgeGroup 
+                    amenities={createAmenityBadges({
+                      nepa_status: property.nepa_status || 'none',
+                      water_source: property.water_source || 'none',
+                      internet_type: property.internet_type || 'none',
+                      security_type: property.security_type || [],
+                      has_bq: property.has_bq || false,
+                      has_generator: property.property_details?.has_generator || false,
+                      has_pool: property.property_details?.has_pool || false,
+                      has_gym: property.property_details?.has_gym || false,
+                      parking_spaces: property.property_details?.parking_spaces || 0,
+                    })}
+                  />
+                </CardContent>
+              </Card>
 
               {/* Property Location Map */}
               <Card>
@@ -691,6 +760,46 @@ export default function ListingDetailsPage() {
                   </div>
                 </CardContent>
               </Card>
+              
+              {/* Quick Stats */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Property Stats</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-sm text-muted-foreground">
+                        Listed
+                      </span>
+                      <span className="text-sm">
+                        {new Date(property.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">
+                        Property Type
+                      </span>
+                      <PropertyTypeBadge type={property.property_type as any} />
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">
+                        Status
+                      </span>
+                      <PropertyStatusChip
+                        status={
+                          property.verification_status === 'verified' 
+                          ? 'available' 
+                          : property.verification_status === 'pending' 
+                            ? 'pending' 
+                            : 'unavailable'
+                        }
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
             </div>
           </div>
         </div>
