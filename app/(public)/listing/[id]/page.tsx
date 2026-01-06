@@ -18,7 +18,7 @@ import {
   Input,
   Textarea,
   Separator,
-} from '@/components/ui'
+} from "@/components/ui";
 import {
   MapPin,
   Bed,

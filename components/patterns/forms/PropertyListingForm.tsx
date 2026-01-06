@@ -44,6 +44,11 @@ export function PropertyListingForm({
     size: "",
     yearBuilt: "",
 
+    // Building Details
+    floors: "",
+    buildingMaterial: "",
+    yearRenovated: "",
+
     // Pricing
     price: "",
     serviceCharge: "",
@@ -62,8 +67,23 @@ export function PropertyListingForm({
 
     // Nigerian Specific
     hasBQ: false,
+    bqType: "",
+    bqBathrooms: "",
+    bqKitchen: false,
+    bqSeparateEntrance: false,
+    bqCondition: "",
     hasNEPA: false,
+    hasInverter: false,
+    hasSolarPanels: false,
     hasWater: false,
+    waterTankCapacity: "",
+    hasWaterTreatment: false,
+    roadAccessibility: "",
+    parkingSpaces: "",
+    kitchenType: "",
+    securityHours: "",
+    hasSecurityLevy: false,
+    securityLevyAmount: "",
     isGated: false,
     hasGoodRoads: false,
     ...initialData,
@@ -129,9 +149,14 @@ export function PropertyListingForm({
 
   const infrastructureOptions = [
     "NEPA/Power Supply",
+    "Inverter",
+    "Solar Panels",
     "Borehole/Water Supply",
+    "Water Tank",
+    "Water Treatment System",
     "Internet Connectivity",
     "Good Road Network",
+    "Road Accessibility",
     "Drainage System",
     "Street Lighting",
   ];
@@ -141,12 +166,14 @@ export function PropertyListingForm({
     "Gym",
     "Playground",
     "Garden",
-    "Parking Space",
+    "Parking Spaces",
     "Generator",
     "Air Conditioning",
     "Furnished",
     "Balcony",
     "Elevator",
+    "Built-in Kitchen",
+    "Separate Kitchen",
   ];
 
   const securityOptions = [
@@ -157,6 +184,28 @@ export function PropertyListingForm({
     "Security Guards",
     "Access Control",
   ];
+
+  const bqTypes = [
+    "self_contained",
+    "room_and_parlor",
+    "single_room",
+    "multiple_rooms",
+  ];
+
+  const bqConditions = ["excellent", "good", "fair", "needs_renovation"];
+
+  const buildingMaterials = [
+    "concrete",
+    "brick",
+    "wood",
+    "steel",
+    "glass",
+    "other",
+  ];
+
+  const roadAccessibilityOptions = ["all_year", "dry_season_only", "limited"];
+
+  const kitchenTypes = ["built_in", "separate", "none"];
 
   const handleInputChange = (field: string, value: any) => {
     setFormData((prev: any) => ({
@@ -479,6 +528,57 @@ export function PropertyListingForm({
                   className="w-full p-3 border border-input rounded-lg bg-background focus:ring-2 focus:ring-ring"
                 />
               </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Number of Floors
+                </label>
+                <input
+                  type="number"
+                  value={formData.floors}
+                  onChange={(e) => handleInputChange("floors", e.target.value)}
+                  placeholder="e.g. 2"
+                  min="1"
+                  className="w-full p-3 border border-input rounded-lg bg-background focus:ring-2 focus:ring-ring"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Building Material
+                </label>
+                <select
+                  value={formData.buildingMaterial}
+                  onChange={(e) =>
+                    handleInputChange("buildingMaterial", e.target.value)
+                  }
+                  className="w-full p-3 border border-input rounded-lg bg-background"
+                >
+                  <option value="">Select material</option>
+                  {buildingMaterials.map((material) => (
+                    <option key={material} value={material}>
+                      {material.charAt(0).toUpperCase() + material.slice(1)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Year Renovated
+                </label>
+                <input
+                  type="number"
+                  value={formData.yearRenovated}
+                  onChange={(e) =>
+                    handleInputChange("yearRenovated", e.target.value)
+                  }
+                  placeholder="e.g. 2022"
+                  min="1950"
+                  max={new Date().getFullYear()}
+                  className="w-full p-3 border border-input rounded-lg bg-background focus:ring-2 focus:ring-ring"
+                />
+              </div>
             </div>
 
             {/* Nigerian-Specific Features */}
@@ -514,6 +614,30 @@ export function PropertyListingForm({
                 <label className="flex items-center gap-2">
                   <input
                     type="checkbox"
+                    checked={formData.hasInverter}
+                    onChange={(e) =>
+                      handleInputChange("hasInverter", e.target.checked)
+                    }
+                    className="rounded border-input"
+                  />
+                  <span className="text-sm">Inverter</span>
+                </label>
+
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={formData.hasSolarPanels}
+                    onChange={(e) =>
+                      handleInputChange("hasSolarPanels", e.target.checked)
+                    }
+                    className="rounded border-input"
+                  />
+                  <span className="text-sm">Solar Panels</span>
+                </label>
+
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
                     checked={formData.hasWater}
                     onChange={(e) =>
                       handleInputChange("hasWater", e.target.checked)
@@ -521,6 +645,18 @@ export function PropertyListingForm({
                     className="rounded border-input"
                   />
                   <span className="text-sm">Water Supply</span>
+                </label>
+
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={formData.hasWaterTreatment}
+                    onChange={(e) =>
+                      handleInputChange("hasWaterTreatment", e.target.checked)
+                    }
+                    className="rounded border-input"
+                  />
+                  <span className="text-sm">Water Treatment</span>
                 </label>
 
                 <label className="flex items-center gap-2">
@@ -534,6 +670,171 @@ export function PropertyListingForm({
                   />
                   <span className="text-sm">Gated Community</span>
                 </label>
+
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={formData.hasGoodRoads}
+                    onChange={(e) =>
+                      handleInputChange("hasGoodRoads", e.target.checked)
+                    }
+                    className="rounded border-input"
+                  />
+                  <span className="text-sm">Good Road Network</span>
+                </label>
+              </div>
+
+              {/* Boys Quarters Details */}
+              {formData.hasBQ && (
+                <div className="space-y-4 border-t pt-4">
+                  <h5 className="text-md font-heading font-medium">
+                    Boys Quarters Details
+                  </h5>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-2">
+                        BQ Type
+                      </label>
+                      <select
+                        value={formData.bqType}
+                        onChange={(e) =>
+                          handleInputChange("bqType", e.target.value)
+                        }
+                        className="w-full p-3 border border-input rounded-lg bg-background"
+                      >
+                        <option value="">Select type</option>
+                        {bqTypes.map((type) => (
+                          <option key={type} value={type}>
+                            {type
+                              .replace("_", " ")
+                              .replace(/\b\w/g, (l) => l.toUpperCase())}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium mb-2">
+                        BQ Bathrooms
+                      </label>
+                      <input
+                        type="number"
+                        value={formData.bqBathrooms}
+                        onChange={(e) =>
+                          handleInputChange("bqBathrooms", e.target.value)
+                        }
+                        placeholder="e.g. 1"
+                        min="0"
+                        className="w-full p-3 border border-input rounded-lg bg-background focus:ring-2 focus:ring-ring"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium mb-2">
+                        BQ Condition
+                      </label>
+                      <select
+                        value={formData.bqCondition}
+                        onChange={(e) =>
+                          handleInputChange("bqCondition", e.target.value)
+                        }
+                        className="w-full p-3 border border-input rounded-lg bg-background"
+                      >
+                        <option value="">Select condition</option>
+                        {bqConditions.map((condition) => (
+                          <option key={condition} value={condition}>
+                            {condition.charAt(0).toUpperCase() +
+                              condition.slice(1).replace("_", " ")}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={formData.bqKitchen}
+                        onChange={(e) =>
+                          handleInputChange("bqKitchen", e.target.checked)
+                        }
+                        className="rounded border-input"
+                      />
+                      <span className="text-sm">BQ Kitchen</span>
+                    </label>
+
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={formData.bqSeparateEntrance}
+                        onChange={(e) =>
+                          handleInputChange(
+                            "bqSeparateEntrance",
+                            e.target.checked,
+                          )
+                        }
+                        className="rounded border-input"
+                      />
+                      <span className="text-sm">Separate Entrance</span>
+                    </label>
+                  </div>
+                </div>
+              )}
+
+              {/* Additional Details */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Water Tank Capacity (Liters)
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.waterTankCapacity}
+                    onChange={(e) =>
+                      handleInputChange("waterTankCapacity", e.target.value)
+                    }
+                    placeholder="e.g. 2000"
+                    min="0"
+                    className="w-full p-3 border border-input rounded-lg bg-background focus:ring-2 focus:ring-ring"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Parking Spaces
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.parkingSpaces}
+                    onChange={(e) =>
+                      handleInputChange("parkingSpaces", e.target.value)
+                    }
+                    placeholder="e.g. 2"
+                    min="0"
+                    className="w-full p-3 border border-input rounded-lg bg-background focus:ring-2 focus:ring-ring"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Kitchen Type
+                  </label>
+                  <select
+                    value={formData.kitchenType}
+                    onChange={(e) =>
+                      handleInputChange("kitchenType", e.target.value)
+                    }
+                    className="w-full p-3 border border-input rounded-lg bg-background"
+                  >
+                    <option value="">Select type</option>
+                    {kitchenTypes.map((type) => (
+                      <option key={type} value={type}>
+                        {type
+                          .replace("_", " ")
+                          .replace(/\b\w/g, (l) => l.toUpperCase())}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
           </div>
@@ -674,6 +975,29 @@ export function PropertyListingForm({
                     </label>
                   ))}
                 </div>
+
+                {/* Road Accessibility */}
+                <div className="mt-4">
+                  <label className="block text-sm font-medium mb-2">
+                    Road Accessibility
+                  </label>
+                  <select
+                    value={formData.roadAccessibility}
+                    onChange={(e) =>
+                      handleInputChange("roadAccessibility", e.target.value)
+                    }
+                    className="w-full p-3 border border-input rounded-lg bg-background"
+                  >
+                    <option value="">Select accessibility</option>
+                    {roadAccessibilityOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {option
+                          .replace("_", " ")
+                          .replace(/\b\w/g, (l) => l.toUpperCase())}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               <div>
@@ -711,6 +1035,60 @@ export function PropertyListingForm({
                       <span className="text-sm">{option}</span>
                     </label>
                   ))}
+                </div>
+
+                {/* Security Details */}
+                <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Security Hours
+                    </label>
+                    <select
+                      value={formData.securityHours}
+                      onChange={(e) =>
+                        handleInputChange("securityHours", e.target.value)
+                      }
+                      className="w-full p-3 border border-input rounded-lg bg-background"
+                    >
+                      <option value="">Select hours</option>
+                      <option value="24/7">24/7</option>
+                      <option value="day_only">Day Only</option>
+                      <option value="night_only">Night Only</option>
+                      <option value="none">None</option>
+                    </select>
+                  </div>
+
+                  <label className="flex items-center gap-2 md:col-span-1">
+                    <input
+                      type="checkbox"
+                      checked={formData.hasSecurityLevy}
+                      onChange={(e) =>
+                        handleInputChange("hasSecurityLevy", e.target.checked)
+                      }
+                      className="rounded border-input"
+                    />
+                    <span className="text-sm">Security Levy</span>
+                  </label>
+
+                  {formData.hasSecurityLevy && (
+                    <div>
+                      <label className="block text-sm font-medium mb-2">
+                        Levy Amount (₦)
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.securityLevyAmount}
+                        onChange={(e) =>
+                          handleInputChange(
+                            "securityLevyAmount",
+                            e.target.value,
+                          )
+                        }
+                        placeholder="e.g. 50000"
+                        className="w-full p-3 border border-input rounded-lg bg-background focus:ring-2 focus:ring-ring"
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

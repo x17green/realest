@@ -13,7 +13,12 @@ import {
   TrendingUp,
   MapPinned,
 } from "lucide-react";
-import { VerificationBadge, PropertyStatusChip } from "@/components/realest";
+import {
+  VerificationBadge,
+  PropertyStatusChip,
+  AmenityBadgeGroup,
+  createAmenityBadges,
+} from "@/components/realest";
 
 interface Property {
   id: string;
@@ -212,6 +217,23 @@ export default function FeaturedProperties() {
                           </span>
                         </div>
                       )}
+                    </div>
+
+                    {/* Amenity Badges Demo */}
+                    <div className="mt-4">
+                      <AmenityBadgeGroup
+                        amenities={createAmenityBadges({
+                          nepa_status: "stable",
+                          has_generator: true,
+                          water_source: "borehole",
+                          internet_type: "fiber",
+                          security_type: ["gated_community", "cctv"],
+                          has_bq: true,
+                          parking_spaces: 2,
+                        })}
+                        maxDisplay={4}
+                        showTooltip={false}
+                      />
                     </div>
                   </Card.Content>
                 </Card.Root>
