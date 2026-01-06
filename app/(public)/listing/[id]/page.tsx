@@ -4,8 +4,11 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { Chip, Avatar } from "@heroui/react";
 import {
+  Chip,
+  Avatar,
+} from "@heroui/react";
+import { 
   Card,
   CardContent,
   CardHeader,
@@ -33,51 +36,6 @@ import {
 } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { PropertyMap } from "@/components/property/PropertyMap";
-import {
-  PropertyTypeBadge,
-  PropertyStatusChip,
-  AmenityBadgeGroup,
-  createAmenityBadges,
-  type AmenityType,
-  type AmenityStatus,
-} from "@/components/realest/badges";
-
-// Helper function to map amenity strings to badge types
-function mapAmenityStringsToBadges(amenities: string[]): Array<{
-  type: AmenityType;
-  status: AmenityStatus;
-  value?: string | number;
-}> {
-  const amenityMap: Record<
-    string,
-    { type: AmenityType; status: AmenityStatus }
-  > = {
-    "Swimming Pool": { type: "pool", status: "available" },
-    Pool: { type: "pool", status: "available" },
-    Gym: { type: "gym", status: "available" },
-    "Fitness Center": { type: "gym", status: "available" },
-    Parking: { type: "parking", status: "available" },
-    Generator: { type: "generator", status: "available" },
-    Inverter: { type: "inverter", status: "available" },
-    "Solar Panels": { type: "solar", status: "available" },
-    Solar: { type: "solar", status: "available" },
-    "Water Tank": { type: "water_tank", status: "available" },
-    "Water Treatment": { type: "water_treatment", status: "available" },
-    "Air Conditioning": { type: "kitchen", status: "available" }, // Using kitchen as generic amenity
-    Furnished: { type: "kitchen", status: "available" },
-    Balcony: { type: "kitchen", status: "available" },
-    Elevator: { type: "building", status: "available" },
-    "Built-in Kitchen": { type: "kitchen", status: "available" },
-  };
-
-  return amenities
-    .map((amenity) => amenityMap[amenity])
-    .filter(Boolean) as Array<{
-    type: AmenityType;
-    status: AmenityStatus;
-    value?: string | number;
-  }>;
-}
 
 interface AgentListing {
   id: string;
@@ -251,8 +209,7 @@ export default function ListingDetailsPage() {
             <CardContent className="text-center py-8">
               <h2 className="text-xl font-semibold mb-2">Listing Not Found</h2>
               <p className="text-muted-foreground mb-4">
-                The listing you're looking for doesn't exist or has been
-                removed.
+                The listing you're looking for doesn't exist or has been removed.
               </p>
               <Button variant="default">
                 <Link href="/">Back to Homepage</Link>
@@ -291,12 +248,14 @@ export default function ListingDetailsPage() {
               />
               {property.verification_status === "verified" && (
                 <div className="absolute top-4 left-4">
-                  <PropertyStatusChip
-                    status="available"
-                    customLabel="Vetted Property"
-                    showIcon={true}
-                    showTooltip={false}
-                  />
+                  <Chip
+                    color="success"
+                    variant="primary"
+                    className="flex items-center gap-1"
+                  >
+                    <CheckCircle className="w-4 h-4" />
+                    Vetted Property
+                  </Chip>
                 </div>
               )}
               <div className="absolute top-4 right-4 flex gap-2">
@@ -340,9 +299,7 @@ export default function ListingDetailsPage() {
               <div>
                 <div className="flex items-start justify-between mb-4">
                   <div>
-                    <h1 className="text-3xl font-bold mb-2">
-                      {property.title}
-                    </h1>
+                    <h1 className="text-3xl font-bold mb-2">{property.title}</h1>
                     <div className="flex items-center gap-2 text-muted-foreground mb-2">
                       <MapPin className="w-4 h-4" />
                       <span>
@@ -351,10 +308,9 @@ export default function ListingDetailsPage() {
                       </span>
                     </div>
                     <div className="flex gap-4 text-sm text-muted-foreground">
-                      <PropertyTypeBadge
-                        type={property.property_type as any}
-                        showTooltip={false}
-                      />
+                      <Chip variant="secondary">
+                        {property.property_type.replace("_", " ")}
+                      </Chip>
                       <Chip variant="secondary">
                         For {property.listing_type}
                       </Chip>
@@ -469,13 +425,15 @@ export default function ListingDetailsPage() {
                       <CardTitle>Amenities</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <AmenityBadgeGroup
-                        amenities={mapAmenityStringsToBadges(
-                          property.property_details.amenities || [],
+                      <div className="flex flex-wrap gap-2">
+                        {property.property_details.amenities.map(
+                          (amenity, index) => (
+                            <Chip key={index} variant="secondary">
+                              {amenity}
+                            </Chip>
+                          ),
                         )}
-                        maxDisplay={8}
-                        showTooltip={false}
-                      />
+                      </div>
                     </CardContent>
                   </Card>
                 )}
@@ -584,10 +542,7 @@ export default function ListingDetailsPage() {
                         />
                       </div>
                       <div className="space-y-2">
-                        <label
-                          htmlFor="message"
-                          className="text-sm font-medium"
-                        >
+                        <label htmlFor="message" className="text-sm font-medium">
                           Message
                         </label>
                         <Textarea
@@ -629,7 +584,8 @@ export default function ListingDetailsPage() {
                       <Avatar.Root size="lg">
                         <Avatar.Image
                           src={
-                            property.agent.agent_profile.avatar_url || undefined
+                            property.agent.agent_profile.avatar_url ||
+                            undefined
                           }
                           alt={property.agent.agent_profile.full_name}
                         />
@@ -674,11 +630,7 @@ export default function ListingDetailsPage() {
                             <div className="flex flex-wrap gap-1">
                               {property.agent.specialization.map(
                                 (spec, index) => (
-                                  <Chip
-                                    key={index}
-                                    size="sm"
-                                    variant="secondary"
-                                  >
+                                  <Chip key={index} size="sm" variant="secondary">
                                     {spec}
                                   </Chip>
                                 ),
