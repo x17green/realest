@@ -33,7 +33,7 @@ export default function PropertyReviewStep() {
 
   useEffect(() => {
     if (!propertyType) {
-      router.push("/owner/new/type");
+      router.push("/owner/listings/new/type");
     }
   }, [propertyType, router]);
 
@@ -73,7 +73,7 @@ export default function PropertyReviewStep() {
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
-              <Link href={`/owner/new/documents?type=${propertyType}`}>
+              <Link href={`/owner/listings/new/documents?type=${propertyType}`}>
                 <Button variant="ghost" size="sm" isIconOnly>
                   <ArrowLeft className="w-4 h-4" />
                 </Button>
@@ -231,7 +231,7 @@ export default function PropertyReviewStep() {
 
           {/* Navigation */}
           <div className="flex items-center justify-between mt-8 pt-6 border-t border-border">
-            <Link href={`/owner/new/documents?type=${propertyType}`}>
+            <Link href={`/owner/listings/new/documents?type=${propertyType}`}>
               <Button variant="ghost">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Documents

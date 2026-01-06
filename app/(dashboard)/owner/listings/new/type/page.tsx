@@ -178,7 +178,7 @@ export default function PropertyTypeStep() {
                 Back
               </Button>
             </Link>
-            <Link href={`/owner/new/details?type=${selectedType}`}>
+            <Link href={`/owner/listings/new/details?type=${selectedType}`}>
               <Button
                 variant="default"
                 disabled={!selectedType}

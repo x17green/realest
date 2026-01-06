@@ -235,7 +235,7 @@ export default function NewListingPage() {
                         <Button variant="ghost" disabled>
                           Previous
                         </Button>
-                        <Link href="/owner/new/type">
+                        <Link href="/owner/listings/new/type">
                           <Button variant="default">Continue</Button>
                         </Link>
                       </div>
@@ -249,7 +249,7 @@ export default function NewListingPage() {
                         This step is under development. Click the button below
                         to proceed.
                       </p>
-                      <Link href={`/owner/new/${steps[currentStep].id}`}>
+                      <Link href={`/owner/listings/new/${steps[currentStep].id}`}>
                         <Button variant="default">
                           Go to {steps[currentStep].title}
                         </Button>

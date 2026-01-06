@@ -15,7 +15,7 @@ export default function PropertyMediaStep() {
 
   useEffect(() => {
     if (!propertyType) {
-      router.push("/owner/new/type");
+      router.push("/owner/listings/new/type");
     }
   }, [propertyType, router]);
 
@@ -38,7 +38,7 @@ export default function PropertyMediaStep() {
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
       // Navigate to next step
-      router.push(`/owner/new/documents?type=${propertyType}`);
+      router.push(`/owner/listings/new/documents?type=${propertyType}`);
     } catch (error) {
       console.error("Failed to upload media:", error);
     } finally {
@@ -64,7 +64,7 @@ export default function PropertyMediaStep() {
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
-              <Link href={`/owner/new/location?type=${propertyType}`}>
+              <Link href={`/owner/listings/new/location?type=${propertyType}`}>
                 <Button variant="ghost" size="sm" isIconOnly>
                   <ArrowLeft className="w-4 h-4" />
                 </Button>
@@ -153,7 +153,7 @@ export default function PropertyMediaStep() {
 
             {/* Navigation */}
             <div className="flex items-center justify-between mt-8 pt-6 border-t border-border">
-              <Link href={`/owner/new/location?type=${propertyType}`}>
+              <Link href={`/owner/listings/new/location?type=${propertyType}`}>
                 <Button variant="ghost">
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   Back to Location
