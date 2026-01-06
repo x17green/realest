@@ -214,7 +214,8 @@ const AgentOnboarding: React.FC = () => {
                             updateFormData("email", e.target.value)
                           }
                           placeholder="john@example.com"
-                          className="w-full pl-10 pr-4 py-2.5 bg-surface border rounded-lg transition-all duration-200 focus:ring-2 focus:outline-none focus:border-primary/50 focus:ring-primary/20"
+                          className="w-full pl-10 pr-4 py-2.5 bg-surface border rounded-lg transition-all duration-200 focus:ring-2 focus:outline-none focus:border-primary/50 focus:ring-primary/20 disabled:opacity-50 cursor-not-allowed"
+                          disabled
                         />
                       </div>
                     </div>
@@ -272,13 +273,13 @@ const AgentOnboarding: React.FC = () => {
                         (locationSearch.query &&
                           locationSearch.query.length < 3 &&
                           locationSearch.popularLocations.length > 0)) && (
-                        <div className="absolute top-full left-0 right-0 bg-surface border border-border/50 rounded-lg shadow-lg z-10 mt-1 max-h-48 overflow-y-auto">
+                        <div className="absolute top-full left-0 right-0 bg-background border border-border/50 rounded-lg shadow-lg z-999 mt-1 max-h-48 overflow-y-auto">
                           {locationSearch.results.length > 0 ? (
                             locationSearch.results.map((location) => (
                               <button
                                 key={location.id}
                                 onClick={() => handleLocationSelect(location)}
-                                className="w-full text-left px-4 py-2.5 hover:bg-muted transition-colors duration-150 flex items-center gap-2.5"
+                                className="absolute w-full text-left px-4 py-2.5 hover:bg-muted transition-colors duration-150 flex z-999 items-center gap-2.5"
                               >
                                 {location.type === "city" ? (
                                   <Building2 className="w-4 h-4 text-muted-foreground" />

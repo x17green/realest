@@ -103,7 +103,7 @@ export function AdminSidebar({
       description: "Content management overview",
     },
     {
-      href: "/admin/suport",
+      href: "/admin/support",
       label: "Support Center",
       icon: HelpCircle,
       description: "Support tickets and inquiries",

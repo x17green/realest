@@ -48,9 +48,9 @@ export default function Footer() {
   };
 
   const socialLinks = [
-    { href: "#", icon: XIcon, label: "X" },
+    { href: "https://x.com/realestconnect", icon: XIcon, label: "X" },
     { href: "#", icon: FacebookIcon, label: "Facebook" },
-    { href: "#", icon: InstagramIcon, label: "Instagram" },
+    { href: "https://www.instagram.com/realest.connect", icon: InstagramIcon, label: "Instagram" },
     { href: "#", icon: LinkedInIcon, label: "LinkedIn" },
     { href: "#", icon: YouTubeIcon, label: "YouTube" },
   ];

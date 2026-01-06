@@ -191,7 +191,8 @@ const OwnerOnboarding: React.FC = () => {
                           updateFormData("email", e.target.value)
                         }
                         placeholder="john@example.com"
-                        className="w-full px-4 py-2.5 bg-surface border rounded-lg transition-all duration-200 focus:ring-2 focus:outline-none focus:border-primary/50 focus:ring-primary/20"
+                        className="w-full px-4 py-2.5 bg-surface border rounded-lg transition-all duration-200 focus:ring-2 focus:outline-none focus:border-primary/50 focus:ring-primary/20 disabled:opacity-50 cursor-not-allowed"
+                        disabled
                       />
                     </div>
                   </div>
