@@ -893,6 +893,9 @@ export default function DesignShowcasePage() {
                 <div className="relative">
                   <div className="bg-linear-to-br from-blue-200 to-blue-300 h-48 rounded-t-xl"></div>
                   <div className="absolute top-3 left-3">
+                    <ApartmentBadge size="sm" showTooltip={false} />
+                  </div>
+                  <div className="absolute top-12 left-3">
                     <VerifiedBadge size="sm">Verified</VerifiedBadge>
                   </div>
                   <div className="absolute top-3 right-3">
@@ -952,6 +955,9 @@ export default function DesignShowcasePage() {
                 <div className="relative">
                   <div className="bg-linear-to-br from-green-200 to-green-300 h-48 rounded-t-xl"></div>
                   <div className="absolute top-3 left-3">
+                    <DuplexBadge size="sm" showTooltip={false} />
+                  </div>
+                  <div className="absolute top-12 left-3">
                     <PendingBadge size="sm">Pending</PendingBadge>
                   </div>
                   <div className="absolute top-3 right-3">
@@ -1010,6 +1016,13 @@ export default function DesignShowcasePage() {
                 <div className="relative">
                   <div className="bg-white/20 h-48 rounded-t-xl"></div>
                   <div className="absolute top-3 left-3">
+                    <PropertyTypeBadge
+                      type="penthouse"
+                      size="sm"
+                      showTooltip={false}
+                    />
+                  </div>
+                  <div className="absolute top-12 left-3">
                     <FeaturedBadge size="sm">Featured</FeaturedBadge>
                   </div>
                   <div className="absolute top-3 right-3">
@@ -1074,11 +1087,12 @@ export default function DesignShowcasePage() {
             <div className="bg-muted/50 p-4 rounded-lg">
               <p className="text-sm text-muted-foreground">
                 <strong>Integration Example:</strong> These property cards
-                demonstrate how AmenityBadges integrate seamlessly with existing
-                property cards. The badges are positioned at the bottom of the
-                image overlay and automatically display the most relevant
-                amenities for each property. Hover over badges to see detailed
-                tooltips.
+                demonstrate how PropertyTypeBadges and AmenityBadges integrate
+                seamlessly with existing property cards. PropertyTypeBadges
+                provide clear categorization at the top-left, while
+                AmenityBadges are positioned at the bottom of the image overlay
+                and automatically display the most relevant amenities for each
+                property. Hover over badges to see detailed tooltips.
               </p>
             </div>
           </div>
@@ -1339,6 +1353,9 @@ export default function DesignShowcasePage() {
                 <div className="relative">
                   <div className="bg-linear-to-br from-gray-200 to-gray-300 h-48 rounded-t-xl"></div>
                   <div className="absolute top-4 left-4">
+                    <ApartmentBadge size="sm" showTooltip={false} />
+                  </div>
+                  <div className="absolute top-12 left-4">
                     <VerifiedBadge size="sm">Verified</VerifiedBadge>
                   </div>
                   <div className="absolute top-4 right-4">
@@ -1391,6 +1408,9 @@ export default function DesignShowcasePage() {
                 <div className="relative">
                   <div className="bg-white/20 h-48 rounded-t-xl"></div>
                   <div className="absolute top-4 left-4">
+                    <DuplexBadge size="sm" showTooltip={false} />
+                  </div>
+                  <div className="absolute top-12 left-4">
                     <FeaturedBadge size="sm">Featured</FeaturedBadge>
                   </div>
                   <div className="absolute top-4 right-4">
@@ -1443,6 +1463,9 @@ export default function DesignShowcasePage() {
                 <div className="relative">
                   <div className="bg-linear-to-br from-green-200 to-green-300 h-48 rounded-t-xl"></div>
                   <div className="absolute top-4 left-4">
+                    <ApartmentBadge size="sm" showTooltip={false} />
+                  </div>
+                  <div className="absolute top-12 left-4">
                     <PendingBadge size="sm">Pending</PendingBadge>
                   </div>
                   <div className="absolute top-4 right-4">
