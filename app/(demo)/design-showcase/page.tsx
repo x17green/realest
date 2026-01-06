@@ -38,6 +38,20 @@ import {
   AmenityBadgeGroup,
   createAmenityBadges,
 } from "@/components/realest/badges";
+import {
+  PropertyTypeBadge,
+  HouseBadge,
+  ApartmentBadge,
+  LandBadge,
+  CommercialBadge,
+  HotelBadge,
+  OfficeBadge,
+  DuplexBadge,
+  BungalowBadge,
+  SelfContainedBadge,
+  ResidentialLandBadge,
+  CommercialLandBadge,
+} from "@/components/realest/badges/PropertyTypeBadge";
 import { ProfileDropdown } from "@/components/realest";
 import { ProfileUpload } from "@/components/realest/ProfileUpload";
 import { PropertyListingForm } from "@/components/patterns/forms";
@@ -693,6 +707,178 @@ export default function DesignShowcasePage() {
                   <WaterBadge status="borehole" showIcon={false} />
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Property Type Badges (RealEST Components) */}
+          <div className="space-y-6">
+            <h3 className="font-heading text-2xl font-semibold">
+              Property Type Badges (RealEST Components)
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Broad Property Categories */}
+              <div className="card-enhanced p-6 space-y-4">
+                <h4 className="font-heading text-lg font-medium">
+                  Broad Categories
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  <HouseBadge />
+                  <ApartmentBadge />
+                  <LandBadge />
+                  <CommercialBadge />
+                  <HotelBadge />
+                  <OfficeBadge />
+                </div>
+              </div>
+
+              {/* Nigerian Residential Types */}
+              <div className="card-enhanced p-6 space-y-4">
+                <h4 className="font-heading text-lg font-medium">
+                  Nigerian Residential
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  <DuplexBadge />
+                  <BungalowBadge />
+                  <SelfContainedBadge />
+                  <PropertyTypeBadge type="mini_flat" />
+                  <PropertyTypeBadge type="room_and_parlor" />
+                  <PropertyTypeBadge type="penthouse" />
+                  <PropertyTypeBadge type="terrace" />
+                  <PropertyTypeBadge type="detached_house" />
+                </div>
+              </div>
+
+              {/* Commercial & Land Types */}
+              <div className="card-enhanced p-6 space-y-4">
+                <h4 className="font-heading text-lg font-medium">
+                  Commercial & Land
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  <PropertyTypeBadge type="warehouse" />
+                  <PropertyTypeBadge type="showroom" />
+                  <PropertyTypeBadge type="restaurant" />
+                  <ResidentialLandBadge />
+                  <CommercialLandBadge />
+                  <PropertyTypeBadge type="mixed_use_land" />
+                  <PropertyTypeBadge type="farmland" />
+                </div>
+              </div>
+            </div>
+
+            {/* Size Variations */}
+            <div className="card-enhanced p-6">
+              <h4 className="font-heading text-lg font-medium mb-4">
+                Size Variations & Variants
+              </h4>
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <span className="text-sm font-medium w-16">Small:</span>
+                  <HouseBadge size="sm" />
+                  <ApartmentBadge size="sm" />
+                  <LandBadge size="sm" />
+                </div>
+                <div className="flex items-center gap-4">
+                  <span className="text-sm font-medium w-16">Medium:</span>
+                  <HouseBadge size="md" />
+                  <ApartmentBadge size="md" />
+                  <LandBadge size="md" />
+                </div>
+                <div className="flex items-center gap-4">
+                  <span className="text-sm font-medium w-16">Large:</span>
+                  <HouseBadge size="lg" />
+                  <ApartmentBadge size="lg" />
+                  <LandBadge size="lg" />
+                </div>
+                <div className="flex items-center gap-4">
+                  <span className="text-sm font-medium w-16">Outline:</span>
+                  <HouseBadge variant="outline" />
+                  <ApartmentBadge variant="outline" />
+                </div>
+                <div className="flex items-center gap-4">
+                  <span className="text-sm font-medium w-16">No Icon:</span>
+                  <HouseBadge showIcon={false} />
+                  <ApartmentBadge showIcon={false} />
+                </div>
+              </div>
+            </div>
+
+            {/* Property Type Badge Group Example */}
+            <div className="card-enhanced p-6">
+              <h4 className="font-heading text-lg font-medium mb-4">
+                Property Type Badge Integration
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Property Card Example */}
+                <div className="card-enhanced group cursor-pointer">
+                  <div className="relative">
+                    <div className="bg-linear-to-br from-blue-200 to-blue-300 h-32 rounded-t-xl"></div>
+                    <div className="absolute top-3 left-3">
+                      <DuplexBadge />
+                    </div>
+                    <div className="absolute top-3 right-3">
+                      <PropertyStatusChip
+                        status="available"
+                        size="sm"
+                        showTooltip={false}
+                      />
+                    </div>
+                  </div>
+                  <div className="p-4 space-y-2">
+                    <h4 className="font-heading text-lg font-semibold">
+                      Modern 3BR Duplex
+                    </h4>
+                    <p className="text-sm text-muted-foreground">
+                      Lekki Phase 1, Lagos
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xl font-bold text-brand-violet">
+                        ₦3,500,000/year
+                      </span>
+                      <Button variant="violet" size="sm">
+                        View
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Land Property Example */}
+                <div className="card-enhanced group cursor-pointer">
+                  <div className="relative">
+                    <div className="bg-linear-to-br from-green-200 to-green-300 h-32 rounded-t-xl"></div>
+                    <div className="absolute top-3 left-3">
+                      <ResidentialLandBadge />
+                    </div>
+                    <div className="absolute top-3 right-3">
+                      <PropertyStatusChip
+                        status="featured"
+                        size="sm"
+                        showTooltip={false}
+                      />
+                    </div>
+                  </div>
+                  <div className="p-4 space-y-2">
+                    <h4 className="font-heading text-lg font-semibold">
+                      Residential Plot
+                    </h4>
+                    <p className="text-sm text-muted-foreground">
+                      Banana Island, Lagos
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xl font-bold text-brand-violet">
+                        ₦15,000,000
+                      </span>
+                      <Button variant="neon" size="sm">
+                        View
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground mt-4">
+                Property type badges integrate seamlessly with property cards,
+                providing clear visual categorization. Hover over badges to see
+                detailed tooltips with property type information.
+              </p>
             </div>
           </div>
 

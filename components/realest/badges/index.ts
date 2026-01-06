@@ -51,3 +51,22 @@ export {
   type AmenityType,
   type AmenityStatus,
 } from "./AmenityBadge";
+
+export {
+  PropertyTypeBadge,
+  HouseBadge,
+  ApartmentBadge,
+  LandBadge,
+  CommercialBadge,
+  HotelBadge,
+  OfficeBadge,
+  DuplexBadge,
+  BungalowBadge,
+  SelfContainedBadge,
+  BoysQuartersBadge as PropertyTypeBoysQuartersBadge,
+  ResidentialLandBadge,
+  CommercialLandBadge,
+  propertyTypeBadgeVariants,
+  type PropertyTypeBadgeProps,
+  type PropertyType,
+} from "./PropertyTypeBadge";
