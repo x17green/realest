@@ -123,7 +123,7 @@ This list reflects the latest RealEST routing strategy, emphasizing:
     *   *View/Edit Specific Listing:* `/dashboard/owner/listings/[id]`
     *   *Manage Listing Documents:* `/dashboard/owner/listings/[id]/documents`
     *   *Manage Listing Media:* `/dashboard/owner/listings/[id]/media`
-*   **List New Property/Business (Multi-step Form):** `/dashboard/owner/new`
+*   **List New Property/Business (Multi-step Form):** `/dashboard/owner/listings/new`
     *   *Step 1 (Type):* `/dashboard/owner/listings/new/type`
     *   *Step 2 (Details):* `/dashboard/owner/listings/new/details`
     *   *Step 3 (Location):* `/dashboard/owner/listings/new/location`

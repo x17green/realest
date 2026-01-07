@@ -179,7 +179,7 @@ export default function OwnerListingsPage() {
               Manage your property listings and track their performance.
             </p>
           </div>
-          <Link href="/owner/new">
+          <Link href="/owner/listings/new">
             <Button variant="primary">
               <Plus className="w-4 h-4 mr-2" />
               Add New Property
@@ -301,7 +301,7 @@ export default function OwnerListingsPage() {
                   ? "Start by adding your first property listing."
                   : `You don't have any ${filter} listings.`}
               </p>
-              <Link href="/owner/new">
+              <Link href="/owner/listings/new">
                 <Button variant="primary">
                   <Plus className="w-4 h-4 mr-2" />
                   Add New Property

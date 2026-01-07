@@ -93,7 +93,7 @@ export default function PropertyTypeStep() {
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
-              <Link href="/owner/new">
+              <Link href="/owner/listings/new">
                 <Button variant="ghost" size="sm">
                   <ArrowLeft className="w-4 h-4" />
                 </Button>
@@ -172,7 +172,7 @@ export default function PropertyTypeStep() {
 
           {/* Navigation */}
           <div className="flex items-center justify-between pt-6 border-t border-border">
-            <Link href="/owner/new">
+            <Link href="/owner/listings/new">
               <Button variant="ghost">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back
