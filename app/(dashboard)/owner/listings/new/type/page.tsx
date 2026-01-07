@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Chip } from "@heroui/react";
+import { Chip, Modal } from "@heroui/react";
 import { 
   Card, 
   CardContent,
@@ -20,6 +20,7 @@ import {
   MapPin,
   Utensils,
   Warehouse,
+  X,
 } from "lucide-react";
 
 interface PropertyType {
@@ -44,6 +45,7 @@ interface PropertyCategory {
 
 export default function PropertyTypeStep() {
   const [selectedType, setSelectedType] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const categories: Record<string, PropertyCategory> = {
     residential: {
@@ -398,6 +400,15 @@ export default function PropertyTypeStep() {
     {} as Record<string, PropertyType[]>
   );
 
+  const handleCategoryClick = (categoryId: string) => {
+    setSelectedCategory(categoryId);
+  };
+
+  const handleTypeSelect = (typeId: string) => {
+    setSelectedType(typeId);
+    setSelectedCategory(null);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       <div className="container mx-auto px-4 py-8">
@@ -415,7 +426,7 @@ export default function PropertyTypeStep() {
                   What are you listing?
                 </h1>
                 <p className="text-lg text-muted-foreground">
-                  Select the property type that best describes your listing
+                  Select a category to explore property types
                 </p>
               </div>
             </div>
@@ -424,139 +435,204 @@ export default function PropertyTypeStep() {
             </div>
           </div>
 
-          {/* Category Sections */}
-          <div className="space-y-12">
-            {Object.entries(groupedTypes).map(([categoryId, types]) => {
-              const category = categories[categoryId];
+          {/* Category Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            {Object.entries(categories).map(([categoryId, category]) => {
+              const typeCount = groupedTypes[categoryId]?.length || 0;
               return (
-                <div key={categoryId} className="space-y-4">
-                  {/* Category Header */}
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className={`p-3 rounded-lg ${category.bgColor}`}>
-                      <div className={category.color}>{category.icon}</div>
-                    </div>
-                    <div>
-                      <h2 className="text-2xl font-bold text-foreground">
-                        {category.title}
-                      </h2>
-                      <p className="text-sm text-muted-foreground">
-                        {types.length} option{types.length !== 1 ? "s" : ""} available
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Property Cards Grid */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {types.map((type) => (
-                      <Card
-                        key={type.id}
-                        className={`cursor-pointer transition-all duration-300 hover:shadow-xl ${
-                          selectedType === type.id
-                            ? `border-2 ${category.borderColor} ${category.bgColor} shadow-lg scale-105`
-                            : `border border-border/30 hover:border-primary/50 hover:shadow-md`
+                <Card
+                  key={categoryId}
+                  className={`cursor-pointer transition-all duration-300 hover:shadow-xl group overflow-hidden ${
+                    selectedCategory === categoryId
+                      ? `border-2 ${category.borderColor} ${category.bgColor} shadow-lg scale-105`
+                      : `border border-border/30 hover:border-primary/50 hover:shadow-md`
+                  }`}
+                  onClick={() => handleCategoryClick(categoryId)}
+                >
+                  <CardContent className="p-6">
+                    <div className="space-y-4 text-center">
+                      {/* Icon */}
+                      <div
+                        className={`inline-flex p-4 rounded-xl transition-all ${
+                          selectedCategory === categoryId
+                            ? `bg-primary text-primary-foreground scale-110`
+                            : `bg-primary/10 text-primary group-hover:scale-110`
                         }`}
-                        onClick={() => setSelectedType(type.id)}
                       >
-                        <CardContent className="p-5">
-                          {/* Popular Badge */}
-                          {type.popular && (
-                            <div className="flex justify-end mb-3">
-                              <div className="flex items-center gap-1 bg-amber-50 border border-amber-200 px-3 py-1 rounded-full">
-                                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                                <span className="text-xs font-semibold text-amber-700">
-                                  Popular
-                                </span>
-                              </div>
-                            </div>
-                          )}
+                        {category.icon}
+                      </div>
 
-                          <div className="space-y-3">
-                            {/* Icon & Title */}
-                            <div className="flex items-start justify-between gap-3">
-                              <div
-                                className={`p-3 rounded-lg transition-all shrink-0 ${
-                                  selectedType === type.id
-                                    ? `bg-primary text-primary-foreground`
-                                    : `bg-primary/10 text-primary`
-                                }`}
-                              >
-                                {type.icon}
-                              </div>
-                              {selectedType === type.id && (
-                                <CheckCircle className="w-6 h-6 text-primary mt-1" />
-                              )}
-                            </div>
+                      {/* Title & Count */}
+                      <div>
+                        <h2 className="text-xl font-bold text-foreground mb-1">
+                          {category.name}
+                        </h2>
+                        <p className="text-xs text-muted-foreground">
+                          {typeCount} option{typeCount !== 1 ? "s" : ""}
+                        </p>
+                      </div>
 
-                            {/* Description */}
-                            <div>
-                              <h3 className="font-semibold text-foreground mb-1">
-                                {type.name}
-                              </h3>
-                              <p className="text-xs text-muted-foreground line-clamp-2">
-                                {type.description}
-                              </p>
-                            </div>
+                      {/* Hover CTA */}
+                      <div className="text-xs font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                        Browse →
+                      </div>
 
-                            {/* Features */}
-                            <div className="pt-2 space-y-2 border-t border-border/30">
-                              {type.features.map((feature, index) => (
-                                <div key={index} className="flex items-start gap-2">
-                                  <div className="w-1 h-1 bg-primary rounded-full mt-1.5 shrink-0" />
-                                  <span className="text-xs text-muted-foreground leading-tight">
-                                    {feature}
-                                  </span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </div>
+                      {/* Selection Indicator */}
+                      {selectedCategory === categoryId && (
+                        <div className="pt-2 border-t border-primary/20">
+                          <CheckCircle className="w-5 h-5 text-primary mx-auto" />
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
               );
             })}
           </div>
 
-          {/* CTA Section */}
-          {selectedType && (
-            <div className="mt-12 p-6 bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/30 rounded-xl animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-semibold text-foreground mb-1">
-                    Ready to continue?
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    You selected{" "}
-                    <span className="font-medium text-primary">
-                      {propertyTypes.find((t) => t.id === selectedType)?.name}
-                    </span>
-                    . Let's add the details about your property.
-                  </p>
-                </div>
-                <Link href={`/owner/listings/new/details?type=${selectedType}`}>
-                  <Button variant="default" className="gap-2">
-                    Continue
-                    <ArrowLeft className="w-4 h-4 rotate-180" />
-                  </Button>
-                </Link>
+          {/* Modal for Property Type Selection */}
+          {selectedCategory !== null && (
+            <Modal
+              isOpen={selectedCategory !== null}
+              onOpenChange={(open) => {
+                if (!open) setSelectedCategory(null);
+              }}
+            >
+              <div className="space-y-4">
+                {(() => {
+                  const category = selectedCategory ? categories[selectedCategory] : null;
+                  const types = selectedCategory ? groupedTypes[selectedCategory] : [];
+
+                  return (
+                    <>
+                      {/* Modal Header */}
+                      <div className="flex items-center justify-between gap-4 pb-4 border-b border-border">
+                        <div className="flex items-center gap-3">
+                          <div className={`p-2 rounded-lg ${category?.bgColor || ""}`}>
+                            <div className={category?.color || ""}>
+                              {category?.icon}
+                            </div>
+                          </div>
+                          <div>
+                            <h2 className="text-2xl font-bold text-foreground">
+                              {category?.name} Properties
+                            </h2>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Choose from {types.length} options
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => setSelectedCategory(null)}
+                          className="p-1 hover:bg-muted rounded-lg transition-colors"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      </div>
+
+                      {/* Modal Body */}
+                      <div className="max-h-[60vh] overflow-y-auto px-2">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-4">
+                          {types.map((type) => (
+                            <Card
+                              key={type.id}
+                              className={`cursor-pointer transition-all duration-200 ${
+                                selectedType === type.id
+                                  ? `border-2 border-primary bg-primary/5 shadow-lg`
+                                  : `border border-border/30 hover:border-primary/50 hover:shadow-md`
+                              }`}
+                              onClick={() => handleTypeSelect(type.id)}
+                            >
+                              <CardContent className="p-4">
+                                <div className="space-y-3">
+                                  {/* Popular Badge */}
+                                  {type.popular && (
+                                    <div className="flex justify-end">
+                                      <div className="flex items-center gap-1 bg-amber-50 border border-amber-200 px-2 py-1 rounded-full">
+                                        <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                                        <span className="text-xs font-semibold text-amber-700">
+                                          Popular
+                                        </span>
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {/* Icon & Title */}
+                                  <div className="flex items-start justify-between gap-2">
+                                    <div
+                                      className={`p-2 rounded-lg transition-all shrink-0 ${
+                                        selectedType === type.id
+                                          ? `bg-primary text-primary-foreground`
+                                          : `bg-primary/10 text-primary`
+                                      }`}
+                                    >
+                                      {type.icon}
+                                    </div>
+                                    {selectedType === type.id && (
+                                      <CheckCircle className="w-5 h-5 text-primary mt-1" />
+                                    )}
+                                  </div>
+
+                                  {/* Name & Description */}
+                                  <div>
+                                    <h3 className="font-semibold text-foreground text-sm">
+                                      {type.name}
+                                    </h3>
+                                    <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
+                                      {type.description}
+                                    </p>
+                                  </div>
+
+                                  {/* Features */}
+                                  <div className="pt-2 space-y-1 border-t border-border/30">
+                                    {type.features.slice(0, 2).map((feature, index) => (
+                                      <div
+                                        key={index}
+                                        className="flex items-start gap-1.5"
+                                      >
+                                        <div className="w-0.5 h-0.5 bg-primary rounded-full mt-1.5 shrink-0" />
+                                        <span className="text-xs text-muted-foreground">
+                                          {feature}
+                                        </span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Modal Footer Actions */}
+                      {selectedType && (
+                        <div className="border-t border-border flex gap-3 justify-end pt-4">
+                          <Button variant="ghost" onClick={() => setSelectedCategory(null)}>
+                            Cancel
+                          </Button>
+                          <Link href={`/owner/listings/new/details?type=${selectedType}`}>
+                            <Button variant="default" className="gap-2">
+                              Continue
+                              <ArrowLeft className="w-4 h-4 rotate-180" />
+                            </Button>
+                          </Link>
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
-            </div>
+            </Modal>
           )}
 
-          {/* Navigation */}
-          <div className="flex items-center justify-between pt-8 mt-8 border-t border-border">
+          {/* Navigation Footer */}
+          <div className="flex items-center justify-between pt-8 mt-12 border-t border-border">
             <Link href="/owner/listings/new">
               <Button variant="ghost">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back
               </Button>
             </Link>
-            {!selectedType && (
-              <p className="text-sm text-muted-foreground">
-                Select a property type to continue →
-              </p>
-            )}
             {selectedType && (
               <Link href={`/owner/listings/new/details?type=${selectedType}`}>
                 <Button variant="default">
