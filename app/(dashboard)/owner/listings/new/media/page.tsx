@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Card, Button, Spinner } from "@heroui/react";
+import { Card, CardContent, Button, Input, Spinner } from "@/components/ui";
 import { ArrowLeft, Upload, Save, Image as ImageIcon } from "lucide-react";
 
 export default function PropertyMediaStep() {
@@ -50,7 +50,7 @@ export default function PropertyMediaStep() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <Spinner size="lg" />
+          <Spinner />
           <p className="mt-4 text-muted-foreground">Loading...</p>
         </div>
       </div>
@@ -65,7 +65,7 @@ export default function PropertyMediaStep() {
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
               <Link href={`/owner/listings/new/location?type=${propertyType}`}>
-                <Button variant="ghost" size="sm" isIconOnly>
+                <Button variant="ghost" size="sm">
                   <ArrowLeft className="w-4 h-4" />
                 </Button>
               </Link>
@@ -82,8 +82,8 @@ export default function PropertyMediaStep() {
           </div>
 
           <form onSubmit={handleSubmit}>
-            <Card.Root className="bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl shadow-lg">
-              <Card.Content className="p-8">
+            <Card className="bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl shadow-lg">
+              <CardContent className="p-8">
                 <div className="text-center mb-8">
                   <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Upload className="w-8 h-8 text-primary" />
@@ -96,7 +96,7 @@ export default function PropertyMediaStep() {
 
                   <div className="flex justify-center">
                     <label htmlFor="media-upload">
-                      <Button variant="primary">
+                      <Button variant="default">
                         <Upload className="w-4 h-4 mr-2" />
                         Choose Files
                       </Button>
@@ -148,8 +148,8 @@ export default function PropertyMediaStep() {
                     <li>• Use landscape orientation for most photos</li>
                   </ul>
                 </div>
-              </Card.Content>
-            </Card.Root>
+              </CardContent>
+            </Card>
 
             {/* Navigation */}
             <div className="flex items-center justify-between mt-8 pt-6 border-t border-border">
@@ -159,10 +159,10 @@ export default function PropertyMediaStep() {
                   Back to Location
                 </Button>
               </Link>
-              <Button type="submit" variant="primary" isDisabled={isLoading}>
+              <Button type="submit" variant="default" disabled={isLoading}>
                 {isLoading ? (
                   <>
-                    <Spinner size="sm" className="mr-2" />
+                    <Spinner className="mr-2" />
                     Uploading...
                   </>
                 ) : (

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Card, Button, Input, Spinner } from "@heroui/react";
+import { Card, CardContent, Button, Input, Spinner } from "@/components/ui";
 import {
   Select,
   SelectContent,
@@ -104,7 +104,7 @@ export default function PropertyLocationStep() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <Spinner size="lg" />
+          <Spinner />
           <p className="mt-4 text-muted-foreground">Loading...</p>
         </div>
       </div>
@@ -119,7 +119,7 @@ export default function PropertyLocationStep() {
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
               <Link href={`/owner/listings/new/details?type=${propertyType}`}>
-                <Button variant="ghost" size="sm" isIconOnly>
+                <Button variant="ghost" size="sm">
                   <ArrowLeft className="w-4 h-4" />
                 </Button>
               </Link>
@@ -139,8 +139,8 @@ export default function PropertyLocationStep() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Form Section */}
               <div>
-                <Card.Root className="bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl shadow-lg">
-                  <Card.Content className="p-8">
+                <Card className="bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl shadow-lg">
+                  <CardContent className="p-8">
                     <h3 className="text-lg font-semibold mb-6">
                       Location Details
                     </h3>
@@ -221,14 +221,14 @@ export default function PropertyLocationStep() {
                         </Button>
                       </div>
                     </div>
-                  </Card.Content>
-                </Card.Root>
+                  </CardContent>
+                </Card>
               </div>
 
               {/* Map Preview Section */}
               <div>
-                <Card.Root className="bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl shadow-lg">
-                  <Card.Content className="p-8">
+                <Card className="bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl shadow-lg">
+                  <CardContent className="p-8">
                     <h3 className="text-lg font-semibold mb-6">Map Preview</h3>
 
                     {/* Placeholder for map */}
@@ -256,8 +256,8 @@ export default function PropertyLocationStep() {
                         <span>{formData.longitude || "Not set"}</span>
                       </div>
                     </div>
-                  </Card.Content>
-                </Card.Root>
+                  </CardContent>
+                </Card>
               </div>
             </div>
 
@@ -269,10 +269,10 @@ export default function PropertyLocationStep() {
                   Back to Details
                 </Button>
               </Link>
-              <Button type="submit" variant="primary" isDisabled={isLoading}>
+              <Button type="submit" variant="default" disabled={isLoading}>
                 {isLoading ? (
                   <>
-                    <Spinner size="sm" className="mr-2" />
+                    <Spinner className="mr-2" />
                     Saving...
                   </>
                 ) : (

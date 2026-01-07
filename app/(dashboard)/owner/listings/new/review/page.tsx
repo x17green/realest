@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Card, Button, Spinner, Chip } from "@heroui/react";
+import { Chip } from "@heroui/react";
+import { Card, CardContent, Button, Spinner } from "@/components/ui";
 import { ArrowLeft, CheckCircle, Eye, Send, AlertCircle } from "lucide-react";
 
 export default function PropertyReviewStep() {
@@ -59,7 +60,7 @@ export default function PropertyReviewStep() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <Spinner size="lg" />
+          <Spinner />
           <p className="mt-4 text-muted-foreground">Loading...</p>
         </div>
       </div>
@@ -74,7 +75,7 @@ export default function PropertyReviewStep() {
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
               <Link href={`/owner/listings/new/documents?type=${propertyType}`}>
-                <Button variant="ghost" size="sm" isIconOnly>
+                <Button variant="ghost" size="sm" >
                   <ArrowLeft className="w-4 h-4" />
                 </Button>
               </Link>
@@ -93,8 +94,8 @@ export default function PropertyReviewStep() {
           {/* Property Summary */}
           <div className="space-y-6">
             {/* Basic Info */}
-            <Card.Root className="bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl shadow-lg">
-              <Card.Content className="p-6">
+            <Card className="bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl shadow-lg">
+              <CardContent className="p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <CheckCircle className="w-5 h-5 text-success" />
                   <h3 className="text-lg font-semibold">
@@ -141,13 +142,13 @@ export default function PropertyReviewStep() {
                   </p>
                   <p className="text-sm">{propertyData.description}</p>
                 </div>
-              </Card.Content>
-            </Card.Root>
+              </CardContent>
+            </Card>
 
             {/* Media & Documents */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card.Root className="bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl shadow-lg">
-                <Card.Content className="p-6">
+              <Card className="bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl shadow-lg">
+                <CardContent className="p-6">
                   <div className="flex items-center gap-2 mb-4">
                     <CheckCircle className="w-5 h-5 text-success" />
                     <h3 className="text-lg font-semibold">Photos & Media</h3>
@@ -159,11 +160,11 @@ export default function PropertyReviewStep() {
                     </span>
                     <Chip variant="secondary">{propertyData.images} files</Chip>
                   </div>
-                </Card.Content>
-              </Card.Root>
+                </CardContent>
+              </Card>
 
-              <Card.Root className="bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl shadow-lg">
-                <Card.Content className="p-6">
+              <Card className="bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl shadow-lg">
+                <CardContent className="p-6">
                   <div className="flex items-center gap-2 mb-4">
                     <CheckCircle className="w-5 h-5 text-success" />
                     <h3 className="text-lg font-semibold">Documents</h3>
@@ -177,13 +178,13 @@ export default function PropertyReviewStep() {
                       {propertyData.documents} files
                     </Chip>
                   </div>
-                </Card.Content>
-              </Card.Root>
+                </CardContent>
+              </Card>
             </div>
 
             {/* Amenities */}
-            <Card.Root className="bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl shadow-lg">
-              <Card.Content className="p-6">
+            <Card className="bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl shadow-lg">
+              <CardContent className="p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <CheckCircle className="w-5 h-5 text-success" />
                   <h3 className="text-lg font-semibold">
@@ -198,12 +199,12 @@ export default function PropertyReviewStep() {
                     </Chip>
                   ))}
                 </div>
-              </Card.Content>
-            </Card.Root>
+              </CardContent>
+            </Card>
 
             {/* Publishing Notice */}
-            <Card.Root className="bg-warning/5 border border-warning/20 rounded-2xl shadow-lg">
-              <Card.Content className="p-6">
+            <Card className="bg-warning/5 border border-warning/20 rounded-2xl shadow-lg">
+              <CardContent className="p-6">
                 <div className="flex items-start gap-3">
                   <AlertCircle className="w-5 h-5 text-warning mt-0.5" />
                   <div>
@@ -225,8 +226,8 @@ export default function PropertyReviewStep() {
                     </div>
                   </div>
                 </div>
-              </Card.Content>
-            </Card.Root>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Navigation */}
@@ -243,13 +244,13 @@ export default function PropertyReviewStep() {
                 Preview
               </Button>
               <Button
-                variant="primary"
+                variant="default"
                 onClick={handlePublish}
-                isDisabled={isPublishing}
+                disabled={isPublishing}
               >
                 {isPublishing ? (
                   <>
-                    <Spinner size="sm" className="mr-2" />
+                    <Spinner className="mr-2" />
                     Publishing...
                   </>
                 ) : (
