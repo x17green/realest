@@ -2201,8 +2201,8 @@ export default function DesignShowcasePage() {
                 yearRenovated: "2022",
                 roadAccessibility: "all_year",
               }}
-              onSubmit={(data) => console.log("Form submitted:", data)}
-              onSaveDraft={(data) => console.log("Draft saved:", data)}
+              onSubmit={async (data) => console.log("Form submitted:", data)}
+              onSaveDraft={async (data) => console.log("Draft saved:", data)}
             />
           </div>
         </section>
@@ -2305,8 +2305,8 @@ export default function DesignShowcasePage() {
                     "Access Control",
                   ],
                 }}
-                onSubmit={(data) => console.log("Form submitted:", data)}
-                onSaveDraft={(data) => console.log("Draft saved:", data)}
+                onSubmit={async (data) => console.log("Form submitted:", data)}
+                onSaveDraft={async (data) => console.log("Draft saved:", data)}
               />
             </div>
           </div>

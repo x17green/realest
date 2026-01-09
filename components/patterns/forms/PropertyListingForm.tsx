@@ -8,12 +8,16 @@ import {
   LoadingSpinner,
   ProgressRing,
 } from "@/components/untitledui/StatusComponents";
+import { usePropertyListingForm } from "@/lib/hooks/usePropertyListingForm";
+import { useFileUpload } from "@/lib/hooks/useFileUpload";
+import type { PropertyListingValues } from "@/lib/validations/property";
 
 interface PropertyListingFormProps {
-  onSubmit?: (data: any) => void;
-  onSaveDraft?: (data: any) => void;
+  onSubmit?: (data: PropertyListingValues) => Promise<void>;
+  onSaveDraft?: (data: any) => Promise<void>;
   initialData?: any;
   className?: string;
+  propertyId?: string;
 }
 
 export function PropertyListingForm({
@@ -21,76 +25,63 @@ export function PropertyListingForm({
   onSaveDraft,
   initialData,
   className,
+  propertyId,
 }: PropertyListingFormProps) {
   const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState({
-    // Basic Details
-    title: "",
-    description: "",
-    propertyType: "",
-    purpose: "rent", // rent, sale
+  const totalSteps = 6;
 
-    // Location
-    state: "",
-    lga: "",
-    area: "",
-    address: "",
-    coordinates: { lat: "", lng: "" },
+  // Use custom form hook with validation
+  const {
+    formData,
+    handleInputChange,
+    handleArrayToggle,
+    submitForm,
+    isSubmitting,
+    errors,
+    isValid,
+  } = usePropertyListingForm(onSubmit, onSaveDraft, initialData);
 
-    // Property Details
-    bedrooms: "",
-    bathrooms: "",
-    toilets: "",
-    size: "",
-    yearBuilt: "",
-
-    // Building Details
-    floors: "",
-    buildingMaterial: "",
-    yearRenovated: "",
-
-    // Pricing
-    price: "",
-    serviceCharge: "",
-    cautionFee: "",
-    legalFee: "",
-    agentFee: "",
-
-    // Features & Amenities
-    infrastructure: [],
-    amenities: [],
-    security: [],
-
-    // Images & Documents
-    images: [],
-    documents: [],
-
-    // Nigerian Specific
-    hasBQ: false,
-    bqType: "",
-    bqBathrooms: "",
-    bqKitchen: false,
-    bqSeparateEntrance: false,
-    bqCondition: "",
-    hasNEPA: false,
-    hasInverter: false,
-    hasSolarPanels: false,
-    hasWater: false,
-    waterTankCapacity: "",
-    hasWaterTreatment: false,
-    roadAccessibility: "",
-    parkingSpaces: "",
-    kitchenType: "",
-    securityHours: "",
-    hasSecurityLevy: false,
-    securityLevyAmount: "",
-    isGated: false,
-    hasGoodRoads: false,
-    ...initialData,
+  // Use file upload hook for images
+  const imageUpload = useFileUpload({
+    bucket: 'property-media',
+    propertyId,
+    maxFiles: 20,
+    maxFileSize: 10 * 1024 * 1024, // 10MB
+    allowedTypes: ['image/jpeg', 'image/png', 'image/webp'],
   });
 
-  const [isLoading, setIsLoading] = useState(false);
-  const totalSteps = 6;
+  // Use file upload hook for documents
+  const documentUpload = useFileUpload({
+    bucket: 'property-documents',
+    propertyId,
+    maxFiles: 10,
+    maxFileSize: 5 * 1024 * 1024, // 5MB
+    allowedTypes: [
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ],
+  });
+
+  // Sync uploaded image URLs to form data
+  React.useEffect(() => {
+    const imageUrls = imageUpload.files
+      .filter(f => !f.isUploading && !f.error && f.publicUrl)
+      .map(f => f.publicUrl);
+    if (imageUrls.length > 0) {
+      handleInputChange('images', imageUrls);
+    }
+  }, [imageUpload.files, handleInputChange]);
+
+  // Sync uploaded document URLs to form data
+  React.useEffect(() => {
+    const docUrls = documentUpload.files
+      .filter(f => !f.isUploading && !f.error && f.publicUrl)
+      .map(f => ({ url: f.publicUrl, name: f.file.name }));
+    if (docUrls.length > 0) {
+      handleInputChange('documents', docUrls);
+    }
+  }, [documentUpload.files, handleInputChange]);
 
   const nigerianStates = [
     "Abia",
@@ -207,22 +198,6 @@ export function PropertyListingForm({
 
   const kitchenTypes = ["built_in", "separate", "none"];
 
-  const handleInputChange = (field: string, value: any) => {
-    setFormData((prev: any) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
-  const handleArrayToggle = (field: string, value: string) => {
-    setFormData((prev: any) => ({
-      ...prev,
-      [field]: (prev as any)[field].includes(value)
-        ? (prev as any)[field].filter((item: string) => item !== value)
-        : [...(prev as any)[field], value],
-    }));
-  };
-
   const nextStep = () => {
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
@@ -235,17 +210,8 @@ export function PropertyListingForm({
     }
   };
 
-  const handleSubmit = async (isDraft = false) => {
-    setIsLoading(true);
-    try {
-      if (isDraft) {
-        await onSaveDraft?.(formData);
-      } else {
-        await onSubmit?.(formData);
-      }
-    } finally {
-      setIsLoading(false);
-    }
+  const handleFormSubmit = async (isDraft = false) => {
+    await submitForm(isDraft);
   };
 
   const renderStepContent = () => {
@@ -273,6 +239,9 @@ export function PropertyListingForm({
                 <p className="text-xs text-muted-foreground mt-1">
                   Make it descriptive and appealing
                 </p>
+                {errors.title && (
+                  <p className="text-xs text-destructive mt-1">{errors.title}</p>
+                )}
               </div>
 
               <div>
@@ -325,8 +294,17 @@ export function PropertyListingForm({
                   className="w-full p-3 border border-input rounded-lg bg-background focus:ring-2 focus:ring-ring resize-none"
                   required
                 />
+                {errors.description && (
+                  <p className="text-xs text-destructive mt-1">{errors.description}</p>
+                )}
               </div>
             </div>
+
+            {errors._form && (
+              <div className="p-4 bg-destructive/10 border border-destructive rounded-lg">
+                <p className="text-sm text-destructive">{errors._form}</p>
+              </div>
+            )}
           </div>
         );
 
@@ -1105,7 +1083,7 @@ export function PropertyListingForm({
             <div className="space-y-6">
               <div>
                 <h4 className="text-lg font-heading font-medium mb-4">
-                  Property Images
+                  Property Images *
                 </h4>
                 <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
                   <div className="text-4xl mb-4">📸</div>
@@ -1116,11 +1094,86 @@ export function PropertyListingForm({
                     Upload high-quality images of your property. First image
                     will be the cover photo.
                   </p>
-                  <RealEstButton variant="tertiary">Choose Files</RealEstButton>
+                  <input
+                    type="file"
+                    id="image-upload"
+                    multiple
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={(e) => {
+                      if (e.target.files) {
+                        imageUpload.uploadFiles(e.target.files);
+                      }
+                    }}
+                    className="hidden"
+                  />
+                  <RealEstButton
+                    variant="tertiary"
+                    onClick={() => document.getElementById('image-upload')?.click()}
+                    isLoading={imageUpload.isUploading}
+                  >
+                    {imageUpload.isUploading ? 'Uploading...' : 'Choose Files'}
+                  </RealEstButton>
                   <p className="text-xs text-muted-foreground mt-2">
                     Accepted formats: JPG, PNG, WebP. Max 10MB per image.
                   </p>
                 </div>
+
+                {/* Display uploaded images */}
+                {imageUpload.files.length > 0 && (
+                  <div className="mt-4 grid grid-cols-3 gap-4">
+                    {imageUpload.files.map((file, index) => (
+                      <div key={index} className="relative group">
+                        {file.publicUrl && !file.error && (
+                          <img
+                            src={file.publicUrl}
+                            alt={file.file.name}
+                            className="w-full h-32 object-cover rounded-lg"
+                          />
+                        )}
+                        {file.isUploading && (
+                          <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-lg">
+                            <div className="text-center">
+                              <LoadingSpinner size="sm" />
+                              {file.progress !== undefined && (
+                                <p className="text-white text-xs mt-2">{Math.round(file.progress)}%</p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                        {file.error && (
+                          <div className="w-full h-32 bg-destructive/10 border border-destructive rounded-lg flex items-center justify-center">
+                            <p className="text-xs text-destructive text-center px-2">
+                              {file.error}
+                            </p>
+                          </div>
+                        )}
+                        {!file.isUploading && !file.error && (
+                          <button
+                            onClick={() => imageUpload.removeFile(index)}
+                            className="absolute top-2 right-2 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            ✕
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Display image upload errors */}
+                {imageUpload.errors.length > 0 && (
+                  <div className="mt-4 p-3 bg-destructive/10 border border-destructive rounded-lg">
+                    {imageUpload.errors.map((error, index) => (
+                      <p key={index} className="text-sm text-destructive">
+                        {error}
+                      </p>
+                    ))}
+                  </div>
+                )}
+
+                {errors.images && (
+                  <p className="text-xs text-destructive mt-2">{errors.images}</p>
+                )}
               </div>
 
               <div>
@@ -1135,13 +1188,76 @@ export function PropertyListingForm({
                   <p className="text-sm text-muted-foreground mb-4">
                     Certificate of Occupancy, Survey Plan, Building Plan, etc.
                   </p>
-                  <RealEstButton variant="tertiary">
-                    Choose Documents
+                  <input
+                    type="file"
+                    id="document-upload"
+                    multiple
+                    accept=".pdf,.doc,.docx"
+                    onChange={(e) => {
+                      if (e.target.files) {
+                        documentUpload.uploadFiles(e.target.files);
+                      }
+                    }}
+                    className="hidden"
+                  />
+                  <RealEstButton
+                    variant="tertiary"
+                    onClick={() => document.getElementById('document-upload')?.click()}
+                    isLoading={documentUpload.isUploading}
+                  >
+                    {documentUpload.isUploading ? 'Uploading...' : 'Choose Documents'}
                   </RealEstButton>
                   <p className="text-xs text-muted-foreground mt-2">
                     Accepted formats: PDF, DOC, DOCX. Max 5MB per document.
                   </p>
                 </div>
+
+                {/* Display uploaded documents */}
+                {documentUpload.files.length > 0 && (
+                  <div className="mt-4 space-y-2">
+                    {documentUpload.files.map((file, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-3 bg-muted rounded-lg"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-2xl">📄</span>
+                          <span className="text-sm font-medium">{file.file.name}</span>
+                        </div>
+                        {file.isUploading && (
+                          <div className="flex items-center gap-2">
+                            <LoadingSpinner size="sm" />
+                            {file.progress !== undefined && (
+                              <span className="text-xs text-muted-foreground">{Math.round(file.progress)}%</span>
+                            )}
+                          </div>
+                        )}
+                        {file.error && (
+                          <span className="text-xs text-destructive">{file.error}</span>
+                        )}
+                        {!file.isUploading && !file.error && (
+                          <button
+                            onClick={() => documentUpload.removeFile(index)}
+                            className="text-destructive hover:text-destructive/80"
+                          >
+                            ✕
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Display document upload errors */}
+                {documentUpload.errors.length > 0 && (
+                  <div className="mt-4 p-3 bg-destructive/10 border border-destructive rounded-lg">
+                    {documentUpload.errors.map((error, index) => (
+                      <p key={index} className="text-sm text-destructive">
+                        {error}
+                      </p>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -1218,8 +1334,8 @@ export function PropertyListingForm({
         <div className="flex items-center gap-4">
           <RealEstButton
             variant="ghost"
-            onClick={() => handleSubmit(true)}
-            isLoading={isLoading}
+            onClick={() => handleFormSubmit(true)}
+            isLoading={isSubmitting}
           >
             Save Draft
           </RealEstButton>
@@ -1231,10 +1347,11 @@ export function PropertyListingForm({
           ) : (
             <RealEstButton
               variant="neon"
-              onClick={() => handleSubmit(false)}
-              isLoading={isLoading}
+              onClick={() => handleFormSubmit(false)}
+              isLoading={isSubmitting}
+              disabled={!isValid && !isSubmitting}
             >
-              {isLoading ? "Publishing..." : "Publish Listing"}
+              {isSubmitting ? "Publishing..." : "Publish Listing"}
             </RealEstButton>
           )}
         </div>
