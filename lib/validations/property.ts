@@ -99,7 +99,7 @@ export const propertyListingSchema = z.object({
 
   // 4. Pricing
   price: z.coerce.number().min(1000, "Price must be at least ₦1,000"),
-  price_frequency: z.enum(["monthly", "yearly", "one_time"]).default("one_time"),
+  price_frequency: z.enum(["monthly", "yearly", "sale", "nightly"]).default("sale"),
   
   // 5. Metadata Object (For JSONB columns on property_details Table)
   // This cleanly separates variable data from core columns
@@ -108,14 +108,14 @@ export const propertyListingSchema = z.object({
   // Images (Array of strings/paths from signed-url)
   images: z.array(z.string().min(1, "Image path required"))
     .min(1, "At least one property image is required")
-    .max(20, "Maximum 20 images allowed"),
+    .max(20, "Maximum 20 images allowed")
+    .optional(),
 
   // Documents
   documents: z.array(z.any()).optional(),
 });
 
 export const propertyDetailsSchema = z.object({
-  property_id: z.string().uuid(),
   parking_spaces: z.coerce.number().int().min(0).optional(),
   has_pool: z.boolean().optional(),
   has_garage: z.boolean().optional(),

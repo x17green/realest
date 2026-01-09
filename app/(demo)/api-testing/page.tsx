@@ -71,7 +71,7 @@ export default function ApiTestingPage() {
     latitude: "6.4698",
     longitude: "3.5852",
     property_type: "duplex",
-    listing_type: "sale",
+    listing_type: "for_sale",
     bedrooms: "3",
     bathrooms: "4",
     nepa_status: "stable",
