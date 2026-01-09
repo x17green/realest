@@ -165,7 +165,7 @@ export async function POST(request: NextRequest) {
     
     // Check for potential duplicates: run two parameterized queries and combine results in JS
     const [{ data: byAddress, error: errAddr }, { data: byCoords, error: errCoords }] = await Promise.all([
-      supabase.from('properties').select('id, address, latitude, longitude').eq('status', 'active').eq('address', validatedData.address),
+      supabase.from('properties').select('id, address, latitude, longitude').eq('status', 'draft').eq('address', validatedData.address),
       supabase.from('properties').select('id, address, latitude, longitude').eq('status', 'active')
         .eq('latitude', validatedData.latitude)
         .eq('longitude', validatedData.longitude),
@@ -177,6 +177,10 @@ export async function POST(request: NextRequest) {
       const existingProperties = [...(byAddress || []), ...(byCoords || [])];
       if (existingProperties.length > 0) {
         console.log('Potential duplicate detected:', existingProperties);
+        return NextResponse.json(
+          { error: "Duplicate property detected", duplicates: existingProperties },
+          { status: 409 }
+        );
       }
     }
 
