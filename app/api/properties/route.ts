@@ -10,7 +10,7 @@ const searchQuerySchema = z.object({
   state: z.string().optional(),
   city: z.string().optional(),
   property_type: z.string().optional(),
-  listing_type: z.enum(["for_rent", "for_sale", "for_lease", "short_let"]),
+  listing_type: z.enum(["for_rent", "for_sale", "for_lease", "short_let"]).optional(), // Added .optional()
   min_price: z.number().optional(),
   max_price: z.number().optional(),
   bedrooms: z.number().optional(),
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
       city: searchParams.get("city") || undefined,
       property_type: searchParams.get("property_type") || undefined,
       listing_type:
-        (searchParams.get("listing_type") as "sale" | "rent" | "lease") ||
+        (searchParams.get("listing_type") as "for_rent" | "for_sale" | "for_lease" | "short_let") ||
         undefined,
       min_price: searchParams.get("min_price")
         ? parseFloat(searchParams.get("min_price")!)
