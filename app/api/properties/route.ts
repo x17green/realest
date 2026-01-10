@@ -160,27 +160,39 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
+    
+    // Check for potential duplicates (skip for drafts - only check when publishing)
+    const isDraft = body.status === 'draft';
+    
     const validatedData = propertyListingSchema.parse(body);
     console.log('Validated property data:', validatedData);
     
-    // Check for potential duplicates: run two parameterized queries and combine results in JS
-    const [{ data: byAddress, error: errAddr }, { data: byCoords, error: errCoords }] = await Promise.all([
-      supabase.from('properties').select('id, address, latitude, longitude').eq('status', 'draft').eq('address', validatedData.address),
-      supabase.from('properties').select('id, address, latitude, longitude').eq('status', 'active')
-        .eq('latitude', validatedData.latitude)
-        .eq('longitude', validatedData.longitude),
-    ]);
+    if (!isDraft) {
+      const [{ data: byAddress, error: errAddr }, { data: byCoords, error: errCoords }] = await Promise.all([
+        supabase.from('properties').select('id, address, latitude, longitude')
+          .neq('status', 'draft') // Only check against non-draft properties
+          .eq('address', validatedData.address),
+        supabase.from('properties').select('id, address, latitude, longitude')
+          .eq('status', 'active')
+          .eq('latitude', validatedData.latitude)
+          .eq('longitude', validatedData.longitude),
+      ]);
 
-    if (errAddr || errCoords) {
-      console.error('Duplicate check error:', errAddr || errCoords);
-    } else {
-      const existingProperties = [...(byAddress || []), ...(byCoords || [])];
-      if (existingProperties.length > 0) {
-        console.log('Potential duplicate detected:', existingProperties);
-        return NextResponse.json(
-          { error: "Duplicate property detected", duplicates: existingProperties },
-          { status: 409 }
-        );
+      if (errAddr || errCoords) {
+        console.error('Duplicate check error:', errAddr || errCoords);
+      } else {
+        const existingProperties = [...(byAddress || []), ...(byCoords || [])];
+        if (existingProperties.length > 0) {
+          console.log('Duplicate property detected:', existingProperties);
+          return NextResponse.json(
+            { 
+              error: "A property with this address or location already exists",
+              duplicates: existingProperties,
+              message: "Please verify this is a unique property or contact support if you believe this is an error."
+            },
+            { status: 409 }
+          );
+        }
       }
     }
 
@@ -224,7 +236,7 @@ export async function POST(request: NextRequest) {
       bathrooms: validatedData.bathrooms,
       square_feet: validatedData.square_feet,
       year_built: validatedData.year_built,
-      status: "draft", // Start as draft, user can publish later
+      status: body.status || "draft", // Use provided status or default to draft
       verification_status: "pending",
       listing_source: profile.user_type === 'agent' ? 'agent' : 'owner',
     };

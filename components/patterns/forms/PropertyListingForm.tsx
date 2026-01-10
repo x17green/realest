@@ -29,6 +29,8 @@ export function PropertyListingForm({
 }: PropertyListingFormProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 6;
+  const [draftPropertyId, setDraftPropertyId] = useState<string | undefined>(propertyId);
+  const [isDraftCreating, setIsDraftCreating] = useState(false);
 
   // Use custom form hook with validation
   const {
@@ -44,7 +46,7 @@ export function PropertyListingForm({
   // Use file upload hook for images
   const imageUpload = useFileUpload({
     bucket: 'property-media',
-    propertyId,
+    propertyId: draftPropertyId,
     maxFiles: 20,
     maxFileSize: 10 * 1024 * 1024, // 10MB
     allowedTypes: ['image/jpeg', 'image/png', 'image/webp'],
@@ -53,7 +55,7 @@ export function PropertyListingForm({
   // Use file upload hook for documents
   const documentUpload = useFileUpload({
     bucket: 'property-documents',
-    propertyId,
+    propertyId: draftPropertyId,
     maxFiles: 10,
     maxFileSize: 5 * 1024 * 1024, // 5MB
     allowedTypes: [
@@ -82,6 +84,90 @@ export function PropertyListingForm({
       handleInputChange('documents', docUrls);
     }
   }, [documentUpload.files, handleInputChange]);
+
+  // Create draft property when user reaches Step 5 (images) or Step 6 (documents)
+  React.useEffect(() => {
+    async function createDraftProperty() {
+      if (draftPropertyId || isDraftCreating || propertyId) return; // Already have draft or editing existing
+      if (currentStep < 5) return; // Only create when reaching file upload steps
+
+      setIsDraftCreating(true);
+      try {
+        // Use transform function to map property type correctly
+        const mapPropertyType = (type: string) => {
+          const mapping: Record<string, string> = {
+            'Apartment': 'apartment',
+            'Duplex': 'duplex',
+            'Bungalow': 'bungalow',
+            'Boys Quarters (BQ)': 'flat',
+            'Self-contained': 'self_contained',
+            'Mini Flat': 'mini_flat',
+            'Face-me-I-face-you': 'room_and_parlor',
+            'Mansion': 'house',
+            'Terrace': 'terrace',
+            'Semi-detached': 'detached_house',
+            'Detached': 'detached_house',
+            'Penthouse': 'penthouse',
+          };
+          return mapping[type] || type.toLowerCase().replace(/\s+/g, '_');
+        };
+
+        const response = await fetch('/api/properties', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            // Required fields with proper transformations
+            property_type: mapPropertyType(formData.propertyType) || 'house',
+            listing_type: formData.purpose === 'rent' ? 'for_rent' : 'for_sale', // Map purpose to listing_type
+            title: formData.title || 'Draft Property',
+            description: formData.description || 'Draft - Property being created',
+            price: Number(formData.price) || 1000, // Min 1000 per schema
+            price_frequency: formData.purpose === 'rent' ? 'yearly' : 'sale', // Correct enum values
+            
+            // Location fields
+            address: formData.address || `${formData.area || 'Draft'}, ${formData.lga || 'Lagos'}`,
+            city: formData.lga || formData.area || 'Lagos', // city is required
+            state: formData.state || 'Lagos',
+            country: 'NG',
+            
+            // Coordinates with defaults to avoid NaN
+            latitude: parseFloat(formData.coordinates?.lat) || 6.5244, // Default to Lagos coordinates
+            longitude: parseFloat(formData.coordinates?.lng) || 3.3792,
+            
+            status: 'draft', // Mark as draft
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to create draft property');
+        }
+
+        const { property } = await response.json();
+        setDraftPropertyId(property.id);
+        
+        // Persist to localStorage for recovery
+        localStorage.setItem('draftPropertyId', property.id);
+        console.log('Draft property created:', property.id);
+      } catch (error) {
+        console.error('Failed to create draft property:', error);
+        alert('Unable to save property draft. Please check your internet connection and try again.');
+      } finally {
+        setIsDraftCreating(false);
+      }
+    }
+
+    createDraftProperty();
+    }, [currentStep, draftPropertyId, isDraftCreating, propertyId]);
+  // Recover draft property ID from localStorage on mount
+  React.useEffect(() => {
+    if (!propertyId && !draftPropertyId) {
+      const savedDraftId = localStorage.getItem('draftPropertyId');
+      if (savedDraftId) {
+        setDraftPropertyId(savedDraftId);
+        console.log('Recovered draft property ID:', savedDraftId);
+      }
+    }
+  }, [propertyId, draftPropertyId]);
 
   const nigerianStates = [
     "Abia",
@@ -211,7 +297,79 @@ export function PropertyListingForm({
   };
 
   const handleFormSubmit = async (isDraft = false) => {
-    await submitForm(isDraft);
+    try {
+      // Step 1: Validate and prepare property data
+      const validatedData = await submitForm(isDraft);
+      if (!validatedData) return; // Validation failed
+
+      // Step 2: Update draft property or create new one
+      const propertyResponse = await fetch(
+        draftPropertyId ? `/api/properties/${draftPropertyId}` : '/api/properties',
+        {
+          method: draftPropertyId ? 'PATCH' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...validatedData,
+            status: 'pending_ml_validation', // Update status from draft to pending
+          }),
+        }
+      );
+
+      if (!propertyResponse.ok) {
+        const errorData = await propertyResponse.json();
+        throw new Error(errorData.error || 'Failed to publish property');
+      }
+
+      const { data: createdProperty } = await propertyResponse.json();
+      const newPropertyId = draftPropertyId || createdProperty.id;
+
+      // Step 3: Record uploaded images in property_media table
+      for (const uploadedFile of imageUpload.files) {
+        if (uploadedFile.publicUrl && !uploadedFile.error) {
+          await fetch(`/api/properties/${newPropertyId}/media`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              file_url: uploadedFile.publicUrl,
+              file_name: uploadedFile.file.name,
+              media_type: 'image',
+              is_primary: imageUpload.files.indexOf(uploadedFile) === 0, // First image is primary
+            }),
+          });
+        }
+      }
+
+      // Step 4: Record uploaded documents in property_documents table
+      for (const uploadedDoc of documentUpload.files) {
+        if (uploadedDoc.publicUrl && !uploadedDoc.error) {
+          await fetch(`/api/properties/${newPropertyId}/documents`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              file_url: uploadedDoc.publicUrl,
+              file_name: uploadedDoc.file.name,
+              document_type: 'other', // You may want to add document type selection in the form
+            }),
+          });
+        }
+      }
+
+      // Step 5: Call the onSubmit callback if provided (for parent component handling)
+      if (onSubmit) {
+        await onSubmit(validatedData);
+      }
+
+      // Success - clear draft from localStorage
+      localStorage.removeItem('draftPropertyId');
+      console.log('Property published successfully:', newPropertyId);
+    } catch (error) {
+      console.error('Property submission error:', error);
+      // Error is already handled by submitForm for validation errors
+      // This catches API errors
+      if (error instanceof Error) {
+        alert(`Failed to publish property: ${error.message}`);
+      }
+    }
   };
 
   const renderStepContent = () => {
@@ -277,6 +435,9 @@ export function PropertyListingForm({
                 >
                   <option value="rent">For Rent</option>
                   <option value="sale">For Sale</option>
+                  <option value="lease">For Lease</option>
+                  <option value="shortlet">Short Let</option>
+                  <option value="location">Location Only</option>
                 </select>
               </div>
 

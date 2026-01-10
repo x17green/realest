@@ -7,7 +7,7 @@ export interface PropertyFormData {
   title: string;
   description: string;
   propertyType: string;
-  purpose: 'rent' | 'sale';
+  purpose: 'rent' | 'sale' | 'lease' | 'shortlet' | 'location';
 
   // Location
   state: string;
@@ -200,9 +200,12 @@ export function transformFormDataToSchema(
   formData: PropertyFormData
 ): Partial<PropertyListingValues> {
   // Map purpose to listing_type
-  const listingTypeMap: Record<string, 'for_rent' | 'for_sale'> = {
+  const listingTypeMap: Record<string, 'for_rent' | 'for_sale' | 'for_lease' | 'short_let' | 'location' > = {
     rent: 'for_rent',
     sale: 'for_sale',
+    lease: 'for_lease',
+    shortlet: 'short_let',
+    location: 'location',
   };
 
   // Determine NEPA status
@@ -313,7 +316,7 @@ export interface UsePropertyListingFormReturn {
   setFormData: React.Dispatch<React.SetStateAction<PropertyFormData>>;
   handleInputChange: (field: string, value: any) => void;
   handleArrayToggle: (field: string, value: string) => void;
-  submitForm: (isDraft?: boolean) => Promise<void>;
+  submitForm: (isDraft?: boolean) => Promise<PropertyListingValues | null>;
   isSubmitting: boolean;
   errors: Record<string, string>;
   isValid: boolean;
@@ -365,6 +368,7 @@ export function usePropertyListingForm(
         if (isDraft) {
           // Save draft without validation
           await onSaveDraft?.(formData);
+          return null; // No validated data for drafts
         } else {
           // Transform and validate data
           const transformedData = transformFormDataToSchema(formData);
@@ -372,8 +376,8 @@ export function usePropertyListingForm(
           // Validate with Zod schema
           const validatedData = propertyListingSchema.parse(transformedData);
 
-          // Submit validated data
-          await onSubmit?.(validatedData);
+          // Return validated data for parent component to handle
+          return validatedData;
         }
       } catch (error: any) {
         console.error('Form submission error:', error);
@@ -391,6 +395,7 @@ export function usePropertyListingForm(
             _form: error.message || 'Failed to submit form',
           });
         }
+        return null; // Return null on validation error
       } finally {
         setIsSubmitting(false);
       }

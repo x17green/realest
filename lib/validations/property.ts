@@ -101,8 +101,9 @@ export const propertyListingSchema = z.object({
   price: z.coerce.number().min(1000, "Price must be at least ₦1,000"),
   price_frequency: z.enum(["monthly", "yearly", "sale", "nightly"]).default("sale"),
   
-  // 5. Metadata Object (For JSONB columns on property_details Table)
-  // This cleanly separates variable data from core columns
+  // 5. Status
+  status: z.enum(["draft", "active", "inactive", "sold", "rented", "pending_ml_validation"]).default("draft"),
+  verification_status: z.enum(["pending", "verified", "rejected"]).default("pending"),
  
   // 6. Images & Docs
   // Images (Array of strings/paths from signed-url)
