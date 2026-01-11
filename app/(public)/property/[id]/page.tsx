@@ -5,14 +5,19 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import {
-  Card,
-  Button,
   Chip,
-  Input,
-  TextArea,
   Avatar,
-  Separator,
 } from "@heroui/react";
+import { 
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  Button,
+  Input,
+  Textarea,
+} from '@/components/ui'
 import {
   MapPin,
   Bed,
@@ -25,10 +30,49 @@ import {
   Share,
   Heart,
   CheckCircle,
-  Star,
 } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { PropertyMap } from "@/components/property/PropertyMap";
+import {
+  StatusBadge,
+  VerifiedBadge,
+  PendingBadge,
+  AvailableBadge,
+} from "@/components/ui/status-badge";
+import {
+  PropertyStatusChip,
+  AvailableChip,
+  PendingChip,
+  FeaturedChip,
+} from "@/components/realest/badges/PropertyStatusChip";
+import {
+  AmenityBadge,
+  PowerBadge,
+  WaterBadge,
+  SecurityBadge,
+  InternetBadge,
+  BoysQuartersBadge,
+  GeneratorBadge,
+  ParkingBadge,
+  PoolBadge,
+  GymBadge,
+  AmenityBadgeGroup,
+  createAmenityBadges,
+} from "@/components/realest/badges";
+import {
+  PropertyTypeBadge,
+  HouseBadge,
+  ApartmentBadge,
+  LandBadge,
+  CommercialBadge,
+  HotelBadge,
+  OfficeBadge,
+  DuplexBadge,
+  BungalowBadge,
+  SelfContainedBadge,
+  ResidentialLandBadge,
+  CommercialLandBadge,
+} from "@/components/realest/badges/PropertyTypeBadge";
 
 interface Property {
   id: string;
@@ -48,6 +92,21 @@ interface Property {
   status: string;
   verification_status: "pending" | "verified" | "rejected";
   created_at: string;
+  // Nigerian market fields (to be added to schema)
+  nepa_status?: "stable" | "intermittent" | "poor" | "none" | "generator_only";
+  water_source?: "borehole" | "public_water" | "well" | "water_vendor" | "none";
+  internet_type?: "fiber" | "starlink" | "4g" | "3g" | "none";
+  security_type?: string[];
+  has_bq?: boolean;
+  bq_type?: "self_contained" | "room_and_parlor" | "single_room" | "multiple_rooms";
+  has_generator?: boolean;
+  has_inverter?: boolean;
+  solar_panels?: boolean;
+  water_tank_capacity?: number;
+  has_water_treatment?: boolean;
+  parking_spaces?: number;
+  has_pool?: boolean;
+  has_gym?: boolean;
   property_details: {
     bedrooms: number | null;
     bathrooms: number | null;
@@ -59,6 +118,9 @@ interface Property {
     pets_allowed: boolean | null;
     amenities: string[] | null;
     utilities_included: string[] | null;
+    has_generator: boolean | null;
+    has_pool: boolean | null;
+    has_gym: boolean | null;
   } | null;
   property_media: {
     id: string;
@@ -214,17 +276,17 @@ export default function PropertyDetailsPage() {
       <>
         <Header />
         <div className="min-h-screen bg-background flex items-center justify-center">
-          <Card.Root className="max-w-md">
-            <Card.Content className="text-center py-8">
+          <Card className="max-w-md">
+            <CardContent className="text-center py-8">
               <h2 className="text-xl font-semibold mb-2">Property Not Found</h2>
               <p className="text-muted-foreground mb-4">
                 The property you're looking for doesn't exist or has been removed.
               </p>
-              <Button asChild variant="primary">
+              <Button variant="default">
                 <Link href="/">Back to Homepage</Link>
               </Button>
-            </Card.Content>
-          </Card.Root>
+            </CardContent>
+          </Card>
         </div>
         <Footer />
       </>
@@ -317,10 +379,10 @@ export default function PropertyDetailsPage() {
                     </span>
                   </div>
                   <div className="flex gap-4 text-sm text-muted-foreground">
-                    <Chip variant="secondary">
-                      {property.property_type.replace("_", " ")}
-                    </Chip>
-                    <Chip variant="secondary">For {property.listing_type}</Chip>
+                      <PropertyTypeBadge type={property.property_type as any} />
+                      <PropertyStatusChip 
+                        status={property.status === 'active' ? 'available' : property.status === 'pending' ? 'pending' : 'unavailable'}
+                      />
                   </div>
                 </div>
                 <div className="text-right">
@@ -337,11 +399,11 @@ export default function PropertyDetailsPage() {
             </div>
 
             {/* Property Details */}
-            <Card.Root>
-              <Card.Header>
-                <Card.Title>Property Details</Card.Title>
-              </Card.Header>
-              <Card.Content>
+            <Card>
+              <CardHeader>
+                <CardTitle>Property Details</CardTitle>
+              </CardHeader>
+              <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {property.property_details?.bedrooms && (
                     <div className="flex items-center gap-2">
@@ -407,31 +469,31 @@ export default function PropertyDetailsPage() {
                     </div>
                   </div>
                 )}
-              </Card.Content>
-            </Card.Root>
+              </CardContent>
+            </Card>
 
             {/* Description */}
             {property.description && (
-              <Card.Root>
-                <Card.Header>
-                  <Card.Title>Description</Card.Title>
-                </Card.Header>
-                <Card.Content>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Description</CardTitle>
+                </CardHeader>
+                <CardContent>
                   <p className="text-muted-foreground whitespace-pre-wrap">
                     {property.description}
                   </p>
-                </Card.Content>
-              </Card.Root>
+                </CardContent>
+              </Card>
             )}
 
             {/* Amenities */}
             {property.property_details?.amenities &&
               property.property_details.amenities.length > 0 && (
-                <Card.Root>
-                  <Card.Header>
-                    <Card.Title>Amenities</Card.Title>
-                  </Card.Header>
-                  <Card.Content>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Amenities</CardTitle>
+                  </CardHeader>
+                  <CardContent>
                     <div className="flex flex-wrap gap-2">
                       {property.property_details.amenities.map(
                         (amenity, index) => (
@@ -441,16 +503,38 @@ export default function PropertyDetailsPage() {
                         ),
                       )}
                     </div>
-                  </Card.Content>
-                </Card.Root>
+                  </CardContent>
+                </Card>
               )}
 
+            {/* Nigerian Market Amenities */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Infrastructure & Amenities</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <AmenityBadgeGroup 
+                    amenities={createAmenityBadges({
+                    nepa_status: property.nepa_status || 'none',
+                    water_source: property.water_source || 'none',
+                    internet_type: property.internet_type || 'none',
+                    security_type: property.security_type || [],
+                    has_bq: property.has_bq || false,
+                    has_generator: property.property_details?.has_generator || false,
+                    has_pool: property.property_details?.has_pool || false,
+                    has_gym: property.property_details?.has_gym || false,
+                    parking_spaces: property.property_details?.parking_spaces || 0,
+                  })}
+                />
+              </CardContent>
+            </Card>
+
             {/* Property Location Map */}
-            <Card.Root>
-              <Card.Header>
-                <Card.Title>Location</Card.Title>
-              </Card.Header>
-              <Card.Content>
+            <Card>
+              <CardHeader>
+                <CardTitle>Location</CardTitle>
+              </CardHeader>
+              <CardContent>
                 {property.latitude && property.longitude ? (
                   <div className="h-64 rounded-lg overflow-hidden">
                     <PropertyMap
@@ -471,21 +555,21 @@ export default function PropertyDetailsPage() {
                     </div>
                   </div>
                 )}
-              </Card.Content>
-            </Card.Root>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Contact Form */}
-            <Card.Root>
-              <Card.Header>
-                <Card.Title>Contact Property Owner</Card.Title>
-                <Card.Description>
+            <Card>
+              <CardHeader>
+                <CardTitle>Contact Property Owner</CardTitle>
+                <CardDescription>
                   Send an inquiry about this property
-                </Card.Description>
-              </Card.Header>
-              <Card.Content>
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
                 {inquirySent ? (
                   <div className="text-center py-8">
                     <CheckCircle className="w-12 h-12 text-success mx-auto mb-4" />
@@ -552,7 +636,7 @@ export default function PropertyDetailsPage() {
                       <label htmlFor="message" className="text-sm font-medium">
                         Message
                       </label>
-                      <TextArea
+                      <Textarea
                         id="message"
                         placeholder="Tell the owner about your interest in this property..."
                         value={inquiryForm.message}
@@ -568,23 +652,23 @@ export default function PropertyDetailsPage() {
                     </div>
                     <Button
                       type="submit"
-                      variant="primary"
+                      variant="default"
                       className="w-full"
-                      isDisabled={isSubmitting}
+                      disabled={isSubmitting}
                     >
                       {isSubmitting ? "Sending..." : "Send Inquiry"}
                     </Button>
                   </form>
                 )}
-              </Card.Content>
-            </Card.Root>
+              </CardContent>
+            </Card>
 
             {/* Owner Info */}
-            <Card.Root>
-              <Card.Header>
-                <Card.Title>Listed by</Card.Title>
-              </Card.Header>
-              <Card.Content>
+            <Card>
+              <CardHeader>
+                <CardTitle>Listed by</CardTitle>
+              </CardHeader>
+              <CardContent>
                 <div className="flex items-center gap-3 mb-4">
                   {(() => {
                     // Robust lister resolution: agent > owner > fallback
@@ -638,15 +722,15 @@ export default function PropertyDetailsPage() {
                     </div>
                   </div>
                 )}
-              </Card.Content>
-            </Card.Root>
+              </CardContent>
+            </Card>
 
             {/* Quick Stats */}
-            <Card.Root>
-              <Card.Header>
-                <Card.Title>Property Stats</Card.Title>
-              </Card.Header>
-              <Card.Content>
+            <Card>
+              <CardHeader>
+                <CardTitle>Property Stats</CardTitle>
+              </CardHeader>
+              <CardContent>
                 <div className="space-y-3">
                   <div className="flex justify-between">
                     <span className="text-sm text-muted-foreground">
@@ -656,32 +740,29 @@ export default function PropertyDetailsPage() {
                       {new Date(property.created_at).toLocaleDateString()}
                     </span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between items-center">
                     <span className="text-sm text-muted-foreground">
                       Property Type
                     </span>
-                    <span className="text-sm">{property.property_type}</span>
+                    <PropertyTypeBadge type={property.property_type as any} />
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between items-center">
                     <span className="text-sm text-muted-foreground">
                       Status
                     </span>
-                    <Chip
-                      color={
-                        property.verification_status === "verified"
-                          ? "success"
-                          : property.verification_status === "rejected"
-                            ? "danger"
-                            : "warning"
+                    <PropertyStatusChip
+                      status={
+                        property.verification_status === 'verified' 
+                          ? 'available' 
+                          : property.verification_status === 'pending' 
+                            ? 'pending' 
+                            : 'unavailable'
                       }
-                      variant="secondary"
-                    >
-                      {property.verification_status}
-                    </Chip>
+                    />
                   </div>
                 </div>
-              </Card.Content>
-            </Card.Root>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

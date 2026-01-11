@@ -2,13 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
-
-const uploadMediaSchema = z.object({
-  file_name: z.string().min(1),
-  file_url: z.string().url(),
-  media_type: z.enum(["image", "video", "virtual_tour"]),
-  is_primary: z.boolean().default(false),
-});
+import { propertyMediaSchema } from "@/lib/validations/property";
 
 // GET /api/properties/[id]/media - Get property media
 export async function GET(
@@ -114,26 +108,26 @@ export async function POST(
     }
 
     const body = await request.json();
-    const validatedData = uploadMediaSchema.parse(body);
+    const validatedData = propertyMediaSchema.parse(body);
 
-    // Get current max sort order
+    // Get current max display order
     const { data: existingMedia, error: sortError } = await supabase
       .from("property_media")
-      .select("sort_order")
+      .select("display_order")
       .eq("property_id", propertyId)
-      .order("sort_order", { ascending: false })
+      .order("display_order", { ascending: false })
       .limit(1);
 
-    const nextSortOrder =
+    const nextDisplayOrder =
       existingMedia && existingMedia.length > 0
-        ? existingMedia[0].sort_order + 1
+        ? existingMedia[0].display_order + 1
         : 1;
 
-    // If this is marked as primary, unset other primary images
-    if (validatedData.is_primary) {
+    // If this is marked as featured, unset other featured images
+    if (validatedData.is_featured) {
       await supabase
         .from("property_media")
-        .update({ is_primary: false })
+        .update({ is_featured: false })
         .eq("property_id", propertyId);
     }
 
@@ -143,10 +137,10 @@ export async function POST(
       .insert({
         property_id: propertyId,
         media_type: validatedData.media_type,
-        file_url: validatedData.file_url,
+        media_url: validatedData.media_url,
         file_name: validatedData.file_name,
-        is_primary: validatedData.is_primary,
-        sort_order: nextSortOrder,
+        is_featured: validatedData.is_featured,
+        display_order: nextDisplayOrder,
       })
       .select()
       .single();

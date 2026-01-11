@@ -2,22 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
-
-const uploadDocumentSchema = z.object({
-  file_name: z.string().min(1),
-  file_url: z.string().url(),
-  document_type: z.enum([
-    "certificate_of_occupancy",
-    "deed_of_assignment",
-    "survey_plan",
-    "tax_receipt",
-    "building_approval",
-    "owner_id",
-    "utility_bill",
-    "property_photos",
-    "other",
-  ]),
-});
+import { propertyDocumentSchema } from "@/lib/validations/property";
 
 // GET /api/properties/[id]/documents - Get property documents
 export async function GET(
@@ -129,7 +114,7 @@ export async function POST(
     }
 
     const body = await request.json();
-    const validatedData = uploadDocumentSchema.parse(body);
+    const validatedData = propertyDocumentSchema.parse(body);
 
     // Insert document record
     const { data: document, error: insertError } = await supabase
@@ -137,10 +122,9 @@ export async function POST(
       .insert({
         property_id: propertyId,
         document_type: validatedData.document_type,
-        file_url: validatedData.file_url,
+        document_url: validatedData.document_url,
         file_name: validatedData.file_name,
-        ml_validation_status: "pending", // Trigger ML validation
-        admin_vetting_status: "pending",
+        verification_status: "pending", // Trigger ML validation
       })
       .select()
       .single();

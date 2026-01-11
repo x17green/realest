@@ -8,7 +8,12 @@ import { RealEstButton } from "@/components/heroui/RealEstButton";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { AdvancedSearchForm } from "@/components/patterns/forms";
 import { PropertyMap } from "@/components/property/PropertyMap";
-import { Card, Input, Button, Chip } from "@heroui/react";
+import { Chip } from "@heroui/react";
+import { 
+  Card, 
+  Input, 
+  Button 
+} from "@/components/ui";
 import { Header, Footer } from "@/components/layout";
 import {
   MapPin,
@@ -553,7 +558,7 @@ function SearchPageContent() {
                       className={`w-4 h-4 ${isLiked ? "fill-current text-error" : ""}`}
                     />
                   </RealEstButton>
-                  <RealEstButton variant="primary" size="sm" asChild>
+                  <RealEstButton variant="primary" size="sm">
                     <Link href={detailRoute}>View Details</Link>
                   </RealEstButton>
                 </div>
@@ -621,7 +626,7 @@ function SearchPageContent() {
               </div>
             )}
           </div>
-          <Button variant="primary">Search</Button>
+          <Button variant="outline">Search</Button>
         </div>
 
         {/* Content */}
@@ -729,9 +734,9 @@ function SearchPageContent() {
                       className="pl-12 h-12 text-base"
                     />
                   </div>
-                  <RealEstButton type="submit" size="lg" className="px-8">
+                  <Button variant="default" type="submit" size="lg" className="px-8">
                     Search
-                  </RealEstButton>
+                  </Button>
                   <RealEstButton
                     type="button"
                     variant="outline"
@@ -942,7 +947,7 @@ function SearchPageContent() {
                 <RealEstButton onClick={clearFilters}>
                   Clear All Filters
                 </RealEstButton>
-                <RealEstButton variant="outline" asChild>
+                <RealEstButton variant="outline">
                   <Link href="/search">Browse All Properties</Link>
                 </RealEstButton>
               </div>
@@ -984,7 +989,7 @@ function SearchPageContent() {
                 <div className="flex items-center justify-center gap-2 mt-12">
                   <RealEstButton
                     variant="outline"
-                    isDisabled={currentPage === 1}
+                    disabled={currentPage === 1}
                     onClick={() =>
                       setCurrentPage((prev) => Math.max(1, prev - 1))
                     }
@@ -1015,7 +1020,7 @@ function SearchPageContent() {
 
                   <RealEstButton
                     variant="outline"
-                    isDisabled={
+                    disabled={
                       currentPage >= Math.ceil(totalCount / itemsPerPage)
                     }
                     onClick={() => setCurrentPage((prev) => prev + 1)}

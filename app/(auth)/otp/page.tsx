@@ -3,13 +3,13 @@
 import { useState, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { 
-  Button, 
-  Card, 
-  CardHeader, 
-  CardTitle, 
-  CardDescription, 
-  CardContent 
+import {
+  Button,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
 } from "@/components/ui";
 import { verifyOTP, getCurrentUser, getUserProfile, sendOTP } from "@/lib/auth";
 import { CheckCircle, Shield, RefreshCw, AlertTriangle } from "lucide-react";
@@ -116,17 +116,43 @@ function OTPContent() {
         if (profileResponse.success && profileResponse.profile) {
           const userType = profileResponse.profile.user_type;
 
+          // Check if user needs to complete onboarding
+          if (userType === "owner" || userType === "agent") {
+            // Check if onboarding is complete by verifying role-specific table entry
+            const supabase = (
+              await import("@/lib/supabase/client")
+            ).createClient();
+            const tableName = userType === "owner" ? "owners" : "agents";
+
+            const { data: onboardingComplete } = await supabase
+              .from(tableName)
+              .select("id")
+              .eq("profile_id", userResponse.user.id)
+              .single();
+
+            if (!onboardingComplete) {
+              // User hasn't completed onboarding, redirect to onboarding flow
+              router.push("/onboarding");
+              router.refresh();
+              return;
+            }
+          }
+
+          // User has completed onboarding or doesn't need it, redirect to dashboard
           if (userType === "owner") {
-            router.push("/profile-setup");
-          } else if (userType === "agent") {
-            router.push("/agent-onboarding");
+            router.push("/owner");
           } else if (userType === "admin") {
             router.push("/admin");
+          } else if (userType === "agent") {
+            router.push("/agent");
           } else {
             router.push("/profile");
           }
+          router.refresh();
         } else {
+          // Fallback to profile if profile fetch fails
           router.push("/profile");
+          router.refresh();
         }
       }
     } catch (err) {

@@ -75,7 +75,7 @@ export default function SignUpPage() {
       }
 
       if (response.user) {
-        router.push("/success");
+        router.push(`/success?email=${encodeURIComponent(formData.email)}`);
       }
     } catch (err) {
       setError("An unexpected error occurred");

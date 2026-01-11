@@ -46,7 +46,7 @@
       "name": "List Property",
       "short_name": "List",
       "description": "List your property for verification",
-      "url": "/dashboard/owner/new",
+      "url": "/dashboard/owner/listings/new",
       "icons": [
         {
           "src": "/icon-add.png",

@@ -266,7 +266,7 @@ const ComingSoonHero = () => {
                 variant="neon"
                 size="lg"
                 className="flex justify-center items-center rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 gap-2 py-3 px-6 max-w-2xs mx-auto backdrop-blur-sm"
-                onPress={() => setIsModalOpen(true)}
+                onClick={() => setIsModalOpen(true)}
               >
                 <MailCheck className="w-4 h-4" />
                 <span className="text-sm font-medium ">

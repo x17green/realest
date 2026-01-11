@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { generateSignedUrl } from "@/lib/utils/upload-utils";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -94,7 +95,7 @@ export async function POST(request: Request, { params }: RouteParams) {
       .eq("id", user.id)
       .single();
 
-    if (!profile || !["owner", "admin"].includes(profile.user_type)) {
+    if (!profile || !["owner", "agent", "admin"].includes(profile.user_type)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -170,31 +171,35 @@ export async function POST(request: Request, { params }: RouteParams) {
       );
     }
 
-    // Generate unique filename
-    const fileExt = file.name.split(".").pop();
-    const fileName = `${propertyId}-${documentType}-${Date.now()}.${fileExt}`;
-    const filePath = `documents/${propertyId}/${fileName}`;
+    // Generate signed URL for upload
+    const signedUrlResult = await generateSignedUrl({
+      bucket: "property-documents",
+      file_name: file.name,
+      file_type: file.type,
+      file_size: file.size,
+      user_id: user.id,
+      property_id: propertyId,
+    });
 
-    // Upload to Supabase Storage
-    const { error: uploadError } = await supabase.storage
-      .from("property-documents")
-      .upload(filePath, file, {
-        contentType: file.type,
-        upsert: false,
-      });
+    // Upload file to signed URL
+    const uploadResponse = await fetch(signedUrlResult.signed_url, {
+      method: "PUT",
+      body: file,
+      headers: {
+        "Content-Type": file.type,
+      },
+    });
 
-    if (uploadError) {
-      console.error("Storage upload error:", uploadError);
+    if (!uploadResponse.ok) {
+      console.error("Upload to signed URL failed:", uploadResponse.statusText);
       return NextResponse.json(
         { error: "Failed to upload document" },
         { status: 500 },
       );
     }
 
-    // Get public URL
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from("property-documents").getPublicUrl(filePath);
+    // Use the public URL from signed URL generation
+    const publicUrl = signedUrlResult.public_url;
 
     // Save document record to database
     const { data: documentRecord, error: insertError } = await supabase
@@ -215,7 +220,7 @@ export async function POST(request: Request, { params }: RouteParams) {
     if (insertError) {
       console.error("Database insert error:", insertError);
       // Clean up uploaded file if database insert failed
-      await supabase.storage.from("property-documents").remove([filePath]);
+      await supabase.storage.from("property-documents").remove([signedUrlResult.file_path]);
 
       return NextResponse.json(
         { error: "Failed to save document record" },

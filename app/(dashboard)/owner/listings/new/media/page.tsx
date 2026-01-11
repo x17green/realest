@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Card, Button, Spinner } from "@heroui/react";
-import { ArrowLeft, Upload, Save, FileText } from "lucide-react";
+import { Card, CardContent, Button, Input, Spinner } from "@/components/ui";
+import { ArrowLeft, Upload, Save, Image as ImageIcon } from "lucide-react";
 
-export default function PropertyDocumentsStep() {
+export default function PropertyMediaStep() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const propertyType = searchParams.get("type") || "";
@@ -15,7 +15,7 @@ export default function PropertyDocumentsStep() {
 
   useEffect(() => {
     if (!propertyType) {
-      router.push("/owner/new/type");
+      router.push("/owner/listings/new/type");
     }
   }, [propertyType, router]);
 
@@ -31,16 +31,16 @@ export default function PropertyDocumentsStep() {
     setIsLoading(true);
 
     try {
-      // TODO: Upload documents to server
-      console.log("Uploading documents:", uploadedFiles);
+      // TODO: Upload files to server
+      console.log("Uploading media files:", uploadedFiles);
 
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
       // Navigate to next step
-      router.push(`/owner/new/review?type=${propertyType}`);
+      router.push(`/owner/listings/new/documents?type=${propertyType}`);
     } catch (error) {
-      console.error("Failed to upload documents:", error);
+      console.error("Failed to upload media:", error);
     } finally {
       setIsLoading(false);
     }
@@ -50,7 +50,7 @@ export default function PropertyDocumentsStep() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <Spinner size="lg" />
+          <Spinner />
           <p className="mt-4 text-muted-foreground">Loading...</p>
         </div>
       </div>
@@ -64,49 +64,47 @@ export default function PropertyDocumentsStep() {
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
-              <Link href={`/owner/new/media?type=${propertyType}`}>
-                <Button variant="ghost" size="sm" isIconOnly>
+              <Link href={`/owner/listings/new/location?type=${propertyType}`}>
+                <Button variant="ghost" size="sm">
                   <ArrowLeft className="w-4 h-4" />
                 </Button>
               </Link>
               <div>
                 <h1 className="text-3xl font-bold text-foreground mb-2">
-                  Documents
+                  Photos & Media
                 </h1>
                 <p className="text-muted-foreground">
-                  Upload property documents for verification
+                  Upload high-quality photos and videos of your {propertyType}
                 </p>
               </div>
             </div>
-            <div className="text-sm text-muted-foreground">Step 5 of 6</div>
+            <div className="text-sm text-muted-foreground">Step 4 of 6</div>
           </div>
 
           <form onSubmit={handleSubmit}>
-            <Card.Root className="bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl shadow-lg">
-              <Card.Content className="p-8">
+            <Card className="bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl shadow-lg">
+              <CardContent className="p-8">
                 <div className="text-center mb-8">
                   <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Upload className="w-8 h-8 text-primary" />
                   </div>
-                  <h3 className="text-lg font-semibold mb-2">
-                    Upload Documents
-                  </h3>
+                  <h3 className="text-lg font-semibold mb-2">Upload Media</h3>
                   <p className="text-muted-foreground mb-6">
-                    Upload property documents like deeds, certificates, and
-                    receipts for verification.
+                    Add photos and videos to showcase your property. The first
+                    image will be your featured photo.
                   </p>
 
                   <div className="flex justify-center">
-                    <label htmlFor="document-upload">
-                      <Button variant="primary">
+                    <label htmlFor="media-upload">
+                      <Button variant="default">
                         <Upload className="w-4 h-4 mr-2" />
                         Choose Files
                       </Button>
                       <input
-                        id="document-upload"
+                        id="media-upload"
                         type="file"
                         multiple
-                        accept=".pdf,.doc,.docx,.jpg,.png"
+                        accept="image/*,video/*"
                         onChange={handleFileUpload}
                         className="hidden"
                       />
@@ -114,7 +112,7 @@ export default function PropertyDocumentsStep() {
                   </div>
 
                   <p className="text-xs text-muted-foreground mt-4">
-                    Supported formats: PDF, DOC, DOCX, JPG, PNG. Max file size:
+                    Supported formats: JPG, PNG, GIF, MP4, MOV. Max file size:
                     10MB each.
                   </p>
                 </div>
@@ -123,60 +121,54 @@ export default function PropertyDocumentsStep() {
                 {uploadedFiles.length > 0 && (
                   <div className="mt-8">
                     <h4 className="font-medium mb-4">
-                      Uploaded Documents ({uploadedFiles.length})
+                      Uploaded Files ({uploadedFiles.length})
                     </h4>
-                    <div className="space-y-3">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       {uploadedFiles.map((file, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg"
-                        >
-                          <FileText className="w-5 h-5 text-primary" />
-                          <span className="flex-1 text-sm">{file.name}</span>
-                          <span className="text-xs text-muted-foreground">
-                            {(file.size / 1024 / 1024).toFixed(2)} MB
-                          </span>
+                        <div key={index} className="relative">
+                          <div className="aspect-square bg-muted rounded-lg flex items-center justify-center">
+                            <ImageIcon className="w-8 h-8 text-muted-foreground" />
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-2 truncate">
+                            {file.name}
+                          </p>
                         </div>
                       ))}
                     </div>
                   </div>
                 )}
 
-                {/* Required Documents */}
+                {/* Tips */}
                 <div className="mt-8 p-4 bg-primary/5 border border-primary/20 rounded-lg">
-                  <h4 className="font-medium mb-3">📋 Required Documents</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                    <div>• Property Deed</div>
-                    <div>• Certificate of Occupancy</div>
-                    <div>• Survey Plan</div>
-                    <div>• Payment Receipt</div>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-3">
-                    Upload these documents to improve verification and attract
-                    serious buyers.
-                  </p>
+                  <h4 className="font-medium mb-2">📸 Photo Tips</h4>
+                  <ul className="text-sm text-muted-foreground space-y-1">
+                    <li>• Take photos during daylight for best results</li>
+                    <li>• Include photos of all rooms and outdoor spaces</li>
+                    <li>• Clean and declutter before photographing</li>
+                    <li>• Use landscape orientation for most photos</li>
+                  </ul>
                 </div>
-              </Card.Content>
-            </Card.Root>
+              </CardContent>
+            </Card>
 
             {/* Navigation */}
             <div className="flex items-center justify-between mt-8 pt-6 border-t border-border">
-              <Link href={`/owner/new/media?type=${propertyType}`}>
+              <Link href={`/owner/listings/new/location?type=${propertyType}`}>
                 <Button variant="ghost">
                   <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Media
+                  Back to Location
                 </Button>
               </Link>
-              <Button type="submit" variant="primary" isDisabled={isLoading}>
+              <Button type="submit" variant="default" disabled={isLoading}>
                 {isLoading ? (
                   <>
-                    <Spinner size="sm" className="mr-2" />
+                    <Spinner className="mr-2" />
                     Uploading...
                   </>
                 ) : (
                   <>
                     <Save className="w-4 h-4 mr-2" />
-                    Continue to Review
+                    Continue to Documents
                   </>
                 )}
               </Button>

@@ -205,19 +205,19 @@ export function ProfileDropdown() {
   return (
     <Dropdown>
       <Dropdown.Trigger className="rounded-full">
-        <div className="flex items-center h-8 w-8 m-auto justify-center border border-accent/70 rounded-full">
-          <Avatar>
+        <div className="flex items-center h-auto w-auto m-auto justify-center border border-accent/70 rounded-full">
+          <Avatar className="size-8">
             {avatarUrl && (
               <Avatar.Image
                 alt={
                   user?.role === "admin" ? "ADMIN" : profile?.full_name || "User"
                 }
-                className="rounded-full size-8"
+                className="rounded-full"
                 src={avatarUrl}
               />
             )}
             <Avatar.Fallback delayMs={600}>
-              <div className="rounded-full size-6 border justify-center items-center flex bg-muted-foreground/10">
+              <div className="rounded-full w-full h-full size-6 border justify-center items-center flex bg-muted-foreground/10">
                 {getAvatarFallback()}
               </div>
             </Avatar.Fallback>
@@ -227,20 +227,21 @@ export function ProfileDropdown() {
       <Dropdown.Popover className="card-enhanced w-60 shadow-lg border border-border/50 rounded-xl overflow-hidden p-0">
         <div className="px-3 pt-3 pb-1">
           <div className="flex items-center gap-2">
-            <div className="border border-accent rounded-full p-0.5 size-10 flex items-center justify-center">
-              <Avatar className="size-8">
-                {avatarUrl && (
+            <div className="w-auto h-auto border border-accent rounded-full p-0.5 flex items-center justify-center">
+              <Avatar className="size-10">
+                {avatarUrl ? (
                   <Avatar.Image
                     alt={profile?.full_name || "User"}
                     className="rounded-full"
                     src={avatarUrl}
                   />
-                )}
-                <div className="rounded-full size-8 border justify-center items-center flex bg-muted-foreground/10">
+                ) : (
                   <Avatar.Fallback delayMs={600}>
-                    {getAvatarFallback()}
+                    <div className="rounded-full border w-full h-full justify-center items-center flex bg-muted-foreground/10">
+                      {getAvatarFallback()}
+                    </div>
                   </Avatar.Fallback>
-                </div>
+                )}
               </Avatar>
             </div>
             <div className="flex flex-col gap-0.5">

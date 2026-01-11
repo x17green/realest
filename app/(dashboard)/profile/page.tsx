@@ -27,6 +27,7 @@ import {
   TrendingUp,
   AlertCircle,
 } from "lucide-react";
+import { useUser } from "@/lib/hooks/useUser";
 
 interface UserDashboardStats {
   savedProperties: number;
@@ -79,6 +80,7 @@ interface UserProfile {
 
 export default function UserDashboardPage() {
   const router = useRouter();
+  const { user, profile, logout, role } = useUser();
   const [stats, setStats] = useState<UserDashboardStats | null>(null);
   const [savedProperties, setSavedProperties] = useState<SavedProperty[]>([]);
   const [recentSearches, setRecentSearches] = useState<RecentSearch[]>([]);
@@ -89,6 +91,12 @@ export default function UserDashboardPage() {
   >("saved");
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [authError, setAuthError] = useState<string | null>(null);
+
+  const avatarUrl = profile?.avatar_url;
+  const getAvatarFallback = () =>
+    profile?.full_name?.charAt(0) ||
+    user?.email?.charAt(0)?.toUpperCase() ||
+    "U";
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -310,13 +318,23 @@ export default function UserDashboardPage() {
             <CardContent className="p-6">
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-4">
-                  <Avatar.Root size="lg">
-                    <Avatar.Fallback>
-                      {userProfile.full_name?.charAt(0) ||
-                        userProfile.email?.charAt(0) ||
-                        "U"}
-                    </Avatar.Fallback>
-                  </Avatar.Root>
+                  <div className="w-auto h-auto border border-accent rounded-full p-0.5 flex items-center justify-center">
+                    <Avatar className="size-15">
+                      {avatarUrl ? (
+                        <Avatar.Image
+                          alt={profile?.full_name || "User"}
+                          className="rounded-full"
+                          src={avatarUrl}
+                        />
+                      ) : (
+                        <Avatar.Fallback delayMs={600}>
+                          <div className="rounded-full border w-full h-full justify-center items-center flex bg-muted-foreground/10">
+                            {getAvatarFallback()}
+                          </div>
+                        </Avatar.Fallback>
+                      )}
+                    </Avatar>
+                  </div>
                   <div>
                     <h3 className="text-lg font-semibold">
                       {userProfile.full_name || "Anonymous User"}

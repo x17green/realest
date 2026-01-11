@@ -199,7 +199,7 @@ export default function ListWithUsPage() {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-              <Link href="/dashboard/owner/new">
+              <Link href="/dashboard/owner/listings/new">
                 <Button
                   size="lg"
                   className="bg-primary hover:bg-primary/90 px-8 rounded-xl font-semibold gap-2"
@@ -368,7 +368,7 @@ export default function ListWithUsPage() {
                     ))}
                   </ul>
 
-                  <Link href="/owner/new" className="block">
+                  <Link href="/owner/listings/new" className="block">
                     <Button
                       className={`w-full flex align-bottom  ${
                         plan.popular
@@ -446,7 +446,7 @@ export default function ListWithUsPage() {
                 Join thousands of successful sellers who have found the perfect buyers through RealEST.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/dashboard/owner/new">
+                <Link href="/dashboard/owner/listings/new">
                   <Button
                     size="lg"
                     className="bg-primary hover:bg-primary/90 px-8 rounded-xl font-semibold gap-2"

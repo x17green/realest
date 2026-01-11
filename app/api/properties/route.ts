@@ -3,100 +3,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { z } from "zod";
-
-// Validation schemas for Nigerian market requirements
-const MetadataSchema = z.object({
-  nigeria: z.object({
-    nepa_status: z.enum(["stable", "intermittent", "poor", "none", "generator_only"]).optional(),
-    power_source: z.string().optional()
-  }).optional(),
-  utilities: z.object({
-    water_source: z.enum(["borehole", "public_water", "well", "water_vendor", "none"]).optional(),
-    water_tank_capacity: z.number().positive().optional(),
-    has_water_treatment: z.boolean().optional(),
-    internet_type: z.enum(["fiber", "starlink", "4g", "3g", "none"]).optional()
-  }).optional(),
-  security: z.object({
-    security_type: z.array(z.enum([
-      "gated_community", "security_post", "cctv", 
-      "perimeter_fence", "security_dogs", "estate_security"
-    ])).optional(),
-    security_hours: z.enum(["24/7", "day_only", "night_only", "none"]).optional(),
-    has_security_levy: z.boolean().optional(),
-    security_levy_amount: z.number().positive().optional()
-  }).optional(),
-  bq: z.object({
-    has_bq: z.boolean().optional(),
-    bq_type: z.enum(["self_contained", "room_and_parlor", "single_room", "multiple_rooms"]).optional(),
-    bq_bathrooms: z.number().min(0).optional(),
-    bq_kitchen: z.boolean().optional(),
-    bq_separate_entrance: z.boolean().optional(),
-    bq_condition: z.enum(["excellent", "good", "fair", "needs_renovation"]).optional()
-  }).optional(),
-  building: z.object({
-    floors: z.number().min(1).optional(),
-    material: z.string().optional(),
-    year_renovated: z.number().min(1900).max(new Date().getFullYear()).optional()
-  }).optional(),
-  city: z.string().optional()
-}).passthrough();
-
-const createPropertySchema = z.object({
-  title: z.string().min(10, "Title must be at least 10 characters"),
-  description: z.string().min(50, "Description must be at least 50 characters"),
-  price: z.number().positive("Price must be positive"),
-  country: z.string().optional().default("NG"),
-  address: z.string().min(10, "Address is required"),
-  city: z.string().min(2, "City is required"),
-  state: z.string().min(2, "State is required"),
-  latitude: z.number().min(-90).max(90),
-  longitude: z.number().min(-180).max(180),
-  property_type: z.enum([
-    "duplex", "bungalow", "flat", "self_contained", "mini_flat", "room_and_parlor",
-    "single_room", "penthouse", "terrace", "detached_house", "shop", "office",
-    "warehouse", "showroom", "event_center", "hotel", "restaurant",
-    "residential_land", "commercial_land", "mixed_use_land", "farmland",
-    "house", "apartment", "land", "commercial"
-  ]),
-  listing_type: z.enum(["sale", "rent", "lease"]),
-  listing_source: z.enum(["owner", "agent"]).default("owner"),
-  bedrooms: z.number().min(0).optional(),
-  bathrooms: z.number().min(0).optional(),
-  square_feet: z.number().positive().optional(),
-  // Convenience fields for Nigerian market (will be mapped to metadata)
-  nepa_status: z.enum(["stable", "intermittent", "poor", "none", "generator_only"]).optional(),
-  has_generator: z.boolean().optional(),
-  has_inverter: z.boolean().optional(),
-  solar_panels: z.boolean().optional(),
-  water_source: z.enum(["borehole", "public_water", "well", "water_vendor", "none"]).optional(),
-  water_tank_capacity: z.number().positive().optional(),
-  has_water_treatment: z.boolean().optional(),
-  internet_type: z.enum(["fiber", "starlink", "4g", "3g", "none"]).optional(),
-  road_condition: z.enum(["paved", "tarred", "untarred", "bad"]).optional(),
-  road_accessibility: z.enum(["all_year", "dry_season_only", "limited"]).optional(),
-  security_type: z.array(z.enum([
-    "gated_community", "security_post", "cctv", 
-    "perimeter_fence", "security_dogs", "estate_security"
-  ])).optional(),
-  security_hours: z.enum(["24/7", "day_only", "night_only", "none"]).optional(),
-  has_security_levy: z.boolean().optional(),
-  security_levy_amount: z.number().positive().optional(),
-  has_bq: z.boolean().optional(),
-  bq_type: z.enum(["self_contained", "room_and_parlor", "single_room", "multiple_rooms"]).optional(),
-  bq_bathrooms: z.number().min(0).optional(),
-  bq_kitchen: z.boolean().optional(),
-  bq_separate_entrance: z.boolean().optional(),
-  bq_condition: z.enum(["excellent", "good", "fair", "needs_renovation"]).optional(),
-  // Optional metadata object for extensibility
-  metadata: MetadataSchema.optional()
-});
+import { propertyListingSchema, propertyDraftSchema, propertyDetailsSchema } from "@/lib/validations/property";
 
 const searchQuerySchema = z.object({
   query: z.string().optional(),
   state: z.string().optional(),
   city: z.string().optional(),
   property_type: z.string().optional(),
-  listing_type: z.enum(["sale", "rent", "lease"]).optional(),
+  listing_type: z.enum(["for_rent", "for_sale", "for_lease", "short_let"]).optional(), // Added .optional()
   min_price: z.number().optional(),
   max_price: z.number().optional(),
   bedrooms: z.number().optional(),
@@ -124,7 +38,7 @@ export async function GET(request: NextRequest) {
       city: searchParams.get("city") || undefined,
       property_type: searchParams.get("property_type") || undefined,
       listing_type:
-        (searchParams.get("listing_type") as "sale" | "rent" | "lease") ||
+        (searchParams.get("listing_type") as "for_rent" | "for_sale" | "for_lease" | "short_let") ||
         undefined,
       min_price: searchParams.get("min_price")
         ? parseFloat(searchParams.get("min_price")!)
@@ -154,18 +68,13 @@ export async function GET(request: NextRequest) {
     // Validate search parameters
     const validatedSearch = searchQuerySchema.parse(searchData);
 
-    // Map listing_type to DB format
-    const dbListingType = validatedSearch.listing_type 
-      ? `for_${validatedSearch.listing_type}` as "for_sale" | "for_rent" | "for_lease"
-      : null;
-
     // Use the search_properties RPC for efficient filtering
     const { data: properties, error } = await supabase.rpc('search_properties', {
       p_query: validatedSearch.query ?? null,
       p_city: validatedSearch.city ?? null,
       p_state: validatedSearch.state ?? null,
       p_property_type: validatedSearch.property_type ?? null,
-      p_listing_type: dbListingType ?? null,
+      p_listing_type: validatedSearch.listing_type ?? null,
       p_min_price: validatedSearch.min_price ?? null,
       p_max_price: validatedSearch.max_price ?? null,
       p_nepa_status: validatedSearch.nepa_status ?? null,
@@ -188,7 +97,7 @@ export async function GET(request: NextRequest) {
       p_city: validatedSearch.city ?? null,
       p_state: validatedSearch.state ?? null,
       p_property_type: validatedSearch.property_type ?? null,
-      p_listing_type: dbListingType ?? null,
+      p_listing_type: validatedSearch.listing_type ?? null,
       p_min_price: validatedSearch.min_price ?? null,
       p_max_price: validatedSearch.max_price ?? null,
       p_nepa_status: validatedSearch.nepa_status ?? null,
@@ -251,71 +160,42 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const validatedData = createPropertySchema.parse(body);
+    
+    // Check for potential duplicates (skip for drafts - only check when publishing)
+    const isDraft = body.status === 'draft';
+    
+    // Use lenient draft schema for drafts, strict schema for publishing
+    const validatedData = isDraft 
+      ? propertyDraftSchema.parse(body)
+      : propertyListingSchema.parse(body);
+    console.log('Validated property data:', validatedData);
+    
+    if (!isDraft) {
+      const [{ data: byAddress, error: errAddr }, { data: byCoords, error: errCoords }] = await Promise.all([
+        supabase.from('properties').select('id, address, latitude, longitude')
+          .neq('status', 'draft') // Only check against non-draft properties
+          .eq('address', validatedData.address),
+        supabase.from('properties').select('id, address, latitude, longitude')
+          .eq('status', 'active')
+          .eq('latitude', validatedData.latitude)
+          .eq('longitude', validatedData.longitude),
+      ]);
 
-    // Map listing_type to DB format
-    const dbListingType = validatedData.listing_type ? `for_${validatedData.listing_type}` : null;
-
-    // Build metadata by merging convenience fields
-    const metadata = validatedData.metadata ?? {};
-    if (validatedData.nepa_status) {
-      metadata.nigeria = { ...(metadata.nigeria || {}), nepa_status: validatedData.nepa_status };
-    }
-    if (validatedData.has_generator !== undefined || validatedData.has_inverter !== undefined || validatedData.solar_panels !== undefined) {
-      metadata.nigeria = { 
-        ...(metadata.nigeria || {}), 
-        power_source: validatedData.has_generator ? 'generator' : 
-                     validatedData.has_inverter ? 'inverter' : 
-                     validatedData.solar_panels ? 'solar' : undefined 
-      };
-    }
-    if (validatedData.water_source || validatedData.water_tank_capacity || validatedData.has_water_treatment || validatedData.internet_type) {
-      metadata.utilities = {
-        ...(metadata.utilities || {}),
-        water_source: validatedData.water_source,
-        water_tank_capacity: validatedData.water_tank_capacity,
-        has_water_treatment: validatedData.has_water_treatment,
-        internet_type: validatedData.internet_type
-      };
-    }
-    if (validatedData.security_type || validatedData.security_hours || validatedData.has_security_levy || validatedData.security_levy_amount) {
-      metadata.security = {
-        ...(metadata.security || {}),
-        security_type: validatedData.security_type,
-        security_hours: validatedData.security_hours,
-        has_security_levy: validatedData.has_security_levy,
-        security_levy_amount: validatedData.security_levy_amount
-      };
-    }
-    if (validatedData.has_bq || validatedData.bq_type || validatedData.bq_bathrooms || validatedData.bq_kitchen || validatedData.bq_separate_entrance || validatedData.bq_condition) {
-      metadata.bq = {
-        ...(metadata.bq || {}),
-        has_bq: validatedData.has_bq,
-        bq_type: validatedData.bq_type,
-        bq_bathrooms: validatedData.bq_bathrooms,
-        bq_kitchen: validatedData.bq_kitchen,
-        bq_separate_entrance: validatedData.bq_separate_entrance,
-        bq_condition: validatedData.bq_condition
-      };
-    }
-    if (validatedData.city) {
-      metadata.city = validatedData.city; // For indexed city searches
-    }
-
-    // Check for potential duplicates: run two parameterized queries and combine results in JS
-    const [{ data: byAddress, error: errAddr }, { data: byCoords, error: errCoords }] = await Promise.all([
-      supabase.from('properties').select('id, address, latitude, longitude').eq('status', 'active').eq('address', validatedData.address),
-      supabase.from('properties').select('id, address, latitude, longitude').eq('status', 'active')
-        .eq('latitude', validatedData.latitude)
-        .eq('longitude', validatedData.longitude),
-    ]);
-
-    if (errAddr || errCoords) {
-      console.error('Duplicate check error:', errAddr || errCoords);
-    } else {
-      const existingProperties = [...(byAddress || []), ...(byCoords || [])];
-      if (existingProperties.length > 0) {
-        console.log('Potential duplicate detected:', existingProperties);
+      if (errAddr || errCoords) {
+        console.error('Duplicate check error:', errAddr || errCoords);
+      } else {
+        const existingProperties = [...(byAddress || []), ...(byCoords || [])];
+        if (existingProperties.length > 0) {
+          console.log('Duplicate property detected:', existingProperties);
+          return NextResponse.json(
+            { 
+              error: "A property with this address or location already exists",
+              duplicates: existingProperties,
+              message: "Please verify this is a unique property or contact support if you believe this is an error."
+            },
+            { status: 409 }
+          );
+        }
       }
     }
 
@@ -345,17 +225,23 @@ export async function POST(request: NextRequest) {
       title: validatedData.title,
       description: validatedData.description,
       price: validatedData.price,
-      country: validatedData.country,
+      price_frequency: validatedData.price_frequency,
+      property_type: validatedData.property_type,
+      listing_type: validatedData.listing_type,
       address: validatedData.address,
       city: validatedData.city,
       state: validatedData.state,
+      postal_code: validatedData.postal_code,
+      country: validatedData.country,
       latitude: validatedData.latitude,
       longitude: validatedData.longitude,
-      property_type: validatedData.property_type,
-      listing_type: dbListingType,
-      listing_source: profile.user_type === 'agent' ? 'agent' : 'owner',
-      status: "draft", // Start as draft, user can publish later
+      bedrooms: validatedData.bedrooms,
+      bathrooms: validatedData.bathrooms,
+      square_feet: validatedData.square_feet,
+      year_built: validatedData.year_built,
+      status: body.status || "draft", // Use provided status or default to draft
       verification_status: "pending",
+      listing_source: profile.user_type === 'agent' ? 'agent' : 'owner',
     };
 
     const { data: property, error: propertyError } = await serviceClient
@@ -372,18 +258,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const validatedPropertyDetails = propertyDetailsSchema.parse(body);
+
+    const propertyDetailsData = {
+      property_id: property.id,
+      parking_spaces: validatedPropertyDetails.parking_spaces || null,
+      has_pool: validatedPropertyDetails.has_pool || null,
+      has_garage: validatedPropertyDetails.has_garage || null,
+      has_garden: validatedPropertyDetails.has_garden || null,
+      heating_type: validatedPropertyDetails.heating_type || null,
+      cooling_type: validatedPropertyDetails.cooling_type || null,
+      flooring_type: validatedPropertyDetails.flooring_type || null,
+      roof_type: validatedPropertyDetails.roof_type || null,
+      foundation_type: validatedPropertyDetails.foundation_type || null,
+      metadata: validatedPropertyDetails.metadata || {},
+      amenities: validatedPropertyDetails.amenities || {}, // Initialize as empty JSONB
+      features: validatedPropertyDetails.features || {}   // Initialize as empty JSONB
+    };
+
     // Create property details with metadata (use service client for consistency)
     const { error: detailsError } = await serviceClient
       .from("property_details")
-      .insert({
-        property_id: property.id,
-        bedrooms: validatedData.bedrooms,
-        bathrooms: validatedData.bathrooms,
-        square_feet: validatedData.square_feet,
-        metadata,
-        amenities: {}, // Initialize as empty JSONB
-        features: {}   // Initialize as empty JSONB
-      });
+      .insert(propertyDetailsData);
 
     if (detailsError) {
       console.error("Property details creation error:", detailsError);

@@ -137,9 +137,9 @@ export default function Header() {
               <>
                 <Link href="/login">
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
-                    className="hover:bg-accent"
+                    className="border-accent/40 border-2 border-solid"
                   >
                     Log In
                   </Button>
@@ -147,7 +147,7 @@ export default function Header() {
                 <Link href="/register">
                   <Button
                     size="sm"
-                    className="bg-linear-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg"
+                    variant="default"
                   >
                     Sign Up
                   </Button>

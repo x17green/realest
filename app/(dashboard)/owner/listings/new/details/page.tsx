@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Card, Button, Spinner } from "@heroui/react";
+import { Spinner } from "@heroui/react";
+import { Card, CardContent, Button } from "@/components/ui";
 import { ArrowLeft, Save } from "lucide-react";
 import { PropertyListingForm } from "@/components/patterns/forms";
 
@@ -15,7 +16,7 @@ export default function PropertyDetailsStep() {
 
   useEffect(() => {
     if (!propertyType) {
-      router.push("/owner/new/type");
+      router.push("/owner/listings/new/type");
     }
   }, [propertyType, router]);
 
@@ -29,7 +30,7 @@ export default function PropertyDetailsStep() {
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Navigate to next step
-      router.push(`/owner/new/location?type=${propertyType}`);
+      router.push(`/owner/listings/new/location?type=${propertyType}`);
     } catch (error) {
       console.error("Failed to save property details:", error);
     } finally {
@@ -55,8 +56,8 @@ export default function PropertyDetailsStep() {
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
-              <Link href={`/owner/new/type?type=${propertyType}`}>
-                <Button variant="ghost" size="sm" isIconOnly>
+              <Link href={`/owner/listings/new/type?type=${propertyType}`}>
+                <Button variant="ghost" size="sm">
                   <ArrowLeft className="w-4 h-4" />
                 </Button>
               </Link>
@@ -73,27 +74,27 @@ export default function PropertyDetailsStep() {
           </div>
 
           {/* Form */}
-          <Card.Root className="bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl shadow-lg">
-            <Card.Content className="p-8">
+          <Card className="bg-surface/90 backdrop-blur-lg border border-border/50 rounded-2xl shadow-lg">
+            <CardContent className="p-8">
               <PropertyListingForm
                 initialData={{ property_type: propertyType }}
                 onSubmit={handleFormSubmit}
               />
-            </Card.Content>
-          </Card.Root>
+            </CardContent>
+          </Card>
 
           {/* Navigation */}
           <div className="flex items-center justify-between mt-8 pt-6 border-t border-border">
-            <Link href={`/owner/new/type?type=${propertyType}`}>
+            <Link href={`/owner/listings/new/type?type=${propertyType}`}>
               <Button variant="ghost">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Type
               </Button>
             </Link>
             <Button
-              variant="primary"
+              variant="default"
               onClick={() => document.querySelector("form")?.requestSubmit()}
-              isDisabled={isLoading}
+              disabled={isLoading}
             >
               {isLoading ? (
                 <>
