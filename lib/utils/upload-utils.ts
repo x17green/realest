@@ -54,8 +54,12 @@ export async function generateSignedUrl(input: SignedUrlInput): Promise<SignedUr
         .eq("id", input.property_id)
         .single();
 
-      if (!property || (property.owner_id !== input.user_id && property.agent_id !== input.user_id)) {
-        throw new Error("Property not found or access denied");
+      if (!property) {
+        throw new Error(`Property not found: ${input.property_id}. It may have been deleted or doesn't exist yet.`);
+      }
+      
+      if (property.owner_id !== input.user_id && property.agent_id !== input.user_id) {
+        throw new Error(`Access denied: You don't own property ${input.property_id}`);
       }
     }
   } else if (input.bucket === "avatars") {
@@ -78,9 +82,9 @@ export async function generateSignedUrl(input: SignedUrlInput): Promise<SignedUr
   let filePath: string;
 
   if (input.bucket === "avatars") {
-    filePath = `avatars/${input.user_id}/${timestamp}_${randomId}.${fileExtension}`;
+    filePath = `${input.user_id}/${timestamp}_${randomId}.${fileExtension}`;
   } else if (input.bucket === "property-media" || input.bucket === "property-documents") {
-    filePath = `${input.user_id}/properties/${input.property_id}/${timestamp}_${randomId}.${fileExtension}`;
+    filePath = `${input.user_id}/${input.property_id}/${timestamp}_${randomId}.${fileExtension}`;
   } else {
     filePath = `${timestamp}_${randomId}.${fileExtension}`;
   }

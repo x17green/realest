@@ -32,7 +32,7 @@ export function useFileUpload({
   propertyId,
   maxFiles = 20,
   maxFileSize = 10 * 1024 * 1024, // 10MB default
-  allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'],
+  allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'doc/*', 'application/pdf'],
 }: UseFileUploadOptions): UseFileUploadReturn {
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [isUploading, setIsUploading] = useState(false);

@@ -116,25 +116,22 @@ export function PropertyListingForm({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            // Required fields with proper transformations
-            property_type: mapPropertyType(formData.propertyType) || 'house',
-            listing_type: formData.purpose === 'rent' ? 'for_rent' : 'for_sale', // Map purpose to listing_type
+            // Minimal required fields for draft (propertyDraftSchema)
             title: formData.title || 'Draft Property',
-            description: formData.description || 'Draft - Property being created',
-            price: Number(formData.price) || 1000, // Min 1000 per schema
-            price_frequency: formData.purpose === 'rent' ? 'yearly' : 'sale', // Correct enum values
+            property_type: mapPropertyType(formData.propertyType) || 'house',
+            listing_type: formData.purpose === 'rent' ? 'for_rent' : 'for_sale',
+            price: Number(formData.price) || 0,
+            address: formData.address || 'Draft Address',
+            city: formData.lga || formData.area || 'Lagos',
             
-            // Location fields
-            address: formData.address || `${formData.area || 'Draft'}, ${formData.lga || 'Lagos'}`,
-            city: formData.lga || formData.area || 'Lagos', // city is required
-            state: formData.state || 'Lagos',
+            // Optional fields (can be empty for draft)
+            description: formData.description || '',
+            state: formData.state || '',
+            latitude: parseFloat(formData.coordinates?.lat) || undefined,
+            longitude: parseFloat(formData.coordinates?.lng) || undefined,
             country: 'NG',
             
-            // Coordinates with defaults to avoid NaN
-            latitude: parseFloat(formData.coordinates?.lat) || 6.5244, // Default to Lagos coordinates
-            longitude: parseFloat(formData.coordinates?.lng) || 3.3792,
-            
-            status: 'draft', // Mark as draft
+            status: 'draft',
           }),
         });
 
@@ -143,11 +140,12 @@ export function PropertyListingForm({
         }
 
         const { property } = await response.json();
+        console.log('✅ Draft property created successfully:', property.id);
+        console.log('📄 Draft property data:', property);
         setDraftPropertyId(property.id);
         
         // Persist to localStorage for recovery
         localStorage.setItem('draftPropertyId', property.id);
-        console.log('Draft property created:', property.id);
       } catch (error) {
         console.error('Failed to create draft property:', error);
         alert('Unable to save property draft. Please check your internet connection and try again.');
@@ -163,8 +161,21 @@ export function PropertyListingForm({
     if (!propertyId && !draftPropertyId) {
       const savedDraftId = localStorage.getItem('draftPropertyId');
       if (savedDraftId) {
-        setDraftPropertyId(savedDraftId);
-        console.log('Recovered draft property ID:', savedDraftId);
+        // Validate that the draft property still exists
+        fetch(`/api/properties/${savedDraftId}`)
+          .then(res => {
+            if (res.ok) {
+              setDraftPropertyId(savedDraftId);
+              console.log('✅ Recovered draft property from localStorage:', savedDraftId);
+            } else {
+              console.warn('⚠️ Stale draft property ID in localStorage, clearing:', savedDraftId);
+              localStorage.removeItem('draftPropertyId');
+            }
+          })
+          .catch(err => {
+            console.error('❌ Error validating draft property:', err);
+            localStorage.removeItem('draftPropertyId');
+          });
       }
     }
   }, [propertyId, draftPropertyId]);
@@ -306,7 +317,7 @@ export function PropertyListingForm({
       const propertyResponse = await fetch(
         draftPropertyId ? `/api/properties/${draftPropertyId}` : '/api/properties',
         {
-          method: draftPropertyId ? 'PATCH' : 'POST',
+          method: draftPropertyId ? 'PUT' : 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             ...validatedData,
@@ -324,34 +335,70 @@ export function PropertyListingForm({
       const newPropertyId = draftPropertyId || createdProperty.id;
 
       // Step 3: Record uploaded images in property_media table
+      const mediaInsertErrors: string[] = [];
       for (const uploadedFile of imageUpload.files) {
         if (uploadedFile.publicUrl && !uploadedFile.error) {
-          await fetch(`/api/properties/${newPropertyId}/media`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              file_url: uploadedFile.publicUrl,
-              file_name: uploadedFile.file.name,
-              media_type: 'image',
-              is_primary: imageUpload.files.indexOf(uploadedFile) === 0, // First image is primary
-            }),
-          });
+          try {
+            const mediaResponse = await fetch(`/api/properties/${newPropertyId}/media`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                media_url: uploadedFile.publicUrl,
+                file_name: uploadedFile.file.name,
+                media_type: 'image',
+                is_featured: imageUpload.files.indexOf(uploadedFile) === 0, // First image is featured
+              }),
+            });
+            
+            if (!mediaResponse.ok) {
+              const errorData = await mediaResponse.json();
+              console.error('Media metadata insertion failed:', errorData);
+              mediaInsertErrors.push(`${uploadedFile.file.name}: ${errorData.error || 'Failed to record'}`);
+            } else {
+              console.log('Media metadata recorded:', uploadedFile.file.name);
+            }
+          } catch (error) {
+            console.error('Media metadata insertion error:', error);
+            mediaInsertErrors.push(`${uploadedFile.file.name}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          }
         }
+      }
+      
+      if (mediaInsertErrors.length > 0) {
+        console.warn('Some media metadata failed to record:', mediaInsertErrors);
       }
 
       // Step 4: Record uploaded documents in property_documents table
+      const docInsertErrors: string[] = [];
       for (const uploadedDoc of documentUpload.files) {
         if (uploadedDoc.publicUrl && !uploadedDoc.error) {
-          await fetch(`/api/properties/${newPropertyId}/documents`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              file_url: uploadedDoc.publicUrl,
-              file_name: uploadedDoc.file.name,
-              document_type: 'other', // You may want to add document type selection in the form
-            }),
-          });
+          try {
+            const docResponse = await fetch(`/api/properties/${newPropertyId}/documents`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                document_url: uploadedDoc.publicUrl,
+                file_name: uploadedDoc.file.name,
+                document_type: 'other', // You may want to add document type selection in the form
+              }),
+            });
+            
+            if (!docResponse.ok) {
+              const errorData = await docResponse.json();
+              console.error('Document metadata insertion failed:', errorData);
+              docInsertErrors.push(`${uploadedDoc.file.name}: ${errorData.error || 'Failed to record'}`);
+            } else {
+              console.log('Document metadata recorded:', uploadedDoc.file.name);
+            }
+          } catch (error) {
+            console.error('Document metadata insertion error:', error);
+            docInsertErrors.push(`${uploadedDoc.file.name}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          }
         }
+      }
+      
+      if (docInsertErrors.length > 0) {
+        console.warn('Some document metadata failed to record:', docInsertErrors);
       }
 
       // Step 5: Call the onSubmit callback if provided (for parent component handling)

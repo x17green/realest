@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { z } from "zod";
-import { propertyListingSchema, propertyDetailsSchema } from "@/lib/validations/property";
+import { propertyListingSchema, propertyDraftSchema, propertyDetailsSchema } from "@/lib/validations/property";
 
 const searchQuerySchema = z.object({
   query: z.string().optional(),
@@ -164,7 +164,10 @@ export async function POST(request: NextRequest) {
     // Check for potential duplicates (skip for drafts - only check when publishing)
     const isDraft = body.status === 'draft';
     
-    const validatedData = propertyListingSchema.parse(body);
+    // Use lenient draft schema for drafts, strict schema for publishing
+    const validatedData = isDraft 
+      ? propertyDraftSchema.parse(body)
+      : propertyListingSchema.parse(body);
     console.log('Validated property data:', validatedData);
     
     if (!isDraft) {

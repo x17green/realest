@@ -134,3 +134,80 @@ export const propertyDetailsSchema = z.object({
 });
 
 export type PropertyListingValues = z.infer<typeof propertyListingSchema>;
+
+// Draft schema with minimal requirements (for Step 5 auto-save)
+export const propertyDraftSchema = z.object({
+  // Minimal required fields that user must provide
+  title: z.string().min(1, "Title is required").max(100),
+  property_type: z.enum([
+    "house", "apartment", "land", "commercial", "event_center", 
+    "hotel", "shop", "office", "duplex", "bungalow", "flat", 
+    "self_contained", "mini_flat", "room_and_parlor", 
+    "single_room", "penthouse", "terrace", "detached_house", 
+    "warehouse", "showroom", "restaurant", "residential_land", 
+    "commercial_land", "mixed_use_land", "farmland"
+  ]),
+  listing_type: z.enum(["for_rent", "for_sale", "for_lease", "short_let", "location"]),
+  price: z.coerce.number().min(0),
+  address: z.string().min(1),
+  city: z.string().min(1),
+  
+  // Optional fields that may be empty in draft
+  description: z.string().optional(),
+  state: z.string().optional(),
+  postal_code: z.string().optional(),
+  country: z.string().default("NG"),
+  latitude: z.coerce.number().min(-90).max(90).optional(),
+  longitude: z.coerce.number().min(-180).max(180).optional(),
+  
+  bedrooms: z.coerce.number().min(0).optional(),
+  bathrooms: z.coerce.number().min(0).optional(),
+  toilets: z.coerce.number().min(0).optional(),
+  square_feet: z.coerce.number().min(1).optional(),
+  year_built: z.coerce.number().min(1900).max(new Date().getFullYear()).optional(),
+  
+  price_frequency: z.enum(["monthly", "yearly", "sale", "nightly"]).default("sale"),
+  listing_source: z.enum(["owner", "agent"]).default("owner"),
+  
+  status: z.enum(["draft", "active", "inactive", "sold", "rented", "pending_ml_validation"]).default("draft"),
+  verification_status: z.enum(["pending", "verified", "rejected"]).default("pending"),
+  
+  images: z.array(z.string()).optional(),
+  documents: z.array(z.any()).optional(),
+});
+
+export type PropertyDraftValues = z.infer<typeof propertyDraftSchema>;
+
+// Property Media Schema (for property_media table)
+export const propertyMediaSchema = z.object({
+  property_id: z.string().uuid("Invalid property ID"),
+  media_type: z.enum(["image", "video"]),
+  media_url: z.string().url("Invalid media URL"),
+  file_name: z.string().min(1, "File name is required"),
+  display_order: z.number().int().min(0).default(0),
+  is_featured: z.boolean().default(false),
+});
+
+export type PropertyMediaValues = z.infer<typeof propertyMediaSchema>;
+
+// Property Document Schema (for property_documents table)
+export const propertyDocumentSchema = z.object({
+  property_id: z.string().uuid("Invalid property ID"),
+  document_type: z.enum([
+    "title_deed",
+    "building_permit",
+    "energy_certificate",
+    "survey",
+    "inspection_report",
+    "other"
+  ]),
+  document_url: z.string().url("Invalid document URL"),
+  file_name: z.string().min(1, "File name is required"),
+  file_size: z.number().int().positive().optional(),
+  verification_status: z.enum(["pending", "verified", "rejected"]).default("pending"),
+  verified_by: z.string().uuid().optional(),
+  verified_at: z.string().datetime().optional(),
+  notes: z.string().optional(),
+});
+
+export type PropertyDocumentValues = z.infer<typeof propertyDocumentSchema>;
