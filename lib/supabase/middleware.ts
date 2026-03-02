@@ -67,7 +67,6 @@ export async function updateSession(request: NextRequest) {
     "/agent",
     "/owner",
     "/profile",
-    "/profile-setup",
     "/onboarding",
   ];
   const isProtectedRoute = protectedRoutes.some((route) =>
@@ -84,6 +83,39 @@ export async function updateSession(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
+  }
+
+  // Onboarding guard: owner/agent users who haven't completed onboarding
+  // must be redirected to /onboarding before accessing any other protected route.
+  if (
+    user &&
+    isProtectedRoute &&
+    !pathname.startsWith("/onboarding") &&
+    shouldEnableAuthentication()
+  ) {
+    const { data: userData } = await supabase
+      .from("users")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    const role = userData?.role;
+
+    if (role === "owner" || role === "agent") {
+      const table = role === "owner" ? "owners" : "agents";
+
+      const { data: onboardingRecord } = await supabase
+        .from(table)
+        .select("id")
+        .eq("profile_id", user.id)
+        .single();
+
+      if (!onboardingRecord) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/onboarding";
+        return NextResponse.redirect(url);
+      }
+    }
   }
 
   return supabaseResponse;

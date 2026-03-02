@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { prisma, Prisma } from '@/lib/prisma'
 import { z } from 'zod'
 
 // Query schema for property exploration
@@ -37,8 +38,6 @@ type ExploreQuery = z.infer<typeof exploreQuerySchema>
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient()
-
     // Parse and validate query parameters
     const url = new URL(request.url)
     const queryParams: Record<string, string | string[]> = {}
@@ -55,63 +54,27 @@ export async function GET(request: NextRequest) {
 
     const query = exploreQuerySchema.parse(queryParams)
 
-    // Build the base query - only live properties
-    let dbQuery = supabase
-      .from('properties')
-      .select(`
-        id,
-        title,
-        property_type,
-        price,
-        price_frequency,
-        address,
-        state,
-        lga,
-        latitude,
-        longitude,
-        bedrooms,
-        bathrooms,
-        size_sqm,
-        has_bq,
-        nepa_status,
-        water_source,
-        internet_type,
-        security_type,
-        status,
-        verified_at,
-        is_featured,
-        created_at,
-        updated_at,
-        views_count,
-        owner:profiles!inner(full_name, avatar_url),
-        media:property_media!inner(*)
-      `, { count: 'exact' })
-      .eq('status', 'live')
+    // Build Prisma where clause — only supports schema fields
+    const where: Prisma.propertiesWhereInput = { status: 'live' }
 
-    // Apply location filters
+    // Apply location filters (schema has: state, city, address, latitude, longitude)
     if (query.state) {
-      dbQuery = dbQuery.eq('state', query.state)
+      where.state = query.state
     }
 
-    if (query.lga) {
-      dbQuery = dbQuery.eq('lga', query.lga)
-    }
-
-    // Geospatial radius search
+    // Geospatial radius search — use Supabase RPC (PostGIS)
     if (query.latitude && query.longitude && query.radius_km) {
-      // Use PostGIS ST_DWithin for radius search via RPC
-      const { data: radiusProperties } = await supabase
-        .rpc('properties_within_radius', {
-          lat: query.latitude,
-          lng: query.longitude,
-          radius_km: query.radius_km
-        })
+      const supabase = await createClient()
+      const { data: radiusProperties } = await supabase.rpc('properties_within_radius', {
+        lat: query.latitude,
+        lng: query.longitude,
+        radius_km: query.radius_km,
+      })
 
       if (radiusProperties && radiusProperties.length > 0) {
         const radiusIds = radiusProperties.map((p: any) => p.id)
-        dbQuery = dbQuery.in('id', radiusIds)
+        where.id = { in: radiusIds }
       } else {
-        // No properties in radius, return empty
         return NextResponse.json({
           properties: [],
           pagination: {
@@ -120,106 +83,74 @@ export async function GET(request: NextRequest) {
             total: 0,
             total_pages: 0,
             has_next: false,
-            has_prev: false
-          }
+            has_prev: false,
+          },
         })
       }
     }
 
     // Property type filter
     if (query.property_type) {
-      dbQuery = dbQuery.eq('property_type', query.property_type)
+      where.property_type = query.property_type
     }
 
     // Price range filters
-    if (query.min_price !== undefined) {
-      dbQuery = dbQuery.gte('price', query.min_price)
-    }
-
-    if (query.max_price !== undefined) {
-      dbQuery = dbQuery.lte('price', query.max_price)
+    if (query.min_price !== undefined || query.max_price !== undefined) {
+      where.price = {}
+      if (query.min_price !== undefined) where.price.gte = query.min_price
+      if (query.max_price !== undefined) where.price.lte = query.max_price
     }
 
     // Bedroom/bathroom filters
     if (query.bedrooms !== undefined) {
-      dbQuery = dbQuery.gte('bedrooms', query.bedrooms)
+      where.bedrooms = { gte: query.bedrooms }
     }
-
     if (query.bathrooms !== undefined) {
-      dbQuery = dbQuery.gte('bathrooms', query.bathrooms)
+      where.bathrooms = { gte: query.bathrooms }
     }
 
-    // BQ filter
-    if (query.has_bq !== undefined) {
-      dbQuery = dbQuery.eq('has_bq', query.has_bq)
-    }
+    // Build orderBy
+    let orderBy: Prisma.propertiesOrderByWithRelationInput = { created_at: 'desc' }
+    if (query.sort_by === 'price_asc') orderBy = { price: 'asc' }
+    else if (query.sort_by === 'price_desc') orderBy = { price: 'desc' }
 
-    // Infrastructure filters (Nigerian market)
-    if (query.nepa_status) {
-      dbQuery = dbQuery.eq('nepa_status', query.nepa_status)
-    }
+    const [properties, total] = await Promise.all([
+      prisma.properties.findMany({
+        where,
+        select: {
+          id: true,
+          title: true,
+          property_type: true,
+          price: true,
+          price_frequency: true,
+          address: true,
+          city: true,
+          state: true,
+          latitude: true,
+          longitude: true,
+          bedrooms: true,
+          bathrooms: true,
+          status: true,
+          created_at: true,
+          updated_at: true,
+          owners: { select: { profiles: { select: { full_name: true, avatar_url: true } } } },
+          property_media: true,
+        },
+        orderBy,
+        skip: (query.page - 1) * query.per_page,
+        take: query.per_page,
+      }),
+      prisma.properties.count({ where }),
+    ])
 
-    if (query.water_source) {
-      dbQuery = dbQuery.eq('water_source', query.water_source)
-    }
-
-    if (query.internet_type) {
-      dbQuery = dbQuery.eq('internet_type', query.internet_type)
-    }
-
-    // Security type filter (array overlap)
-    if (query.security_type && query.security_type.length > 0) {
-      // Check if any of the requested security types are in the property's security_type array
-      dbQuery = dbQuery.overlaps('security_type', query.security_type)
-    }
-
-    // Apply sorting
-    switch (query.sort_by) {
-      case 'newest':
-        dbQuery = dbQuery.order('created_at', { ascending: false })
-        break
-      case 'price_asc':
-        dbQuery = dbQuery.order('price', { ascending: true })
-        break
-      case 'price_desc':
-        dbQuery = dbQuery.order('price', { ascending: false })
-        break
-      case 'distance':
-        if (query.latitude && query.longitude) {
-          // For distance sorting, we need to calculate distance in the select
-          // This is a simplified approach - in production you might want to use a more complex query
-          dbQuery = dbQuery.order('created_at', { ascending: false }) // Fallback to newest
-        } else {
-          dbQuery = dbQuery.order('created_at', { ascending: false })
-        }
-        break
-    }
-
-    // Apply pagination
-    const from = (query.page - 1) * query.per_page
-    const to = from + query.per_page - 1
-    dbQuery = dbQuery.range(from, to)
-
-    // Execute query
-    const { data: properties, error, count } = await dbQuery
-
-    if (error) {
-      console.error('Database error:', error)
-      return NextResponse.json(
-        { error: 'Failed to fetch properties' },
-        { status: 500 }
-      )
-    }
-
-    // Calculate pagination metadata
-    const totalPages = Math.ceil((count || 0) / query.per_page)
+    const totalPages = Math.ceil(total / query.per_page)
 
     return NextResponse.json({
-      data: properties || [],
+      data: properties,
       pagination: {
         page: query.page,
         per_page: query.per_page,
-        total: count || 0,
+        total,
         total_pages: totalPages,
         has_next: query.page < totalPages,
         has_prev: query.page > 1,
@@ -227,41 +158,34 @@ export async function GET(request: NextRequest) {
       filters: {
         applied: {
           state: query.state,
-          lga: query.lga,
           property_type: query.property_type,
           price_range: query.min_price || query.max_price ? {
             min: query.min_price,
-            max: query.max_price
+            max: query.max_price,
           } : undefined,
           bedrooms: query.bedrooms,
           bathrooms: query.bathrooms,
-          has_bq: query.has_bq,
-          nepa_status: query.nepa_status,
-          water_source: query.water_source,
-          internet_type: query.internet_type,
-          security_type: query.security_type,
           location: query.latitude && query.longitude ? {
             latitude: query.latitude,
             longitude: query.longitude,
-            radius_km: query.radius_km
-          } : undefined
-        }
-      }
+            radius_km: query.radius_km,
+          } : undefined,
+        },
+      },
     })
-
   } catch (error) {
     console.error('API error:', error)
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Invalid query parameters', details: error.errors },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
     return NextResponse.json(
       { error: 'Internal server error' },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }

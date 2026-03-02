@@ -126,9 +126,15 @@ export function useOnboarding(
         }
       }
 
+      if (userType === "owner" && step === 2) {
+        if (!formData.companyName?.trim()) {
+          newError = "Business/company name is required";
+        }
+      }
+
       if (userType === "agent" && (step === 2 || step === 4)) {
         if (!formData.licenseNumber?.trim()) {
-          newError = "License number is required";
+          newError = "RC number (company registration) is required";
         } else if (!formData.agencyName?.trim()) {
           newError = "Agency name is required";
         } else if (
@@ -173,7 +179,7 @@ export function useOnboarding(
     try {
       const { formData } = state;
 
-      // Update profiles table
+      // Update profiles table (role lives on users.role — never write user_type to profiles)
       const profileUpdates = {
         id: user.id,
         full_name: formData.fullName.trim(),
@@ -181,7 +187,6 @@ export function useOnboarding(
         phone: formData.phone.trim(),
         bio: formData.bio.trim() || null,
         avatar_url: formData.profilePhotoUrl || null,
-        user_type: userType,
         updated_at: new Date().toISOString(),
       };
 

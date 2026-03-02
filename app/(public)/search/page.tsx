@@ -3,7 +3,6 @@
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
 import { RealEstButton } from "@/components/heroui/RealEstButton";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { AdvancedSearchForm } from "@/components/patterns/forms";
@@ -42,100 +41,45 @@ import {
   Building,
 } from "lucide-react";
 
+// Normalized shape returned by /api/search/properties
 interface Property {
   id: string;
   title: string;
   description: string;
   price: number;
-  currency: string;
+  price_frequency: string | null;
+  listing_type: string; // for_sale | for_rent | for_lease | short_let
+  listing_source: string; // owner | agent
+  property_type: string;
   address: string;
   city: string;
   state: string | null;
   country: string;
   latitude: number | null;
   longitude: number | null;
-  property_type: string;
-  listing_type: string;
+  bedrooms: number | null;
+  bathrooms: number | null;
+  square_feet: number | null;
   status: string;
   verification_status: "pending" | "verified" | "rejected";
   created_at: string;
-
-  // Nigerian-specific fields
-  has_bq?: boolean;
-  has_nepa?: boolean;
-  has_water?: boolean;
-  is_gated?: boolean;
-  has_good_roads?: boolean;
-  security_rating?: number;
-  infrastructure_score?: number;
-
-  property_details:
-    | {
-        bedrooms: number | null;
-        bathrooms: number | null;
-        toilets?: number | null;
-        square_feet: number | null;
-        lot_size: number | null;
-        year_built: number | null;
-        parking_spaces: number | null;
-        furnished: boolean | null;
-        pets_allowed: boolean | null;
-        amenities: string[] | null;
-        utilities_included: string[] | null;
-      }[]
-    | null;
-
-  property_media: {
-    id: string;
-    media_type: "image" | "video" | "virtual_tour";
-    file_url: string;
-    file_name: string;
-    is_primary: boolean;
-  }[];
-
-  owner: {
-    id: string;
-    full_name: string;
-    email: string;
-    phone: string | null;
-    avatar_url: string | null;
-    user_type?: string;
-    rating?: number;
-    verified?: boolean;
-  };
-
-  // Agent listing support
-  agent?: {
-    id: string;
-    license_number: string;
-    agency_name: string;
-    specialization: string[];
-    verified: boolean;
-    rating: number | null;
-    agent_profile?: {
-      id: string;
-      full_name: string;
-      email: string;
-      phone: string | null;
-      avatar_url: string | null;
-    };
-  };
-
-  // Computed fields
-  view_count?: number;
-  like_count?: number;
+  // First media item
+  thumbnail: { url: string; type: string } | null;
+  // Nigerian infra (from property_details.metadata)
+  has_bq: boolean;
+  nepa_status: string | null;
+  water_source: string | null;
+  security_type: string[];
+  // Lister info (flattened)
+  owner: { id: string; full_name: string | null; avatar_url: string | null; phone: string | null } | null;
+  agent: { id: string; full_name: string | null; avatar_url: string | null; phone: string | null } | null;
+  // Computed client-side
   days_listed?: number;
+  view_count?: number;
 }
 
 type ViewMode = "grid" | "list" | "map";
-type SortOption =
-  | "relevance"
-  | "price_low"
-  | "price_high"
-  | "newest"
-  | "oldest"
-  | "size_large"
-  | "size_small";
+type SortOption = "relevance" | "price_low" | "price_high" | "newest" | "oldest";
 
 function SearchPageContent() {
   const searchParams = useSearchParams();
@@ -170,12 +114,22 @@ function SearchPageContent() {
 
   const itemsPerPage = 12;
 
-  const formatPrice = (price: number, currency: string = "NGN") => {
+  const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-NG", {
       style: "currency",
-      currency: currency,
+      currency: "NGN",
       minimumFractionDigits: 0,
     }).format(price);
+  };
+
+  const formatListingType = (type: string) => {
+    const map: Record<string, string> = {
+      for_rent: "Rent",
+      for_sale: "Sale",
+      for_lease: "Lease",
+      short_let: "Short Let",
+    };
+    return map[type] ?? type.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
   };
 
   const getDaysListed = (createdAt: string) => {
@@ -208,109 +162,47 @@ function SearchPageContent() {
   useEffect(() => {
     const fetchProperties = async () => {
       setIsLoading(true);
-      const supabase = createClient();
-      let query = supabase
-        .from("properties")
-        .select(
-          `
-          *,
-          property_details (*),
-          property_media (*),
-          owner:profiles!properties_owner_id_fkey (
-            id,
-            full_name,
-            email,
-            phone,
-            avatar_url,
-            user_type
-          ),
-          agent:agents!properties_agent_id_fkey (
-            id,
-            license_number,
-            agency_name,
-            specialization,
-            verified,
-            rating,
-            agent_profile:profiles!agents_profile_id_fkey (
-              id,
-              full_name,
-              email,
-              phone,
-              avatar_url
-            )
-          )
-        `,
-          { count: "exact" },
-        )
-        .eq("status", "active")
-        .range(
-          (currentPage - 1) * itemsPerPage,
-          currentPage * itemsPerPage - 1,
-        );
+      try {
+        const params = new URLSearchParams();
+        if (quickSearch) params.set("query", quickSearch);
+        if (activeFilters.state) params.set("state", activeFilters.state);
+        // API accepts a single property_type; send first selected if multiple
+        if (activeFilters.propertyType && activeFilters.propertyType.length > 0) {
+          params.set("property_type", activeFilters.propertyType[0]);
+        }
+        if (activeFilters.purpose && activeFilters.purpose !== "any") {
+          params.set("listing_type", activeFilters.purpose);
+        }
+        if (activeFilters.minPrice) params.set("min_price", String(activeFilters.minPrice));
+        if (activeFilters.maxPrice) params.set("max_price", String(activeFilters.maxPrice));
+        if (activeFilters.bedrooms) params.set("bedrooms", String(activeFilters.bedrooms));
+        if (activeFilters.bathrooms) params.set("bathrooms", String(activeFilters.bathrooms));
+        params.set("page", String(currentPage));
+        params.set("limit", String(itemsPerPage));
 
-      // Apply quick search
-      if (quickSearch) {
-        query = query.or(
-          `title.ilike.%${quickSearch}%,address.ilike.%${quickSearch}%,city.ilike.%${quickSearch}%,state.ilike.%${quickSearch}%`,
-        );
-      }
+        const sortMap: Record<SortOption, string> = {
+          relevance: "newest",
+          price_low: "price_asc",
+          price_high: "price_desc",
+          newest: "newest",
+          oldest: "oldest",
+        };
+        params.set("sort_by", sortMap[sortBy]);
 
-      // Apply filters
-      if (activeFilters.propertyType && activeFilters.propertyType.length > 0) {
-        query = query.in("property_type", activeFilters.propertyType);
-      }
+        const res = await fetch(`/api/search/properties?${params}`);
+        const json = await res.json();
 
-      if (activeFilters.purpose && activeFilters.purpose !== "any") {
-        query = query.eq("listing_type", activeFilters.purpose);
-      }
-
-      if (activeFilters.minPrice) {
-        query = query.gte("price", activeFilters.minPrice);
-      }
-
-      if (activeFilters.maxPrice) {
-        query = query.lte("price", activeFilters.maxPrice);
-      }
-
-      if (activeFilters.state) {
-        query = query.eq("state", activeFilters.state);
-      }
-
-      if (activeFilters.verifiedOnly) {
-        query = query.eq("verification_status", "verified");
-      }
-
-      // Apply sorting
-      switch (sortBy) {
-        case "price_low":
-          query = query.order("price", { ascending: true });
-          break;
-        case "price_high":
-          query = query.order("price", { ascending: false });
-          break;
-        case "newest":
-          query = query.order("created_at", { ascending: false });
-          break;
-        case "oldest":
-          query = query.order("created_at", { ascending: true });
-          break;
-        default:
-          query = query.order("created_at", { ascending: false });
-      }
-
-      const { data, error, count } = await query;
-
-      if (!error && data) {
-        // Add computed fields
-        const enrichedData = data.map((property: any) => ({
-          ...property,
-          view_count: Math.floor(Math.random() * 500) + 50,
-          like_count: Math.floor(Math.random() * 50) + 5,
-          days_listed: getDaysListed(property.created_at),
-        }));
-
-        setProperties(enrichedData as Property[]);
-        setTotalCount(count || 0);
+        if (res.ok) {
+          const enriched = (json.properties ?? []).map((p: Property) => ({
+            ...p,
+            days_listed: getDaysListed(p.created_at),
+            view_count: Math.floor(Math.random() * 500) + 50,
+          }));
+          setProperties(enriched);
+          setTotalCount(json.pagination?.total ?? 0);
+        }
+      } catch (err) {
+        console.error("Search fetch error:", err);
       }
       setIsLoading(false);
     };
@@ -358,32 +250,13 @@ function SearchPageContent() {
     property: Property;
     isListView?: boolean;
   }) => {
-    const primaryImage = property.property_media?.find(
-      (media) => media.is_primary,
-    );
-    const propertyDetails = Array.isArray(property.property_details)
-      ? property.property_details[0]
-      : property.property_details;
     const isLiked = likedProperties.has(property.id);
 
-    // Dynamic lister resolution
-    let lister = null;
-    let listerType = "";
-    let detailRoute = `/property/${property.id}`;
-    if (property.agent && property.agent.agent_profile) {
-      lister = property.agent.agent_profile;
-      listerType = "Agent";
-      detailRoute = `/listing/${property.id}`;
-    } else if (property.owner) {
-      lister = property.owner;
-      if (property.owner.user_type === "admin") {
-        listerType = "Admin";
-        detailRoute = `/listing/${property.id}`;
-      } else {
-        listerType = "Owner";
-        detailRoute = `/property/${property.id}`;
-      }
-    }
+    // Lister resolution based on listing_source
+    const isAgentListing = property.listing_source === "agent" && !!property.agent;
+    const lister = isAgentListing ? property.agent : property.owner;
+    const listerType = isAgentListing ? "Agent" : "Owner";
+    const detailRoute = isAgentListing ? `/listing/${property.id}` : `/property/${property.id}`;
 
     if (isListView) {
       return (
@@ -391,9 +264,9 @@ function SearchPageContent() {
           <div className="flex gap-6">
             {/* Image */}
             <div className="w-48 h-32 bg-muted rounded-xl overflow-hidden shrink-0 relative">
-              {primaryImage ? (
+              {property.thumbnail ? (
                 <img
-                  src={primaryImage.file_url}
+                  src={property.thumbnail.url}
                   alt={property.title}
                   className="w-full h-full object-cover"
                 />
@@ -442,9 +315,9 @@ function SearchPageContent() {
                         .replace(/\b\w/g, (l) => l.toUpperCase())}
                     </Chip>
                     <Chip variant="secondary" className="text-xs">
-                      For {property.listing_type}
+                      For {formatListingType(property.listing_type)}
                     </Chip>
-                    {property.days_listed != 7 && (
+                    {(property.days_listed ?? 999) < 7 && (
                       <StatusBadge variant="new" size="sm">
                         New
                       </StatusBadge>
@@ -474,9 +347,9 @@ function SearchPageContent() {
                 </div>
                 <div className="text-right ml-4">
                   <div className="text-xl font-heading font-bold text-primary mb-1">
-                    {formatPrice(property.price, property.currency)}
+                    {formatPrice(property.price)}
                   </div>
-                  {property.listing_type === "rent" && (
+                  {property.listing_type === "for_rent" && (
                     <div className="text-xs text-muted-foreground">
                       per month
                     </div>
@@ -486,49 +359,41 @@ function SearchPageContent() {
 
               {/* Property details */}
               <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
-                {propertyDetails?.bedrooms && (
+                {property.bedrooms != null && (
                   <div className="flex items-center gap-1">
                     <Bed className="w-4 h-4" />
-                    <span>{propertyDetails.bedrooms}</span>
+                    <span>{property.bedrooms}</span>
                   </div>
                 )}
-                {propertyDetails?.bathrooms && (
+                {property.bathrooms != null && (
                   <div className="flex items-center gap-1">
                     <Bath className="w-4 h-4" />
-                    <span>{propertyDetails.bathrooms}</span>
+                    <span>{property.bathrooms}</span>
                   </div>
                 )}
-                {propertyDetails?.square_feet && (
+                {property.square_feet != null && (
                   <div className="flex items-center gap-1">
                     <Ruler className="w-4 h-4" />
-                    <span>
-                      {propertyDetails.square_feet.toLocaleString()} sqft
-                    </span>
-                  </div>
-                )}
-                {propertyDetails?.parking_spaces && (
-                  <div className="flex items-center gap-1">
-                    <Users className="w-4 h-4" />
-                    <span>{propertyDetails.parking_spaces} parking</span>
+                    <span>{property.square_feet.toLocaleString()} sqft</span>
                   </div>
                 )}
               </div>
 
               {/* Nigerian features */}
               <div className="flex flex-wrap gap-2 mb-3">
-                {property.has_nepa && (
+                {property.nepa_status && ![ "none", "poor" ].includes(property.nepa_status) && (
                   <div className="flex items-center gap-1 text-xs bg-success/10 text-success px-2 py-1 rounded-full">
                     <Zap className="w-3 h-3" />
                     <span>NEPA</span>
                   </div>
                 )}
-                {property.has_water && (
+                {property.water_source && property.water_source !== "none" && (
                   <div className="flex items-center gap-1 text-xs bg-info/10 text-info px-2 py-1 rounded-full">
                     <Droplets className="w-3 h-3" />
                     <span>Water</span>
                   </div>
                 )}
-                {property.is_gated && (
+                {property.security_type.includes("gated_community") && (
                   <div className="flex items-center gap-1 text-xs bg-warning/10 text-warning px-2 py-1 rounded-full">
                     <Shield className="w-3 h-3" />
                     <span>Gated</span>
@@ -574,9 +439,9 @@ function SearchPageContent() {
       <div className="bg-card border border-border rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2 group">
         {/* Image */}
         <div className="relative h-48 bg-muted overflow-hidden">
-          {primaryImage ? (
+          {property.thumbnail ? (
             <img
-              src={primaryImage.file_url}
+              src={property.thumbnail.url}
               alt={property.title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
@@ -596,7 +461,7 @@ function SearchPageContent() {
                 ? "Verified"
                 : property.verification_status}
             </StatusBadge>
-            {property.days_listed != 7 && (
+            {(property.days_listed ?? 999) < 7 && (
               <StatusBadge variant="new">New</StatusBadge>
             )}
           </div>
@@ -618,15 +483,14 @@ function SearchPageContent() {
           {/* Price overlay */}
           <div className="absolute bottom-3 right-3 bg-background/90 backdrop-blur-sm rounded-lg px-3 py-1">
             <div className="font-heading font-bold text-primary">
-              {formatPrice(property.price, property.currency)}
+              {formatPrice(property.price)}
             </div>
-            {property.listing_type === "rent" && (
+            {property.listing_type === "for_rent" && (
               <div className="text-xs text-muted-foreground text-center">
                 per month
               </div>
             )}
           </div>
-          <Button variant="outline">Search</Button>
         </div>
 
         {/* Content */}
@@ -646,22 +510,22 @@ function SearchPageContent() {
 
           {/* Property details */}
           <div className="flex items-center gap-3 text-sm text-muted-foreground mb-3">
-            {propertyDetails?.bedrooms && (
+            {property.bedrooms != null && (
               <div className="flex items-center gap-1">
                 <Bed className="w-4 h-4" />
-                <span>{propertyDetails.bedrooms}</span>
+                <span>{property.bedrooms}</span>
               </div>
             )}
-            {propertyDetails?.bathrooms && (
+            {property.bathrooms != null && (
               <div className="flex items-center gap-1">
                 <Bath className="w-4 h-4" />
-                <span>{propertyDetails.bathrooms}</span>
+                <span>{property.bathrooms}</span>
               </div>
             )}
-            {propertyDetails?.square_feet && (
+            {property.square_feet != null && (
               <div className="flex items-center gap-1">
                 <Ruler className="w-4 h-4" />
-                <span>{(propertyDetails.square_feet! / 1000).toFixed(1)}k</span>
+                <span>{(property.square_feet / 1000).toFixed(1)}k sqft</span>
               </div>
             )}
           </div>
@@ -673,17 +537,17 @@ function SearchPageContent() {
                 BQ
               </StatusBadge>
             )}
-            {property.has_nepa && (
+            {property.nepa_status && !["none", "poor"].includes(property.nepa_status) && (
               <div className="text-xs bg-success/10 text-success px-2 py-1 rounded-full">
                 NEPA
               </div>
             )}
-            {property.has_water && (
+            {property.water_source && property.water_source !== "none" && (
               <div className="text-xs bg-info/10 text-info px-2 py-1 rounded-full">
                 Water
               </div>
             )}
-            {property.is_gated && (
+            {property.security_type.includes("gated_community") && (
               <div className="text-xs bg-warning/10 text-warning px-2 py-1 rounded-full">
                 Gated
               </div>
@@ -868,8 +732,6 @@ function SearchPageContent() {
                 <option value="price_high">Price: High to Low</option>
                 <option value="newest">Newest First</option>
                 <option value="oldest">Oldest First</option>
-                <option value="size_large">Largest First</option>
-                <option value="size_small">Smallest First</option>
               </select>
 
               {/* View Mode Toggle */}

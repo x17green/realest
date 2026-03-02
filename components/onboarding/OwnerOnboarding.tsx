@@ -312,10 +312,7 @@ const OwnerOnboarding: React.FC = () => {
                 <div className="space-y-4">
                   <div className="space-y-1.5">
                     <label className="text-sm font-semibold text-foreground">
-                      Company Name{" "}
-                      <span className="text-muted-foreground text-xs font-normal">
-                        (Optional)
-                      </span>
+                      Company / Business Name <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -323,7 +320,7 @@ const OwnerOnboarding: React.FC = () => {
                       onChange={(e) =>
                         updateFormData("companyName", e.target.value)
                       }
-                      placeholder="Your real estate company"
+                      placeholder="Your real estate company or personal name"
                       className="w-full px-4 py-2.5 bg-surface border border-border/50 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary/50 focus:outline-none transition-all duration-200"
                     />
                   </div>
@@ -654,11 +651,12 @@ const OwnerOnboarding: React.FC = () => {
                   <Button
                     onClick={handleNext}
                     disabled={
-                      currentStep === 1 &&
-                      (!formData.fullName.trim() ||
-                        !formData.email.trim() ||
-                        !formData.phone.trim() ||
-                        !!phoneError)
+                      (currentStep === 1 &&
+                        (!formData.fullName.trim() ||
+                          !formData.email.trim() ||
+                          !formData.phone.trim() ||
+                          !!phoneError)) ||
+                      (currentStep === 2 && !formData.companyName?.trim())
                     }
                     variant="default"
                     size="lg"

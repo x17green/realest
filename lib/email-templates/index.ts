@@ -20,12 +20,18 @@ export {
   default as passwordReset,
 } from "./password-reset";
 
+export {
+  createInquiryTemplate,
+  default as inquiryNotification,
+} from "./inquiry";
+
 // Re-export types for convenience
 export type {
   EmailTemplate,
   WaitlistEmailData,
   AdminNotificationData,
   PasswordResetEmailData,
+  InquiryEmailData,
   EmailConfig,
   TemplateContext,
   EmailTemplateFunction,
@@ -36,16 +42,18 @@ export type {
 import { createWaitlistConfirmationTemplate } from "./waitlist-confirmation";
 import { createAdminNotificationTemplate } from "./admin-notification";
 import { createPasswordResetTemplate } from "./password-reset";
+import { createInquiryTemplate } from "./inquiry";
 import {
   EmailConfig,
   WaitlistEmailData,
   AdminNotificationData,
   PasswordResetEmailData,
+  InquiryEmailData,
 } from "./types";
 
 // RealEST email configuration
 export const DEFAULT_EMAIL_CONFIG: EmailConfig = {
-  companyName: "RealEST",
+  companyName: "RealEST Connect",
   tagline: "Find Your Next Move",
   domain: "realest.ng",
   fromEmail: process.env.FROM_EMAIL || "hello@realest.ng",
@@ -94,6 +102,13 @@ export class EmailTemplateFactory {
   }
 
   /**
+   * Create property inquiry notification email
+   */
+  createInquiryNotification(data: InquiryEmailData) {
+    return createInquiryTemplate(data);
+  }
+
+  /**
    * Update configuration
    */
   updateConfig(newConfig: Partial<EmailConfig>) {
@@ -110,7 +125,7 @@ export class EmailTemplateFactory {
 
 // Singleton factory instance with environment-based RealEST configuration
 export const emailFactory = new EmailTemplateFactory({
-  companyName: "RealEST",
+  companyName: "RealEST Connect",
   tagline: "Find Your Next Move",
   domain: "realest.ng",
   fromEmail: process.env.FROM_EMAIL || "hello@realest.ng",
@@ -132,6 +147,9 @@ export const Templates = {
 
   passwordReset: (data: PasswordResetEmailData) =>
     emailFactory.createPasswordReset(data),
+
+  inquiryNotification: (data: InquiryEmailData) =>
+    emailFactory.createInquiryNotification(data),
 };
 
 // Template validation utilities

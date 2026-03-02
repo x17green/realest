@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { prisma } from "@/lib/prisma";
 
 const closeSchema = z.object({
   reason: z
@@ -48,53 +49,34 @@ export async function POST(request: Request, { params }: RouteParams) {
     const closeData = validationResult.data;
 
     // Verify inquiry exists and user can close it
-    const { data: inquiry, error: inquiryError } = await supabase
-      .from("inquiries")
-      .select(
-        `
-        *,
-        sender:profiles!inquiries_sender_id_fkey(id, full_name),
-        receiver:profiles!inquiries_receiver_id_fkey(id, full_name),
-        property:properties(title, owner_id)
-      `,
-      )
-      .eq("id", inquiryId)
-      .single();
+    const inquiry = await prisma.inquiries.findUnique({
+      where: { id: inquiryId },
+      include: {
+        profiles_inquiries_sender_idToprofiles: { select: { id: true, full_name: true, email: true } },
+        profiles_inquiries_owner_idToprofiles: { select: { id: true, full_name: true, email: true } },
+        properties: { select: { title: true, address: true, owner_id: true } },
+      },
+    });
 
-    if (inquiryError || !inquiry) {
+    if (!inquiry) {
       return NextResponse.json({ error: "Inquiry not found" }, { status: 404 });
     }
 
-    // Verify user is either sender or receiver
-    if (inquiry.sender_id !== user.id && inquiry.receiver_id !== user.id) {
+    // Verify user is either sender or owner
+    if (inquiry.sender_id !== user.id && inquiry.owner_id !== user.id) {
       return NextResponse.json({ error: "Access denied" }, { status: 403 });
     }
 
     // Close the inquiry
-    const { data: closedInquiry, error: updateError } = await supabase
-      .from("inquiries")
-      .update({
-        status: "closed",
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", inquiryId)
-      .select(
-        `
-        *,
-        sender:profiles!inquiries_sender_id_fkey(full_name, email),
-        receiver:profiles!inquiries_receiver_id_fkey(full_name, email),
-        property:properties(title, address)
-      `,
-      )
-      .single();
-
-    if (updateError) {
-      console.error("Database update error:", updateError);
-      return NextResponse.json(
-        { error: "Failed to close inquiry" },
-        { status: 500 },
-      );
-    }
+    const closedInquiry = await prisma.inquiries.update({
+      where: { id: inquiryId },
+      data: { status: "closed", updated_at: new Date() },
+      include: {
+        profiles_inquiries_sender_idToprofiles: { select: { full_name: true, email: true } },
+        profiles_inquiries_owner_idToprofiles: { select: { full_name: true, email: true } },
+        properties: { select: { title: true, address: true } },
+      },
+    });
 
     // Log closure reason if provided (could be stored in a separate activity log)
     if (closeData.reason || closeData.notes) {
@@ -105,17 +87,19 @@ export async function POST(request: Request, { params }: RouteParams) {
     }
 
     // Send notification email to the other party
-    const isOwnerClosing = inquiry.receiver_id === user.id;
-    const recipient = isOwnerClosing ? inquiry.sender : inquiry.receiver;
+    const isOwnerClosing = inquiry.owner_id === user.id;
+    const recipient = isOwnerClosing
+      ? inquiry.profiles_inquiries_sender_idToprofiles
+      : inquiry.profiles_inquiries_owner_idToprofiles;
 
     const emailData = {
       to: recipient.email,
-      subject: `Inquiry closed for ${inquiry.property.title}`,
+      subject: `Inquiry closed for ${inquiry.properties?.title}`,
       template: "inquiry-closed",
       data: {
-        recipient_name: recipient.full_name,
-        property_title: inquiry.property.title,
-        property_address: inquiry.property.address,
+        recipient_name: recipient?.full_name,
+        property_title: inquiry.properties?.title,
+        property_address: inquiry.properties?.address,
         closed_by: isOwnerClosing ? "property owner" : "inquirer",
         reason: closeData.reason,
         notes: closeData.notes,

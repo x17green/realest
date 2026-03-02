@@ -15,6 +15,10 @@ export interface BaseUserProfile {
   phone: string | null;
   bio: string | null;
   avatar_url: string | null;
+  /**
+   * Role from public.users.role — single source of truth.
+   * Named user_type for backward compatibility with existing UI code.
+   */
   user_type: UserRole;
   created_at: string;
   updated_at: string;
@@ -112,14 +116,14 @@ export function useUser(): UseUserReturn {
   const supabase = createClient();
   const isInitialized = useRef(false);
 
-  // Fetch user role from user_roles table
+  // Fetch user role from public.users table (single source of truth)
   const fetchUserRole = useCallback(
     async (userId: string): Promise<UserRole | null> => {
       try {
-        const { data: userRole, error } = await supabase
-          .from("user_roles")
+        const { data: userData, error } = await supabase
+          .from("users")
           .select("role")
-          .eq("user_id", userId)
+          .eq("id", userId)
           .single();
 
         if (error) {
@@ -127,7 +131,7 @@ export function useUser(): UseUserReturn {
           return null;
         }
 
-        return (userRole?.role as UserRole) || null;
+        return (userData?.role as UserRole) || null;
       } catch (err) {
         console.error("Error in fetchUserRole:", err);
         return null;

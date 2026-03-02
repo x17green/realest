@@ -19,28 +19,27 @@ export default async function UsersPage() {
   }
 
   // Check if user is an admin
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("user_type")
+  const { data: userRow } = await supabase
+    .from("users")
+    .select("role")
     .eq("id", user.id)
     .single();
 
-  if (profile?.user_type !== "admin") {
+  if (userRow?.role !== "admin") {
     redirect("/");
   }
 
-  // Fetch all users
+  // Fetch all users — query users table (role + is_active live here)
   const { data: users } = await supabase
-    .from("profiles")
+    .from("users")
     .select("*")
     .order("created_at", { ascending: false });
 
-  // Mock user stats
   const userStats = {
     totalUsers: users?.length || 0,
-    verifiedUsers: users?.filter(u => u.is_verified).length || 0,
-    activeUsers: users?.filter(u => u.user_type !== 'banned').length || 0,
-    bannedUsers: users?.filter(u => u.user_type === 'banned').length || 0,
+    verifiedUsers: users?.filter(u => u.is_active).length || 0,
+    activeUsers: users?.filter(u => u.is_active).length || 0,
+    bannedUsers: users?.filter(u => !u.is_active).length || 0,
   };
 
   return (
@@ -147,11 +146,11 @@ export default async function UsersPage() {
                     </TableCell>
                     <TableCell>{userProfile.email || "N/A"}</TableCell>
                     <TableCell>
-                      <Badge variant="outline">{userProfile.user_type}</Badge>
+                      <Badge variant="outline">{userProfile.role}</Badge>
                     </TableCell>
                     <TableCell>
-                      <Badge variant={userProfile.is_verified ? "default" : "secondary"}>
-                        {userProfile.is_verified ? "Verified" : "Unverified"}
+                      <Badge variant={userProfile.is_active ? "default" : "secondary"}>
+                        {userProfile.is_active ? "Active" : "Inactive"}
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -166,7 +165,7 @@ export default async function UsersPage() {
                           </Link>
                         </Button>
                         <Button size="sm" variant="outline">
-                          {userProfile.user_type === 'banned' ? 'Unban' : 'Ban'}
+                          {userProfile.is_active ? 'Ban' : 'Unban'}
                         </Button>
                       </div>
                     </TableCell>

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { z } from 'zod'
+import { prisma } from '@/lib/prisma'
 
 // Query parameters schema
 const vettingQuerySchema = z.object({
@@ -29,13 +30,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     // Verify user is admin
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('user_type')
-      .eq('id', user.id)
-      .single()
-
-    if (!profile || profile.user_type !== 'admin') {
+    const adminRow = await prisma.users.findUnique({ where: { id: user.id }, select: { role: true } })
+    if (!adminRow || adminRow.role !== 'admin') {
       return NextResponse.json(
         { error: 'Admin access required' },
         { status: 403 }
@@ -64,109 +60,52 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const perPageNum = parseInt(per_page)
     const offset = (pageNum - 1) * perPageNum
 
-    // Build query for properties pending physical vetting
-    let query = supabase
-      .from('properties')
-      .select(`
-        *,
-        owner:profiles(full_name, email, phone, avatar_url),
-        documents:property_documents(*),
-        media:property_media(*)
-      `)
-      .eq('status', 'pending_vetting')
+    const where = { status: 'pending_vetting', ...(state ? { state } : {}) }
+    const orderBy = sort === 'oldest' ? { created_at: 'asc' as const } : { created_at: 'desc' as const }
 
-    // Apply state filter if provided
-    if (state) {
-      query = query.eq('state', state)
-    }
+    const [properties, totalCount] = await Promise.all([
+      prisma.properties.findMany({
+        where,
+        include: {
+          owners: { include: { profiles: { select: { full_name: true, email: true, phone: true } } } },
+          property_documents: true,
+          property_media: { select: { id: true } },
+        },
+        orderBy,
+        skip: offset,
+        take: perPageNum,
+      }),
+      prisma.properties.count({ where }),
+    ])
 
-    // Apply sorting
-    switch (sort) {
-      case 'newest':
-        query = query.order('created_at', { ascending: false })
-        break
-      case 'oldest':
-        query = query.order('created_at', { ascending: true })
-        break
-      case 'urgent':
-        // Urgent could be based on time since ML validation, property value, etc.
-        query = query.order('ml_validated_at', { ascending: true })
-        break
-      case 'location':
-        query = query.order('state', { ascending: true }).order('lga', { ascending: true })
-        break
-    }
-
-    // Apply pagination
-    query = query.range(offset, offset + perPageNum - 1)
-
-    const { data: properties, error: propertiesError } = await query
-
-    if (propertiesError) {
-      console.error('Error fetching vetting queue:', propertiesError)
-      return NextResponse.json(
-        { error: 'Failed to fetch vetting queue' },
-        { status: 500 }
-      )
-    }
-
-    // Get total count for pagination
-    let countQuery = supabase
-      .from('properties')
-      .select('*', { count: 'exact', head: true })
-      .eq('status', 'pending_vetting')
-
-    if (state) {
-      countQuery = countQuery.eq('state', state)
-    }
-
-    const { count, error: countError } = await countQuery
-
-    if (countError) {
-      console.error('Error getting total count:', countError)
-    }
-
-    const totalCount = count || 0
     const totalPages = Math.ceil(totalCount / perPageNum)
 
-    // Format response with vetting specific data
-    const formattedProperties = properties?.map(property => ({
+    const formattedProperties = properties.map((property: any) => ({
       id: property.id,
       title: property.title,
       property_type: property.property_type,
       address: property.address,
       state: property.state,
-      lga: property.lga,
-      landmark: property.landmark,
       latitude: property.latitude,
       longitude: property.longitude,
       price: property.price,
       price_frequency: property.price_frequency,
       created_at: property.created_at,
-      ml_validated_at: property.ml_validated_at,
-      owner: property.owner,
-      document_count: property.documents?.length || 0,
-      media_count: property.media?.length || 0,
-      // Vetting specific fields
-      vetting_status: 'pending', // pending, scheduled, in_progress, completed
-      scheduled_date: null,
-      assigned_vetter: null,
-      vetting_notes: null,
-      // Priority indicators
-      days_since_ml_validation: Math.floor(
-        (Date.now() - new Date(property.ml_validated_at || property.created_at).getTime()) / (1000 * 60 * 60 * 24)
-      ),
-      is_high_value: property.price > 10000000, // ₦10M threshold
-      has_complete_documents: (property.documents?.length || 0) >= 3,
-      urgency_level: property.price > 50000000 ? 'urgent' :
-                    property.price > 10000000 ? 'high' :
-                    (property.documents?.length || 0) >= 5 ? 'medium' : 'low',
-    })) || []
+      owner: property.owners?.profiles ?? null,
+      document_count: property.property_documents?.length || 0,
+      media_count: property.property_media?.length || 0,
+      vetting_status: 'pending',
+      days_since_created: Math.floor((Date.now() - new Date(property.created_at!).getTime()) / (1000 * 60 * 60 * 24)),
+      is_high_value: Number(property.price) > 10000000,
+      has_complete_documents: (property.property_documents?.length || 0) >= 3,
+      urgency_level: Number(property.price) > 50000000 ? 'urgent' :
+                    Number(property.price) > 10000000 ? 'high' :
+                    (property.property_documents?.length || 0) >= 5 ? 'medium' : 'low',
+    }))
 
-    // Apply priority filter if specified
     let filteredProperties = formattedProperties
     if (priority) {
-      filteredProperties = formattedProperties.filter(p => p.urgency_level === priority)
+      filteredProperties = formattedProperties.filter((p: any) => p.urgency_level === priority)
     }
 
     return NextResponse.json({
@@ -181,15 +120,15 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       },
       summary: {
         total_pending: totalCount,
-        urgent_properties: formattedProperties.filter(p => p.urgency_level === 'urgent').length,
-        high_value_properties: formattedProperties.filter(p => p.is_high_value).length,
-        average_wait_days: formattedProperties.reduce((acc, p) => acc + p.days_since_ml_validation, 0) / formattedProperties.length || 0,
-        states_represented: [...new Set(formattedProperties.map(p => p.state))].length,
+        urgent_properties: formattedProperties.filter((p: any) => p.urgency_level === 'urgent').length,
+        high_value_properties: formattedProperties.filter((p: any) => p.is_high_value).length,
+        average_wait_days: formattedProperties.reduce((acc: number, p: any) => acc + p.days_since_ml_validation, 0) / formattedProperties.length || 0,
+        states_represented: [...new Set(formattedProperties.map((p: any) => p.state))].length,
       },
       filters: {
         applied_state: state,
         applied_priority: priority,
-        available_states: [...new Set(properties?.map(p => p.state) || [])].sort(),
+        available_states: [...new Set(properties?.map((p: any) => p.state) || [])].sort(),
       }
     })
 

@@ -174,6 +174,10 @@ export function getPriceContext(
     land: { LA: 5000000, FC: 8000000, KN: 2000000 },
   };
 
+  // Hospitality venues use a different pricing model — skip relative market comparison
+  if (propertyType === "hotel") return "Quoted per night";
+  if (propertyType === "event_center") return "Quoted per day (full venue hire)";
+
   const avgPrice = basePrices[propertyType]?.[state] || 10000000;
 
   if (price > avgPrice * 1.2) return "Above market average";

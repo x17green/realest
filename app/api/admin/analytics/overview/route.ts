@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { z } from 'zod'
+import { prisma } from '@/lib/prisma'
 
 // Query parameters schema
 const analyticsQuerySchema = z.object({
@@ -26,13 +27,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     // Verify user is admin
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('user_type')
-      .eq('id', user.id)
-      .single()
-
-    if (!profile || profile.user_type !== 'admin') {
+    const adminRow = await prisma.users.findUnique({ where: { id: user.id }, select: { role: true } })
+    if (!adminRow || adminRow.role !== 'admin') {
       return NextResponse.json(
         { error: 'Admin access required' },
         { status: 403 }
@@ -82,52 +78,39 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     const startDateStr = startDate.toISOString()
 
-    // Fetch core metrics
-    const [
-      { data: userStats, error: userError },
-      { data: propertyStats, error: propertyError },
-      { data: inquiryStats, error: inquiryError },
-      { data: adminActions, error: adminError },
-    ] = await Promise.all([
+    // Fetch core metrics via Prisma
+    const [userStats, propertyStats, inquiryStats, adminActions] = await Promise.all([
       // User statistics
-      supabase
-        .from('profiles')
-        .select('user_type, created_at')
-        .gte('created_at', startDateStr),
-
+      prisma.profiles.findMany({
+        where: { created_at: { gte: startDate } },
+        select: { created_at: true, users: { select: { role: true } } },
+      }),
       // Property statistics
-      supabase
-        .from('properties')
-        .select('status, property_type, state, created_at, verified_at, price')
-        .gte('created_at', startDateStr),
-
+      prisma.properties.findMany({
+        where: { created_at: { gte: startDate } },
+        select: { status: true, property_type: true, state: true, created_at: true, price: true },
+      }),
       // Inquiry statistics
-      supabase
-        .from('inquiries')
-        .select('status, created_at, property:properties(status)')
-        .gte('created_at', startDateStr),
-
+      prisma.inquiries.findMany({
+        where: { created_at: { gte: startDate } },
+        select: { status: true, created_at: true, properties: { select: { status: true } } },
+      }),
       // Admin action statistics
-      supabase
-        .from('admin_actions')
-        .select('action_type, created_at')
-        .gte('created_at', startDateStr),
+      prisma.admin_audit_log.findMany({
+        where: { created_at: { gte: startDate } },
+        select: { action: true, created_at: true },
+      }),
     ])
 
-    if (userError || propertyError || inquiryError || adminError) {
-      console.error('Error fetching analytics data:', { userError, propertyError, inquiryError, adminError })
-      return NextResponse.json(
-        { error: 'Failed to fetch analytics data' },
-        { status: 500 }
-      )
-    }
+    const userError = null, propertyError = null, inquiryError = null, adminError = null
 
     // Calculate user metrics
     const userMetrics = {
       total_users: userStats?.length || 0,
       new_users: userStats?.length || 0,
-      user_type_distribution: userStats?.reduce((acc, user) => {
-        acc[user.user_type] = (acc[user.user_type] || 0) + 1
+      user_type_distribution: userStats?.reduce((acc: Record<string, number>, u: any) => {
+        const role = u.users?.role || 'user'
+        acc[role] = (acc[role] || 0) + 1
         return acc
       }, {} as Record<string, number>) || {},
       user_growth_rate: calculateGrowthRate(userStats || [], startDate),
@@ -136,24 +119,24 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     // Calculate property metrics
     const propertyMetrics = {
       total_properties: propertyStats?.length || 0,
-      live_properties: propertyStats?.filter(p => p.status === 'live').length || 0,
-      pending_properties: propertyStats?.filter(p =>
+      live_properties: propertyStats?.filter((p: any) => p.status === 'live').length || 0,
+      pending_properties: propertyStats?.filter((p: any) =>
         ['pending_ml_validation', 'pending_vetting'].includes(p.status)
       ).length || 0,
-      rejected_properties: propertyStats?.filter(p => p.status === 'rejected').length || 0,
-      verified_properties: propertyStats?.filter(p => p.verified_at).length || 0,
-      property_type_distribution: propertyStats?.reduce((acc, property) => {
+      rejected_properties: propertyStats?.filter((p: any) => p.status === 'rejected').length || 0,
+      verified_properties: propertyStats?.filter((p: any) => p.verified_at).length || 0,
+      property_type_distribution: propertyStats?.reduce((acc: Record<string, number>, property: any) => {
         acc[property.property_type] = (acc[property.property_type] || 0) + 1
         return acc
       }, {} as Record<string, number>) || {},
-      state_distribution: propertyStats?.reduce((acc, property) => {
+      state_distribution: propertyStats?.reduce((acc: Record<string, number>, property: any) => {
         acc[property.state] = (acc[property.state] || 0) + 1
         return acc
       }, {} as Record<string, number>) || {},
       average_property_price: propertyStats?.length ?
-        propertyStats.reduce((sum, p) => sum + (p.price || 0), 0) / propertyStats.length : 0,
+        propertyStats.reduce((sum: number, p: any) => sum + (Number(p.price) || 0), 0) / propertyStats.length : 0,
       property_success_rate: propertyStats?.length ?
-        (propertyStats.filter(p => p.status === 'live').length / propertyStats.length) * 100 : 0,
+        (propertyStats.filter((p: any) => p.status === 'live').length / propertyStats.length) * 100 : 0,
     }
 
     // Calculate inquiry metrics
@@ -171,8 +154,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     // Calculate admin metrics
     const adminMetrics = {
       total_admin_actions: adminActions?.length || 0,
-      action_type_distribution: adminActions?.reduce((acc, action) => {
-        acc[action.action_type] = (acc[action.action_type] || 0) + 1
+      action_type_distribution: adminActions?.reduce((acc: Record<string, number>, action: any) => {
+        acc[action.action] = (acc[action.action] || 0) + 1
         return acc
       }, {} as Record<string, number>) || {},
       admin_productivity: adminActions?.length ?
@@ -193,7 +176,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     // Generate trend data if requested
     let trends = null
     if (includeTrends) {
-      trends = await generateTrendData(supabase, startDate, period)
+      trends = await generateTrendData(startDate, period)
     }
 
     return NextResponse.json({
@@ -216,13 +199,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         total_inquiries: inquiryMetrics.total_inquiries,
         platform_health_score: calculateHealthScore(platformHealth),
         top_performing_states: Object.entries(propertyMetrics.state_distribution)
-          .sort(([,a], [,b]) => b - a)
+          .sort(([,a], [,b]) => (b as number) - (a as number))
           .slice(0, 5)
           .map(([state, count]) => ({ state, count })),
         recent_growth: {
-          users_last_7_days: await getRecentCount(supabase, 'profiles', 7),
-          properties_last_7_days: await getRecentCount(supabase, 'properties', 7),
-          inquiries_last_7_days: await getRecentCount(supabase, 'inquiries', 7),
+          users_last_7_days: await getRecentCount('profiles', 7),
+          properties_last_7_days: await getRecentCount('properties', 7),
+          inquiries_last_7_days: await getRecentCount('inquiries', 7),
         }
       }
     })
@@ -251,7 +234,7 @@ function calculateGrowthRate(data: any[], startDate: Date): number {
 }
 
 // Helper function to generate trend data
-async function generateTrendData(supabase: any, startDate: Date, period: string) {
+async function generateTrendData(startDate: Date, period: string) {
   // Generate daily data points for the period
   const days = period === '7d' ? 7 : period === '30d' ? 30 : period === '90d' ? 90 : 365
   const dataPoints = []
@@ -260,18 +243,17 @@ async function generateTrendData(supabase: any, startDate: Date, period: string)
     const date = new Date(Date.now() - i * 24 * 60 * 60 * 1000)
     const dateStr = date.toISOString().split('T')[0]
 
-    // Get counts for this date (simplified - in production use proper aggregation)
     const [userCount, propertyCount, inquiryCount] = await Promise.all([
-      supabase.from('profiles').select('*', { count: 'exact', head: true }).lte('created_at', dateStr),
-      supabase.from('properties').select('*', { count: 'exact', head: true }).lte('created_at', dateStr),
-      supabase.from('inquiries').select('*', { count: 'exact', head: true }).lte('created_at', dateStr),
+      prisma.profiles.count({ where: { created_at: { lte: date } } }),
+      prisma.properties.count({ where: { created_at: { lte: date } } }),
+      prisma.inquiries.count({ where: { created_at: { lte: date } } }),
     ])
 
     dataPoints.push({
       date: dateStr,
-      users: userCount.count || 0,
-      properties: propertyCount.count || 0,
-      inquiries: inquiryCount.count || 0,
+      users: userCount,
+      properties: propertyCount,
+      inquiries: inquiryCount,
     })
   }
 
@@ -279,15 +261,11 @@ async function generateTrendData(supabase: any, startDate: Date, period: string)
 }
 
 // Helper function to get recent counts
-async function getRecentCount(supabase: any, table: string, days: number): Promise<number> {
-  const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString()
-
-  const { count } = await supabase
-    .from(table)
-    .select('*', { count: 'exact', head: true })
-    .gte('created_at', startDate)
-
-  return count || 0
+async function getRecentCount(table: 'profiles' | 'properties' | 'inquiries', days: number): Promise<number> {
+  const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000)
+  if (table === 'profiles') return prisma.profiles.count({ where: { created_at: { gte: startDate } } })
+  if (table === 'properties') return prisma.properties.count({ where: { created_at: { gte: startDate } } })
+  return prisma.inquiries.count({ where: { created_at: { gte: startDate } } })
 }
 
 // Helper function to calculate platform health score (0-100)

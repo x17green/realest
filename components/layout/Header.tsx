@@ -37,12 +37,12 @@ export default function Header() {
       setUser(user);
 
       if (user) {
-        const { data: userRole } = await supabase
-          .from("user_roles")
+        const { data: userData } = await supabase
+          .from("users")
           .select("role")
-          .eq("user_id", user.id)
+          .eq("id", user.id)
           .single();
-        setRole(userRole?.role || null);
+        setRole(userData?.role || null);
       } else {
         setRole(null);
       }
@@ -58,12 +58,12 @@ export default function Header() {
       setUser(session?.user ?? null);
       if (session?.user) {
         supabase
-          .from("user_roles")
+          .from("users")
           .select("role")
-          .eq("user_id", session.user.id)
+          .eq("id", session.user.id)
           .single()
-          .then(({ data: userRole }) => {
-            setRole(userRole?.role || null);
+          .then(({ data: userData }) => {
+            setRole(userData?.role || null);
           });
       } else {
         setRole(null);

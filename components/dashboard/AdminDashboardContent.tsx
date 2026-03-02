@@ -16,23 +16,22 @@ interface Property {
   price: number
   verification_status: string
   created_at: string
-  profiles: { full_name: string; email: string }
+  owners?: { profiles?: { full_name: string; email: string } | null } | null
 }
 
-interface Document {
+interface PropertyDocument {
   id: string
   document_type: string
   file_name: string
   verification_status: string
   created_at: string
   properties: { title: string; owner_id: string }
-  profiles: { full_name: string }
 }
 
 interface AdminDashboardContentProps {
   user: User
   pendingProperties: Property[]
-  pendingDocuments: Document[]
+  pendingDocuments: PropertyDocument[]
   verifiedCount: number
   rejectedCount: number
 }

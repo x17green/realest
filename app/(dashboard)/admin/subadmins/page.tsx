@@ -7,18 +7,18 @@ export default async function SubAdminsPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect("/auth/login?redirect=/admin/subadmins")
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("id, user_type, full_name")
+  const { data: userRow } = await supabase
+    .from("users")
+    .select("role")
     .eq("id", user.id)
     .single()
-  if (!profile || profile.user_type !== "admin") redirect("/")
+  if (!userRow || userRow.role !== "admin") redirect("/")
 
   // Fetch existing admins
   const { data: admins } = await supabase
-    .from("profiles")
+    .from("users")
     .select("id, full_name, email, created_at")
-    .eq("user_type", "admin")
+    .eq("role", "admin")
     .order("created_at", { ascending: false })
 
   return (

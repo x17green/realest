@@ -23,6 +23,7 @@ export interface PasswordValidation {
 
 export interface UserProfile {
   id: string;
+  /** Role of the user — sourced from public.users.role (user_role enum) */
   user_type: "user" | "owner" | "agent" | "admin";
   full_name: string;
   email: string;
@@ -80,31 +81,25 @@ export async function getUserProfile(
 ): Promise<{ success: boolean; profile?: UserProfile; error?: string }> {
   try {
     const supabase = createClient();
-    // Get role from user_roles
-    const { data: userRole, error: roleError } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId)
-      .single();
 
-    if (roleError) {
-      return { success: false, error: roleError.message };
-    }
-
-    // Get profile data if exists
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("*")
+    // Single query to public.users — role is the single source of truth
+    const { data: userData, error: userError } = await supabase
+      .from("users")
+      .select("id, email, phone, full_name, avatar_url, role")
       .eq("id", userId)
       .single();
 
+    if (userError || !userData) {
+      return { success: false, error: userError?.message ?? "User not found" };
+    }
+
     const profileData: UserProfile = {
       id: userId,
-      user_type: userRole.role,
-      full_name: profile?.full_name || "",
-      email: profile?.email || "",
-      phone: profile?.phone,
-      avatar_url: profile?.avatar_url,
+      user_type: userData.role as UserProfile["user_type"],
+      full_name: userData.full_name || "",
+      email: userData.email || "",
+      phone: userData.phone ?? undefined,
+      avatar_url: userData.avatar_url ?? undefined,
     };
 
     return { success: true, profile: profileData };
@@ -171,18 +166,9 @@ export async function signUpWithPassword(
       return { success: false, error: error.message };
     }
 
-    // Insert into user_roles table
-    if (data.user) {
-      const { error: roleError } = await supabase.from("user_roles").insert({
-        user_id: data.user.id,
-        role: userType || "user",
-      });
-
-      if (roleError) {
-        console.error("Failed to create user role:", roleError);
-        // Don't fail signup, but log error
-      }
-    }
+    // NOTE: The DB trigger handle_new_user() automatically creates public.users
+    // and public.profiles rows when auth.users is inserted — no manual insert needed.
+    // user_type is passed via options.data above and the trigger reads it.
 
     return { success: true, user: data.user || undefined };
   } catch (err) {
@@ -198,76 +184,16 @@ export async function sendHybridPasswordReset(
   email: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const supabase = createClient();
-
-    // First, look up the user to get their name
-    const { data: userData, error: userError } = await supabase
-      .from("profiles")
-      .select("full_name")
-      .eq("email", email)
-      .single();
-
-    if (userError || !userData) {
-      return {
-        success: false,
-        error: "User not found. Please check your email address.",
-      };
-    }
-
-    const firstName = userData.full_name?.split(" ")[0] || "there";
-
-    // Generate OTP for the user
-    const { data: otpData, error: otpError } =
-      await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          shouldCreateUser: false,
-        },
-      });
-
-    if (otpError) {
-      return {
-        success: false,
-        error: `OTP generation failed: ${otpError.message}`,
-      };
-    }
-
-    // Generate password reset link
-    const { data: resetData, error: resetError } =
-      await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      });
-
-    if (resetError) {
-      return {
-        success: false,
-        error: `Reset link generation failed: ${resetError.message}`,
-      };
-    }
-
-    // Generate a 6-digit OTP code (Supabase doesn't return the actual OTP)
-    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-
-    // Create reset link (this would be the link from Supabase's email)
-    const resetLink = `${window.location.origin}/reset-password`;
-
-    // Import email service dynamically to avoid circular imports
-    const { sendHybridPasswordResetEmail } = await import("@/lib/emailService");
-
-    // Send the hybrid email
-    const emailResult = await sendHybridPasswordResetEmail({
-      email,
-      firstName,
-      otpCode,
-      resetLink,
-      expiryMinutes: 15,
+    const res = await fetch("/api/auth/forgot-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
     });
 
-    if (!emailResult.success) {
-      return {
-        success: false,
-        error: `Email sending failed: ${emailResult.error}`,
-      };
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      return { success: false, error: data.error || "Failed to send reset email" };
     }
 
     return { success: true };
@@ -445,9 +371,8 @@ export async function resendEmailVerification(
 export function getRedirectUrl(userType?: string): string {
   switch (userType) {
     case "owner":
-      return "/profile-setup";
     case "agent":
-      return "/agent-onboarding";
+      return "/onboarding";
     case "admin":
       return "/admin";
     case "user":

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { prisma, Prisma } from '@/lib/prisma'
 
 // GET /api/agents/[id]/properties - Get properties listed by agent
 export async function GET(
@@ -12,18 +13,16 @@ export async function GET(
     const agentId = id;
 
     // Verify agent exists and is verified
-    const { data: agent, error: agentError } = await supabase
-      .from("profiles")
-      .select("id, full_name, agent_verification_status")
-      .eq("id", agentId)
-      .eq("user_type", "agent")
-      .single();
+    const agentRow = await prisma.agents.findFirst({
+      where: { profile_id: agentId },
+      select: { id: true, verified: true, profiles: { select: { full_name: true } } },
+    });
 
-    if (agentError || !agent) {
+    if (!agentRow) {
       return NextResponse.json({ error: "Agent not found" }, { status: 404 });
     }
 
-    if (agent.agent_verification_status !== "verified") {
+    if (!agentRow.verified) {
       return NextResponse.json(
         { error: "Agent profile not available" },
         { status: 404 },
@@ -42,115 +41,79 @@ export async function GET(
     const sortOrder = url.searchParams.get("sort_order") || "desc";
 
     // Build properties query
-    let propertiesQuery = supabase
-      .from("properties")
-      .select(
-        `
-        id,
-        title,
-        description,
-        price,
-        price_frequency,
-        address,
-        state,
-        lga,
-        landmark,
-        latitude,
-        longitude,
-        bedrooms,
-        bathrooms,
-        size_sqm,
-        has_bq,
-        property_type,
-        nepa_status,
-        water_source,
-        internet_type,
-        security_type,
-        status,
-        verified_at,
-        created_at,
-        updated_at,
-        views_count,
-        inquiries_count,
-        media:property_media(
-          id,
-          file_url,
-          alt_text,
-          is_primary,
-          display_order
-        )
-      `,
-        { count: "exact" },
-      )
-      .eq("owner_id", agentId);
+    const where: Prisma.propertiesWhereInput = { agent_id: agentRow.id };
+    if (status !== "all") where.status = status;
 
-    // Filter by status
-    if (status !== "all") {
-      propertiesQuery = propertiesQuery.eq("status", status);
-    }
-
-    // Apply sorting
-    const validSortFields = ["created_at", "price", "title", "views_count"];
+    const validSortFields = ["created_at", "price", "title"];
     const sortField = validSortFields.includes(sortBy) ? sortBy : "created_at";
+    const orderBy: Prisma.propertiesOrderByWithRelationInput = { [sortField]: sortOrder as 'asc' | 'desc' };
 
-    propertiesQuery = propertiesQuery.order(sortField, {
-      ascending: sortOrder === "asc",
-      nullsFirst: false,
-    });
+    const skip = (page - 1) * perPage;
 
-    // Apply pagination
-    const from = (page - 1) * perPage;
-    const to = from + perPage - 1;
-    propertiesQuery = propertiesQuery.range(from, to);
+    const [properties, count] = await Promise.all([
+      prisma.properties.findMany({
+        where,
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          price: true,
+          price_frequency: true,
+          address: true,
+          state: true,
+          city: true,
+          bedrooms: true,
+          bathrooms: true,
+          square_feet: true,
+          property_type: true,
+          status: true,
+          created_at: true,
+          updated_at: true,
+          property_media: {
+            select: { id: true, media_url: true, is_featured: true, display_order: true },
+            orderBy: { display_order: 'asc' },
+          },
+        },
+        orderBy,
+        skip,
+        take: perPage,
+      }),
+      prisma.properties.count({ where }),
+    ]);
 
-    const {
-      data: properties,
-      error: propertiesError,
-      count,
-    } = await propertiesQuery;
-
-    if (propertiesError) {
-      console.error("Database error:", propertiesError);
-      return NextResponse.json(
-        { error: "Failed to fetch agent properties" },
-        { status: 500 },
-      );
-    }
-
-    // Process properties to include primary image
+    // Process properties to include featured image
     const processedProperties =
-      properties?.map((property: any) => ({
+      properties.map((property: any) => ({
         ...property,
         primary_image:
-          property.media?.find((m: any) => m.is_primary)?.file_url ||
-          property.media?.[0]?.file_url ||
+          property.property_media?.find((m: any) => m.is_featured)?.media_url ||
+          property.property_media?.[0]?.media_url ||
           null,
-        images_count: property.media?.length || 0,
-      })) || [];
+        images_count: property.property_media?.length || 0,
+      }));
 
     // Get property statistics for this agent
-    const { data: stats } = await supabase
-      .from("properties")
-      .select("status")
-      .eq("owner_id", agentId);
+    const allStatuses = await prisma.properties.findMany({
+      where: { agent_id: agentRow.id },
+      select: { status: true },
+    });
 
     const propertyStats = {
-      total: stats?.length || 0,
-      live: stats?.filter((p: any) => p.status === "live").length || 0,
-      pending:
-        stats?.filter((p: any) =>
-          ["pending_ml_validation", "pending_vetting"].includes(p.status),
-        ).length || 0,
-      sold: stats?.filter((p: any) => p.status === "sold").length || 0,
+      total: allStatuses.length,
+      live: allStatuses.filter((p: any) => p.status === "live").length,
+      pending: allStatuses.filter((p: any) =>
+        ["pending_ml_validation", "pending_vetting"].includes(p.status),
+      ).length,
+      sold: allStatuses.filter((p: any) => p.status === "sold").length,
     };
 
-    const totalPages = Math.ceil((count || 0) / perPage);
+    const totalPages = Math.ceil(count / perPage);
 
     return NextResponse.json({
       data: processedProperties,
       agent: {
-        id: agent.id,
-        name: agent.full_name,
+        id: agentRow.profiles.id,
+        name: agentRow.profiles.full_name,
       },
       pagination: {
         page,

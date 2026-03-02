@@ -7,13 +7,13 @@ export default async function NewPropertyPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect("/auth/login?redirect=/agent/properties/new")
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("id, user_type")
+  const { data: userData } = await supabase
+    .from("users")
+    .select("id, role")
     .eq("id", user.id)
     .single()
 
-  if (!profile || profile.user_type !== "agent") redirect("/")
+  if (!userData || userData.role !== "agent") redirect("/")
 
   return (
     <div className="space-y-6">

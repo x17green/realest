@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
 import {
   Chip,
   Avatar,
@@ -33,6 +32,7 @@ import {
 } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { PropertyMap } from "@/components/property/PropertyMap";
+import { formatPrice, formatListingType } from "@/lib/utils/propertyUtils";
 import {
   StatusBadge,
   VerifiedBadge,
@@ -88,7 +88,8 @@ interface Property {
   latitude: number | null;
   longitude: number | null;
   property_type: string;
-  listing_type: "sale" | "rent" | "lease";
+  listing_type: "for_sale" | "for_rent" | "for_lease" | "short_let" | "location";
+  price_frequency: string | null;
   status: string;
   verification_status: "pending" | "verified" | "rejected";
   created_at: string;
@@ -135,8 +136,7 @@ interface Property {
     email: string;
     phone: string | null;
     avatar_url: string | null;
-    user_type?: string;
-  };
+  } | null;
   agent?: {
     id: string;
     license_number: string;
@@ -168,53 +168,22 @@ export default function PropertyDetailsPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [inquirySent, setInquirySent] = useState(false);
+  const [inquiryError, setInquiryError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProperty = async () => {
       setIsLoading(true);
-      const supabase = createClient();
-
-
-      const { data } = await supabase
-        .from("properties")
-        .select(
-          `
-          *,
-          property_details (*),
-          property_media (*),
-          owner:profiles!properties_owner_id_fkey (
-            id,
-            full_name,
-            email,
-            phone,
-            avatar_url,
-            user_type
-          ),
-          agent:agents!properties_agent_id_fkey (
-            id,
-            license_number,
-            agency_name,
-            specialization,
-            verified,
-            rating,
-            agent_profile:profiles!agents_profile_id_fkey (
-              id,
-              full_name,
-              email,
-              phone,
-              avatar_url
-            )
-          )
-        `,
-        )
-        .eq("id", propertyId)
-        .eq("status", "active")
-        .single();
-
-      if (data) {
-        setProperty(data as Property);
+      try {
+        const res = await fetch(`/api/properties/${propertyId}/public?source=owner`);
+        if (res.ok) {
+          const json = await res.json();
+          if (json.data) setProperty(json.data as Property);
+        }
+      } catch (err) {
+        console.error("Failed to fetch property:", err);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
 
     if (propertyId) {
@@ -225,23 +194,33 @@ export default function PropertyDetailsPage() {
   const handleInquirySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setInquiryError(null);
 
     try {
-      const supabase = createClient();
-      const { error } = await supabase.from("inquiries").insert({
-        property_id: propertyId,
-        user_email: inquiryForm.email,
-        user_name: inquiryForm.name,
-        user_phone: inquiryForm.phone,
-        message: inquiryForm.message,
+      const res = await fetch("/api/inquiries/guest", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          property_id: propertyId,
+          name: inquiryForm.name,
+          email: inquiryForm.email,
+          phone: inquiryForm.phone || undefined,
+          message: inquiryForm.message,
+        }),
       });
 
-      if (!error) {
+      if (res.ok) {
         setInquirySent(true);
         setInquiryForm({ name: "", email: "", phone: "", message: "" });
+      } else {
+        const err = await res.json();
+        const detail = err?.details?.[0]?.message ?? err?.error ?? "Failed to send inquiry. Please try again.";
+        setInquiryError(detail);
+        console.error("Inquiry error:", err);
       }
     } catch (err) {
       console.error("Error sending inquiry:", err);
+      setInquiryError("Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -381,19 +360,17 @@ export default function PropertyDetailsPage() {
                   <div className="flex gap-4 text-sm text-muted-foreground">
                       <PropertyTypeBadge type={property.property_type as any} />
                       <PropertyStatusChip 
-                        status={property.status === 'active' ? 'available' : property.status === 'pending' ? 'pending' : 'unavailable'}
+                        status={property.status === 'live' ? 'available' : property.status === 'pending' ? 'pending' : 'unavailable'}
                       />
                   </div>
                 </div>
                 <div className="text-right">
                   <div className="text-3xl font-bold text-primary mb-1">
-                    £{property.price.toLocaleString()}
+                    {formatPrice(property.price, property.price_frequency)}
                   </div>
-                  {property.listing_type === "rent" && (
-                    <div className="text-sm text-muted-foreground">
-                      per month
-                    </div>
-                  )}
+                  <div className="text-sm text-muted-foreground">
+                    {formatListingType(property.listing_type)}
+                  </div>
                 </div>
               </div>
             </div>
@@ -647,9 +624,13 @@ export default function PropertyDetailsPage() {
                           }))
                         }
                         required
+                        minLength={10}
                         rows={4}
                       />
                     </div>
+                    {inquiryError && (
+                      <p className="text-sm text-destructive">{inquiryError}</p>
+                    )}
                     <Button
                       type="submit"
                       variant="default"
@@ -679,22 +660,36 @@ export default function PropertyDetailsPage() {
                       listerType = 'Agent';
                     } else if (property.owner) {
                       lister = property.owner;
-                      listerType = property.owner.user_type === 'admin' ? 'Admin' : 'Owner';
+                      listerType = 'Owner';
                     } else {
                       lister = { full_name: 'Unknown', avatar_url: null };
                       listerType = 'Admin';
                     }
                     return (
                       <>
-                        <Avatar.Root size="lg">
-                          <Avatar.Image src={lister.avatar_url || undefined} />
-                          <Avatar.Fallback>
-                            {lister.full_name ? lister.full_name.charAt(0) : "?"}
-                          </Avatar.Fallback>
-                        </Avatar.Root>
-                        <div>
-                          <div className="font-medium">{lister.full_name}</div>
-                          <div className="text-sm text-muted-foreground">{listerType}</div>
+                        <div className="flex sm:flex-col justify-center items-center gap-4">
+                          <div className="w-auto h-auto border border-accent rounded-full p-0.5 flex items-center justify-center">
+                            <Avatar className="size-15">
+                              {/*{avatarUrl ? (*/}
+                                <Avatar.Image
+                                  alt={lister.full_name || "Owner"}
+                                  className="rounded-full"
+                                  src={lister.avatar_url || undefined}
+                                />
+                              {/*) : (*/}
+                                <Avatar.Fallback delayMs={600}>
+                                  <div className="rounded-full border w-full h-full justify-center items-center flex bg-muted-foreground/10">
+                                    {/*{getAvatarFallback()}*/}
+                                    {lister.full_name ? lister.full_name.charAt(0) : "?"}
+                                  </div>
+                                </Avatar.Fallback>
+                              {/*)}*/}
+                            </Avatar>
+                          </div>
+                          <div className="w-full justify-center">
+                            <div className="font-medium">{lister.full_name}</div>
+                            <div className="text-sm text-muted-foreground">{listerType}</div>
+                          </div>
                         </div>
                       </>
                     );

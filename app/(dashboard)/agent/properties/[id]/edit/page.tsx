@@ -7,13 +7,13 @@ export default async function EditPropertyPage({ params }: { params: { id: strin
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect(`/auth/login?redirect=/agent/properties/${params.id}/edit`)
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("id, user_type")
+  const { data: userRow } = await supabase
+    .from("users")
+    .select("role")
     .eq("id", user.id)
     .single()
 
-  if (!profile || profile.user_type !== "agent") redirect("/")
+  if (!userRow || userRow.role !== "agent") redirect("/")
 
   const { data: property } = await supabase
     .from("properties")

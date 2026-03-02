@@ -146,7 +146,12 @@ export default function RootLayout({
         <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png" />
         <link rel="apple-touch-icon-precomposed" sizes="120x120" href="/apple-touch-icon-120x120-precomposed.png" />
         <link rel="manifest" href="/manifest.json" />
-
+        
+        {/* HubSpot Tracking Code */}
+        {/*<!-- Start of HubSpot Embed Code -->*/}
+        <script type="text/javascript" id="hs-script-loader" async defer src="//js-eu1.hs-scripts.com/147628032.js"></script>
+        {/*<!-- End of HubSpot Embed Code -->*/}
+        
         {/* React DevTools */}
         <script src="http://localhost:8097"></script>
       </head>

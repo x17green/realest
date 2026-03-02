@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 interface RouteParams {
@@ -20,25 +21,22 @@ export async function GET(request: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Verify user owns this property or is admin
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("user_type")
-      .eq("id", user.id)
-      .single();
-
-    if (!profile || !["owner", "admin"].includes(profile.user_type)) {
+    // Verify role via Prisma
+    const userRow = await prisma.users.findUnique({
+      where: { id: user.id },
+      select: { role: true },
+    });
+    if (!userRow || !["owner", "admin"].includes(userRow.role)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     // Get the property details for duplicate checking
-    const { data: property, error: propertyError } = await supabase
-      .from("properties")
-      .select("title, address, state, lga, latitude, longitude, owner_id")
-      .eq("id", propertyId)
-      .single();
+    const property = await prisma.properties.findUnique({
+      where: { id: propertyId },
+      select: { title: true, address: true, state: true, latitude: true, longitude: true, owner_id: true },
+    });
 
-    if (propertyError || !property) {
+    if (!property) {
       return NextResponse.json(
         { error: "Property not found" },
         { status: 404 },
@@ -46,7 +44,7 @@ export async function GET(request: Request, { params }: RouteParams) {
     }
 
     // Verify ownership (unless admin)
-    if (profile.user_type !== "admin" && property.owner_id !== user.id) {
+    if (userRow.role !== "admin" && property.owner_id !== user.id) {
       return NextResponse.json({ error: "Access denied" }, { status: 403 });
     }
 
@@ -57,40 +55,41 @@ export async function GET(request: Request, { params }: RouteParams) {
       similar_titles: [] as any[],
     };
 
-    // 1. Exact address match (excluding current property and rejected ones)
-    const { data: exactMatches } = await supabase
-      .from("properties")
-      .select(
-        `
-        id, title, address, state, lga, status, created_at,
-        owner:profiles(full_name, email)
-      `,
-      )
-      .eq("address", property.address)
-      .eq("state", property.state)
-      .neq("id", propertyId) // Exclude current property
-      .neq("status", "rejected") // Don't flag against rejected properties
-      .limit(5);
+    // 1. Exact address match via Prisma
+    const exactMatches = await prisma.properties.findMany({
+      where: {
+        address: property.address,
+        state: property.state ?? undefined,
+        NOT: [{ id: propertyId }, { status: "rejected" }],
+      },
+      select: {
+        id: true,
+        title: true,
+        address: true,
+        state: true,
+        status: true,
+        created_at: true,
+        profiles: { select: { full_name: true, email: true } },
+      },
+      take: 5,
+    });
 
-    if (exactMatches) {
-      duplicates.exact_address = exactMatches;
-    }
+    duplicates.exact_address = exactMatches;
 
-    // 2. Nearby properties (within 500 meters if coordinates available)
+    // 2. Nearby properties — use Supabase RPC (PostGIS)
     if (property.latitude && property.longitude) {
       const { data: nearby } = await supabase.rpc("properties_within_radius", {
-        lat: property.latitude,
-        lng: property.longitude,
-        radius_km: 0.5, // 500 meters
+        lat: Number(property.latitude),
+        lng: Number(property.longitude),
+        radius_km: 0.5,
         exclude_property_id: propertyId,
       });
-
       if (nearby) {
-        duplicates.nearby_properties = nearby.slice(0, 5); // Limit results
+        duplicates.nearby_properties = nearby.slice(0, 5);
       }
     }
 
-    // 3. Similar titles in same LGA (basic text similarity)
+    // 3. Similar titles in same state (basic text similarity)
     const titleWords = property.title.toLowerCase().split(" ");
     const significantWords = titleWords.filter(
       (word: string) =>
@@ -99,25 +98,23 @@ export async function GET(request: Request, { params }: RouteParams) {
     );
 
     if (significantWords.length > 0) {
-      // Simple approach: check for properties with similar key words
-      const { data: similarTitles } = await supabase
-        .from("properties")
-        .select(
-          `
-          id, title, address, state, lga, status,
-          owner:profiles(full_name)
-        `,
-        )
-        .eq("lga", property.lga)
-        .eq("state", property.state)
-        .neq("id", propertyId)
-        .neq("status", "rejected")
-        .ilike("title", `%${significantWords[0]}%`) // At least one matching word
-        .limit(5);
-
-      if (similarTitles) {
-        duplicates.similar_titles = similarTitles;
-      }
+      const similarTitles = await prisma.properties.findMany({
+        where: {
+          state: property.state ?? undefined,
+          NOT: [{ id: propertyId }, { status: "rejected" }],
+          title: { contains: significantWords[0], mode: "insensitive" },
+        },
+        select: {
+          id: true,
+          title: true,
+          address: true,
+          state: true,
+          status: true,
+          profiles: { select: { full_name: true } },
+        },
+        take: 5,
+      });
+      duplicates.similar_titles = similarTitles;
     }
 
     // Calculate overall duplicate risk

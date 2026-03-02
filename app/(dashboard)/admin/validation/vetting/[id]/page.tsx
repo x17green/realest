@@ -22,20 +22,20 @@ export default async function VettingReportPage({
   }
 
   // Check if user is an admin
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("user_type")
+  const { data: userRow } = await supabase
+    .from("users")
+    .select("role")
     .eq("id", user.id)
     .single();
 
-  if (profile?.user_type !== "admin") {
+  if (userRow?.role !== "admin") {
     redirect("/");
   }
 
   // Fetch the specific property
   const { data: property } = await supabase
     .from("properties")
-    .select("*, profiles(full_name, email, phone)")
+    .select("*, owners(profiles(full_name, email, phone)), property_documents(*)")
     .eq("id", params.id)
     .eq("verification_status", "vetting")
     .single();
@@ -105,10 +105,10 @@ export default async function VettingReportPage({
                     </div>
                     <div>
                       <p className="text-muted-foreground">Owner</p>
-                      <p>{property.profiles?.full_name}</p>
+                      <p>{property.owners?.profiles?.full_name}</p>
                       <div>
-                        <p className="text-sm text-muted-foreground">{property.profiles?.email}</p>
-                        <p className="text-sm text-muted-foreground">{property.profiles?.phone}</p>
+                        <p className="text-sm text-muted-foreground">{property.owners?.profiles?.email}</p>
+                        <p className="text-sm text-muted-foreground">{property.owners?.profiles?.phone}</p>
                       </div>
                     </div>
                   </div>

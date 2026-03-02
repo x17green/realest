@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Card, Button, Input, TextArea } from "@heroui/react";
+import { Input } from "@heroui/react";
+import { Button, Textarea, Card, CardContent } from "@/components/ui";
 import { Header, Footer } from "@/components/layout";
 import {
   Mail,
@@ -133,7 +134,7 @@ export default function ContactPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
             {contactMethods.map((method, index) => (
-              <Card.Root
+              <Card
                 key={index}
                 className="bg-background/80 backdrop-blur-lg border border-border/50 rounded-2xl p-6 text-center hover:shadow-lg transition-shadow cursor-pointer group"
                 onClick={() => {
@@ -145,7 +146,7 @@ export default function ContactPage() {
                   }
                 }}
               >
-                <Card.Content className="space-y-4">
+                <CardContent className="space-y-4">
                   <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mx-auto group-hover:bg-primary/20 transition-colors">
                     <method.icon className="w-6 h-6 text-primary" />
                   </div>
@@ -156,8 +157,8 @@ export default function ContactPage() {
                   <div className="font-medium text-primary">
                     {method.contact}
                   </div>
-                </Card.Content>
-              </Card.Root>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>
@@ -176,8 +177,8 @@ export default function ContactPage() {
               </p>
 
               {isSubmitted ? (
-                <Card.Root className="bg-green-50 border border-green-200 rounded-2xl p-6">
-                  <Card.Content className="text-center space-y-4">
+                <Card className="bg-green-50 border border-green-200 rounded-2xl p-6">
+                  <CardContent className="text-center space-y-4">
                     <CheckCircle className="w-12 h-12 text-green-600 mx-auto" />
                     <h3 className="text-lg font-semibold text-green-800">
                       Message Sent Successfully!
@@ -186,11 +187,11 @@ export default function ContactPage() {
                       Thank you for contacting us. We'll respond to your message
                       within 24 hours.
                     </p>
-                  </Card.Content>
-                </Card.Root>
+                  </CardContent>
+                </Card>
               ) : (
-                <Card.Root className="bg-background/80 backdrop-blur-lg border border-border/50 rounded-2xl p-6">
-                  <Card.Content>
+                <Card className="bg-background/80 backdrop-blur-lg border border-border/50 rounded-2xl p-6">
+                  <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -242,7 +243,7 @@ export default function ContactPage() {
                         <label className="text-sm font-medium mb-2 block">
                           Message *
                         </label>
-                        <TextArea
+                        <Textarea
                           name="message"
                           value={formData.message}
                           onChange={handleChange}
@@ -256,7 +257,7 @@ export default function ContactPage() {
                         type="submit"
                         size="lg"
                         className="w-full bg-primary hover:bg-primary/90"
-                        isDisabled={isSubmitting}
+                        disabled={isSubmitting}
                       >
                         {isSubmitting ? (
                           "Sending..."
@@ -268,8 +269,8 @@ export default function ContactPage() {
                         )}
                       </Button>
                     </form>
-                  </Card.Content>
-                </Card.Root>
+                  </CardContent>
+                </Card>
               )}
             </div>
 
@@ -282,8 +283,8 @@ export default function ContactPage() {
               </p>
 
               <div className="space-y-6">
-                <Card.Root className="bg-background/80 backdrop-blur-lg border border-border/50 rounded-2xl p-6">
-                  <Card.Content className="space-y-4">
+                <Card className="bg-background/80 backdrop-blur-lg border border-border/50 rounded-2xl p-6">
+                  <CardContent className="space-y-4">
                     <div className="flex items-start gap-4">
                       <MapPin className="w-6 h-6 text-primary mt-1 shrink-0" />
                       <div>
@@ -293,11 +294,11 @@ export default function ContactPage() {
                         </p>
                       </div>
                     </div>
-                  </Card.Content>
-                </Card.Root>
+                  </CardContent>
+                </Card>
 
-                <Card.Root className="bg-background/80 backdrop-blur-lg border border-border/50 rounded-2xl p-6">
-                  <Card.Content className="space-y-4">
+                <Card className="bg-background/80 backdrop-blur-lg border border-border/50 rounded-2xl p-6">
+                  <CardContent className="space-y-4">
                     <div className="flex items-start gap-4">
                       <Phone className="w-6 h-6 text-primary mt-1 shrink-0" />
                       <div>
@@ -307,11 +308,11 @@ export default function ContactPage() {
                         </p>
                       </div>
                     </div>
-                  </Card.Content>
-                </Card.Root>
+                  </CardContent>
+                </Card>
 
-                <Card.Root className="bg-background/80 backdrop-blur-lg border border-border/50 rounded-2xl p-6">
-                  <Card.Content className="space-y-4">
+                <Card className="bg-background/80 backdrop-blur-lg border border-border/50 rounded-2xl p-6">
+                  <CardContent className="space-y-4">
                     <div className="flex items-start gap-4">
                       <Mail className="w-6 h-6 text-primary mt-1 shrink-0" />
                       <div>
@@ -321,11 +322,11 @@ export default function ContactPage() {
                         </p>
                       </div>
                     </div>
-                  </Card.Content>
-                </Card.Root>
+                  </CardContent>
+                </Card>
 
-                <Card.Root className="bg-background/80 backdrop-blur-lg border border-border/50 rounded-2xl p-6">
-                  <Card.Content className="space-y-4">
+                <Card className="bg-background/80 backdrop-blur-lg border border-border/50 rounded-2xl p-6">
+                  <CardContent className="space-y-4">
                     <div className="flex items-start gap-4">
                       <Clock className="w-6 h-6 text-primary mt-1 shrink-0" />
                       <div>
@@ -335,8 +336,8 @@ export default function ContactPage() {
                         </p>
                       </div>
                     </div>
-                  </Card.Content>
-                </Card.Root>
+                  </CardContent>
+                </Card>
               </div>
             </div>
           </div>
@@ -373,15 +374,15 @@ export default function ContactPage() {
                   "We typically respond to all inquiries within 24 hours during business days. For urgent property-related matters, we aim to respond within 4 hours.",
               },
             ].map((faq, index) => (
-              <Card.Root
+              <Card
                 key={index}
                 className="bg-background/80 backdrop-blur-lg border border-border/50 rounded-2xl p-6"
               >
-                <Card.Content>
+                <CardContent>
                   <h3 className="font-semibold text-lg mb-2">{faq.question}</h3>
                   <p className="text-muted-foreground">{faq.answer}</p>
-                </Card.Content>
-              </Card.Root>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>

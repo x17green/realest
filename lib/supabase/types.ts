@@ -207,20 +207,22 @@ export interface Database {
         Row: {
           id: string;
           owner_id: string;
+          agent_id: string | null;
           title: string;
           description: string | null;
           price: number;
-          currency: string;
+          price_frequency: string | null;
           address: string;
           city: string;
           state: string | null;
-          zip_code: string | null;
+          postal_code: string | null;
           country: string;
           latitude: number | null;
           longitude: number | null;
           property_type: string;
-          listing_type: "sale" | "rent" | "lease";
-          status: "draft" | "active" | "inactive" | "sold" | "rented";
+          listing_type: "for_sale" | "for_rent" | "for_lease" | "short_let" | "location";
+          listing_source: string | null;
+          status: "draft" | "live" | "pending_ml_validation" | "pending_vetting" | "rejected" | "sold" | "rented" | "inactive";
           verification_status: "pending" | "verified" | "rejected";
           created_at: string;
           updated_at: string;
@@ -228,20 +230,22 @@ export interface Database {
         Insert: {
           id?: string;
           owner_id: string;
+          agent_id?: string | null;
           title: string;
           description?: string | null;
           price: number;
-          currency?: string;
+          price_frequency?: string | null;
           address: string;
           city: string;
           state?: string | null;
-          zip_code?: string | null;
+          postal_code?: string | null;
           country?: string;
           latitude?: number | null;
           longitude?: number | null;
           property_type: string;
-          listing_type: "sale" | "rent" | "lease";
-          status?: "draft" | "active" | "inactive" | "sold" | "rented";
+          listing_type: "for_sale" | "for_rent" | "for_lease" | "short_let" | "location";
+          listing_source?: string | null;
+          status?: "draft" | "live" | "pending_ml_validation" | "pending_vetting" | "rejected" | "sold" | "rented" | "inactive";
           verification_status?: "pending" | "verified" | "rejected";
           created_at?: string;
           updated_at?: string;
@@ -249,20 +253,22 @@ export interface Database {
         Update: {
           id?: string;
           owner_id?: string;
+          agent_id?: string | null;
           title?: string;
           description?: string | null;
           price?: number;
-          currency?: string;
+          price_frequency?: string | null;
           address?: string;
           city?: string;
           state?: string | null;
-          zip_code?: string | null;
+          postal_code?: string | null;
           country?: string;
           latitude?: number | null;
           longitude?: number | null;
           property_type?: string;
-          listing_type?: "sale" | "rent" | "lease";
-          status?: "draft" | "active" | "inactive" | "sold" | "rented";
+          listing_type?: "for_sale" | "for_rent" | "for_lease" | "short_let" | "location";
+          listing_source?: string | null;
+          status?: "draft" | "live" | "pending_ml_validation" | "pending_vetting" | "rejected" | "sold" | "rented" | "inactive";
           verification_status?: "pending" | "verified" | "rejected";
           created_at?: string;
           updated_at?: string;
@@ -673,7 +679,7 @@ export const propertyListingSchema = z.object({
   latitude: z.number().min(-90).max(90),
   longitude: z.number().min(-180).max(180),
   price: z.number().min(1000),
-  price_frequency: z.enum(['sale', 'annual', 'monthly', 'nightly']),
+  price_frequency: z.enum(['sale', 'annual', 'monthly', 'nightly', 'daily']),
   bedrooms: z.number().min(0).max(20).optional(),
   bathrooms: z.number().min(0).max(20).optional(),
   size_sqm: z.number().min(1).optional(),

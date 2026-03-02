@@ -200,11 +200,11 @@ Update the email factory configuration:
 
 ```typescript
 export const emailFactory = new EmailTemplateFactory({
-  companyName: 'RealProof',
+  companyName: 'RealEST Connect',
   fromEmail: process.env.FROM_EMAIL || 'hello@realproof.ng',
-  supportEmail: process.env.SUPPORT_EMAIL || 'hello@realproof.ng',
+  supportEmail: process.env.SUPPORT_EMAIL || 'hello@realest.ng',
   unsubscribeUrl: process.env.UNSUBSCRIBE_URL || '{unsubscribe_url}',
-  websiteUrl: process.env.WEBSITE_URL || 'https://realproof.ng'
+  websiteUrl: process.env.WEBSITE_URL || 'https://realest.ng'
 });
 ```
 
@@ -219,7 +219,7 @@ import { createBaseEmailHTML, createEmailHeader } from './base-template';
 
 export const createMyTemplate: EmailTemplateFunction<MyData> = (data) => {
   const subject = `My Email Subject`;
-  const header = createEmailHeader('RealProof', 'My Email Title');
+  const header = createEmailHeader('RealEST Connect', 'My Email Title');
   
   const emailContent = `
     ${header}
@@ -259,12 +259,12 @@ Required for email functionality:
 ```env
 # Email Service Configuration
 RESEND_API_KEY=re_xxxxxxxx          # Resend API key
-FROM_EMAIL=hello@realproof.ng       # Verified sender email
-ADMIN_EMAIL=admin@realproof.ng      # Admin notification recipient
+FROM_EMAIL=hello@realest.ng       # Verified sender email
+ADMIN_EMAIL=admin@realest.ng      # Admin notification recipient
 
 # Template Configuration (Optional)
-SUPPORT_EMAIL=hello@realproof.ng    # Support contact
-WEBSITE_URL=https://realproof.ng    # Company website
+SUPPORT_EMAIL=hello@realest.ng    # Support contact
+WEBSITE_URL=https://realest.ng    # Company website
 UNSUBSCRIBE_URL={unsubscribe_url}   # Unsubscribe link
 ```
 
@@ -370,4 +370,4 @@ When adding new templates or modifying existing ones:
 
 **Version**: 1.0.0  
 **Last Updated**: 2024  
-**Maintainer**: RealProof Development Team
+**Maintainer**: RealEST Connect Development Team

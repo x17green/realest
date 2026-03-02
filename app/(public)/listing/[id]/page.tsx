@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
 import {
   Chip,
   Avatar,
@@ -36,6 +35,7 @@ import {
 } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
 import { PropertyMap } from "@/components/property/PropertyMap";
+import { formatPrice, formatListingType } from "@/lib/utils/propertyUtils";
 import {
   StatusBadge,
   VerifiedBadge,
@@ -91,7 +91,8 @@ interface AgentListing {
   latitude: number | null;
   longitude: number | null;
   property_type: string;
-  listing_type: "sale" | "rent" | "lease";
+  listing_type: "sale" | "rent" | "lease" | "location" | "short_let";
+  price_frequency: string | null;
   status: string;
   verification_status: "pending" | "verified" | "rejected";
   created_at: string;
@@ -154,45 +155,22 @@ export default function ListingDetailsPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [inquirySent, setInquirySent] = useState(false);
+  const [inquiryError, setInquiryError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProperty = async () => {
       setIsLoading(true);
-      const supabase = createClient();
-
-      const { data } = await supabase
-        .from("properties")
-        .select(
-          `
-          *,
-          property_details (*),
-          property_media (*),
-          agent:agents!properties_agent_id_fkey (
-            id,
-            license_number,
-            agency_name,
-            specialization,
-            verified,
-            rating,
-            agent_profile:profiles!agents_profile_id_fkey (
-              id,
-              full_name,
-              email,
-              phone,
-              avatar_url
-            )
-          )
-        `,
-        )
-        .eq("id", propertyId)
-        .eq("listing_source", "agent")
-        .eq("status", "active")
-        .single();
-
-      if (data) {
-        setProperty(data as AgentListing);
+      try {
+        const res = await fetch(`/api/properties/${propertyId}/public?source=agent`);
+        if (res.ok) {
+          const json = await res.json();
+          if (json.data) setProperty(json.data as AgentListing);
+        }
+      } catch (err) {
+        console.error("Failed to fetch listing:", err);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
 
     if (propertyId) {
@@ -203,24 +181,34 @@ export default function ListingDetailsPage() {
   const handleInquirySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setInquiryError(null);
 
     try {
-      const supabase = createClient();
-      const { error } = await supabase.from("inquiries").insert({
-        property_id: propertyId,
-        user_email: inquiryForm.email,
-        user_name: inquiryForm.name,
-        user_phone: inquiryForm.phone,
-        message: inquiryForm.message,
+      const res = await fetch("/api/inquiries/guest", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          property_id: propertyId,
+          name: inquiryForm.name,
+          email: inquiryForm.email,
+          phone: inquiryForm.phone || undefined,
+          message: inquiryForm.message,
+        }),
       });
 
-      if (!error) {
+      if (res.ok) {
         setInquirySent(true);
         setInquiryForm({ name: "", email: "", phone: "", message: "" });
+      } else {
+        const err = await res.json();
+        const detail = err?.details?.[0]?.message ?? err?.error ?? "Failed to send inquiry. Please try again.";
+        setInquiryError(detail);
+        console.error("Inquiry error:", err);
       }
-      setIsSubmitting(false);
     } catch (error) {
       console.error("Failed to send inquiry:", error);
+      setInquiryError("Something went wrong. Please try again.");
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -359,19 +347,17 @@ export default function ListingDetailsPage() {
                     <div className="flex gap-4 text-sm text-muted-foreground">
                       <PropertyTypeBadge type={property.property_type as any} />
                       <PropertyStatusChip 
-                        status={property.status === 'active' ? 'available' : property.status === 'pending' ? 'pending' : 'unavailable'}
+                        status={property.status === 'live' ? 'available' : property.status === 'pending' ? 'pending' : 'unavailable'}
                       />
                     </div>
                   </div>
                   <div className="text-right">
                     <div className="text-3xl font-bold text-primary mb-1">
-                      £{property.price.toLocaleString()}
+                      {formatPrice(property.price, property.price_frequency)}
                     </div>
-                    {property.listing_type === "rent" && (
-                      <div className="text-sm text-muted-foreground">
-                        per month
-                      </div>
-                    )}
+                    <div className="text-sm text-muted-foreground">
+                      {formatListingType(property.listing_type)}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -625,9 +611,13 @@ export default function ListingDetailsPage() {
                             }))
                           }
                           required
+                          minLength={10}
                           rows={4}
                         />
                       </div>
+                      {inquiryError && (
+                        <p className="text-sm text-destructive">{inquiryError}</p>
+                      )}
                       <Button
                         type="submit"
                         variant="default"
@@ -650,21 +640,23 @@ export default function ListingDetailsPage() {
                   <div className="space-y-4">
                     {/* Agent Profile */}
                     <div className="flex items-center gap-3">
-                      <Avatar.Root size="lg">
-                        <Avatar.Image
-                          src={
-                            property.agent.agent_profile.avatar_url ||
-                            undefined
-                          }
-                          alt={property.agent.agent_profile.full_name}
-                        />
-                        <Avatar.Fallback>
-                          {property.agent.agent_profile.full_name
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")}
-                        </Avatar.Fallback>
-                      </Avatar.Root>
+                      <div className="w-auto h-auto border border-accent rounded-full p-0.5 flex items-center justify-center">
+                        <Avatar className="size-12">
+                          <Avatar.Image
+                            src={property.agent.agent_profile.avatar_url || undefined}
+                            alt={property.agent.agent_profile.full_name}
+                            className="rounded-full"
+                          />
+                          <Avatar.Fallback delayMs={600}>
+                            <div className="rounded-full border w-full h-full justify-center items-center flex bg-muted-foreground/10">
+                              {property.agent.agent_profile.full_name
+                                .split(" ")
+                                .map((n) => n[0])
+                                .join("")}
+                            </div>
+                          </Avatar.Fallback>
+                        </Avatar>
+                      </div>
                       <div className="flex-1">
                         <div className="font-medium">
                           {property.agent.agent_profile.full_name}

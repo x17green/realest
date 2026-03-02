@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { z } from 'zod'
+import { prisma } from '@/lib/prisma'
 
 // Validation schema for vetting actions
 const vettingUpdateSchema = z.object({
@@ -40,13 +41,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }
 
     // Verify user is admin
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('user_type')
-      .eq('id', user.id)
-      .single()
-
-    if (!profile || profile.user_type !== 'admin') {
+    const adminRow = await prisma.users.findUnique({ where: { id: user.id }, select: { role: true } })
+    if (!adminRow || adminRow.role !== 'admin') {
       return NextResponse.json(
         { error: 'Admin access required' },
         { status: 403 }
@@ -66,130 +62,51 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     const { action, notes, scheduled_date, rejection_reason, issue_details } = validation.data
 
-    // Fetch current property to verify it's in pending_vetting status
-    const { data: property, error: fetchError } = await supabase
-      .from('properties')
-      .select('*')
-      .eq('id', id)
-      .eq('status', 'pending_vetting')
-      .single()
+    // Fetch current property
+    const property = await prisma.properties.findFirst({
+      where: { id, status: 'pending_vetting' },
+      select: { id: true, status: true, owner_id: true, title: true },
+    })
 
-    if (fetchError || !property) {
+    if (!property) {
       return NextResponse.json(
         { error: 'Property not found or not eligible for vetting' },
         { status: 404 }
       )
     }
 
-    let newStatus: string
-    let updateData: any = {
-      updated_at: new Date().toISOString(),
-    }
-
-    // Determine new status based on action
+    // Determine new status (only schema-valid fields: status + updated_at)
+    let finalStatus: string
     switch (action) {
-      case 'approve':
-        newStatus = 'live'
-        updateData.verified_at = new Date().toISOString()
-        break
-      case 'reject':
-        newStatus = 'rejected'
-        updateData.rejection_reason = rejection_reason
-        break
-      case 'schedule':
-        newStatus = 'pending_vetting' // Status stays the same, but we track scheduling
-        if (scheduled_date) {
-          updateData.scheduled_vetting_date = scheduled_date
-        }
-        break
-      case 'flag_issue':
-        newStatus = 'pending_vetting' // Status stays the same, but flagged for review
-        updateData.flagged_for_review = true
-        updateData.review_notes = issue_details
-        break
-      default:
-        return NextResponse.json(
-          { error: 'Invalid action' },
-          { status: 400 }
-        )
+      case 'approve': finalStatus = 'live'; break
+      case 'reject': finalStatus = 'rejected'; break
+      case 'schedule': finalStatus = 'pending_vetting'; break
+      case 'flag_issue': finalStatus = 'pending_vetting'; break
+      default: return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
     }
 
-    updateData.status = newStatus
+    const updatedProperty = await prisma.properties.update({
+      where: { id },
+      data: { status: finalStatus, updated_at: new Date() },
+      select: { id: true, status: true, title: true },
+    })
 
-    // Update property status
-    const { data: updatedProperty, error: updateError } = await supabase
-      .from('properties')
-      .update(updateData)
-      .eq('id', id)
-      .select()
-      .single()
-
-    if (updateError) {
-      console.error('Error updating property status:', updateError)
-      return NextResponse.json(
-        { error: 'Failed to update property status' },
-        { status: 500 }
-      )
-    }
-
-    // Log admin action in audit table
-    const { error: auditError } = await supabase
-      .from('admin_actions')
-      .insert({
-        admin_id: user.id,
-        action_type: 'physical_vetting',
-        target_type: 'property',
+    // Log admin action
+    await prisma.admin_audit_log.create({
+      data: {
+        actor_id: user.id,
+        action: 'physical_vetting',
         target_id: id,
-        action_details: {
-          action,
-          previous_status: 'pending_vetting',
-          new_status: newStatus,
-          notes,
-          scheduled_date,
-          rejection_reason,
-          issue_details,
-        },
-        ip_address: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip'),
-        user_agent: request.headers.get('user-agent'),
-      })
-
-    if (auditError) {
-      console.error('Error logging admin action:', auditError)
-      // Don't fail the request for audit logging errors
-    }
-
-    // Send notification to property owner
-    try {
-      const { data: owner } = await supabase
-        .from('profiles')
-        .select('email, full_name')
-        .eq('id', property.owner_id)
-        .single()
-
-      if (owner?.email) {
-        // TODO: Implement email notification
-        // await sendPropertyVettingNotification({
-        //   to: owner.email,
-        //   ownerName: owner.full_name,
-        //   propertyTitle: property.title,
-        //   action,
-        //   notes,
-        //   scheduledDate: scheduled_date,
-        // })
-
-        console.log(`Notification sent to ${owner.email} for property ${property.title}`)
-      }
-    } catch (notificationError) {
-      console.error('Error sending notification:', notificationError)
-      // Don't fail the request for notification errors
-    }
+        metadata: { action, previous_status: 'pending_vetting', new_status: finalStatus, notes, scheduled_date, rejection_reason, issue_details },
+      },
+    })
 
     return NextResponse.json({
       success: true,
       data: {
         property: updatedProperty,
         action_taken: action,
-        new_status: newStatus,
+        new_status: finalStatus,
         message: getActionMessage(action, property.title),
       }
     })

@@ -22,15 +22,21 @@ export default async function AnalyticsPage() {
   }
 
   // Check if user is a property owner
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("user_type, is_premium")
+  const { data: userRow } = await supabase
+    .from("users")
+    .select("role")
     .eq("id", user.id)
     .single();
 
-  if (profile?.user_type !== "owner") {
+  if (userRow?.role !== "owner") {
     redirect("/");
   }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("is_premium")
+    .eq("id", user.id)
+    .single();
 
   // Mock analytics data - in a real app, this would come from analytics tables
   const analytics = {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
+import { prisma } from "@/lib/prisma";
 
 // Schema for resolving duplicates
 const resolveDuplicateSchema = z.object({
@@ -36,13 +37,8 @@ export async function PUT(
     }
 
     // Verify user is admin
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("user_type")
-      .eq("id", user.id)
-      .single();
-
-    if (profileError || profile?.user_type !== "admin") {
+    const adminRow = await prisma.users.findUnique({ where: { id: user.id }, select: { role: true } })
+    if (!adminRow || adminRow.role !== 'admin') {
       return NextResponse.json(
         { error: "Admin access required" },
         { status: 403 },
@@ -53,17 +49,15 @@ export async function PUT(
     const body = await request.json();
     const validatedData = resolveDuplicateSchema.parse(body);
 
-    // Get duplicate record
-    const { data: duplicate, error: duplicateError } = await supabase
-      .from("properties")
-      .select("id, status, owner_id, title, is_duplicate")
-      .eq("id", duplicateId)
-      .eq("is_duplicate", true)
-      .single();
+    // Get duplicate record (is_duplicate not in schema, just fetch by id)
+    const duplicate = await prisma.properties.findUnique({
+      where: { id: duplicateId },
+      select: { id: true, status: true, owner_id: true, title: true },
+    })
 
-    if (duplicateError || !duplicate) {
+    if (!duplicate) {
       return NextResponse.json(
-        { error: "Duplicate property not found" },
+        { error: "Property not found" },
         { status: 404 },
       );
     }
@@ -89,127 +83,95 @@ export async function PUT(
       );
     }
 
-    // Execute resolution action
-    let result = null;
+    // Execute resolution action (only schema-valid fields: status + updated_at)
+    let result: { id: string; status: string | null } | null = null
     const resolutionDetails = {
       duplicate_id: duplicateId,
       action: validatedData.action,
-      master_property_id: validatedData.master_property_id,
-      rejection_reason: validatedData.rejection_reason,
-      admin_notes: validatedData.admin_notes,
+      master_property_id: validatedData.master_property_id ?? null,
+      rejection_reason: validatedData.rejection_reason ?? null,
+      admin_notes: validatedData.admin_notes ?? null,
       resolved_at: new Date().toISOString(),
       resolved_by: user.id,
-    };
+    }
 
     switch (validatedData.action) {
-      case "keep_both":
-        // Mark as not duplicate, allow both to exist
-        const { data: keepBothResult, error: keepBothError } = await supabase
-          .from("properties")
-          .update({
-            is_duplicate: false,
-            duplicate_resolved_at: new Date().toISOString(),
-            duplicate_resolution_action: "keep_both",
-            admin_notes: validatedData.admin_notes,
-          })
-          .eq("id", duplicateId)
-          .select()
-          .single();
+      case 'keep_both':
+        // Both listings remain, no status change
+        result = await prisma.properties.update({
+          where: { id: duplicateId },
+          data: { updated_at: new Date() },
+          select: { id: true, status: true },
+        })
+        break
 
-        if (keepBothError) throw keepBothError;
-        result = keepBothResult;
-        break;
+      case 'keep_master':
+        // Reject the duplicate
+        result = await prisma.properties.update({
+          where: { id: duplicateId },
+          data: { status: 'rejected', updated_at: new Date() },
+          select: { id: true, status: true },
+        })
+        break
 
-      case "keep_master":
-        // Reject the duplicate, keep the master
-        const { data: keepMasterResult, error: keepMasterError } =
-          await supabase
-            .from("properties")
-            .update({
-              status: "rejected",
-              rejection_reason: `Duplicate of property ${validatedData.master_property_id}`,
-              is_duplicate: false,
-              duplicate_resolved_at: new Date().toISOString(),
-              duplicate_resolution_action: "keep_master",
-              admin_notes: validatedData.admin_notes,
-            })
-            .eq("id", duplicateId)
-            .select()
-            .single();
-
-        if (keepMasterError) throw keepMasterError;
-        result = keepMasterResult;
-        break;
-
-      case "reject_duplicate":
-        // Reject both properties
-        const { data: rejectBothResult, error: rejectBothError } =
-          await supabase
-            .from("properties")
-            .update({
-              status: "rejected",
-              rejection_reason: validatedData.rejection_reason,
-              is_duplicate: false,
-              duplicate_resolved_at: new Date().toISOString(),
-              duplicate_resolution_action: "reject_duplicate",
-              admin_notes: validatedData.admin_notes,
-            })
-            .eq("id", duplicateId)
-            .select()
-            .single();
-
-        if (rejectBothError) throw rejectBothError;
-        result = rejectBothResult;
-        break;
+      case 'reject_duplicate':
+        // Reject the duplicate
+        result = await prisma.properties.update({
+          where: { id: duplicateId },
+          data: { status: 'rejected', updated_at: new Date() },
+          select: { id: true, status: true },
+        })
+        break
     }
 
     // Create notifications for affected owners
-    if (validatedData.action === "keep_master") {
-      // Notify owner of rejected duplicate
-      await supabase.from("notifications").insert({
-        user_id: duplicate.owner_id,
-        type: "duplicate_resolution",
-        title: "Property Marked as Duplicate",
-        message: `Your property "${duplicate.title}" has been identified as a duplicate and rejected. The original listing will remain active.`,
-        data: resolutionDetails,
-      });
-    } else if (validatedData.action === "reject_duplicate") {
-      // Notify owner of rejected property
-      await supabase.from("notifications").insert({
-        user_id: duplicate.owner_id,
-        type: "duplicate_resolution",
-        title: "Property Rejected - Duplicate",
-        message: `Your property "${duplicate.title}" has been rejected as a duplicate. Reason: ${validatedData.rejection_reason}`,
-        data: resolutionDetails,
-      });
+    if (validatedData.action === 'keep_master') {
+      await prisma.notifications.create({
+        data: {
+          user_id: duplicate.owner_id,
+          type: 'duplicate_resolution',
+          title: 'Property Marked as Duplicate',
+          message: `Your property "${duplicate.title}" has been identified as a duplicate and rejected. The original listing will remain active.`,
+          data: resolutionDetails,
+        },
+      })
+    } else if (validatedData.action === 'reject_duplicate') {
+      await prisma.notifications.create({
+        data: {
+          user_id: duplicate.owner_id,
+          type: 'duplicate_resolution',
+          title: 'Property Rejected - Duplicate',
+          message: `Your property "${duplicate.title}" has been rejected as a duplicate. Reason: ${validatedData.rejection_reason}`,
+          data: resolutionDetails,
+        },
+      })
     }
 
     // Log admin action
-    await supabase.from("admin_audit_log").insert({
-      admin_id: user.id,
-      action: "duplicate_resolution",
-      target_type: "property",
-      target_id: duplicateId,
-      details: resolutionDetails,
-    });
+    await prisma.admin_audit_log.create({
+      data: {
+        actor_id: user.id,
+        action: 'duplicate_resolution',
+        target_id: duplicateId,
+        metadata: resolutionDetails,
+      },
+    })
 
     return NextResponse.json({
       data: result,
       message: `Duplicate resolved: ${validatedData.action}`,
     });
   } catch (error) {
-    console.error("API error:", error);
-
+    console.error('API error:', error)
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Invalid request data", details: error.errors },
+        { error: 'Invalid request data', details: error.errors },
         { status: 400 },
-      );
+      )
     }
-
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: 'Internal server error' },
       { status: 500 },
-    );
+    )
   }
 }

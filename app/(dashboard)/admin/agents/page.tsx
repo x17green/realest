@@ -8,12 +8,12 @@ export default async function VerifyAgentsPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect("/auth/login?redirect=/admin/verify-agents")
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("id, user_type, full_name")
+  const { data: userData } = await supabase
+    .from("users")
+    .select("id, role")
     .eq("id", user.id)
     .single()
-  if (!profile || profile.user_type !== "admin") redirect("/")
+  if (!userData || userData.role !== "admin") redirect("/")
 
   // Fetch pending agents with basic info
   const { data: agents } = await supabase

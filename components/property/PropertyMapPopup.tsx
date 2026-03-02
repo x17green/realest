@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import type { Property } from "@/lib/hooks/usePropertyMap";
 import { getPriceContext } from "@/lib/utils/mapUtils";
+import { formatPrice, formatListingType } from "@/lib/utils/propertyUtils";
 
 // Dynamic imports for SSR compatibility
 const Popup = dynamic(() => import("react-leaflet").then((mod) => mod.Popup), {
@@ -28,7 +29,8 @@ export function PropertyMapPopup({
           {property.address}, {property.city}, {property.state || ""}
         </p>
         <p className="text-xl font-bold text-primary mb-2">
-          ₦{property.price.toLocaleString()} for {property.listing_type}
+          {formatPrice(property.price, property.price_frequency)}
+          <span className="text-sm font-normal text-muted-foreground ml-1">· {formatListingType(property.listing_type)}</span>
         </p>
         <p className="text-sm text-muted-foreground mb-2">
           {getPriceContext(

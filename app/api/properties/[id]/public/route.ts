@@ -1,194 +1,182 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/prisma";
 
+/**
+ * GET /api/properties/[id]/public
+ *
+ * Public property/listing detail endpoint used by:
+ *   - /property/[id]  → ?source=owner  (properties listed by owners)
+ *   - /listing/[id]   → ?source=agent  (listings created by agents)
+ *
+ * Query params:
+ *   source = "owner" (default) | "agent"
+ */
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const supabase = await createClient();
     const { id } = await params;
-    const propertyId = id;
+    const url = new URL(request.url);
+    const source = url.searchParams.get("source") ?? "owner";
+    const isAgent = source === "agent";
 
-    // Fetch property with full details - only live properties
-    const { data: property, error } = await supabase
-      .from("properties")
-      .select(
-        `
+    const property = await prisma.properties.findFirst({
+      where: {
         id,
-        owner_id,
-        property_type,
-        title,
-        description,
-        address,
-        state,
-        lga,
-        landmark,
-        latitude,
-        longitude,
-        price,
-        price_frequency,
-        bedrooms,
-        bathrooms,
-        size_sqm,
-        has_bq,
-        bq_type,
-        bq_bathrooms,
-        bq_kitchen,
-        bq_separate_entrance,
-        bq_condition,
-        nepa_status,
-        water_source,
-        internet_type,
-        security_type,
-        status,
-        verified_at,
-        is_featured,
-        created_at,
-        updated_at,
-        views_count,
-        owner:profiles!inner(
-          id,
-          full_name,
-          avatar_url,
-          user_type,
-          phone
-        ),
-        media:property_media(
-          id,
-          media_type,
-          file_url,
-          thumbnail_url,
-          alt_text,
-          display_order,
-          is_primary
-        ),
-        documents:property_documents(
-          id,
-          document_type,
-          file_name,
-          ml_validation_status,
-          uploaded_at
-        )
-      `,
-      )
-      .eq("id", propertyId)
-      .eq("status", "live")
-      .single();
-
-    if (error) {
-      console.error("Database error:", error);
-      if (error.code === "PGRST116") {
-        // No rows returned
-        return NextResponse.json(
-          { error: "Property not found" },
-          { status: 404 },
-        );
-      }
-      return NextResponse.json(
-        { error: "Failed to fetch property" },
-        { status: 500 },
-      );
-    }
+        status: "live",
+        listing_source: isAgent ? "agent" : { not: "agent" },
+      },
+      include: {
+        // property_details is one-to-many; take first row
+        property_details: true,
+        property_media: {
+          select: {
+            id: true,
+            media_type: true,
+            media_url: true,   // actual column name in DB
+            file_name: true,
+            display_order: true,
+            is_featured: true, // actual column name (mapped → is_primary in response)
+          },
+          orderBy: { display_order: "asc" },
+        },
+        // Always include both, use only what's relevant
+        owners: {
+          include: {
+            profiles: {
+              select: { id: true, full_name: true, email: true, avatar_url: true, phone: true },
+            },
+          },
+        },
+        agents: {
+          select: {
+            id: true,
+            license_number: true,
+            agency_name: true,
+            specialization: true,
+            verified: true,
+            rating: true,
+            profiles: {
+              select: { id: true, full_name: true, email: true, phone: true, avatar_url: true },
+            },
+          },
+        },
+      },
+    });
 
     if (!property) {
-      return NextResponse.json(
-        { error: "Property not found" },
-        { status: 404 },
-      );
+      return NextResponse.json({ error: "Property not found" }, { status: 404 });
     }
 
-    // Increment view count (fire and forget)
-    (async () => {
-      try {
-        await supabase
-          .from("properties")
-          .update({
-            views_count: (property.views_count || 0) + 1,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", propertyId);
-      } catch (err: any) {
-        console.error("Failed to update view count:", err);
-      }
-    })();
+    // property_details is an array (one-to-many relation)
+    const details = property.property_details?.[0] ?? null;
+    const meta = (details?.metadata as Record<string, unknown>) ?? {};
+    const features = (details?.features as Record<string, unknown>) ?? {};
+    const amenitiesRaw = details?.amenities;
 
-    // Format the response
+    // Normalise listing_type values (DB stores "for_rent", pages expect "rent" etc.)
+    const listingTypeMap: Record<string, string> = {
+      for_rent: "rent",
+      for_sale: "sale",
+      for_lease: "lease",
+    };
+    const normalisedListingType =
+      listingTypeMap[property.listing_type as string] ?? property.listing_type;
+
     const formattedProperty = {
       id: property.id,
-      property_type: property.property_type,
       title: property.title,
       description: property.description,
+      price: property.price ? Number(property.price) : 0,
+      price_frequency: property.price_frequency,
+      listing_type: normalisedListingType,
+      listing_source: property.listing_source,
       address: property.address,
+      city: property.city,
       state: property.state,
-      lga: property.lga,
-      landmark: property.landmark,
-      coordinates: {
-        latitude: property.latitude,
-        longitude: property.longitude,
-      },
-      pricing: {
-        amount: property.price,
-        frequency: property.price_frequency,
-      },
-      details: {
-        bedrooms: property.bedrooms,
-        bathrooms: property.bathrooms,
-        size_sqm: property.size_sqm,
-        has_bq: property.has_bq,
-        bq_details: property.has_bq
+      country: property.country,
+      latitude: property.latitude ? Number(property.latitude) : null,
+      longitude: property.longitude ? Number(property.longitude) : null,
+      property_type: property.property_type,
+      status: property.status,
+      verification_status: property.verification_status,
+      created_at: property.created_at,
+
+      // Nigerian market fields — stored in property_details.metadata
+      nepa_status: (meta.nepa_status as string) ?? null,
+      water_source: (meta.water_source as string) ?? null,
+      internet_type: (meta.internet_type as string) ?? null,
+      security_type: (meta.security_type as string[]) ?? [],
+      has_bq: (meta.has_bq as boolean) ?? false,
+
+      // Flattened property_details matching the page's expected shape
+      property_details: details
+        ? {
+            bedrooms: property.bedrooms,
+            bathrooms: property.bathrooms ? Number(property.bathrooms) : null,
+            square_feet: property.square_feet ? Number(property.square_feet) : null,
+            lot_size: (meta.lot_size as number) ?? null,
+            year_built: property.year_built,
+            parking_spaces: details.parking_spaces,
+            furnished: (features.furnished as boolean) ?? null,
+            pets_allowed: (features.pets_allowed as boolean) ?? null,
+            amenities: Array.isArray(amenitiesRaw)
+              ? (amenitiesRaw as string[])
+              : amenitiesRaw && typeof amenitiesRaw === "object"
+              ? Object.keys(amenitiesRaw as object)
+              : null,
+            utilities_included: (meta.utilities_included as string[]) ?? null,
+            has_generator: (meta.has_generator as boolean) ?? false,
+            has_pool: details.has_pool ?? false,
+            has_gym: (meta.has_gym as boolean) ?? false,
+          }
+        : null,
+
+      // Media — mapped to field names expected by both pages
+      property_media: property.property_media.map((m: { id: string; media_type: string; media_url: string; file_name: string; display_order: number | null; is_featured: boolean | null }) => ({
+        id: m.id,
+        media_type: m.media_type,
+        file_url: m.media_url,       // pages expect file_url
+        file_name: m.file_name,
+        is_primary: m.is_featured ?? false, // pages expect is_primary
+      })),
+
+      // Owner info (populated only for owner-source listings)
+      owner: !isAgent && property.owners?.profiles
+        ? {
+            id: property.owners.profiles.id,
+            full_name: property.owners.profiles.full_name,
+            email: property.owners.profiles.email,
+            phone: property.owners.profiles.phone,
+            avatar_url: property.owners.profiles.avatar_url,
+          }
+        : null,
+
+      // Agent info (populated only for agent-source listings)
+      agent:
+        isAgent && property.agents
           ? {
-              type: property.bq_type,
-              bathrooms: property.bq_bathrooms,
-              kitchen: property.bq_kitchen,
-              separate_entrance: property.bq_separate_entrance,
-              condition: property.bq_condition,
+              id: property.agents.id,
+              license_number: property.agents.license_number,
+              agency_name: property.agents.agency_name ?? "",
+              specialization: property.agents.specialization,
+              verified: property.agents.verified ?? false,
+              rating: property.agents.rating ? Number(property.agents.rating) : null,
+              agent_profile: {
+                id: property.agents.profiles.id,
+                full_name: property.agents.profiles.full_name,
+                email: property.agents.profiles.email,
+                phone: property.agents.profiles.phone,
+                avatar_url: property.agents.profiles.avatar_url,
+              },
             }
           : null,
-      },
-      infrastructure: {
-        nepa_status: property.nepa_status,
-        water_source: property.water_source,
-        internet_type: property.internet_type,
-        security_type: property.security_type,
-      },
-      verification: {
-        is_verified: !!property.verified_at,
-        verified_at: property.verified_at,
-        is_featured: property.is_featured,
-      },
-      listing_info: {
-        created_at: property.created_at,
-        updated_at: property.updated_at,
-        views_count: property.views_count,
-      },
-      owner: {
-        id: (property.owner as any).id,
-        name: (property.owner as any).full_name,
-        avatar_url: (property.owner as any).avatar_url,
-        user_type: (property.owner as any).user_type,
-        phone: (property.owner as any).phone,
-      },
-      media:
-        property.media?.sort(
-          (a: any, b: any) => (a.display_order || 0) - (b.display_order || 0),
-        ) || [],
-      documents:
-        property.documents?.map((doc: any) => ({
-          id: doc.id,
-          type: doc.document_type,
-          file_name: doc.file_name,
-          validation_status: doc.ml_validation_status,
-          uploaded_at: doc.uploaded_at,
-        })) || [],
     };
 
     return NextResponse.json({ data: formattedProperty });
   } catch (error) {
-    console.error("API error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    console.error("Public property API error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

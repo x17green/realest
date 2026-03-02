@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server"
 import { createServiceClient } from "@/lib/supabase/service"
 import { logAdminAction } from "@/lib/audit"
 import { generateSubAdminInvitationEmail } from "@/lib/email-templates/subadmin-invitation"
+import { prisma } from "@/lib/prisma"
 
 const resend = new Resend(process.env.RESEND_API_KEY!)
 
@@ -23,15 +24,12 @@ export async function POST(request: Request) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("id, user_type, full_name")
-      .eq("id", user.id)
-      .single()
-
-    if (!profile || profile.user_type !== "admin") {
+    const adminRow = await prisma.users.findUnique({ where: { id: user.id }, select: { role: true } })
+    if (!adminRow || adminRow.role !== 'admin') {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
+
+    const adminProfile = await prisma.profiles.findUnique({ where: { id: user.id }, select: { full_name: true } })
 
     const service = createServiceClient()
 
@@ -87,7 +85,7 @@ export async function POST(request: Request) {
     const htmlContent = generateSubAdminInvitationEmail({
       email,
       full_name,
-      inviter_name: profile.full_name ?? "RealEST Admin",
+      inviter_name: adminProfile?.full_name ?? "RealEST Admin",
       reset_link: resetLink,
     })
 

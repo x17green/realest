@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Card, Chip } from "@heroui/react";
 import Link from "next/link";
+import { formatPrice, formatListingType, formatPropertyType } from "@/lib/utils/propertyUtils";
 import {
   MapPin,
   Bed,
@@ -24,6 +25,7 @@ interface Property {
   id: string;
   title: string;
   price: number;
+  price_frequency: string | null;
   address: string;
   city: string;
   bedrooms: number;
@@ -43,7 +45,7 @@ export default function FeaturedProperties() {
       const { data, error } = await supabase
         .from("properties")
         .select("*")
-        .eq("status", "active")
+        .eq("status", "live")
         .eq("verification_status", "verified")
         .limit(4);
 
@@ -171,7 +173,7 @@ export default function FeaturedProperties() {
                       variant="secondary"
                       className="absolute bottom-3 left-3 bg-surface/90 backdrop-blur-sm border-border/50 text-xs"
                     >
-                      {property.listing_type.replace("_", " ").toUpperCase()}
+                      {formatListingType(property.listing_type)}
                     </Chip>
 
                     {/* Property Type Badge */}
@@ -179,7 +181,7 @@ export default function FeaturedProperties() {
                       variant="secondary"
                       className="absolute bottom-3 right-3 bg-surface/90 backdrop-blur-sm border-border/50 text-xs"
                     >
-                      {property.property_type}
+                      {formatPropertyType(property.property_type)}
                     </Chip>
                   </div>
 
@@ -188,7 +190,7 @@ export default function FeaturedProperties() {
                       {property.title}
                     </h3>
                     <p className="text-h2 font-bold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent mb-3">
-                      ₦{property.price.toLocaleString()}
+                      {formatPrice(property.price, property.price_frequency)}
                     </p>
                     <div className="flex items-center gap-1 text-body-s text-muted-foreground mb-4">
                       <MapPin className="w-4 h-4 shrink-0 text-primary" />

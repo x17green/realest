@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { prisma } from '@/lib/prisma'
 
 // GET /api/admin/reports/vetting - Admin vetting reports
 export async function GET(request: NextRequest) {
@@ -17,13 +18,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Verify user is admin
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('user_type')
-      .eq('id', user.id)
-      .single()
-
-    if (profileError || profile?.user_type !== 'admin') {
+    const adminRow = await prisma.users.findUnique({ where: { id: user.id }, select: { role: true } })
+    if (!adminRow || adminRow.role !== 'admin') {
       return NextResponse.json(
         { error: 'Admin access required' },
         { status: 403 }
@@ -54,100 +50,71 @@ export async function GET(request: NextRequest) {
     }
 
     // Build base query for properties in the period
-    let propertiesQuery = supabase
-      .from('properties')
-      .select(`
-        id,
-        title,
-        status,
-        created_at,
-        vetted_at,
-        verified_at,
-        rejection_reason,
-        vetted_by,
-        owner:profiles!inner(
-          id,
-          full_name,
-          email
-        ),
-        vetter:profiles!vetted_by(
-          id,
-          full_name
-        )
-      `)
-      .gte('created_at', startDate.toISOString())
+    const properties = await prisma.properties.findMany({
+      where: {
+        created_at: { gte: startDate },
+        ...(status ? { status } : {}),
+      },
+      select: {
+        id: true,
+        title: true,
+        status: true,
+        created_at: true,
+        updated_at: true,
+        owners: {
+          select: { profiles: { select: { id: true, full_name: true, email: true } } },
+        },
+      },
+      orderBy: { created_at: 'desc' },
+    })
 
-    // Filter by status if specified
-    if (status) {
-      propertiesQuery = propertiesQuery.eq('status', status)
-    }
-
-    const { data: properties, error: propertiesError } = await propertiesQuery
-      .order('created_at', { ascending: false })
-
-    if (propertiesError) {
-      console.error('Database error:', propertiesError)
-      return NextResponse.json(
-        { error: 'Failed to fetch vetting reports' },
-        { status: 500 }
-      )
-    }
+    // Map to consistent shape (owner from profiles relation)
+    const mappedProperties = properties.map((p: any) => ({
+      id: p.id,
+      title: p.title,
+      status: p.status,
+      created_at: p.created_at,
+      updated_at: p.updated_at,
+      owner: p.owners?.profiles ? { id: p.owners.profiles.id, full_name: p.owners.profiles.full_name, email: p.owners.profiles.email } : null,
+    }))
 
     // Calculate statistics
     const stats = {
-      total_properties: properties?.length || 0,
-      pending_vetting: properties?.filter((p: any) => p.status === 'pending_vetting').length || 0,
-      live_properties: properties?.filter((p: any) => p.status === 'live').length || 0,
-      rejected_properties: properties?.filter((p: any) => p.status === 'rejected').length || 0,
+      total_properties: mappedProperties?.length || 0,
+      pending_vetting: mappedProperties?.filter((p: any) => p.status === 'pending_vetting').length || 0,
+      live_properties: mappedProperties?.filter((p: any) => p.status === 'live').length || 0,
+      rejected_properties: mappedProperties?.filter((p: any) => p.status === 'rejected').length || 0,
       average_vetting_time: 0,
       vetting_efficiency: 0
     }
 
-    // Calculate average vetting time for completed properties
-    const completedProperties = properties?.filter((p: any) =>
+    // Calculate vetting efficiency (properties processed per day)
+    const completedProperties = mappedProperties?.filter((p: any) =>
       p.status === 'live' || p.status === 'rejected'
     ) || []
 
-    if (completedProperties.length > 0) {
-      const totalVettingTime = completedProperties.reduce((sum: number, prop: any) => {
-        if (prop.vetted_at && prop.created_at) {
-          const created = new Date(prop.created_at)
-          const vetted = new Date(prop.vetted_at)
-          return sum + (vetted.getTime() - created.getTime())
-        }
-        return sum
-      }, 0)
-
-      stats.average_vetting_time = totalVettingTime / completedProperties.length
-    }
-
-    // Calculate vetting efficiency (properties vetted per day)
     const daysInPeriod = Math.max(1, Math.ceil((now.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000)))
     stats.vetting_efficiency = completedProperties.length / daysInPeriod
 
     // Get admin activity summary
-    const { data: adminActivity } = await supabase
-      .from('admin_audit_log')
-      .select(`
-        admin_id,
-        action,
-        created_at,
-        admin:profiles!admin_id(
-          id,
-          full_name
-        )
-      `)
-      .eq('action', 'property_vetting')
-      .gte('created_at', startDate.toISOString())
-      .order('created_at', { ascending: false })
+    const adminActivity = await prisma.admin_audit_log.findMany({
+      where: {
+        action: 'property_vetting',
+        created_at: { gte: startDate },
+      },
+      include: {
+        profiles: { select: { id: true, full_name: true } },
+      },
+      orderBy: { created_at: 'desc' },
+    })
 
     // Group admin activity
     const adminStats: Record<string, any> = {}
     adminActivity?.forEach((activity: any) => {
-      const adminId = activity.admin_id
+      const adminId = activity.actor_id
       if (!adminStats[adminId]) {
         adminStats[adminId] = {
-          admin_name: activity.admin?.full_name || 'Unknown',
+          admin_name: activity.profiles?.full_name || 'Unknown',
           vetted_count: 0,
           last_activity: activity.created_at
         }
@@ -155,20 +122,11 @@ export async function GET(request: NextRequest) {
       adminStats[adminId].vetted_count++
     })
 
-    // Get rejection reasons summary
-    const rejectionReasons: Record<string, number> = {}
-    properties?.filter((p: any) => p.status === 'rejected' && p.rejection_reason)
-      .forEach((prop: any) => {
-        const reason = prop.rejection_reason
-        rejectionReasons[reason] = (rejectionReasons[reason] || 0) + 1
-      })
-
     return NextResponse.json({
       data: {
-        properties: properties || [],
+        properties: mappedProperties || [],
         stats,
         admin_activity: Object.values(adminStats),
-        rejection_reasons: rejectionReasons
       },
       period,
       date_range: {

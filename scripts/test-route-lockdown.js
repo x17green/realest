@@ -40,7 +40,7 @@ const TEST_ROUTES = [
   "/owner",
   "/owner/inquiries",
   "/owner/list-property",
-  "/profile-setup",
+  "/onboarding",
   "/onboarding",
 
   // Demo routes

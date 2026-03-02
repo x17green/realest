@@ -18,20 +18,20 @@ export default async function DuplicatesPage() {
   }
 
   // Check if user is an admin
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("user_type")
+  const { data: userRow } = await supabase
+    .from("users")
+    .select("role")
     .eq("id", user.id)
     .single();
 
-  if (profile?.user_type !== "admin") {
+  if (userRow?.role !== "admin") {
     redirect("/");
   }
 
   // Fetch potential duplicate properties
   const { data: duplicates } = await supabase
     .from("properties")
-    .select("*, profiles(full_name, email)")
+    .select("*, owners(profiles(full_name, email))")
     .eq("verification_status", "duplicate_check")
     .order("created_at", { ascending: true });
 
@@ -75,7 +75,7 @@ export default async function DuplicatesPage() {
                 {duplicates?.map((property) => (
                   <TableRow key={property.id}>
                     <TableCell className="font-medium">{property.title}</TableCell>
-                    <TableCell>{property.profiles?.full_name}</TableCell>
+                    <TableCell>{property.owners?.profiles?.full_name}</TableCell>
                     <TableCell>{property.location}</TableCell>
                     <TableCell>
                       <Badge variant="secondary">

@@ -1,62 +1,49 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { prisma } from '@/lib/prisma'
 
 // GET /api/system/health - System health check
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient()
     const startTime = Date.now()
 
-    // Check database connectivity
-    const { data: dbHealth, error: dbError } = await supabase
-      .from('properties')
-      .select('count', { count: 'exact', head: true })
-      .limit(1)
+    // Check database connectivity via Prisma
+    let dbStatus = 'healthy'
+    let dbError: string | null = null
+    try {
+      await prisma.$queryRaw`SELECT 1`
+    } catch (err: any) {
+      dbStatus = 'error'
+      dbError = err.message
+    }
 
     const dbResponseTime = Date.now() - startTime
-    const dbStatus = dbError ? 'error' : 'healthy'
 
     // Get system statistics
     const stats: any = {
       database: {
         status: dbStatus,
         response_time_ms: dbResponseTime,
-        error: dbError?.message || null
+        error: dbError
       }
     }
 
     // Get application metrics (if available)
     try {
-      const { count: totalProperties } = await supabase
-        .from('properties')
-        .select('*', { count: 'exact', head: true })
-
-      const { count: liveProperties } = await supabase
-        .from('properties')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'live')
-
-      const { count: totalUsers } = await supabase
-        .from('profiles')
-        .select('*', { count: 'exact', head: true })
-
-      const { count: pendingVetting } = await supabase
-        .from('properties')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'pending_vetting')
-
-      const { count: pendingML } = await supabase
-        .from('properties')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'pending_ml_validation')
+      const [totalProperties, liveProperties, totalUsers, pendingVetting, pendingML] = await Promise.all([
+        prisma.properties.count(),
+        prisma.properties.count({ where: { status: 'live' } }),
+        prisma.profiles.count(),
+        prisma.properties.count({ where: { status: 'pending_vetting' } }),
+        prisma.properties.count({ where: { status: 'pending_ml_validation' } }),
+      ])
 
       stats.metrics = {
-        total_properties: totalProperties || 0,
-        live_properties: liveProperties || 0,
-        total_users: totalUsers || 0,
-        pending_vetting: pendingVetting || 0,
-        pending_ml_validation: pendingML || 0,
-        vetting_queue_size: (pendingVetting || 0) + (pendingML || 0)
+        total_properties: totalProperties,
+        live_properties: liveProperties,
+        total_users: totalUsers,
+        pending_vetting: pendingVetting,
+        pending_ml_validation: pendingML,
+        vetting_queue_size: pendingVetting + pendingML
       }
     } catch (metricsError: any) {
       stats.metrics = {

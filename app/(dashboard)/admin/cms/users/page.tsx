@@ -34,36 +34,37 @@ export default async function CMSUsersPage() {
   }
 
   // Check if user is an admin
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("user_type")
+  const { data: userData } = await supabase
+    .from("users")
+    .select("role")
     .eq("id", user.id)
     .single();
 
-  if (profile?.user_type !== "admin") {
+  if (userData?.role !== "admin") {
     redirect("/");
   }
 
   // Fetch all users with their activity data
   const { data: users } = await supabase
-    .from("profiles")
+    .from("users")
     .select(`
       *,
-      properties:properties(count),
-      inquiries:inquiries(count),
-      reviews:reviews(count)
+      profiles(
+        inquiries_inquiries_owner_idToprofiles(count),
+        reviews(count)
+      )
     `)
     .order("created_at", { ascending: false });
 
-  // Mock user statistics (in a real app, this would be calculated from the data)
+  // User statistics derived from the users table
   const userStats = {
     totalUsers: users?.length || 0,
-    activeUsers: users?.filter(u => u.last_login_at && new Date(u.last_login_at) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).length || 0,
-    verifiedUsers: users?.filter(u => u.is_verified).length || 0,
-    bannedUsers: users?.filter(u => u.user_type === 'banned').length || 0,
-    owners: users?.filter(u => u.user_type === 'owner').length || 0,
-    agents: users?.filter(u => u.user_type === 'agent').length || 0,
-    regularUsers: users?.filter(u => u.user_type === 'user').length || 0,
+    activeUsers: users?.filter(u => u.is_active).length || 0,
+    verifiedUsers: users?.filter(u => u.is_active && !u.deleted_at).length || 0,
+    bannedUsers: users?.filter(u => !u.is_active).length || 0,
+    owners: users?.filter(u => u.role === 'owner').length || 0,
+    agents: users?.filter(u => u.role === 'agent').length || 0,
+    regularUsers: users?.filter(u => u.role === 'user').length || 0,
   };
 
   return (

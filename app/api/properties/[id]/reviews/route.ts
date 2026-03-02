@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
 // Schema for creating a review
@@ -17,7 +18,6 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const supabase = await createClient();
     const { id } = await params;
     const propertyId = id;
 
@@ -28,96 +28,68 @@ export async function GET(
       parseInt(url.searchParams.get("per_page") || "10"),
       50,
     );
-    const targetType = url.searchParams.get("target_type"); // 'owner' or 'agent'
 
     // Verify property exists and is live
-    const { data: property, error: propertyError } = await supabase
-      .from("properties")
-      .select("id, owner_id")
-      .eq("id", propertyId)
-      .eq("status", "live")
-      .single();
+    const property = await prisma.properties.findUnique({
+      where: { id: propertyId, status: "live" },
+      select: { id: true, owner_id: true },
+    });
 
-    if (propertyError || !property) {
+    if (!property) {
       return NextResponse.json(
         { error: "Property not found" },
         { status: 404 },
       );
     }
 
-    // Build reviews query
-    let reviewsQuery = supabase
-      .from("reviews")
-      .select(
-        `
-        id,
-        rating,
-        comment,
-        target_type,
-        created_at,
-        reviewer:profiles!inner(
-          id,
-          full_name,
-          avatar_url
-        )
-      `,
-        { count: "exact" },
-      )
-      .eq("target_id", propertyId)
-      .eq("target_type", "property");
+    const where = { property_id: propertyId };
 
-    // Filter by review target if specified
-    if (targetType) {
-      reviewsQuery = reviewsQuery.eq("review_target", targetType);
-    }
-
-    // Apply pagination
-    const from = (page - 1) * perPage;
-    const to = from + perPage - 1;
-    reviewsQuery = reviewsQuery
-      .order("created_at", { ascending: false })
-      .range(from, to);
-
-    const { data: reviews, error, count } = await reviewsQuery;
-
-    if (error) {
-      console.error("Database error:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch reviews" },
-        { status: 500 },
-      );
-    }
+    const [reviews, total] = await Promise.all([
+      prisma.reviews.findMany({
+        where,
+        select: {
+          id: true,
+          rating: true,
+          comment: true,
+          target_type: true,
+          created_at: true,
+          profiles: {
+            select: {
+              id: true,
+              full_name: true,
+              avatar_url: true,
+            },
+          },
+        },
+        orderBy: { created_at: "desc" },
+        skip: (page - 1) * perPage,
+        take: perPage,
+      }),
+      prisma.reviews.count({ where }),
+    ]);
 
     // Calculate average rating
-    const { data: ratingStats } = await supabase
-      .from("reviews")
-      .select("rating")
-      .eq("target_id", propertyId)
-      .eq("target_type", "property");
+    const ratingAgg = await prisma.reviews.aggregate({
+      where,
+      _avg: { rating: true },
+    });
+    const averageRating = ratingAgg._avg.rating ?? 0;
 
-    const averageRating =
-      ratingStats && ratingStats.length > 0
-        ? ratingStats.reduce(
-            (sum: number, review: any) => sum + review.rating,
-            0,
-          ) / ratingStats.length
-        : 0;
-
-    const totalPages = Math.ceil((count || 0) / perPage);
+    const totalPages = Math.ceil(total / perPage);
 
     return NextResponse.json({
-      data: reviews || [],
+      data: reviews,
       pagination: {
         page,
         per_page: perPage,
-        total: count || 0,
+        total,
         total_pages: totalPages,
         has_next: page < totalPages,
         has_prev: page > 1,
       },
       stats: {
-        average_rating: Math.round(averageRating * 10) / 10, // Round to 1 decimal
-        total_reviews: count || 0,
+        average_rating: Math.round(averageRating * 10) / 10,
+        total_reviews: total,
       },
     });
   } catch (error) {
@@ -157,14 +129,12 @@ export async function POST(
     const validatedData = createReviewSchema.parse(body);
 
     // Verify property exists and is live
-    const { data: property, error: propertyError } = await supabase
-      .from("properties")
-      .select("id, owner_id")
-      .eq("id", propertyId)
-      .eq("status", "live")
-      .single();
+    const property = await prisma.properties.findUnique({
+      where: { id: propertyId, status: "live" },
+      select: { id: true, owner_id: true },
+    });
 
-    if (propertyError || !property) {
+    if (!property) {
       return NextResponse.json(
         { error: "Property not found" },
         { status: 404 },
@@ -172,13 +142,10 @@ export async function POST(
     }
 
     // Check if user has already reviewed this property
-    const { data: existingReview } = await supabase
-      .from("reviews")
-      .select("id")
-      .eq("reviewer_id", user.id)
-      .eq("target_id", propertyId)
-      .eq("target_type", "property")
-      .single();
+    const existingReview = await prisma.reviews.findFirst({
+      where: { reviewer_id: user.id, property_id: propertyId },
+      select: { id: true },
+    });
 
     if (existingReview) {
       return NextResponse.json(
@@ -187,22 +154,17 @@ export async function POST(
       );
     }
 
-    // Check if user has interacted with this property (inquiry, saved, etc.)
-    const { data: hasInteraction } = await supabase
-      .from("inquiries")
-      .select("id")
-      .eq("sender_id", user.id)
-      .eq("property_id", propertyId)
-      .limit(1)
-      .single();
-
-    const { data: hasSaved } = await supabase
-      .from("saved_properties")
-      .select("id")
-      .eq("user_id", user.id)
-      .eq("property_id", propertyId)
-      .limit(1)
-      .single();
+    // Check if user has interacted with this property (inquiry or saved)
+    const [hasInteraction, hasSaved] = await Promise.all([
+      prisma.inquiries.findFirst({
+        where: { sender_id: user.id, property_id: propertyId },
+        select: { id: true },
+      }),
+      prisma.saved_properties.findFirst({
+        where: { user_id: user.id, property_id: propertyId },
+        select: { id: true },
+      }),
+    ]);
 
     if (!hasInteraction && !hasSaved) {
       return NextResponse.json(
@@ -215,39 +177,29 @@ export async function POST(
     }
 
     // Create the review
-    const { data: review, error: insertError } = await supabase
-      .from("reviews")
-      .insert({
+    const review = await prisma.reviews.create({
+      data: {
         reviewer_id: user.id,
-        target_id: propertyId,
-        target_type: "property",
-        review_target: validatedData.target_type, // 'owner' or 'agent'
+        property_id: propertyId,
+        target_type: validatedData.target_type,
         rating: validatedData.rating,
         comment: validatedData.comment,
-      })
-      .select(
-        `
-        id,
-        rating,
-        comment,
-        review_target,
-        created_at,
-        reviewer:profiles!inner(
-          id,
-          full_name,
-          avatar_url
-        )
-      `,
-      )
-      .single();
-
-    if (insertError) {
-      console.error("Database error:", insertError);
-      return NextResponse.json(
-        { error: "Failed to create review" },
-        { status: 500 },
-      );
-    }
+      },
+      select: {
+        id: true,
+        rating: true,
+        comment: true,
+        target_type: true,
+        created_at: true,
+        profiles: {
+          select: {
+            id: true,
+            full_name: true,
+            avatar_url: true,
+          },
+        },
+      },
+    });
 
     return NextResponse.json(
       { data: review, message: "Review created successfully" },
