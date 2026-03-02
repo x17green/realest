@@ -341,7 +341,8 @@ const AgentOnboarding: React.FC = () => {
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
                       <label className="text-sm font-semibold text-foreground">
-                        License Number <span className="text-red-500">*</span>
+                        RC Number <span className="text-red-500">*</span>
+                        <span className="text-muted-foreground text-xs font-normal ml-1">(Company Registration)</span>
                       </label>
                       <div className="relative">
                         <Shield className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -351,7 +352,7 @@ const AgentOnboarding: React.FC = () => {
                           onChange={(e) =>
                             updateFormData("licenseNumber", e.target.value)
                           }
-                          placeholder="e.g., LICENSE-12345"
+                          placeholder="e.g., RC-1234567"
                           className="w-full pl-10 pr-4 py-2.5 bg-surface border rounded-lg transition-all duration-200 focus:ring-2 focus:outline-none focus:border-primary/50 focus:ring-primary/20"
                         />
                       </div>
@@ -632,7 +633,7 @@ const AgentOnboarding: React.FC = () => {
                           <div className="flex items-center gap-2">
                             <CheckCircle className="w-4 h-4 text-green-500 shrink-0" />
                             <span className="text-sm text-muted-foreground">
-                              License:
+                              RC Number:
                             </span>
                             <span className="text-sm font-medium text-foreground">
                               {formData.licenseNumber}
@@ -763,7 +764,9 @@ const AgentOnboarding: React.FC = () => {
                           !formData.phone.trim() ||
                           !!phoneError)) ||
                       (currentStep === 2 &&
-                        (!(formData.specializations || []).length ||
+                        (!formData.licenseNumber?.trim() ||
+                          !formData.agencyName?.trim() ||
+                          !(formData.specializations || []).length ||
                           !formData.agreeTerms))
                     }
                     variant="default"

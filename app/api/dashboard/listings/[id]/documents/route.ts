@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { generateSignedUrl } from "@/lib/utils/upload-utils";
 
@@ -21,26 +22,22 @@ export async function GET(request: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Verify user owns this property or is admin
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("user_type")
-      .eq("id", user.id)
-      .single();
-
-    if (!profile || !["owner", "admin"].includes(profile.user_type)) {
+    // Verify role via Prisma
+    const userRow = await prisma.users.findUnique({
+      where: { id: user.id },
+      select: { role: true },
+    });
+    if (!userRow || !["owner", "admin"].includes(userRow.role)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     // Verify property ownership (unless admin)
-    if (profile.user_type !== "admin") {
-      const { data: property } = await supabase
-        .from("properties")
-        .select("owner_id")
-        .eq("id", propertyId)
-        .single();
-
-      if (!property || property.owner_id !== user.id) {
+    if (userRow.role !== "admin") {
+      const property = await prisma.properties.findFirst({
+        where: { id: propertyId, owner_id: user.id },
+        select: { id: true },
+      });
+      if (!property) {
         return NextResponse.json(
           { error: "Property not found or access denied" },
           { status: 404 },
@@ -49,19 +46,10 @@ export async function GET(request: Request, { params }: RouteParams) {
     }
 
     // Fetch documents for this property
-    const { data: documents, error } = await supabase
-      .from("property_documents")
-      .select("*")
-      .eq("property_id", propertyId)
-      .order("uploaded_at", { ascending: false });
-
-    if (error) {
-      console.error("Database error:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch documents" },
-        { status: 500 },
-      );
-    }
+    const documents = await prisma.property_documents.findMany({
+      where: { property_id: propertyId },
+      orderBy: { created_at: "desc" },
+    });
 
     return NextResponse.json({ data: documents });
   } catch (error) {
@@ -88,26 +76,22 @@ export async function POST(request: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Verify user owns this property or is admin
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("user_type")
-      .eq("id", user.id)
-      .single();
-
-    if (!profile || !["owner", "agent", "admin"].includes(profile.user_type)) {
+    // Verify role via Prisma
+    const userRow = await prisma.users.findUnique({
+      where: { id: user.id },
+      select: { role: true },
+    });
+    if (!userRow || !["owner", "agent", "admin"].includes(userRow.role)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     // Verify property ownership (unless admin)
-    if (profile.user_type !== "admin") {
-      const { data: property } = await supabase
-        .from("properties")
-        .select("owner_id")
-        .eq("id", propertyId)
-        .single();
-
-      if (!property || property.owner_id !== user.id) {
+    if (userRow.role !== "admin") {
+      const property = await prisma.properties.findFirst({
+        where: { id: propertyId, owner_id: user.id },
+        select: { id: true },
+      });
+      if (!property) {
         return NextResponse.json(
           { error: "Property not found or access denied" },
           { status: 404 },
@@ -201,32 +185,17 @@ export async function POST(request: Request, { params }: RouteParams) {
     // Use the public URL from signed URL generation
     const publicUrl = signedUrlResult.public_url;
 
-    // Save document record to database
-    const { data: documentRecord, error: insertError } = await supabase
-      .from("property_documents")
-      .insert({
+    // Save document record to database via Prisma
+    const documentRecord = await prisma.property_documents.create({
+      data: {
         property_id: propertyId,
         document_type: documentType,
-        file_url: publicUrl,
+        document_url: publicUrl,
         file_name: file.name,
         file_size: file.size,
-        mime_type: file.type,
-        ml_validation_status: "pending", // Will be processed by ML service
-        uploaded_at: new Date().toISOString(),
-      })
-      .select()
-      .single();
-
-    if (insertError) {
-      console.error("Database insert error:", insertError);
-      // Clean up uploaded file if database insert failed
-      await supabase.storage.from("property-documents").remove([signedUrlResult.file_path]);
-
-      return NextResponse.json(
-        { error: "Failed to save document record" },
-        { status: 500 },
-      );
-    }
+        verification_status: "pending",
+      },
+    });
 
     // Trigger ML validation (placeholder - would call ML service)
     // This would typically be done asynchronously via Edge Functions

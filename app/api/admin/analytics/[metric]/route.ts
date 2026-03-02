@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { z } from 'zod'
+import { prisma } from '@/lib/prisma'
 
 // Query parameters schema
 const metricQuerySchema = z.object({
@@ -30,13 +31,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     // Verify user is admin
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('user_type')
-      .eq('id', user.id)
-      .single()
-
-    if (!profile || profile.user_type !== 'admin') {
+    const adminRow = await prisma.users.findUnique({ where: { id: user.id }, select: { role: true } })
+    if (!adminRow || adminRow.role !== 'admin') {
       return NextResponse.json(
         { error: 'Admin access required' },
         { status: 403 }
@@ -93,37 +89,37 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     switch (metric) {
       case 'users':
-        metricData = await getUserMetrics(supabase, startDateStr, group_by)
+        metricData = await getUserMetrics(startDateStr, group_by)
         if (includeComparison) {
-          comparisonData = await getUserMetricsComparison(supabase, startDate, period, group_by)
+          comparisonData = await getUserMetricsComparison(startDate, period, group_by)
         }
         break
 
       case 'properties':
-        metricData = await getPropertyMetrics(supabase, startDateStr, group_by)
+        metricData = await getPropertyMetrics(startDateStr, group_by)
         if (includeComparison) {
-          comparisonData = await getPropertyMetricsComparison(supabase, startDate, period, group_by)
+          comparisonData = await getPropertyMetricsComparison(startDate, period, group_by)
         }
         break
 
       case 'inquiries':
-        metricData = await getInquiryMetrics(supabase, startDateStr, group_by)
+        metricData = await getInquiryMetrics(startDateStr, group_by)
         if (includeComparison) {
-          comparisonData = await getInquiryMetricsComparison(supabase, startDate, period, group_by)
+          comparisonData = await getInquiryMetricsComparison(startDate, period, group_by)
         }
         break
 
       case 'revenue':
-        metricData = await getRevenueMetrics(supabase, startDateStr, group_by)
+        metricData = await getRevenueMetrics(startDateStr, group_by)
         if (includeComparison) {
-          comparisonData = await getRevenueMetricsComparison(supabase, startDate, period, group_by)
+          comparisonData = await getRevenueMetricsComparison(startDate, period, group_by)
         }
         break
 
       case 'performance':
-        metricData = await getPerformanceMetrics(supabase, startDateStr, group_by)
+        metricData = await getPerformanceMetrics(startDateStr, group_by)
         if (includeComparison) {
-          comparisonData = await getPerformanceMetricsComparison(supabase, startDate, period, group_by)
+          comparisonData = await getPerformanceMetricsComparison(startDate, period, group_by)
         }
         break
 
@@ -160,543 +156,198 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   }
 }
 
-// User metrics functions
-async function getUserMetrics(supabase: any, startDateStr: string, groupBy: string) {
-  // For now, return mock data since we need to implement proper date grouping
-  // In production, this would use a more complex query with date truncation
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('user_type, created_at')
-    .gte('created_at', startDateStr)
-    .order('created_at', { ascending: true })
-
-  if (error) {
-    console.error('Error fetching user metrics:', error)
-    return []
+// Helper: group a date into a period string
+function groupDate(date: Date, groupBy: string): string {
+  if (groupBy === 'month') return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+  if (groupBy === 'week') {
+    const weekStart = new Date(date)
+    weekStart.setDate(date.getDate() - date.getDay())
+    return weekStart.toISOString().split('T')[0]
   }
-
-  // Group by date periods (simplified implementation)
-  const groupedData: { [key: string]: any } = {}
-
-  data.forEach((user: any) => {
-    const date = new Date(user.created_at)
-    let period: string
-
-    switch (groupBy) {
-      case 'day':
-        period = date.toISOString().split('T')[0]
-        break
-      case 'week':
-        const weekStart = new Date(date)
-        weekStart.setDate(date.getDate() - date.getDay())
-        period = weekStart.toISOString().split('T')[0]
-        break
-      case 'month':
-        period = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
-        break
-      default:
-        period = date.toISOString().split('T')[0]
-    }
-
-    if (!groupedData[period]) {
-      groupedData[period] = {
-        period,
-        total_users: 0,
-        regular_users: 0,
-        property_owners: 0,
-        admins: 0
-      }
-    }
-
-    groupedData[period].total_users++
-    if (user.user_type === 'user') groupedData[period].regular_users++
-    if (user.user_type === 'owner') groupedData[period].property_owners++
-    if (user.user_type === 'admin') groupedData[period].admins++
-  })
-
-  return Object.values(groupedData).sort((a: any, b: any) => a.period.localeCompare(b.period))
+  return date.toISOString().split('T')[0]
 }
 
-async function getUserMetricsComparison(supabase: any, startDate: Date, period: string, groupBy: string) {
-  // Calculate previous period
-  const periodLength = getPeriodLength(period)
-  const previousStartDate = new Date(startDate.getTime() - periodLength)
-
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('user_type, created_at')
-    .gte('created_at', previousStartDate.toISOString())
-    .lt('created_at', startDate.toISOString())
-    .order('created_at', { ascending: true })
-
-  if (error) {
-    console.error('Error fetching user metrics comparison:', error)
-    return []
+// Helper: period length in ms
+function getPeriodLength(period: string): number {
+  switch (period) {
+    case '7d': return 7 * 24 * 60 * 60 * 1000
+    case '30d': return 30 * 24 * 60 * 60 * 1000
+    case '90d': return 90 * 24 * 60 * 60 * 1000
+    case '1y': return 365 * 24 * 60 * 60 * 1000
+    case 'all': return 365 * 24 * 60 * 60 * 1000
+    default: return 30 * 24 * 60 * 60 * 1000
   }
+}
 
-  // Group by date periods (simplified implementation)
-  const groupedData: { [key: string]: any } = {}
-
-  data.forEach((user: any) => {
-    const date = new Date(user.created_at)
-    let period: string
-
-    switch (groupBy) {
-      case 'day':
-        period = date.toISOString().split('T')[0]
-        break
-      case 'week':
-        const weekStart = new Date(date)
-        weekStart.setDate(date.getDate() - date.getDay())
-        period = weekStart.toISOString().split('T')[0]
-        break
-      case 'month':
-        period = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
-        break
-      default:
-        period = date.toISOString().split('T')[0]
-    }
-
-    if (!groupedData[period]) {
-      groupedData[period] = {
-        period,
-        total_users: 0,
-        regular_users: 0,
-        property_owners: 0,
-        admins: 0
-      }
-    }
-
-    groupedData[period].total_users++
-    if (user.user_type === 'user') groupedData[period].regular_users++
-    if (user.user_type === 'owner') groupedData[period].property_owners++
-    if (user.user_type === 'admin') groupedData[period].admins++
+// User metrics
+async function getUserMetrics(startDateStr: string, groupBy: string) {
+  const data = await prisma.profiles.findMany({
+    where: { created_at: { gte: new Date(startDateStr) } },
+    select: { created_at: true, users: { select: { role: true } } },
+    orderBy: { created_at: 'asc' },
   })
-
-  return Object.values(groupedData).sort((a: any, b: any) => a.period.localeCompare(b.period))
-}
-
-// Property metrics functions
-async function getPropertyMetrics(supabase: any, startDateStr: string, groupBy: string) {
-  const { data, error } = await supabase
-    .from('properties')
-    .select('status, is_featured, created_at')
-    .gte('created_at', startDateStr)
-    .order('created_at', { ascending: true })
-
-  if (error) {
-    console.error('Error fetching property metrics:', error)
-    return []
-  }
-
-  // Group by date periods (simplified implementation)
-  const groupedData: { [key: string]: any } = {}
-
-  data.forEach((property: any) => {
-    const date = new Date(property.created_at)
-    let period: string
-
-    switch (groupBy) {
-      case 'day':
-        period = date.toISOString().split('T')[0]
-        break
-      case 'week':
-        const weekStart = new Date(date)
-        weekStart.setDate(date.getDate() - date.getDay())
-        period = weekStart.toISOString().split('T')[0]
-        break
-      case 'month':
-        period = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
-        break
-      default:
-        period = date.toISOString().split('T')[0]
-    }
-
-    if (!groupedData[period]) {
-      groupedData[period] = {
-        period,
-        total_properties: 0,
-        live_properties: 0,
-        pending_ml: 0,
-        pending_vetting: 0,
-        rejected_properties: 0,
-        featured_properties: 0
-      }
-    }
-
-    groupedData[period].total_properties++
-    if (property.status === 'live') groupedData[period].live_properties++
-    if (property.status === 'pending_ml_validation') groupedData[period].pending_ml++
-    if (property.status === 'pending_vetting') groupedData[period].pending_vetting++
-    if (property.status === 'rejected') groupedData[period].rejected_properties++
-    if (property.is_featured) groupedData[period].featured_properties++
+  const grouped: Record<string, { period: string; total_users: number; regular_users: number; property_owners: number; admins: number }> = {}
+  data.forEach((u: { created_at: Date | null; users: { role: string } | null }) => {
+    const p = groupDate(new Date(u.created_at!), groupBy)
+    const role = u.users?.role ?? 'user'
+    if (!grouped[p]) grouped[p] = { period: p, total_users: 0, regular_users: 0, property_owners: 0, admins: 0 }
+    grouped[p].total_users++
+    if (role === 'user') grouped[p].regular_users++
+    if (role === 'owner') grouped[p].property_owners++
+    if (role === 'admin') grouped[p].admins++
   })
-
-  return Object.values(groupedData).sort((a: any, b: any) => a.period.localeCompare(b.period))
+  return Object.values(grouped).sort((a, b) => a.period.localeCompare(b.period))
 }
 
-async function getPropertyMetricsComparison(supabase: any, startDate: Date, period: string, groupBy: string) {
-  // Calculate previous period
-  const periodLength = getPeriodLength(period)
-  const previousStartDate = new Date(startDate.getTime() - periodLength)
-
-  const { data, error } = await supabase
-    .from('properties')
-    .select('status, is_featured, created_at')
-    .gte('created_at', previousStartDate.toISOString())
-    .lt('created_at', startDate.toISOString())
-    .order('created_at', { ascending: true })
-
-  if (error) {
-    console.error('Error fetching property metrics comparison:', error)
-    return []
-  }
-
-  // Group by date periods (simplified implementation)
-  const groupedData: { [key: string]: any } = {}
-
-  data.forEach((property: any) => {
-    const date = new Date(property.created_at)
-    let period: string
-
-    switch (groupBy) {
-      case 'day':
-        period = date.toISOString().split('T')[0]
-        break
-      case 'week':
-        const weekStart = new Date(date)
-        weekStart.setDate(date.getDate() - date.getDay())
-        period = weekStart.toISOString().split('T')[0]
-        break
-      case 'month':
-        period = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
-        break
-      default:
-        period = date.toISOString().split('T')[0]
-    }
-
-    if (!groupedData[period]) {
-      groupedData[period] = {
-        period,
-        total_properties: 0,
-        live_properties: 0,
-        pending_ml: 0,
-        pending_vetting: 0,
-        rejected_properties: 0,
-        featured_properties: 0
-      }
-    }
-
-    groupedData[period].total_properties++
-    if (property.status === 'live') groupedData[period].live_properties++
-    if (property.status === 'pending_ml_validation') groupedData[period].pending_ml++
-    if (property.status === 'pending_vetting') groupedData[period].pending_vetting++
-    if (property.status === 'rejected') groupedData[period].rejected_properties++
-    if (property.is_featured) groupedData[period].featured_properties++
+async function getUserMetricsComparison(startDate: Date, period: string, groupBy: string) {
+  const prev = new Date(startDate.getTime() - getPeriodLength(period))
+  const data = await prisma.profiles.findMany({
+    where: { created_at: { gte: prev, lt: startDate } },
+    select: { created_at: true, users: { select: { role: true } } },
+    orderBy: { created_at: 'asc' },
   })
-
-  return Object.values(groupedData).sort((a: any, b: any) => a.period.localeCompare(b.period))
-}
-
-// Inquiry metrics functions
-async function getInquiryMetrics(supabase: any, startDateStr: string, groupBy: string) {
-  const { data, error } = await supabase
-    .from('inquiries')
-    .select('status, created_at, responded_at')
-    .gte('created_at', startDateStr)
-    .order('created_at', { ascending: true })
-
-  if (error) {
-    console.error('Error fetching inquiry metrics:', error)
-    return []
-  }
-
-  // Group by date periods (simplified implementation)
-  const groupedData: { [key: string]: any } = {}
-
-  data.forEach((inquiry: any) => {
-    const date = new Date(inquiry.created_at)
-    let period: string
-
-    switch (groupBy) {
-      case 'day':
-        period = date.toISOString().split('T')[0]
-        break
-      case 'week':
-        const weekStart = new Date(date)
-        weekStart.setDate(date.getDate() - date.getDay())
-        period = weekStart.toISOString().split('T')[0]
-        break
-      case 'month':
-        period = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
-        break
-      default:
-        period = date.toISOString().split('T')[0]
-    }
-
-    if (!groupedData[period]) {
-      groupedData[period] = {
-        period,
-        total_inquiries: 0,
-        responded_inquiries: 0,
-        closed_inquiries: 0,
-        new_inquiries: 0,
-        avg_response_time_hours: 0
-      }
-    }
-
-    groupedData[period].total_inquiries++
-    if (inquiry.status === 'responded') groupedData[period].responded_inquiries++
-    if (inquiry.status === 'closed') groupedData[period].closed_inquiries++
-    if (inquiry.status === 'new') groupedData[period].new_inquiries++
-
-    // Calculate average response time
-    if (inquiry.responded_at) {
-      const responseTime = (new Date(inquiry.responded_at).getTime() - date.getTime()) / (1000 * 60 * 60) // hours
-      groupedData[period].avg_response_time_hours = (
-        (groupedData[period].avg_response_time_hours * (groupedData[period].total_inquiries - 1) + responseTime) /
-        groupedData[period].total_inquiries
-      )
-    }
+  const grouped: Record<string, { period: string; total_users: number; regular_users: number; property_owners: number; admins: number }> = {}
+  data.forEach((u: { created_at: Date | null; users: { role: string } | null }) => {
+    const p = groupDate(new Date(u.created_at!), groupBy)
+    const role = u.users?.role ?? 'user'
+    if (!grouped[p]) grouped[p] = { period: p, total_users: 0, regular_users: 0, property_owners: 0, admins: 0 }
+    grouped[p].total_users++
+    if (role === 'user') grouped[p].regular_users++
+    if (role === 'owner') grouped[p].property_owners++
+    if (role === 'admin') grouped[p].admins++
   })
-
-  return Object.values(groupedData).sort((a: any, b: any) => a.period.localeCompare(b.period))
+  return Object.values(grouped).sort((a, b) => a.period.localeCompare(b.period))
 }
 
-async function getInquiryMetricsComparison(supabase: any, startDate: Date, period: string, groupBy: string) {
-  // Calculate previous period
-  const periodLength = getPeriodLength(period)
-  const previousStartDate = new Date(startDate.getTime() - periodLength)
-
-  const { data, error } = await supabase
-    .from('inquiries')
-    .select('status, created_at, responded_at')
-    .gte('created_at', previousStartDate.toISOString())
-    .lt('created_at', startDate.toISOString())
-    .order('created_at', { ascending: true })
-
-  if (error) {
-    console.error('Error fetching inquiry metrics comparison:', error)
-    return []
-  }
-
-  // Group by date periods (simplified implementation)
-  const groupedData: { [key: string]: any } = {}
-
-  data.forEach((inquiry: any) => {
-    const date = new Date(inquiry.created_at)
-    let period: string
-
-    switch (groupBy) {
-      case 'day':
-        period = date.toISOString().split('T')[0]
-        break
-      case 'week':
-        const weekStart = new Date(date)
-        weekStart.setDate(date.getDate() - date.getDay())
-        period = weekStart.toISOString().split('T')[0]
-        break
-      case 'month':
-        period = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
-        break
-      default:
-        period = date.toISOString().split('T')[0]
-    }
-
-    if (!groupedData[period]) {
-      groupedData[period] = {
-        period,
-        total_inquiries: 0,
-        responded_inquiries: 0,
-        closed_inquiries: 0,
-        new_inquiries: 0,
-        avg_response_time_hours: 0
-      }
-    }
-
-    groupedData[period].total_inquiries++
-    if (inquiry.status === 'responded') groupedData[period].responded_inquiries++
-    if (inquiry.status === 'closed') groupedData[period].closed_inquiries++
-    if (inquiry.status === 'new') groupedData[period].new_inquiries++
-
-    // Calculate average response time
-    if (inquiry.responded_at) {
-      const responseTime = (new Date(inquiry.responded_at).getTime() - date.getTime()) / (1000 * 60 * 60) // hours
-      groupedData[period].avg_response_time_hours = (
-        (groupedData[period].avg_response_time_hours * (groupedData[period].total_inquiries - 1) + responseTime) /
-        groupedData[period].total_inquiries
-      )
-    }
+// Property metrics
+async function getPropertyMetrics(startDateStr: string, groupBy: string) {
+  const data = await prisma.properties.findMany({
+    where: { created_at: { gte: new Date(startDateStr) } },
+    select: { status: true, created_at: true },
+    orderBy: { created_at: 'asc' },
   })
-
-  return Object.values(groupedData).sort((a: any, b: any) => a.period.localeCompare(b.period))
+  const grouped: Record<string, { period: string; total_properties: number; live_properties: number; pending_ml: number; pending_vetting: number; rejected_properties: number }> = {}
+  data.forEach((prop: { created_at: Date | null; status: string | null }) => {
+    const p = groupDate(new Date(prop.created_at!), groupBy)
+    if (!grouped[p]) grouped[p] = { period: p, total_properties: 0, live_properties: 0, pending_ml: 0, pending_vetting: 0, rejected_properties: 0 }
+    grouped[p].total_properties++
+    if (prop.status === 'live') grouped[p].live_properties++
+    if (prop.status === 'pending_ml_validation') grouped[p].pending_ml++
+    if (prop.status === 'pending_vetting') grouped[p].pending_vetting++
+    if (prop.status === 'rejected') grouped[p].rejected_properties++
+  })
+  return Object.values(grouped).sort((a, b) => a.period.localeCompare(b.period))
 }
 
-// Revenue metrics (placeholder - would need transaction data)
-async function getRevenueMetrics(supabase: any, startDateStr: string, groupBy: string) {
-  // Placeholder for revenue metrics
-  // In a real implementation, this would query transaction/payment data
-  return [
-    {
-      period: startDateStr.split('T')[0],
-      revenue: 0,
-      transactions: 0,
-      average_transaction: 0,
-    }
-  ]
+async function getPropertyMetricsComparison(startDate: Date, period: string, groupBy: string) {
+  const prev = new Date(startDate.getTime() - getPeriodLength(period))
+  const data = await prisma.properties.findMany({
+    where: { created_at: { gte: prev, lt: startDate } },
+    select: { status: true, created_at: true },
+    orderBy: { created_at: 'asc' },
+  })
+  const grouped: Record<string, { period: string; total_properties: number; live_properties: number; pending_ml: number; pending_vetting: number; rejected_properties: number }> = {}
+  data.forEach((prop: { created_at: Date | null; status: string | null }) => {
+    const p = groupDate(new Date(prop.created_at!), groupBy)
+    if (!grouped[p]) grouped[p] = { period: p, total_properties: 0, live_properties: 0, pending_ml: 0, pending_vetting: 0, rejected_properties: 0 }
+    grouped[p].total_properties++
+    if (prop.status === 'live') grouped[p].live_properties++
+    if (prop.status === 'pending_ml_validation') grouped[p].pending_ml++
+    if (prop.status === 'pending_vetting') grouped[p].pending_vetting++
+    if (prop.status === 'rejected') grouped[p].rejected_properties++
+  })
+  return Object.values(grouped).sort((a, b) => a.period.localeCompare(b.period))
 }
 
-async function getRevenueMetricsComparison(supabase: any, startDate: Date, period: string, groupBy: string) {
+// Inquiry metrics
+async function getInquiryMetrics(startDateStr: string, groupBy: string) {
+  const data = await prisma.inquiries.findMany({
+    where: { created_at: { gte: new Date(startDateStr) } },
+    select: { status: true, created_at: true },
+    orderBy: { created_at: 'asc' },
+  })
+  const grouped: Record<string, { period: string; total_inquiries: number; responded_inquiries: number; closed_inquiries: number; new_inquiries: number }> = {}
+  data.forEach((inq: { created_at: Date | null; status: string | null }) => {
+    const p = groupDate(new Date(inq.created_at!), groupBy)
+    if (!grouped[p]) grouped[p] = { period: p, total_inquiries: 0, responded_inquiries: 0, closed_inquiries: 0, new_inquiries: 0 }
+    grouped[p].total_inquiries++
+    if (inq.status === 'responded') grouped[p].responded_inquiries++
+    if (inq.status === 'closed') grouped[p].closed_inquiries++
+    if (inq.status === 'new') grouped[p].new_inquiries++
+  })
+  return Object.values(grouped).sort((a, b) => a.period.localeCompare(b.period))
+}
+
+async function getInquiryMetricsComparison(startDate: Date, period: string, groupBy: string) {
+  const prev = new Date(startDate.getTime() - getPeriodLength(period))
+  const data = await prisma.inquiries.findMany({
+    where: { created_at: { gte: prev, lt: startDate } },
+    select: { status: true, created_at: true },
+    orderBy: { created_at: 'asc' },
+  })
+  const grouped: Record<string, { period: string; total_inquiries: number; responded_inquiries: number; closed_inquiries: number; new_inquiries: number }> = {}
+  data.forEach((inq: { created_at: Date | null; status: string | null }) => {
+    const p = groupDate(new Date(inq.created_at!), groupBy)
+    if (!grouped[p]) grouped[p] = { period: p, total_inquiries: 0, responded_inquiries: 0, closed_inquiries: 0, new_inquiries: 0 }
+    grouped[p].total_inquiries++
+    if (inq.status === 'responded') grouped[p].responded_inquiries++
+    if (inq.status === 'closed') grouped[p].closed_inquiries++
+    if (inq.status === 'new') grouped[p].new_inquiries++
+  })
+  return Object.values(grouped).sort((a, b) => a.period.localeCompare(b.period))
+}
+
+// Revenue metrics (placeholder - no transaction table yet)
+async function getRevenueMetrics(startDateStr: string, _groupBy: string) {
+  return [{ period: startDateStr.split('T')[0], revenue: 0, transactions: 0, average_transaction: 0 }]
+}
+
+async function getRevenueMetricsComparison(_startDate: Date, _period: string, _groupBy: string) {
   return []
 }
 
 // Performance metrics
-async function getPerformanceMetrics(supabase: any, startDateStr: string, groupBy: string) {
-  // Get combined data from properties, inquiries, and profiles
-  const [propertiesData, inquiriesData, profilesData] = await Promise.all([
-    supabase.from('properties').select('created_at, status').gte('created_at', startDateStr),
-    supabase.from('inquiries').select('created_at, status').gte('created_at', startDateStr),
-    supabase.from('profiles').select('created_at').gte('created_at', startDateStr)
+async function getPerformanceMetrics(startDateStr: string, groupBy: string) {
+  const [props, inqs, profs] = await Promise.all([
+    prisma.properties.findMany({ where: { created_at: { gte: new Date(startDateStr) } }, select: { created_at: true, status: true } }),
+    prisma.inquiries.findMany({ where: { created_at: { gte: new Date(startDateStr) } }, select: { created_at: true, status: true } }),
+    prisma.profiles.findMany({ where: { created_at: { gte: new Date(startDateStr) } }, select: { created_at: true } }),
   ])
-
-  if (propertiesData.error || inquiriesData.error || profilesData.error) {
-    console.error('Error fetching performance metrics:', propertiesData.error || inquiriesData.error || profilesData.error)
-    return []
-  }
-
-  // Combine all operations
-  const allOperations = [
-    ...propertiesData.data.map((p: any) => ({ created_at: p.created_at, type: 'property', status: p.status })),
-    ...inquiriesData.data.map((i: any) => ({ created_at: i.created_at, type: 'inquiry', status: i.status })),
-    ...profilesData.data.map((p: any) => ({ created_at: p.created_at, type: 'user', status: 'success' }))
+  const ops = [
+    ...props.map((x: { created_at: Date | null; status: string | null }) => ({ created_at: x.created_at!, status: x.status })),
+    ...inqs.map((x: { created_at: Date | null; status: string | null }) => ({ created_at: x.created_at!, status: x.status })),
+    ...profs.map((x: { created_at: Date | null }) => ({ created_at: x.created_at!, status: 'success' })),
   ]
-
-  // Group by date periods
-  const groupedData: { [key: string]: any } = {}
-
-  allOperations.forEach((operation: any) => {
-    const date = new Date(operation.created_at)
-    let period: string
-
-    switch (groupBy) {
-      case 'day':
-        period = date.toISOString().split('T')[0]
-        break
-      case 'week':
-        const weekStart = new Date(date)
-        weekStart.setDate(date.getDate() - date.getDay())
-        period = weekStart.toISOString().split('T')[0]
-        break
-      case 'month':
-        period = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
-        break
-      default:
-        period = date.toISOString().split('T')[0]
-    }
-
-    if (!groupedData[period]) {
-      groupedData[period] = {
-        period,
-        total_requests: 0,
-        avg_response_time_ms: 0, // Simplified - would need actual timing data
-        successful_operations: 0,
-        failed_operations: 0
-      }
-    }
-
-    groupedData[period].total_requests++
-    if (operation.status === 'live' || operation.status === 'success' || operation.status === 'responded' || operation.status === 'closed') {
-      groupedData[period].successful_operations++
-    } else if (operation.status === 'rejected' || operation.status === 'failed') {
-      groupedData[period].failed_operations++
-    }
+  const grouped: Record<string, { period: string; total_requests: number; successful_operations: number; failed_operations: number }> = {}
+  ops.forEach((op) => {
+    const p = groupDate(new Date(op.created_at), groupBy)
+    if (!grouped[p]) grouped[p] = { period: p, total_requests: 0, successful_operations: 0, failed_operations: 0 }
+    grouped[p].total_requests++
+    if (['live', 'success', 'responded', 'closed'].includes(op.status ?? '')) grouped[p].successful_operations++
+    else if (['rejected', 'failed'].includes(op.status ?? '')) grouped[p].failed_operations++
   })
-
-  return Object.values(groupedData).sort((a: any, b: any) => a.period.localeCompare(b.period))
+  return Object.values(grouped).sort((a, b) => a.period.localeCompare(b.period))
 }
 
-async function getPerformanceMetricsComparison(supabase: any, startDate: Date, period: string, groupBy: string) {
-  // Calculate previous period
-  const periodLength = getPeriodLength(period)
-  const previousStartDate = new Date(startDate.getTime() - periodLength)
-
-  // Get combined data from properties, inquiries, and profiles
-  const [propertiesData, inquiriesData, profilesData] = await Promise.all([
-    supabase.from('properties').select('created_at, status').gte('created_at', previousStartDate.toISOString()).lt('created_at', startDate.toISOString()),
-    supabase.from('inquiries').select('created_at, status').gte('created_at', previousStartDate.toISOString()).lt('created_at', startDate.toISOString()),
-    supabase.from('profiles').select('created_at').gte('created_at', previousStartDate.toISOString()).lt('created_at', startDate.toISOString())
+async function getPerformanceMetricsComparison(startDate: Date, period: string, groupBy: string) {
+  const prev = new Date(startDate.getTime() - getPeriodLength(period))
+  const [props, inqs, profs] = await Promise.all([
+    prisma.properties.findMany({ where: { created_at: { gte: prev, lt: startDate } }, select: { created_at: true, status: true } }),
+    prisma.inquiries.findMany({ where: { created_at: { gte: prev, lt: startDate } }, select: { created_at: true, status: true } }),
+    prisma.profiles.findMany({ where: { created_at: { gte: prev, lt: startDate } }, select: { created_at: true } }),
   ])
-
-  if (propertiesData.error || inquiriesData.error || profilesData.error) {
-    console.error('Error fetching performance metrics comparison:', propertiesData.error || inquiriesData.error || profilesData.error)
-    return []
-  }
-
-  // Combine all operations
-  const allOperations = [
-    ...propertiesData.data.map((p: any) => ({ created_at: p.created_at, type: 'property', status: p.status })),
-    ...inquiriesData.data.map((i: any) => ({ created_at: i.created_at, type: 'inquiry', status: i.status })),
-    ...profilesData.data.map((p: any) => ({ created_at: p.created_at, type: 'user', status: 'success' }))
+  const ops = [
+    ...props.map((x: { created_at: Date | null; status: string | null }) => ({ created_at: x.created_at!, status: x.status })),
+    ...inqs.map((x: { created_at: Date | null; status: string | null }) => ({ created_at: x.created_at!, status: x.status })),
+    ...profs.map((x: { created_at: Date | null }) => ({ created_at: x.created_at!, status: 'success' })),
   ]
-
-  // Group by date periods
-  const groupedData: { [key: string]: any } = {}
-
-  allOperations.forEach((operation: any) => {
-    const date = new Date(operation.created_at)
-    let period: string
-
-    switch (groupBy) {
-      case 'day':
-        period = date.toISOString().split('T')[0]
-        break
-      case 'week':
-        const weekStart = new Date(date)
-        weekStart.setDate(date.getDate() - date.getDay())
-        period = weekStart.toISOString().split('T')[0]
-        break
-      case 'month':
-        period = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
-        break
-      default:
-        period = date.toISOString().split('T')[0]
-    }
-
-    if (!groupedData[period]) {
-      groupedData[period] = {
-        period,
-        total_requests: 0,
-        avg_response_time_ms: 0, // Simplified - would need actual timing data
-        successful_operations: 0,
-        failed_operations: 0
-      }
-    }
-
-    groupedData[period].total_requests++
-    if (operation.status === 'live' || operation.status === 'success' || operation.status === 'responded' || operation.status === 'closed') {
-      groupedData[period].successful_operations++
-    } else if (operation.status === 'rejected' || operation.status === 'failed') {
-      groupedData[period].failed_operations++
-    }
+  const grouped: Record<string, { period: string; total_requests: number; successful_operations: number; failed_operations: number }> = {}
+  ops.forEach((op) => {
+    const p = groupDate(new Date(op.created_at), groupBy)
+    if (!grouped[p]) grouped[p] = { period: p, total_requests: 0, successful_operations: 0, failed_operations: 0 }
+    grouped[p].total_requests++
+    if (['live', 'success', 'responded', 'closed'].includes(op.status ?? '')) grouped[p].successful_operations++
+    else if (['rejected', 'failed'].includes(op.status ?? '')) grouped[p].failed_operations++
   })
-
-  return Object.values(groupedData).sort((a: any, b: any) => a.period.localeCompare(b.period))
-}
-
-// Helper function to get period length in milliseconds
-function getPeriodLength(period: string): number {
-  switch (period) {
-    case '7d':
-      return 7 * 24 * 60 * 60 * 1000
-    case '30d':
-      return 30 * 24 * 60 * 60 * 1000
-    case '90d':
-      return 90 * 24 * 60 * 60 * 1000
-    case '1y':
-      return 365 * 24 * 60 * 60 * 1000
-    case 'all':
-      return 365 * 24 * 60 * 60 * 1000 // Default to 1 year for comparison
-    default:
-      return 30 * 24 * 60 * 60 * 1000
-  }
+  return Object.values(grouped).sort((a, b) => a.period.localeCompare(b.period))
 }

@@ -1,0 +1,388 @@
+generator client {
+  provider        = "prisma-client"
+  output          = "../lib/prisma"
+  previewFeatures = ["partialIndexes"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model admin_audit_log {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  actor_id   String   @db.Uuid
+  action     String
+  target_id  String?  @db.Uuid
+  metadata   Json?
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  profiles   profiles @relation(fields: [actor_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([action], map: "idx_admin_audit_log_action")
+  @@index([actor_id], map: "idx_admin_audit_log_actor_id")
+  @@index([created_at(sort: Desc)], map: "idx_admin_audit_log_created_at")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model agents {
+  id                String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  profile_id        String       @unique @db.Uuid
+  license_number    String       @unique
+  agency_name       String?
+  specialization    String[]
+  phone             String?
+  verified          Boolean?     @default(false)
+  verification_date DateTime?    @db.Timestamptz(6)
+  years_experience  Int?
+  bio               String?
+  photo_url         String?
+  rating            Decimal?     @db.Decimal(3, 2)
+  total_sales       Int?         @default(0)
+  total_listings    Int?         @default(0)
+  created_at        DateTime?    @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime?    @default(now()) @db.Timestamptz(6)
+  whatsapp          String?      @db.VarChar(20)
+  profiles          profiles     @relation(fields: [profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  properties        properties[]
+
+  @@index([profile_id], map: "idx_agents_profile_id")
+  @@index([verified], map: "idx_agents_verified")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model inquiries {
+  id                                     String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  property_id                            String     @db.Uuid
+  sender_id                              String     @db.Uuid
+  owner_id                               String     @db.Uuid
+  message                                String
+  status                                 String     @default("new")
+  created_at                             DateTime?  @default(now()) @db.Timestamptz(6)
+  updated_at                             DateTime?  @default(now()) @db.Timestamptz(6)
+  profiles_inquiries_owner_idToprofiles  profiles   @relation("inquiries_owner_idToprofiles", fields: [owner_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  properties                             properties @relation(fields: [property_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  profiles_inquiries_sender_idToprofiles profiles   @relation("inquiries_sender_idToprofiles", fields: [sender_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([owner_id], map: "idx_inquiries_owner_id")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model kyc_requests {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id          String    @db.Uuid
+  user_type        String
+  status           String?   @default("pending")
+  kyc_provider     String
+  kyc_reference_id String?
+  documents        Json?
+  submitted_at     DateTime? @default(now()) @db.Timestamptz(6)
+  approved_at      DateTime? @db.Timestamptz(6)
+  rejected_at      DateTime? @db.Timestamptz(6)
+  rejection_reason String?
+  created_at       DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime? @default(now()) @db.Timestamptz(6)
+  profiles         profiles  @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([status], map: "idx_kyc_requests_status")
+  @@index([user_id], map: "idx_kyc_requests_user_id")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model notifications {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id    String    @db.Uuid
+  type       String
+  title      String
+  message    String
+  data       Json?     @default("{}")
+  is_read    Boolean?  @default(false)
+  read_at    DateTime? @db.Timestamptz(6)
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  profiles   profiles  @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([created_at(sort: Desc)], map: "idx_notifications_created_at")
+  @@index([is_read], map: "idx_notifications_is_read")
+  @@index([type], map: "idx_notifications_type")
+  @@index([user_id], map: "idx_notifications_user_id")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model owners {
+  id                String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  profile_id        String       @unique @db.Uuid
+  business_name     String?
+  property_types    String[]
+  phone             String?
+  verified          Boolean?     @default(false)
+  verification_date DateTime?    @db.Timestamptz(6)
+  years_experience  Int?
+  bio               String?
+  photo_url         String?
+  rating            Decimal?     @db.Decimal
+  total_properties  Int?
+  whatsapp          String?      @db.VarChar
+  created_at        DateTime?    @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime?    @default(now()) @db.Timestamptz(6)
+  profiles          profiles     @relation(fields: [profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  properties        properties[]
+
+  @@index([profile_id], map: "idx_owners_profile_id")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model payments {
+  id             String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id        String      @db.Uuid
+  property_id    String?     @db.Uuid
+  amount         Decimal     @db.Decimal(10, 2)
+  currency       String?     @default("NGN")
+  type           String
+  status         String?     @default("pending")
+  transaction_id String?
+  created_at     DateTime?   @default(now()) @db.Timestamptz(6)
+  properties     properties? @relation(fields: [property_id], references: [id], onUpdate: NoAction)
+  profiles       profiles    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([property_id], map: "idx_payments_property_id")
+  @@index([user_id], map: "idx_payments_user_id")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model profiles {
+  id                                      String               @id @db.Uuid
+  email                                   String
+  full_name                               String?
+  avatar_url                              String?
+  phone                                   String?
+  bio                                     String?
+  created_at                              DateTime?            @default(now()) @db.Timestamptz(6)
+  updated_at                              DateTime?            @default(now()) @db.Timestamptz(6)
+  admin_audit_log                         admin_audit_log[]
+  agents                                  agents?
+  inquiries_inquiries_owner_idToprofiles  inquiries[]          @relation("inquiries_owner_idToprofiles")
+  inquiries_inquiries_sender_idToprofiles inquiries[]          @relation("inquiries_sender_idToprofiles")
+  kyc_requests                            kyc_requests[]
+  notifications                           notifications[]
+  owners                                  owners?
+  payments                                payments[]
+  users                                   users                @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "profiles_users_id_fkey")
+  property_documents                      property_documents[]
+  reviews                                 reviews[]
+  saved_properties                        saved_properties[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model properties {
+  id                  String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  owner_id            String?              @db.Uuid
+  title               String
+  description         String?
+  price               Decimal              @db.Decimal
+  property_type       String
+  listing_type        String               @default("'for_rent'::text")
+  address             String
+  city                String
+  state               String?
+  postal_code         String?
+  country             String               @default("NG")
+  latitude            Decimal?             @db.Decimal
+  longitude           Decimal?             @db.Decimal
+  bedrooms            Int?
+  bathrooms           Decimal?             @db.Decimal
+  square_feet         Decimal?             @db.Decimal
+  year_built          Int?
+  status              String               @default("'draft'::text")
+  verification_status String               @default("pending")
+  created_at          DateTime?            @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime?            @default(now()) @db.Timestamptz(6)
+  agent_id            String?              @db.Uuid
+  listing_source      String?              @default("owner")
+  price_frequency     String?              @default("sale")
+  inquiries           inquiries[]
+  payments            payments[]
+  agents              agents?              @relation(fields: [agent_id], references: [id], onUpdate: NoAction)
+  owners              owners?              @relation(fields: [owner_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  property_details    property_details[]
+  property_documents  property_documents[]
+  property_media      property_media[]
+  reviews             reviews[]
+  saved_properties    saved_properties[]
+
+  @@index([agent_id], map: "idx_properties_agent")
+  @@index([description(ops: raw("gin_trgm_ops"))], map: "idx_properties_description_trgm", type: Gin)
+  @@index([owner_id], map: "idx_properties_owner")
+  @@index([status], map: "idx_properties_status")
+  @@index([title(ops: raw("gin_trgm_ops"))], map: "idx_properties_title_trgm", type: Gin)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model property_details {
+  id              String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  property_id     String     @db.Uuid
+  parking_spaces  Int?
+  has_pool        Boolean?   @default(false)
+  has_garage      Boolean?   @default(false)
+  has_garden      Boolean?   @default(false)
+  heating_type    String?
+  cooling_type    String?
+  flooring_type   String?
+  roof_type       String?
+  foundation_type String?
+  created_at      DateTime?  @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime?  @default(now()) @db.Timestamptz(6)
+  metadata        Json?      @default("{}")
+  amenities       Json?      @default("{}")
+  features        Json?      @default("{}")
+  properties      properties @relation(fields: [property_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([metadata], map: "idx_property_details_metadata_gin", type: Gin)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model property_documents {
+  id                  String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  property_id         String     @db.Uuid
+  document_type       String
+  document_url        String
+  file_name           String
+  file_size           Int?
+  verification_status String     @default("pending")
+  verified_by         String?    @db.Uuid
+  verified_at         DateTime?  @db.Timestamptz(6)
+  notes               String?
+  created_at          DateTime?  @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime?  @default(now()) @db.Timestamptz(6)
+  properties          properties @relation(fields: [property_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  profiles            profiles?  @relation(fields: [verified_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([verified_by], map: "idx_property_documents_verified_by")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model property_media {
+  id            String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  property_id   String     @db.Uuid
+  media_type    String
+  media_url     String
+  file_name     String
+  display_order Int?       @default(0)
+  is_featured   Boolean?   @default(false)
+  created_at    DateTime?  @default(now()) @db.Timestamptz(6)
+  properties    properties @relation(fields: [property_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model reviews {
+  id          String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  property_id String     @db.Uuid
+  reviewer_id String     @db.Uuid
+  target_type String
+  rating      Int
+  comment     String?
+  created_at  DateTime?  @default(now()) @db.Timestamptz(6)
+  properties  properties @relation(fields: [property_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  profiles    profiles   @relation(fields: [reviewer_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([property_id], map: "idx_reviews_property_id")
+  @@index([reviewer_id], map: "idx_reviews_reviewer_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model saved_properties {
+  id          String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id     String     @db.Uuid
+  property_id String     @db.Uuid
+  created_at  DateTime?  @default(now()) @db.Timestamptz(6)
+  properties  properties @relation(fields: [property_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  profiles    profiles   @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([user_id, property_id])
+  @@index([property_id], map: "idx_saved_properties_property_id")
+  @@index([user_id], map: "idx_saved_properties_user_id")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model spatial_ref_sys {
+  srid      Int     @id
+  auth_name String? @db.VarChar(256)
+  auth_srid Int?
+  srtext    String? @db.VarChar(2048)
+  proj4text String? @db.VarChar(2048)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model users {
+  id         String    @id @db.Uuid
+  email      String?   @unique
+  phone      String?
+  full_name  String?
+  avatar_url String?
+  role       UserRole  @default(user)
+  is_active  Boolean   @default(true)
+  metadata   Json?     @default("{}")
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at DateTime? @default(now()) @db.Timestamptz(6)
+  deleted_at DateTime? @db.Timestamptz(6)
+  profiles   profiles?
+
+  @@index([deleted_at], map: "idx_users_deleted_at", where: raw("(deleted_at IS NOT NULL)"))
+  @@index([email], map: "idx_users_email")
+  @@index([role], map: "idx_users_role")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model waitlist {
+  id                       String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email                    String    @unique @db.VarChar(255)
+  first_name               String    @db.VarChar(100)
+  last_name                String?   @db.VarChar(100)
+  phone                    String?   @db.VarChar(20)
+  source                   String?   @default("website") @db.VarChar(50)
+  status                   String?   @default("active") @db.VarChar(20)
+  interests                String[]
+  location_preference      String?   @db.VarChar(100)
+  property_type_preference String?   @db.VarChar(50)
+  budget_range             String?   @db.VarChar(50)
+  subscribed_at            DateTime? @default(now()) @db.Timestamptz(6)
+  unsubscribed_at          DateTime? @db.Timestamptz(6)
+  last_contacted_at        DateTime? @db.Timestamptz(6)
+  contact_count            Int?      @default(0)
+  referrer_url             String?
+  user_agent               String?
+  ip_address               String?   @db.Inet
+  utm_source               String?   @db.VarChar(100)
+  utm_medium               String?   @db.VarChar(100)
+  utm_campaign             String?   @db.VarChar(100)
+  created_at               DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at               DateTime? @default(now()) @db.Timestamptz(6)
+
+  @@index([email], map: "idx_waitlist_email")
+  @@index([location_preference], map: "idx_waitlist_location_preference")
+  @@index([source], map: "idx_waitlist_source")
+  @@index([status], map: "idx_waitlist_status")
+  @@index([subscribed_at], map: "idx_waitlist_subscribed_at")
+}
+
+enum UserRole {
+  user
+  agent
+  owner
+  admin
+
+  @@map("user_role")
+}

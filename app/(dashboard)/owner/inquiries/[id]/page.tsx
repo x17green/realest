@@ -32,13 +32,13 @@ export default async function InquiryDetailPage({
   }
 
   // Check if user is a property owner
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("user_type")
+  const { data: userRow } = await supabase
+    .from("users")
+    .select("role")
     .eq("id", user.id)
     .single();
 
-  if (profile?.user_type !== "owner") {
+  if (userRow?.role !== "owner") {
     redirect("/");
   }
 

@@ -36,29 +36,33 @@ export async function generateSignedUrl(input: SignedUrlInput): Promise<SignedUr
     }
 
     // Check if user owns the property or is admin
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("user_type")
+    const { data: userRow } = await supabase
+      .from("users")
+      .select("role")
       .eq("id", input.user_id)
       .single();
 
-    if (!profile || !["owner", "agent", "admin"].includes(profile.user_type)) {
+    if (!userRow || !["owner", "agent", "admin"].includes(userRow.role)) {
       throw new Error("Unauthorized: Only property owners, agents or admins can upload");
     }
 
     // Verify property ownership (unless admin)
-    if (profile.user_type !== "admin") {
+    if (userRow.role !== "admin") {
       const { data: property } = await supabase
         .from("properties")
-        .select("owner_id,agent_id")
+        .select("owner_id, agent_id, owners(profile_id)")
         .eq("id", input.property_id)
         .single();
 
       if (!property) {
         throw new Error(`Property not found: ${input.property_id}. It may have been deleted or doesn't exist yet.`);
       }
-      
-      if (property.owner_id !== input.user_id && property.agent_id !== input.user_id) {
+
+      // owner_id is now owners.id (not profile UUID); resolve via the nested owners.profile_id
+      // Supabase returns a single object for many-to-one FK joins
+      const ownersData = property.owners as { profile_id: string } | { profile_id: string }[] | null;
+      const ownerProfileId = Array.isArray(ownersData) ? ownersData[0]?.profile_id : ownersData?.profile_id;
+      if (ownerProfileId !== input.user_id && property.agent_id !== input.user_id) {
         throw new Error(`Access denied: You don't own property ${input.property_id}`);
       }
     }

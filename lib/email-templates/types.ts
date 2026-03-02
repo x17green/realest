@@ -29,6 +29,23 @@ export interface PasswordResetEmailData {
   expiryMinutes?: number; // Default 15 minutes
 }
 
+export interface InquiryEmailData {
+  // Recipient — the property lister (owner or agent)
+  recipientName: string;
+  recipientEmail: string;
+  // Sender — the prospective buyer/tenant
+  senderName: string;
+  senderEmail: string;
+  senderPhone?: string;
+  // Property context
+  propertyTitle: string;
+  propertyAddress: string;
+  propertyId: string;
+  listingType: string; // for_sale | for_rent | for_lease | short_let
+  // Message content
+  message: string;
+}
+
 export interface EmailConfig {
   companyName: string;
   tagline: string;

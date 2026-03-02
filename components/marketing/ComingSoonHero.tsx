@@ -302,28 +302,28 @@ const ComingSoonHero = () => {
             <div className="flex flex-wrap gap-2 justify-center mb-8">
               <Chip
                 variant="secondary"
-                className="cursor-default bg-primary/10 hover:bg-primary/15 transition-all duration-200 border border-primary/20 flex items-center gap-2"
+                className="flex justify-center items-center cursor-default bg-primary/10 hover:bg-primary/15 transition-all duration-200 gap-2 p-2 border border-primary/20 rounded-xs"
               >
                 <Building className="w-4 h-4" />
                 Modern Apartments
               </Chip>
               <Chip
                 variant="secondary"
-                className="cursor-default bg-primary/10 hover:bg-primary/15 transition-all duration-200 border border-primary/20 flex items-center gap-2"
+                className="flex justify-center items-center cursor-default bg-primary/10 hover:bg-primary/15 transition-all duration-200 gap-2 p-2 border border-primary/20 rounded-xs"
               >
                 <TrendingUp className="w-4 h-4" />
                 Exclusive Luxury Villas
               </Chip>
               <Chip
                 variant="secondary"
-                className="cursor-default bg-primary/10 hover:bg-primary/15 transition-all duration-200 border border-primary/20 flex items-center gap-2"
+                className="flex justify-center items-center cursor-default bg-primary/10 hover:bg-primary/15 transition-all duration-200 gap-2 p-2 border border-primary/20 rounded-xs"
               >
                 <Calendar className="w-4 h-4" />
                 Event Spaces
               </Chip>
               <Chip
                 variant="secondary"
-                className="cursor-default bg-primary/10 hover:bg-primary/15 transition-all duration-200 border border-primary/20 flex items-center gap-2"
+                className="flex justify-center items-center cursor-default bg-primary/10 hover:bg-primary/15 transition-all duration-200 gap-2 p-2 border border-primary/20 rounded-xs"
               >
                 <MapPin className="w-4 h-4" />
                 Lagos • Abuja • PH

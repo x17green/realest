@@ -147,7 +147,7 @@ export default function UserDashboardPage() {
             phone: profile.phone,
             bio: profile.bio,
             email: user.email || "",
-            user_type: profile.user_type,
+            user_type: role || "user",
           });
         } else {
           setAuthError("Profile not found. Please contact support.");

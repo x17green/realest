@@ -18,20 +18,20 @@ export default async function MLReviewPage() {
   }
 
   // Check if user is an admin
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("user_type")
+  const { data: userRow } = await supabase
+    .from("users")
+    .select("role")
     .eq("id", user.id)
     .single();
 
-  if (profile?.user_type !== "admin") {
+  if (userRow?.role !== "admin") {
     redirect("/");
   }
 
   // Fetch properties in ML review queue
   const { data: mlQueue } = await supabase
     .from("properties")
-    .select("*, profiles(full_name, email)")
+    .select("*, owners(profiles(full_name, email))")
     .eq("verification_status", "ml_review")
     .order("created_at", { ascending: true });
 
@@ -73,7 +73,7 @@ export default async function MLReviewPage() {
                 {mlQueue?.map((property) => (
                   <TableRow key={property.id}>
                     <TableCell className="font-medium">{property.title}</TableCell>
-                    <TableCell>{property.profiles?.full_name}</TableCell>
+                    <TableCell>{property.owners?.profiles?.full_name}</TableCell>
                     <TableCell>
                       <Badge variant="secondary">
                         {property.ml_score || "N/A"}%

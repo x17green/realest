@@ -1,15 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { prisma } from '@/lib/prisma'
 
 // GET /api/system/status - System status information
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient()
-
-    // Get current app mode from environment
     const appMode = process.env.NEXT_PUBLIC_APP_MODE || 'development'
 
-    // Get system information
     const systemInfo = {
       app_mode: appMode,
       version: process.env.npm_package_version || '1.0.0',
@@ -18,75 +14,50 @@ export async function GET(request: NextRequest) {
       uptime: process.uptime()
     }
 
-    // Get database statistics
     const stats: any = {}
 
     try {
-      // Property statistics
-      const { count: totalProperties } = await supabase
-        .from('properties')
-        .select('*', { count: 'exact', head: true })
-
-      const { count: liveProperties } = await supabase
-        .from('properties')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'live')
-
-      const { count: pendingProperties } = await supabase
-        .from('properties')
-        .select('*', { count: 'exact', head: true })
-        .in('status', ['pending_ml_validation', 'pending_vetting'])
-
-      // User statistics
-      const { count: totalUsers } = await supabase
-        .from('profiles')
-        .select('*', { count: 'exact', head: true })
-
-      const { count: owners } = await supabase
-        .from('profiles')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_type', 'owner')
-
-      const { count: agents } = await supabase
-        .from('profiles')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_type', 'agent')
-
-      const { count: admins } = await supabase
-        .from('profiles')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_type', 'admin')
-
-      // Activity statistics (last 30 days)
       const thirtyDaysAgo = new Date()
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
-      const { count: recentProperties } = await supabase
-        .from('properties')
-        .select('*', { count: 'exact', head: true })
-        .gte('created_at', thirtyDaysAgo.toISOString())
-
-      const { count: recentInquiries } = await supabase
-        .from('inquiries')
-        .select('*', { count: 'exact', head: true })
-        .gte('created_at', thirtyDaysAgo.toISOString())
+      const [
+        totalProperties,
+        liveProperties,
+        pendingProperties,
+        totalUsers,
+        owners,
+        agents,
+        admins,
+        recentProperties,
+        recentInquiries,
+      ] = await Promise.all([
+        prisma.properties.count(),
+        prisma.properties.count({ where: { status: 'live' } }),
+        prisma.properties.count({ where: { status: { in: ['pending_ml_validation', 'pending_vetting'] } } }),
+        prisma.users.count(),
+        prisma.users.count({ where: { role: 'owner' } }),
+        prisma.users.count({ where: { role: 'agent' } }),
+        prisma.users.count({ where: { role: 'admin' } }),
+        prisma.properties.count({ where: { created_at: { gte: thirtyDaysAgo } } }),
+        prisma.inquiries.count({ where: { created_at: { gte: thirtyDaysAgo } } }),
+      ])
 
       stats.database = {
         properties: {
-          total: totalProperties || 0,
-          live: liveProperties || 0,
-          pending: pendingProperties || 0,
-          recent: recentProperties || 0
+          total: totalProperties,
+          live: liveProperties,
+          pending: pendingProperties,
+          recent: recentProperties
         },
         users: {
-          total: totalUsers || 0,
-          owners: owners || 0,
-          agents: agents || 0,
-          admins: admins || 0
+          total: totalUsers,
+          owners,
+          agents,
+          admins
         },
         activity: {
-          recent_inquiries: recentInquiries || 0,
-          inquiries_last_30_days: recentInquiries || 0
+          recent_inquiries: recentInquiries,
+          inquiries_last_30_days: recentInquiries
         }
       }
     } catch (statsError: any) {

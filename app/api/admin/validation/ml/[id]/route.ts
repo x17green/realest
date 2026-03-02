@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { z } from 'zod'
+import { prisma } from '@/lib/prisma'
 
 // Request body schema for ML validation update
 const mlValidationUpdateSchema = z.object({
@@ -31,13 +32,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }
 
     // Verify user is admin
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('user_type')
-      .eq('id', user.id)
-      .single()
-
-    if (!profile || profile.user_type !== 'admin') {
+    const adminRow = await prisma.users.findUnique({ where: { id: user.id }, select: { role: true } })
+    if (!adminRow || adminRow.role !== 'admin') {
       return NextResponse.json(
         { error: 'Admin access required' },
         { status: 403 }
@@ -58,125 +54,42 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const { action, ml_confidence_score, ml_validation_notes, admin_notes } = validation.data
 
     // Verify property exists and is in correct status
-    const { data: property, error: propertyError } = await supabase
-      .from('properties')
-      .select('*')
-      .eq('id', propertyId)
-      .eq('status', 'pending_ml_validation')
-      .single()
+    const property = await prisma.properties.findFirst({
+      where: { id: propertyId, status: 'pending_ml_validation' },
+      select: { id: true, status: true, owner_id: true, title: true },
+    })
 
-    if (propertyError || !property) {
+    if (!property) {
       return NextResponse.json(
         { error: 'Property not found or not in ML validation status' },
         { status: 404 }
       )
     }
 
-    // Update property based on action
+    // Determine new status based on action (only schema-valid fields)
     let newStatus: string
-    let updateData: any = {
-      updated_at: new Date().toISOString(),
-    }
-
     switch (action) {
-      case 'approve':
-        newStatus = 'pending_vetting'
-        updateData.status = newStatus
-        updateData.ml_validation_status = 'passed'
-        updateData.ml_confidence_score = ml_confidence_score || 0.8
-        updateData.ml_validation_notes = ml_validation_notes
-        updateData.ml_validated_at = new Date().toISOString()
-        break
-
-      case 'reject':
-        newStatus = 'rejected'
-        updateData.status = newStatus
-        updateData.ml_validation_status = 'failed'
-        updateData.ml_confidence_score = ml_confidence_score || 0
-        updateData.ml_validation_notes = ml_validation_notes
-        updateData.rejected_at = new Date().toISOString()
-        updateData.rejection_reason = admin_notes || 'Failed ML validation'
-        break
-
-      case 'flag_duplicate':
-        newStatus = 'pending_duplicate_review'
-        updateData.status = newStatus
-        updateData.ml_validation_status = 'review_required'
-        updateData.ml_confidence_score = ml_confidence_score || 0.5
-        updateData.ml_validation_notes = ml_validation_notes
-        updateData.flagged_as_duplicate = true
-        updateData.duplicate_review_notes = admin_notes
-        break
-
-      default:
-        return NextResponse.json(
-          { error: 'Invalid action' },
-          { status: 400 }
-        )
+      case 'approve': newStatus = 'pending_vetting'; break
+      case 'reject': newStatus = 'rejected'; break
+      case 'flag_duplicate': newStatus = 'pending_duplicate_review'; break
+      default: return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
     }
 
-    // Update property status
-    const { data: updatedProperty, error: updateError } = await supabase
-      .from('properties')
-      .update(updateData)
-      .eq('id', propertyId)
-      .select()
-      .single()
+    const updatedProperty = await prisma.properties.update({
+      where: { id: propertyId },
+      data: { status: newStatus, updated_at: new Date() },
+      select: { id: true, status: true, title: true },
+    })
 
-    if (updateError) {
-      console.error('Error updating property:', updateError)
-      return NextResponse.json(
-        { error: 'Failed to update property status' },
-        { status: 500 }
-      )
-    }
-
-    // Log admin action for audit trail
-    const { error: logError } = await supabase
-      .from('admin_actions')
-      .insert({
-        admin_id: user.id,
-        action_type: 'ml_validation_update',
-        target_type: 'property',
+    // Log admin action
+    await prisma.admin_audit_log.create({
+      data: {
+        actor_id: user.id,
+        action: 'ml_validation_update',
         target_id: propertyId,
-        action_details: {
-          action,
-          previous_status: property.status,
-          new_status: newStatus,
-          ml_confidence_score,
-          ml_validation_notes,
-          admin_notes,
-        },
-        created_at: new Date().toISOString(),
-      })
-
-    if (logError) {
-      console.error('Error logging admin action:', logError)
-      // Don't fail the request for logging errors
-    }
-
-    // Send notification to property owner
-    try {
-      const { data: owner } = await supabase
-        .from('profiles')
-        .select('email, full_name')
-        .eq('id', property.owner_id)
-        .single()
-
-      if (owner?.email) {
-        // TODO: Send email notification using email service
-        // await sendPropertyStatusNotification({
-        //   to: owner.email,
-        //   ownerName: owner.full_name,
-        //   propertyTitle: property.title,
-        //   status: newStatus,
-        //   notes: admin_notes,
-        // })
-      }
-    } catch (emailError) {
-      console.error('Error sending notification email:', emailError)
-      // Don't fail the request for email errors
-    }
+        metadata: { action, previous_status: 'pending_ml_validation', new_status: newStatus, ml_confidence_score, ml_validation_notes, admin_notes },
+      },
+    })
 
     return NextResponse.json({
       success: true,

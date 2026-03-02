@@ -99,7 +99,7 @@ export const propertyListingSchema = z.object({
 
   // 4. Pricing
   price: z.coerce.number().min(1000, "Price must be at least ₦1,000"),
-  price_frequency: z.enum(["monthly", "yearly", "sale", "nightly"]).default("sale"),
+  price_frequency: z.enum(["monthly", "yearly", "sale", "nightly", "daily"]).default("sale"),
   
   // 5. Status
   status: z.enum(["draft", "active", "inactive", "sold", "rented", "pending_ml_validation"]).default("draft"),
@@ -166,7 +166,7 @@ export const propertyDraftSchema = z.object({
   square_feet: z.coerce.number().min(1).optional(),
   year_built: z.coerce.number().min(1900).max(new Date().getFullYear()).optional(),
   
-  price_frequency: z.enum(["monthly", "yearly", "sale", "nightly"]).default("sale"),
+  price_frequency: z.enum(["monthly", "yearly", "sale", "nightly", "daily"]).default("sale"),
   listing_source: z.enum(["owner", "agent"]).default("owner"),
   
   status: z.enum(["draft", "active", "inactive", "sold", "rented", "pending_ml_validation"]).default("draft"),

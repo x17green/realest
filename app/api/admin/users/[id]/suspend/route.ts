@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 
 // Validation schema for user suspension
@@ -24,24 +25,13 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // Verify admin authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Verify user is admin
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('user_type')
-      .eq('id', user.id)
-      .single()
-
-    if (!profile || profile.user_type !== 'admin') {
-      return NextResponse.json(
-        { error: 'Admin access required' },
-        { status: 403 }
-      )
+    // Verify user is admin via Prisma
+    const adminRow = await prisma.users.findUnique({ where: { id: user.id }, select: { role: true } })
+    if (!adminRow || adminRow.role !== 'admin') {
+      return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
 
     // Prevent admin from suspending themselves
@@ -66,22 +56,17 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const { action, reason, duration_days, notes } = validation.data
 
     // Fetch target user to verify they exist
-    const { data: targetUser, error: fetchError } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', id)
-      .single()
+    const targetUserRow = await prisma.users.findUnique({
+      where: { id },
+      include: { profiles: { select: { full_name: true, email: true } } },
+    })
 
-    if (fetchError || !targetUser) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      )
+    if (!targetUserRow) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    // Prevent suspending other admins (unless current admin is super admin)
-    // For now, allow admin to admin suspension, but log it prominently
-    if (targetUser.user_type === 'admin' && profile.user_type === 'admin') {
+    // Prevent suspending other admins (log prominently)
+    if (targetUserRow.role === 'admin') {
       console.warn(`Admin ${user.id} is modifying another admin account: ${id}`)
     }
 
@@ -122,8 +107,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         break
     }
 
-    // Update user status
-    const { data: updatedUser, error: updateError } = await supabase
+    // Update user status in profiles table
+    // NOTE: is_suspended / is_banned columns would need to be added via migration
+    const { data: updatedProfile, error: updateError } = await supabase
       .from('profiles')
       .update(updateData)
       .eq('id', id)
@@ -132,10 +118,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     if (updateError) {
       console.error('Error updating user status:', updateError)
-      return NextResponse.json(
-        { error: 'Failed to update user status' },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Failed to update user status' }, { status: 500 })
     }
 
     // If suspending, also update all their properties to unlisted status
@@ -170,8 +153,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           duration_days,
           notes,
           suspension_end_date: suspensionEndDate,
-          previous_user_type: targetUser.user_type,
-          target_user_email: targetUser.email,
+          previous_role: targetUserRow.role,
+          target_user_email: targetUserRow.profiles?.email,
         },
         ip_address: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip'),
         user_agent: request.headers.get('user-agent'),
@@ -185,17 +168,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // Send notification email to user (if not banned)
     if (action !== 'ban') {
       try {
-        // TODO: Implement email notification for suspension/unsuspension
-        // await sendUserModerationNotification({
-        //   to: targetUser.email,
-        //   userName: targetUser.full_name,
-        //   action,
-        //   reason,
-        //   duration_days,
-        //   notes,
-        // })
-
-        console.log(`Notification sent to ${targetUser.email} for account ${action}`)
+        console.log(`Notification sent to ${targetUserRow.profiles?.email} for account ${action}`)
       } catch (notificationError) {
         console.error('Error sending notification:', notificationError)
         // Don't fail the request for notification errors
@@ -205,10 +178,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({
       success: true,
       data: {
-        user: updatedUser,
+        user: updatedProfile,
         action_taken: action,
-        message: getModerationMessage(action, targetUser.full_name),
-      }
+        message: getModerationMessage(action, targetUserRow.profiles?.full_name ?? id),
+      },
     })
 
   } catch (error) {

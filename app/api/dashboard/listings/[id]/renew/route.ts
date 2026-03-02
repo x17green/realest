@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 interface RouteParams {
@@ -20,76 +21,51 @@ export async function POST(request: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Verify user owns this property or is admin
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("user_type")
-      .eq("id", user.id)
-      .single();
-
-    if (!profile || !["owner", "admin"].includes(profile.user_type)) {
+    // Verify role via Prisma
+    const userRow = await prisma.users.findUnique({
+      where: { id: user.id },
+      select: { role: true },
+    });
+    if (!userRow || !["owner", "admin"].includes(userRow.role)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    // Verify property ownership (unless admin)
-    if (profile.user_type !== "admin") {
-      const { data: property } = await supabase
-        .from("properties")
-        .select("owner_id, status")
-        .eq("id", propertyId)
-        .single();
+    // Verify property ownership (unless admin) and check status
+    const property = await prisma.properties.findFirst({
+      where: {
+        id: propertyId,
+        ...(userRow.role !== "admin" ? { owner_id: user.id } : {}),
+      },
+      select: { status: true },
+    });
 
-      if (!property || property.owner_id !== user.id) {
-        return NextResponse.json(
-          { error: "Property not found or access denied" },
-          { status: 404 },
-        );
-      }
-
-      // Check if property can be renewed (must be live or expired)
-      if (!["live", "expired"].includes(property.status)) {
-        return NextResponse.json(
-          {
-            error: "Cannot renew property",
-            message: "Only live or expired properties can be renewed",
-          },
-          { status: 400 },
-        );
-      }
-    }
-
-    // Calculate renewal date (typically 1 year from now)
-    const renewalDate = new Date();
-    renewalDate.setFullYear(renewalDate.getFullYear() + 1);
-
-    // Update property with renewal
-    const { data: updatedProperty, error } = await supabase
-      .from("properties")
-      .update({
-        status: "live", // Reactivate if expired
-        updated_at: new Date().toISOString(),
-        // Add renewal tracking fields if they exist in schema
-        // renewed_at: new Date().toISOString(),
-        // renewal_expires_at: renewalDate.toISOString()
-      })
-      .eq("id", propertyId)
-      .select(
-        `
-        *,
-        owner:profiles(full_name, email)
-      `,
-      )
-      .single();
-
-    if (error) {
-      console.error("Database error:", error);
+    if (!property) {
       return NextResponse.json(
-        { error: "Failed to renew property" },
-        { status: 500 },
+        { error: "Property not found or access denied" },
+        { status: 404 },
       );
     }
 
-    // Log renewal activity (could be stored in an activity log table)
+    if (userRow.role !== "admin" && !["live", "expired"].includes(property.status)) {
+      return NextResponse.json(
+        {
+          error: "Cannot renew property",
+          message: "Only live or expired properties can be renewed",
+        },
+        { status: 400 },
+      );
+    }
+
+    // Update property with renewal via Prisma
+    const updatedProperty = await prisma.properties.update({
+      where: { id: propertyId },
+      data: {
+        status: "live",
+        updated_at: new Date(),
+      },
+      include: { owners: { include: { profiles: { select: { full_name: true, email: true } } } } },
+    });
+
     console.log(`Property ${propertyId} renewed by user ${user.id}`);
 
     return NextResponse.json({

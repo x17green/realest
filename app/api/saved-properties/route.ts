@@ -1,6 +1,7 @@
 // realest/app/api/saved-properties/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/prisma";
 
 // Note: This assumes we add a 'saved_properties' table to the database
 // Table structure:
@@ -24,31 +25,19 @@ export async function GET(request: NextRequest) {
     }
 
     // Get saved properties with full property details
-    const { data: savedProperties, error } = await supabase
-      .from("saved_properties")
-      .select(`
-        id,
-        created_at,
-        properties (
-          *,
-          property_details (*),
-          property_media (*),
-          profiles:owner_id (
-            full_name,
-            avatar_url
-          )
-        )
-      `)
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      console.error("Saved properties fetch error:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch saved properties" },
-        { status: 500 }
-      );
-    }
+    const savedProperties = await prisma.saved_properties.findMany({
+      where: { user_id: user.id },
+      include: {
+        properties: {
+          include: {
+            property_details: true,
+            property_media: true,
+            owners: { include: { profiles: { select: { full_name: true, avatar_url: true } } } },
+          },
+        },
+      },
+      orderBy: { created_at: "desc" },
+    });
 
     return NextResponse.json({ saved_properties: savedProperties });
   } catch (error) {
@@ -85,27 +74,23 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if property exists and is live
-    const { data: property, error: propertyError } = await supabase
-      .from("properties")
-      .select("id, status")
-      .eq("id", property_id)
-      .eq("status", "live")
-      .single();
+    const property = await prisma.properties.findFirst({
+      where: { id: property_id, status: "live" },
+      select: { id: true },
+    });
 
-    if (propertyError || !property) {
+    if (!property) {
       return NextResponse.json(
         { error: "Property not found or not available" },
         { status: 404 }
       );
     }
 
-    // Check if already saved
-    const { data: existing, error: existingError } = await supabase
-      .from("saved_properties")
-      .select("id")
-      .eq("user_id", user.id)
-      .eq("property_id", property_id)
-      .single();
+    // Check if already saved (upsert or check unique constraint)
+    const existing = await prisma.saved_properties.findFirst({
+      where: { user_id: user.id, property_id },
+      select: { id: true },
+    });
 
     if (existing) {
       return NextResponse.json(
@@ -115,22 +100,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Save property
-    const { data: savedProperty, error: saveError } = await supabase
-      .from("saved_properties")
-      .insert({
-        user_id: user.id,
-        property_id: property_id,
-      })
-      .select()
-      .single();
-
-    if (saveError) {
-      console.error("Save property error:", saveError);
-      return NextResponse.json(
-        { error: "Failed to save property" },
-        { status: 500 }
-      );
-    }
+    const savedProperty = await prisma.saved_properties.create({
+      data: { user_id: user.id, property_id },
+    });
 
     return NextResponse.json(
       { saved_property: savedProperty, message: "Property saved successfully" },
@@ -170,19 +142,9 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Remove from saved properties
-    const { error } = await supabase
-      .from("saved_properties")
-      .delete()
-      .eq("user_id", user.id)
-      .eq("property_id", propertyId);
-
-    if (error) {
-      console.error("Remove saved property error:", error);
-      return NextResponse.json(
-        { error: "Failed to remove saved property" },
-        { status: 500 }
-      );
-    }
+    await prisma.saved_properties.deleteMany({
+      where: { user_id: user.id, property_id: propertyId },
+    });
 
     return NextResponse.json({
       message: "Property removed from saved list"

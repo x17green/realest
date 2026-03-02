@@ -18,13 +18,13 @@ export default async function ContentPage() {
   }
 
   // Check if user is an admin
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("user_type")
+  const { data: userRow } = await supabase
+    .from("users")
+    .select("role")
     .eq("id", user.id)
     .single();
 
-  if (profile?.user_type !== "admin") {
+  if (userRow?.role !== "admin") {
     redirect("/");
   }
 

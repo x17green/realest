@@ -123,9 +123,13 @@ NEXT_PUBLIC_APP_MODE determines feature availability:
 Supabase Auth
 ├── Client-side: lib/supabase/client.ts
 ├── Server-side: lib/supabase/server.ts
-├── Profiles table: user_type (user|owner|agent|admin)
+├── users table: role enum (user|owner|agent|admin) — single source of truth
+├── profiles table: user metadata (full_name, phone, avatar_url) — NO role column
 └── RLS policies enforce row-level access
 ```
+
+> ⚠️ **Schema Note**: Role is stored on `public.users.role` (UserRole enum), NOT on `profiles.user_type`.
+> Always query `users.role` for role checks. `profiles` has no `user_type` column.
 
 ## Nigerian Market Context (Critical)
 

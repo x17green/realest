@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { prisma } from "@/lib/prisma";
 
 const respondSchema = z.object({
   response_message: z
@@ -52,73 +53,54 @@ export async function POST(request: Request, { params }: RouteParams) {
 
     const responseData = validationResult.data;
 
-    // Verify inquiry exists and user is the receiver (property owner)
-    const { data: inquiry, error: inquiryError } = await supabase
-      .from("inquiries")
-      .select(
-        `
-        *,
-        sender:profiles!inquiries_sender_id_fkey(full_name, email),
-        property:properties(title, address, owner_id)
-      `,
-      )
-      .eq("id", inquiryId)
-      .single();
+    // Verify inquiry exists and user is the property owner
+    const inquiry = await prisma.inquiries.findUnique({
+      where: { id: inquiryId },
+      include: {
+        profiles_inquiries_sender_idToprofiles: { select: { full_name: true, email: true } },
+        properties: { select: { title: true, address: true, owner_id: true } },
+      },
+    });
 
-    if (inquiryError || !inquiry) {
+    if (!inquiry) {
       return NextResponse.json({ error: "Inquiry not found" }, { status: 404 });
     }
 
     // Verify user is the property owner
-    if (inquiry.property.owner_id !== user.id) {
+    if (inquiry.properties?.owner_id !== user.id) {
       return NextResponse.json(
         {
-          error:
-            "Access denied - Only property owners can respond to inquiries",
+          error: "Access denied - Only property owners can respond to inquiries",
         },
         { status: 403 },
       );
     }
 
-    // Update inquiry status and add response
-    const { data: updatedInquiry, error: updateError } = await supabase
-      .from("inquiries")
-      .update({
-        status: "responded",
-        responded_at: new Date().toISOString(),
-      })
-      .eq("id", inquiryId)
-      .select()
-      .single();
-
-    if (updateError) {
-      console.error("Database update error:", updateError);
-      return NextResponse.json(
-        { error: "Failed to update inquiry status" },
-        { status: 500 },
-      );
-    }
+    // Update inquiry status (no responded_at field in schema)
+    const updatedInquiry = await prisma.inquiries.update({
+      where: { id: inquiryId },
+      data: { status: "responded", updated_at: new Date() },
+    });
 
     // Create response record (assuming there's a responses table, or store in inquiry)
     // For now, we'll store the response in the inquiry message or create a separate response
     // This would typically be a separate table for threaded conversations
 
     // Send email notification to inquirer
-    const ownerProfile = await supabase
-      .from("profiles")
-      .select("full_name, email")
-      .eq("id", user.id)
-      .single();
+    const ownerProfile = await prisma.profiles.findUnique({
+      where: { id: user.id },
+      select: { full_name: true, email: true },
+    });
 
     const emailData = {
-      to: inquiry.sender.email,
-      subject: `Response to your inquiry about ${inquiry.property.title}`,
+      to: inquiry.profiles_inquiries_sender_idToprofiles?.email,
+      subject: `Response to your inquiry about ${inquiry.properties?.title}`,
       template: "inquiry-response",
       data: {
-        inquirer_name: inquiry.sender.full_name,
-        owner_name: ownerProfile.data?.full_name || "Property Owner",
-        property_title: inquiry.property.title,
-        property_address: inquiry.property.address,
+        inquirer_name: inquiry.profiles_inquiries_sender_idToprofiles?.full_name,
+        owner_name: ownerProfile?.full_name || "Property Owner",
+        property_title: inquiry.properties?.title,
+        property_address: inquiry.properties?.address,
         response_message: responseData.response_message,
         contact_phone: responseData.contact_phone,
         contact_email: responseData.contact_email,

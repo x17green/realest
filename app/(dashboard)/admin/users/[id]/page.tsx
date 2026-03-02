@@ -25,19 +25,19 @@ export default async function UserEditPage({
   }
 
   // Check if user is an admin
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("user_type")
+  const { data: userRow } = await supabase
+    .from("users")
+    .select("role")
     .eq("id", user.id)
     .single();
 
-  if (profile?.user_type !== "admin") {
+  if (userRow?.role !== "admin") {
     redirect("/");
   }
 
-  // Fetch the specific user
+  // Fetch the specific user — users table holds role + is_active
   const { data: userProfile } = await supabase
-    .from("profiles")
+    .from("users")
     .select("*")
     .eq("id", params.id)
     .single();
@@ -111,7 +111,7 @@ export default async function UserEditPage({
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="user_type">User Type</Label>
-                    <Select defaultValue={userProfile.user_type}>
+                    <Select defaultValue={userProfile.role}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select user type" />
                       </SelectTrigger>
@@ -197,15 +197,15 @@ export default async function UserEditPage({
               <CardContent className="space-y-4">
                 <div>
                   <p className="text-sm text-muted-foreground">Current Status</p>
-                  <Badge variant={userProfile.user_type === 'banned' ? 'destructive' : 'default'}>
-                    {userProfile.user_type}
+                  <Badge variant={!userProfile.is_active ? 'destructive' : 'default'}>
+                    {userProfile.role}{!userProfile.is_active ? ' (Banned)' : ''}
                   </Badge>
                 </div>
 
                 <div>
                   <p className="text-sm text-muted-foreground">Verification</p>
-                  <Badge variant={userProfile.is_verified ? 'default' : 'secondary'}>
-                    {userProfile.is_verified ? 'Verified' : 'Unverified'}
+                  <Badge variant={userProfile.is_active ? 'default' : 'secondary'}>
+                    {userProfile.is_active ? 'Active' : 'Inactive'}
                   </Badge>
                 </div>
 
@@ -238,10 +238,10 @@ export default async function UserEditPage({
                 </Button>
 
                 <Button
-                  variant={userProfile.user_type === 'banned' ? 'default' : 'destructive'}
+                  variant={!userProfile.is_active ? 'default' : 'destructive'}
                   className="w-full"
                 >
-                  {userProfile.user_type === 'banned' ? 'Unban User' : 'Ban User'}
+                  {!userProfile.is_active ? 'Unban User' : 'Ban User'}
                 </Button>
 
                 <Button variant="ghost" className="w-full text-red-600 hover:text-red-700">

@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { useUser } from "@/lib/hooks/useUser";
 import { AgentOnboarding, OwnerOnboarding } from "@/components/onboarding";
 
 export default async function OnboardingLayout({
@@ -8,7 +7,6 @@ export default async function OnboardingLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Server-side user type detection
   const supabase = await createClient();
   const {
     data: { user },
@@ -19,19 +17,19 @@ export default async function OnboardingLayout({
     redirect("/login");
   }
 
-  // Get user profile to determine type
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles")
-    .select("user_type")
+  // Query public.users — role is the single source of truth (not profiles.user_type)
+  const { data: userData, error: userError } = await supabase
+    .from("users")
+    .select("role")
     .eq("id", user.id)
     .single();
 
-  if (profileError || !profile) {
-    // If no profile exists, redirect to profile setup
-    redirect("/profile-setup");
+  if (userError || !userData) {
+    // No users row means account setup is incomplete
+    redirect("/login");
   }
 
-  const userType = profile.user_type;
+  const userType = userData.role;
 
   // Check if user has already completed onboarding
   if (userType === "agent") {

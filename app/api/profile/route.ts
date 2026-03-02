@@ -1,6 +1,7 @@
 // realest/app/api/profile/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
 const updateProfileSchema = z.object({
@@ -30,14 +31,11 @@ export async function GET(request: NextRequest) {
     }
 
     // Get user profile
-    const { data: profile, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", user.id)
-      .single();
+    const profile = await prisma.profiles.findUnique({
+      where: { id: user.id },
+    });
 
-    if (error) {
-      console.error("Profile fetch error:", error);
+    if (!profile) {
       return NextResponse.json({ error: "Profile not found" }, { status: 404 });
     }
 
@@ -68,24 +66,13 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
     const validatedData = updateProfileSchema.parse(body);
 
-    // Update profile
-    const { data: updatedProfile, error } = await supabase
-      .from("profiles")
-      .update({
+    const updatedProfile = await prisma.profiles.update({
+      where: { id: user.id },
+      data: {
         ...validatedData,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", user.id)
-      .select()
-      .single();
-
-    if (error) {
-      console.error("Profile update error:", error);
-      return NextResponse.json(
-        { error: "Failed to update profile" },
-        { status: 500 },
-      );
-    }
+        updated_at: new Date(),
+      },
+    });
 
     return NextResponse.json({
       profile: updatedProfile,

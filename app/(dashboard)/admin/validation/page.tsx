@@ -25,41 +25,41 @@ export default async function ValidationPage() {
   }
 
   // Check if user is an admin
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("user_type")
+  const { data: userRow } = await supabase
+    .from("users")
+    .select("role")
     .eq("id", user.id)
     .single();
 
-  if (profile?.user_type !== "admin") {
+  if (userRow?.role !== "admin") {
     redirect("/");
   }
 
   // Fetch pending properties for validation
   const { data: pendingProperties } = await supabase
     .from("properties")
-    .select("*, profiles(full_name, email)")
+    .select("*, owners(profiles(full_name, email))")
     .eq("verification_status", "pending")
     .order("created_at", { ascending: true });
 
   // Fetch properties in ML review queue
   const { data: mlQueue } = await supabase
     .from("properties")
-    .select("*, profiles(full_name, email)")
+    .select("*, owners(profiles(full_name, email))")
     .eq("verification_status", "ml_review")
     .order("created_at", { ascending: true });
 
   // Fetch properties in physical vetting
   const { data: vettingQueue } = await supabase
     .from("properties")
-    .select("*, profiles(full_name, email)")
+    .select("*, owners(profiles(full_name, email))")
     .eq("verification_status", "vetting")
     .order("created_at", { ascending: true });
 
   // Fetch potential duplicates
   const { data: duplicates } = await supabase
     .from("properties")
-    .select("*, profiles(full_name, email)")
+    .select("*, owners(profiles(full_name, email))")
     .eq("verification_status", "duplicate_check")
     .order("created_at", { ascending: true });
 
@@ -151,7 +151,7 @@ export default async function ValidationPage() {
                     <TableCell className="font-medium">
                       {property.title}
                     </TableCell>
-                    <TableCell>{property.profiles?.full_name}</TableCell>
+                    <TableCell>{property.owners?.profiles?.full_name}</TableCell>
                     <TableCell>
                       {new Date(property.created_at).toLocaleDateString()}
                     </TableCell>

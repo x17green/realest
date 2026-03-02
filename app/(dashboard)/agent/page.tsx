@@ -71,7 +71,7 @@ export default function AgentDashboardPage() {
           .eq("id", user.id)
           .single();
 
-        if (!profile || profile.user_type !== "agent") {
+        if (!profile || user.app_metadata?.role !== "agent") {
           router.push("/");
           return;
         }

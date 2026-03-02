@@ -11,13 +11,13 @@ export default async function AgentPropertiesPage() {
     redirect("/auth/login?redirect=/agent/properties")
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("id, user_type, full_name")
+  const { data: userRow } = await supabase
+    .from("users")
+    .select("role")
     .eq("id", user.id)
     .single()
 
-  if (!profile || profile.user_type !== "agent") {
+  if (!userRow || userRow.role !== "agent") {
     redirect("/")
   }
 

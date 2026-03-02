@@ -26,7 +26,7 @@ export interface PasswordResetEmailData {
 
 // RealEST configuration for password reset emails
 const REALEST_CONFIG: EmailConfig = {
-  companyName: "RealEST",
+  companyName: "RealEST Connect",
   tagline: "Secure Property Platform",
   domain: "realest.ng",
   fromEmail: process.env.FROM_EMAIL || "hello@realest.ng",

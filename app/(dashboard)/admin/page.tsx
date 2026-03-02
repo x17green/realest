@@ -13,23 +13,23 @@ export default async function AdminDashboardPage() {
   }
 
   // Check if user is an admin
-  const { data: profile } = await supabase.from("profiles").select("user_type").eq("id", user.id).single()
+  const { data: userRow } = await supabase.from("users").select("role").eq("id", user.id).single()
 
-  if (profile?.user_type !== "admin") {
+  if (userRow?.role !== "admin") {
     redirect("/")
   }
 
   // Fetch pending properties for verification
   const { data: pendingProperties } = await supabase
     .from("properties")
-    .select("*, profiles(full_name, email)")
+    .select("*, owners(profiles(full_name, email))")
     .eq("verification_status", "pending")
     .order("created_at", { ascending: true })
 
   // Fetch pending documents
   const { data: pendingDocuments } = await supabase
     .from("property_documents")
-    .select("*, properties(title, owner_id), profiles(full_name)")
+    .select("*, properties(title, owner_id)")
     .eq("verification_status", "pending")
     .order("created_at", { ascending: true })
 

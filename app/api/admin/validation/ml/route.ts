@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { z } from 'zod'
+import { prisma } from '@/lib/prisma'
 
 // Query parameters schema
 const mlValidationQuerySchema = z.object({
@@ -28,13 +29,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     // Verify user is admin
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('user_type')
-      .eq('id', user.id)
-      .single()
-
-    if (!profile || profile.user_type !== 'admin') {
+    const adminRow = await prisma.users.findUnique({ where: { id: user.id }, select: { role: true } })
+    if (!adminRow || adminRow.role !== 'admin') {
       return NextResponse.json(
         { error: 'Admin access required' },
         { status: 403 }
@@ -62,86 +58,42 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const perPageNum = parseInt(per_page)
     const offset = (pageNum - 1) * perPageNum
 
-    // Build query for properties pending ML validation
-    let query = supabase
-      .from('properties')
-      .select(`
-        *,
-        owner:profiles(full_name, email, phone),
-        documents:property_documents(*),
-        media:property_media(*)
-      `)
-      .eq('status', 'pending_ml_validation')
+    const orderBy: { created_at: 'asc' | 'desc' } = sort === 'oldest' ? { created_at: 'asc' } : { created_at: 'desc' }
 
-    // Apply status filter if provided
-    if (status) {
-      // For ML validation, we might want to filter by ML processing status
-      // This would require additional fields in the database
-    }
+    const [properties, totalCount] = await Promise.all([
+      prisma.properties.findMany({
+        where: { status: 'pending_ml_validation' },
+        include: {
+          owners: { include: { profiles: { select: { full_name: true, email: true, phone: true } } } },
+          property_documents: true,
+          property_media: { select: { id: true } },
+        },
+        orderBy,
+        skip: offset,
+        take: perPageNum,
+      }),
+      prisma.properties.count({ where: { status: 'pending_ml_validation' } }),
+    ])
 
-    // Apply sorting
-    switch (sort) {
-      case 'newest':
-        query = query.order('created_at', { ascending: false })
-        break
-      case 'oldest':
-        query = query.order('created_at', { ascending: true })
-        break
-      case 'priority':
-        // Priority could be based on document count, property value, etc.
-        query = query.order('created_at', { ascending: false })
-        break
-    }
-
-    // Apply pagination
-    query = query.range(offset, offset + perPageNum - 1)
-
-    const { data: properties, error: propertiesError } = await query
-
-    if (propertiesError) {
-      console.error('Error fetching ML validation queue:', propertiesError)
-      return NextResponse.json(
-        { error: 'Failed to fetch validation queue' },
-        { status: 500 }
-      )
-    }
-
-    // Get total count for pagination
-    const { count, error: countError } = await supabase
-      .from('properties')
-      .select('*', { count: 'exact', head: true })
-      .eq('status', 'pending_ml_validation')
-
-    if (countError) {
-      console.error('Error getting total count:', countError)
-    }
-
-    const totalCount = count || 0
     const totalPages = Math.ceil(totalCount / perPageNum)
 
-    // Format response with ML validation specific data
-    const formattedProperties = properties?.map(property => ({
+    const formattedProperties = properties.map((property: any) => ({
       id: property.id,
       title: property.title,
       property_type: property.property_type,
       address: property.address,
       state: property.state,
-      lga: property.lga,
       price: property.price,
       price_frequency: property.price_frequency,
       created_at: property.created_at,
-      owner: property.owner,
-      document_count: property.documents?.length || 0,
-      media_count: property.media?.length || 0,
-      // ML validation specific fields (would come from ML service)
-      ml_status: 'pending', // pending, processing, completed
+      owner: property.owners?.profiles ?? null,
+      document_count: property.property_documents?.length || 0,
+      media_count: property.property_media?.length || 0,
+      ml_status: 'pending',
       ml_confidence_score: null,
-      ml_validation_notes: null,
-      ml_processed_at: null,
-      // Priority indicators
-      has_multiple_documents: (property.documents?.length || 0) > 3,
-      is_high_value: property.price > 5000000, // ₦5M threshold
-    })) || []
+      has_multiple_documents: (property.property_documents?.length || 0) > 3,
+      is_high_value: Number(property.price) > 5000000,
+    }))
 
     return NextResponse.json({
       data: formattedProperties,
@@ -155,8 +107,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       },
       summary: {
         total_pending: totalCount,
-        high_priority: formattedProperties.filter(p => p.has_multiple_documents || p.is_high_value).length,
-        average_documents: formattedProperties.reduce((acc, p) => acc + p.document_count, 0) / formattedProperties.length || 0,
+        high_priority: formattedProperties.filter((p: any) => p.has_multiple_documents || p.is_high_value).length,
+        average_documents: formattedProperties.reduce((acc: number, p: any) => acc + p.document_count, 0) / formattedProperties.length || 0,
       }
     })
 

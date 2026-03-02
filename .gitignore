@@ -40,3 +40,4 @@ next-env.d.ts
 # Obsidian vault files
 .vault/
 .obsidian/*
+/lib/generated/prisma

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { prisma, Prisma } from '@/lib/prisma'
 import { z } from 'zod'
 
 // Query parameters schema
@@ -8,39 +9,27 @@ const userQuerySchema = z.object({
   per_page: z.string().optional().default('20'),
   sort: z.enum(['newest', 'oldest', 'name', 'type']).optional().default('newest'),
   user_type: z.enum(['user', 'owner', 'agent', 'admin']).optional(),
-  search: z.string().optional(), // Search by name or email
+  search: z.string().optional(),
   status: z.enum(['active', 'suspended', 'banned']).optional(),
 })
 
-type RouteParams = {
-  params: Promise<{}>
-}
-
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient()
 
-    // Verify admin authentication
+    // Auth
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Verify user is admin
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('user_type')
-      .eq('id', user.id)
-      .single()
-
-    if (!profile || profile.user_type !== 'admin') {
-      return NextResponse.json(
-        { error: 'Admin access required' },
-        { status: 403 }
-      )
+    // Admin role check via Prisma
+    const adminRow = await prisma.users.findUnique({
+      where: { id: user.id },
+      select: { role: true },
+    })
+    if (!adminRow || adminRow.role !== 'admin') {
+      return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
 
     // Parse query parameters
@@ -61,112 +50,94 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       )
     }
 
-    const { page, per_page, sort, user_type, search, status } = queryValidation.data
+    const { page, per_page, sort, user_type, search } = queryValidation.data
     const pageNum = parseInt(page)
     const perPageNum = parseInt(per_page)
-    const offset = (pageNum - 1) * perPageNum
+    const skip = (pageNum - 1) * perPageNum
 
-    // Build query for user profiles
-    let query = supabase
-      .from('profiles')
-      .select(`
-        *,
-        property_count:properties(count),
-        inquiry_count:inquiries(count)
-      `)
-
-    // Apply user type filter
+    // Build where clause
+    const where: Prisma.usersWhereInput = {}
     if (user_type) {
-      query = query.eq('user_type', user_type)
+      where.role = user_type as Prisma.EnumUserRoleFilter
     }
-
-    // Apply search filter (name or email)
     if (search) {
-      query = query.or(`full_name.ilike.%${search}%,email.ilike.%${search}%`)
+      where.profiles = {
+        OR: [
+          { full_name: { contains: search, mode: 'insensitive' } },
+          { email: { contains: search, mode: 'insensitive' } },
+        ],
+      }
     }
 
-    // Apply status filter (if we add a status field later)
-    // For now, all users are considered active unless suspended
-    if (status) {
-      // This would require adding a status field to profiles table
-      // query = query.eq('status', status)
-    }
-
-    // Apply sorting
+    // Determine orderBy
+    let orderBy: Prisma.usersOrderByWithRelationInput
     switch (sort) {
-      case 'newest':
-        query = query.order('created_at', { ascending: false })
-        break
       case 'oldest':
-        query = query.order('created_at', { ascending: true })
+        orderBy = { created_at: 'asc' }
         break
       case 'name':
-        query = query.order('full_name', { ascending: true })
+        orderBy = { profiles: { full_name: 'asc' } }
         break
       case 'type':
-        query = query.order('user_type', { ascending: true })
+        orderBy = { role: 'asc' }
         break
+      default: // newest
+        orderBy = { created_at: 'desc' }
     }
 
-    // Apply pagination
-    query = query.range(offset, offset + perPageNum - 1)
+    // Fetch users + total count in parallel
+    const [userRows, totalCount] = await Promise.all([
+      prisma.users.findMany({
+        where,
+        orderBy,
+        skip,
+        take: perPageNum,
+        include: {
+          profiles: {
+            select: {
+              full_name: true,
+              email: true,
+              phone: true,
+              avatar_url: true,
+            },
+          },
+        },
+      }),
+      prisma.users.count({ where }),
+    ])
 
-    const { data: users, error: usersError } = await query
+    // Fetch property/inquiry counts per user
+    const userIds = userRows.map((u: any) => u.id)
+    const [propCounts, inqCounts] = await Promise.all([
+      prisma.properties.groupBy({ by: ['owner_id'], where: { owner_id: { in: userIds } }, _count: { id: true } }),
+      prisma.inquiries.groupBy({ by: ['owner_id'], where: { owner_id: { in: userIds } }, _count: { id: true } }),
+    ])
+    const propCountMap = Object.fromEntries(propCounts.map((r: any) => [r.owner_id, r._count.id]))
+    const inqCountMap = Object.fromEntries(inqCounts.map((r: any) => [r.owner_id, r._count.id]))
 
-    if (usersError) {
-      console.error('Error fetching users:', usersError)
-      return NextResponse.json(
-        { error: 'Failed to fetch users' },
-        { status: 500 }
-      )
-    }
-
-    // Get total count for pagination
-    let countQuery = supabase
-      .from('profiles')
-      .select('*', { count: 'exact', head: true })
-
-    if (user_type) {
-      countQuery = countQuery.eq('user_type', user_type)
-    }
-
-    if (search) {
-      countQuery = countQuery.or(`full_name.ilike.%${search}%,email.ilike.%${search}%`)
-    }
-
-    const { count, error: countError } = await countQuery
-
-    if (countError) {
-      console.error('Error getting total count:', countError)
-    }
-
-    const totalCount = count || 0
     const totalPages = Math.ceil(totalCount / perPageNum)
 
-    // Format response with user statistics
-    const formattedUsers = users?.map(user => ({
-      id: user.id,
-      full_name: user.full_name,
-      email: user.email,
-      phone: user.phone,
-      user_type: user.user_type,
-      avatar_url: user.avatar_url,
-      created_at: user.created_at,
-      updated_at: user.updated_at,
-      // Aggregated data
-      property_count: user.property_count?.[0]?.count || 0,
-      inquiry_count: user.inquiry_count?.[0]?.count || 0,
-      // Status indicators
-      is_active: true, // All users are active unless we add suspension logic
-      last_activity: user.updated_at,
+    const formattedUsers = userRows.map((u: any) => ({
+      id: u.id,
+      full_name: u.profiles?.full_name ?? null,
+      email: u.profiles?.email ?? null,
+      phone: u.profiles?.phone ?? null,
+      avatar_url: u.profiles?.avatar_url ?? null,
+      role: u.role,
+      created_at: u.created_at,
+      updated_at: u.updated_at,
+      property_count: propCountMap[u.id] ?? 0,
+      inquiry_count: inqCountMap[u.id] ?? 0,
+      is_active: true,
+      last_activity: u.updated_at,
       account_age_days: Math.floor(
-        (Date.now() - new Date(user.created_at).getTime()) / (1000 * 60 * 60 * 24)
+        (Date.now() - new Date(u.created_at ?? 0).getTime()) / (1000 * 60 * 60 * 24)
       ),
-    })) || []
+    }))
 
-    // Calculate user type distribution
-    const userTypeStats = formattedUsers.reduce((acc, user) => {
-      acc[user.user_type] = (acc[user.user_type] || 0) + 1
+    // Role distribution for current page (summary reflects full result set via totalCount)
+    const roleStats = formattedUsers.reduce((acc: Record<string, number>, u: any) => {
+      if (u.role) acc[u.role] = (acc[u.role] || 0) + 1
       return acc
     }, {} as Record<string, number>)
 
@@ -182,26 +153,23 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       },
       summary: {
         total_users: totalCount,
-        user_type_distribution: userTypeStats,
-        active_users: formattedUsers.filter(u => u.is_active).length,
-        new_users_last_30_days: formattedUsers.filter(u =>
-          new Date(u.created_at) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+        role_distribution: roleStats,
+        new_users_last_30_days: formattedUsers.filter((u: any) =>
+          new Date(u.created_at ?? 0) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
         ).length,
-        average_account_age_days: formattedUsers.reduce((acc, u) => acc + u.account_age_days, 0) / formattedUsers.length || 0,
+        average_account_age_days:
+          formattedUsers.length > 0
+            ? formattedUsers.reduce((acc: number, u: any) => acc + u.account_age_days, 0) / formattedUsers.length
+            : 0,
       },
       filters: {
-        applied_user_type: user_type,
+        applied_role: user_type,
         applied_search: search,
-        applied_status: status,
-        available_user_types: ['user', 'owner', 'agent', 'admin'],
-      }
+        available_roles: ['user', 'owner', 'agent', 'admin'],
+      },
     })
-
   } catch (error) {
-    console.error('Unexpected error in user management:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    console.error('Unexpected error in admin user management:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

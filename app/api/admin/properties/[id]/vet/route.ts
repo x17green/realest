@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
+import { prisma } from "@/lib/prisma";
 
 // Schema for vetting a property
 const vetPropertySchema = z.object({
@@ -36,13 +37,8 @@ export async function PUT(
     }
 
     // Verify user is admin
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("user_type")
-      .eq("id", user.id)
-      .single();
-
-    if (profileError || profile?.user_type !== "admin") {
+    const adminRow = await prisma.users.findUnique({ where: { id: user.id }, select: { role: true } })
+    if (!adminRow || adminRow.role !== 'admin') {
       return NextResponse.json(
         { error: "Admin access required" },
         { status: 403 },
@@ -54,74 +50,31 @@ export async function PUT(
     const validatedData = vetPropertySchema.parse(body);
 
     // Verify property exists and is in vetting status
-    const { data: property, error: propertyError } = await supabase
-      .from("properties")
-      .select("id, status, owner_id, title")
-      .eq("id", propertyId)
-      .eq("status", "pending_vetting")
-      .single();
+    const property = await prisma.properties.findFirst({
+      where: { id: propertyId, status: 'pending_vetting' },
+      select: { id: true, status: true, owner_id: true, title: true },
+    })
 
-    if (propertyError || !property) {
+    if (!property) {
       return NextResponse.json(
         { error: "Property not found or not pending vetting" },
         { status: 404 },
       );
     }
 
-    // Prepare update data
-    const updateData: any = {
-      status: validatedData.status,
-      vetted_by: user.id,
-      vetted_at: new Date().toISOString(),
-    };
-
-    if (validatedData.status === "live") {
-      updateData.verified_at =
-        validatedData.verified_at || new Date().toISOString();
-    } else if (validatedData.status === "rejected") {
-      if (!validatedData.rejection_reason) {
-        return NextResponse.json(
-          { error: "Rejection reason required for rejected properties" },
-          { status: 400 },
-        );
-      }
-      updateData.rejection_reason = validatedData.rejection_reason;
-    }
-
-    if (validatedData.admin_notes) {
-      updateData.admin_notes = validatedData.admin_notes;
-    }
-
-    // Update property status
-    const { data: updatedProperty, error: updateError } = await supabase
-      .from("properties")
-      .update(updateData)
-      .eq("id", propertyId)
-      .select(
-        `
-        id,
-        status,
-        vetted_by,
-        vetted_at,
-        verified_at,
-        rejection_reason,
-        admin_notes,
-        owner:profiles!inner(
-          id,
-          full_name,
-          email
-        )
-      `,
-      )
-      .single();
-
-    if (updateError) {
-      console.error("Database error:", updateError);
+    if (validatedData.status === "rejected" && !validatedData.rejection_reason) {
       return NextResponse.json(
-        { error: "Failed to update property status" },
-        { status: 500 },
+        { error: "Rejection reason required for rejected properties" },
+        { status: 400 },
       );
     }
+
+    // Update property status (only schema-valid fields)
+    const updatedProperty = await prisma.properties.update({
+      where: { id: propertyId },
+      data: { status: validatedData.status, updated_at: new Date() },
+      select: { id: true, status: true, title: true, owner_id: true },
+    })
 
     // Create notification for property owner
     const notificationMessage =
@@ -129,34 +82,30 @@ export async function PUT(
         ? `Your property "${property.title}" has been verified and is now live on RealEST!`
         : `Your property "${property.title}" has been rejected. Reason: ${validatedData.rejection_reason}`;
 
-    await supabase.from("notifications").insert({
-      user_id: property.owner_id,
-      type: "property_status",
-      title:
-        validatedData.status === "live"
-          ? "Property Verified"
-          : "Property Rejected",
-      message: notificationMessage,
+    await prisma.notifications.create({
       data: {
-        property_id: propertyId,
-        status: validatedData.status,
-        rejection_reason: validatedData.rejection_reason,
+        user_id: property.owner_id,
+        type: 'property_status',
+        title: validatedData.status === 'live' ? 'Property Verified' : 'Property Rejected',
+        message: notificationMessage,
+        data: { property_id: propertyId, status: validatedData.status, rejection_reason: validatedData.rejection_reason ?? null },
       },
-    });
+    })
 
     // Log admin action
-    await supabase.from("admin_audit_log").insert({
-      admin_id: user.id,
-      action: "property_vetting",
-      target_type: "property",
-      target_id: propertyId,
-      details: {
-        old_status: "pending_vetting",
-        new_status: validatedData.status,
-        rejection_reason: validatedData.rejection_reason,
-        admin_notes: validatedData.admin_notes,
+    await prisma.admin_audit_log.create({
+      data: {
+        actor_id: user.id,
+        action: 'property_vetting',
+        target_id: propertyId,
+        metadata: {
+          old_status: 'pending_vetting',
+          new_status: validatedData.status,
+          rejection_reason: validatedData.rejection_reason ?? null,
+          admin_notes: validatedData.admin_notes ?? null,
+        },
       },
-    });
+    })
 
     return NextResponse.json({
       data: updatedProperty,

@@ -8,13 +8,28 @@ import {
   type WaitlistEmailData,
   type AdminNotificationData,
   type PasswordResetEmailData,
+  type InquiryEmailData,
   type EmailTemplate,
 } from "./email-templates";
 
 // Email service configuration
 const resend = new Resend(process.env.RESEND_API_KEY);
-const FROM_EMAIL = process.env.FROM_EMAIL || "hello@realproof.ng";
-const COMPANY_NAME = "RealProof";
+const FROM_EMAIL = process.env.FROM_EMAIL          || "RealEST Connect <info@connect.realest.ng>";
+const FROM_EMAIL_INQUIRIES = process.env.FROM_EMAIL_INQUIRIES || FROM_EMAIL;
+const FROM_EMAIL_AUTH = process.env.FROM_EMAIL_AUTH     || FROM_EMAIL;
+const FROM_EMAIL_WAITLIST = process.env.FROM_EMAIL_WAITLIST || FROM_EMAIL;
+const COMPANY_NAME = "RealEST Connect";
+
+/** Returns true when Resend rejects due to daily/monthly quota */
+function isQuotaError(err: unknown): boolean {
+  if (!err || typeof err !== "object") return false;
+  const e = err as Record<string, unknown>;
+  return (
+    e.name === "daily_quota_exceeded" ||
+    e.name === "monthly_quota_exceeded" ||
+    String(e.message ?? "").toLowerCase().includes("quota")
+  );
+}
 
 /**
  * Send waitlist confirmation email
@@ -25,6 +40,7 @@ export async function sendWaitlistConfirmationEmail(
   success: boolean;
   error?: string;
   messageId?: string;
+  quotaExceeded?: boolean;
 }> {
   try {
     if (!process.env.RESEND_API_KEY) {
@@ -46,7 +62,7 @@ export async function sendWaitlistConfirmationEmail(
     const template = Templates.waitlistConfirmation(data);
 
     const { data: emailResult, error } = await resend.emails.send({
-      from: FROM_EMAIL,
+      from: FROM_EMAIL_WAITLIST,
       to: [data.email],
       subject: template.subject,
       html: template.html,
@@ -55,7 +71,7 @@ export async function sendWaitlistConfirmationEmail(
 
     if (error) {
       console.error("❌ Email sending failed:", error);
-      return { success: false, error: error.message };
+      return { success: false, error: error.message, quotaExceeded: isQuotaError(error) };
     }
 
     console.log("✅ Confirmation email sent:", emailResult?.id);
@@ -77,6 +93,7 @@ export async function sendWaitlistAdminNotification(
 ): Promise<{
   success: boolean;
   error?: string;
+  quotaExceeded?: boolean;
 }> {
   try {
     if (!process.env.RESEND_API_KEY || !process.env.ADMIN_EMAIL) {
@@ -106,7 +123,7 @@ export async function sendWaitlistAdminNotification(
 
     if (error) {
       console.error("❌ Admin notification failed:", error);
-      return { success: false, error: error.message };
+      return { success: false, error: error.message, quotaExceeded: isQuotaError(error) };
     }
 
     console.log("✅ Admin notification sent successfully");
@@ -198,6 +215,52 @@ export async function previewEmailTemplate(
 }
 
 /**
+ * Send property inquiry notification to the listing contact (owner or agent)
+ */
+export async function sendInquiryEmail(data: InquiryEmailData): Promise<{
+  success: boolean;
+  error?: string;
+  messageId?: string;
+  quotaExceeded?: boolean;
+}> {
+  try {
+    if (!process.env.RESEND_API_KEY) {
+      console.warn("⚠️ RESEND_API_KEY not configured. Email sending disabled.");
+      return { success: false, error: "Email service not configured" };
+    }
+
+    console.log(
+      `📧 Sending inquiry email to ${data.recipientEmail} for property: ${data.propertyTitle}`,
+    );
+
+    const template = Templates.inquiryNotification(data);
+
+    const { data: emailResult, error } = await resend.emails.send({
+      from: FROM_EMAIL_INQUIRIES,
+      to: [data.recipientEmail],
+      replyTo: data.senderEmail,
+      subject: template.subject,
+      html: template.html,
+      text: template.text,
+    });
+
+    if (error) {
+      console.error("❌ Inquiry email sending failed:", error);
+      return { success: false, error: error.message, quotaExceeded: isQuotaError(error) };
+    }
+
+    console.log("✅ Inquiry email sent:", emailResult?.id);
+    return { success: true, messageId: emailResult?.id };
+  } catch (error) {
+    console.error("❌ Unexpected inquiry email error:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown email error",
+    };
+  }
+}
+
+/**
  * Send hybrid password reset email (OTP + Link)
  * Provides users with both OTP code entry and direct reset link options
  */
@@ -207,6 +270,7 @@ export async function sendHybridPasswordResetEmail(
   success: boolean;
   error?: string;
   messageId?: string;
+  quotaExceeded?: boolean;
 }> {
   try {
     if (!process.env.RESEND_API_KEY) {
@@ -226,7 +290,7 @@ export async function sendHybridPasswordResetEmail(
     const template = Templates.passwordReset(data);
 
     const { data: emailResult, error } = await resend.emails.send({
-      from: FROM_EMAIL,
+      from: FROM_EMAIL_AUTH,
       to: [data.email],
       subject: template.subject,
       html: template.html,
@@ -235,7 +299,7 @@ export async function sendHybridPasswordResetEmail(
 
     if (error) {
       console.error("❌ Password reset email sending failed:", error);
-      return { success: false, error: error.message };
+      return { success: false, error: error.message, quotaExceeded: isQuotaError(error) };
     }
 
     console.log("✅ Password reset email sent:", emailResult?.id);
@@ -285,10 +349,10 @@ export async function testEmailConfiguration(): Promise<{
  * Environment variables needed:
  *
  * RESEND_API_KEY=re_xxxxxxxx (get from resend.com)
- * FROM_EMAIL=hello@realproof.ng (verified domain in Resend)
- * ADMIN_EMAIL=admin@realproof.ng (optional, for admin notifications)
- * SUPPORT_EMAIL=hello@realproof.ng (optional, for email footers)
- * WEBSITE_URL=https://realproof.ng (optional, for email links)
+ * FROM_EMAIL=hello@realest.ng (verified domain in Resend)
+ * ADMIN_EMAIL=admin@realest.ng (optional, for admin notifications)
+ * SUPPORT_EMAIL=hello@realest.ng (optional, for email footers)
+ * WEBSITE_URL=https://realest.ng (optional, for email links)
  * UNSUBSCRIBE_URL={unsubscribe_url} (optional, for unsubscribe functionality)
  */
 
