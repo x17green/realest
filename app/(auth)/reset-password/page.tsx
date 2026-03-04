@@ -135,7 +135,7 @@ function ResetPasswordContent() {
           resetResponse.error?.includes("password")
         ) {
           setError(
-            "New password must be different from your current password or does not meet requirements.",
+            "Password must be different from current and meet requirements.",
           );
         } else {
           setError(
@@ -195,15 +195,8 @@ function ResetPasswordContent() {
 
           <CardContent className="space-y-6">
             <div className="text-center space-y-4">
-              <div className="bg-success-50 border border-success-200 p-4 rounded-lg">
-                <p className="text-sm text-success-700">
-                  Your password has been securely updated. For security, you
-                  have been signed out. Please sign in with your new password.
-                </p>
-              </div>
-
               <p className="text-sm text-muted-foreground">
-                Redirecting to sign in page in a few seconds...
+                Redirecting to login...
               </p>
             </div>
 
@@ -226,10 +219,10 @@ function ResetPasswordContent() {
             <Shield className="w-12 h-12 text-primary" />
           </div>
           <CardTitle className="text-2xl font-bold">
-            Reset Your Password
+            Reset Password
           </CardTitle>
           <CardDescription>
-            Create a new secure password for your RealEST account
+            Set new password for your RealEST Connect account
           </CardDescription>
         </CardHeader>
 
@@ -319,7 +312,7 @@ function ResetPasswordContent() {
 
             <div className="space-y-2">
               <label htmlFor="confirmPassword" className="text-sm font-medium">
-                Confirm New Password
+                Confirm Password
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />

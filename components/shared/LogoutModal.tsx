@@ -202,15 +202,6 @@ export function LogoutModal({
                 </div>
               </div>
 
-              {/* Security context note */}
-              {/* <div className="bg-linear-to-r from-primary/5 to-accent/5 border border-primary/20 rounded-xl p-4 flex gap-3">
-                <Shield className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  For your security, all active sessions and authentication
-                  tokens will be invalidated immediately upon signing out.
-                </p>
-              </div> */}
-
               {/* Inline error */}
               {error && (
                 <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-700 dark:text-red-300 flex items-center gap-2">

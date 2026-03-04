@@ -13,7 +13,8 @@ import {
 } from "@/components/ui";
 import { Input } from "@/components/ui/input";
 import { sendHybridPasswordReset } from "@/lib/auth";
-import { Mail, ArrowLeft, AlertCircle, CheckCircle, Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Mail, ArrowLeft, AlertCircle, Loader2 } from "lucide-react";
 
 // ── Email validation state ─────────────────────────────────────────────────────
 
@@ -105,29 +106,14 @@ export default function ForgotPasswordPage() {
 
   const inputFeedback = () => {
     switch (emailStatus) {
-      case "checking":
-        return (
-          <p className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1.5">
-            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            Checking…
-          </p>
-        );
-      case "found":
-        return (
-          <p className="flex items-center gap-1.5 text-xs text-green-600 dark:text-green-400 mt-1.5">
-            <CheckCircle className="w-3.5 h-3.5" />
-            Account found — you can continue
-          </p>
-        );
       case "not_found":
         return (
-          <div className="flex items-start gap-2 mt-2 p-3 rounded-lg bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800">
+          <div className="flex items-center gap-2 mt-2 p-3 rounded-lg bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800">
             <AlertCircle className="w-4 h-4 text-orange-600 dark:text-orange-400 mt-0.5 shrink-0" />
             <div className="text-xs text-orange-800 dark:text-orange-200">
-              <p className="font-medium">No account found</p>
-              <p className="text-orange-700 dark:text-orange-300 mt-0.5">
-                This email isn't registered.{" "}
-                <Link href="/register" className="underline font-medium">
+              <p className="font-medium">
+                No account found. {" "}
+                <Link href="/register" className="underline font-medium text-orange-700 dark:text-orange-300">
                   Sign up instead?
                 </Link>
               </p>
@@ -152,16 +138,15 @@ export default function ForgotPasswordPage() {
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">Forgot Password?</CardTitle>
           <CardDescription>
-            Enter your email address and we'll send you a secure password reset
-            code
+            Enter the email address associated with your account, and we'll send you a code to reset your password.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium">
+              {/* <label htmlFor="email" className="text-sm font-medium">
                 Email Address
-              </label>
+              </label> */}
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
@@ -173,7 +158,13 @@ export default function ForgotPasswordPage() {
                     setEmail(e.target.value);
                     if (submitError) setSubmitError("");
                   }}
-                  className="pl-10"
+                  className={cn(
+                    "pl-10 transition-colors",
+                    emailStatus === "found" &&
+                      "border-green-500 focus-visible:ring-green-500/25",
+                    (emailStatus === "invalid" || emailStatus === "not_found") &&
+                      "border-destructive focus-visible:ring-destructive/25",
+                  )}
                   required
                   autoFocus
                 />
@@ -197,7 +188,7 @@ export default function ForgotPasswordPage() {
               {isLoading ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Sending Reset Code…
+                  Sending code…
                 </>
               ) : (
                 "Send Reset Code"
@@ -205,7 +196,7 @@ export default function ForgotPasswordPage() {
             </Button>
           </form>
 
-          <div className="flex items-center gap-2">
+          <div className="flex justify-center items-center gap-2">
             <ArrowLeft className="w-4 h-4" />
             <Link href="/login" className="text-sm font-medium hover:underline">
               Back to Sign In

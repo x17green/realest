@@ -18,7 +18,7 @@ import {
   resendEmailVerification,
   sendHybridPasswordReset,
 } from "@/lib/auth";
-import { CheckCircle, Shield, RefreshCw, AlertTriangle, Clock } from "lucide-react";
+import { CheckCircle, Shield, RefreshCw, AlertTriangle, Clock, AlertCircle } from "lucide-react";
 
 function OTPContent() {
   const router = useRouter();
@@ -270,10 +270,10 @@ function OTPContent() {
 
           <CardContent className="space-y-6">
             <div className="text-center space-y-4">
-              <div className="bg-success-50 border border-success-200 p-4 rounded-lg">
+              <div className="bg-success-50 p-4 rounded-lg">
                 <p className="text-sm text-success-700">
                   {otpType === "reset"
-                    ? "Code accepted. Taking you to the password reset page…"
+                    ? "Code verified. Proceed to reset password…"
                     : "Welcome to RealEST! Redirecting you to your dashboard…"}
                 </p>
               </div>
@@ -390,8 +390,13 @@ function OTPContent() {
             </div>
 
             {error && (
-              <div className="text-sm text-danger bg-danger-50 border border-danger-200 rounded-md p-3">
-                {error}
+              <div className="text-xs flex justify-center items-center text-danger gap-2 mt-2 p-3 rounded-lg bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800">
+                <AlertCircle className="w-4 h-4 text-orange-600 dark:text-orange-400 mt-0.5 shrink-0" />
+                <div className="text-xs text-orange-800 dark:text-orange-200">
+                  <p className="font-medium text-orange-700 dark:text-orange-300">
+                    {error}
+                  </p>
+                </div>
               </div>
             )}
 

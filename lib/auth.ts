@@ -423,20 +423,14 @@ export async function hasRole(
  */
 export function formatAuthError(error: string): string {
   const errorMappings: Record<string, string> = {
-    "Invalid login credentials":
-      "The email or password you entered is incorrect. Please try again.",
-    "Email not confirmed":
-      "Please check your email and click the verification link before signing in.",
-    "Too many requests":
-      "Too many login attempts. Please wait a few minutes before trying again.",
-    "User not found":
-      "No account found with this email address. Please check your email or sign up.",
-    "Invalid email": "Please enter a valid email address.",
-    "Password is too short": "Password must be at least 8 characters long.",
-    "Signup is disabled":
-      "New user registration is currently disabled. Please contact support.",
-    "Email already registered":
-      "An account with this email already exists. Please sign in instead.",
+    "Invalid login credentials": "Invalid email or password",
+    "Email not confirmed": "Email not verified. Check your inbox",
+    "Too many requests": "Too many attempts. Wait a few minutes",
+    "User not found": "No account found for this email",
+    "Invalid email": "Enter valid email",
+    "Password is too short": "Password needs 8+ characters",
+    "Signup is disabled": "Signups temporarily disabled",
+    "Email already registered": "Email already in use. Sign in instead"
   };
 
   return errorMappings[error] || error;

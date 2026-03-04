@@ -17,7 +17,7 @@ import {
   getUserProfile,
   formatAuthError,
 } from "@/lib/auth";
-import { Eye, EyeOff, Mail, Lock, CheckCircle } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, CheckCircle, AlertCircle } from "lucide-react";
 
 function LoginForm() {
   const router = useRouter();
@@ -36,10 +36,10 @@ function LoginForm() {
     const reset = searchParams.get("reset");
 
     if (verified === "true") {
-      setSuccessMessage("Your email has been verified! You can now sign in.");
+      setSuccessMessage("Email verification complete! Sign in to continue.");
     } else if (reset === "true") {
       setSuccessMessage(
-        "Your password has been reset successfully. Please sign in with your new password.",
+        "Password reset successful. Please sign in.",
       );
     }
   }, [searchParams]);
@@ -187,8 +187,13 @@ function LoginForm() {
             )}
 
             {error && (
-              <div className="text-sm text-danger bg-danger-50 border border-danger-200 rounded-md p-3">
-                {error}
+              <div className="text-xs flex justify-center items-center text-danger gap-2 mt-2 p-3 rounded-lg bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800">
+                <AlertCircle className="w-4 h-4 text-orange-600 dark:text-orange-400 mt-0.5 shrink-0" />
+                <div className="text-xs text-orange-800 dark:text-orange-200">
+                  <p className="font-medium text-orange-700 dark:text-orange-300">
+                    {error}
+                  </p>
+                </div>
               </div>
             )}
 
