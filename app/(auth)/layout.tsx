@@ -2,9 +2,13 @@ import { Metadata } from "next";
 import { AuthHeader, AuthFooter } from "@/components/layout/AuthHeader";
 
 export const metadata: Metadata = {
-  title: "Authentication | RealEST",
+  title: {
+    template: "%s | RealEST",
+    default: "Account | RealEST",
+  },
   description:
     "Sign in or create your RealEST account to access verified property listings and manage your real estate portfolio.",
+  robots: { index: true, follow: false },
 };
 
 /**
