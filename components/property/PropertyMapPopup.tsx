@@ -39,16 +39,16 @@ export function PropertyMapPopup({
             property.state || "",
           )}
         </p>
-        {property.property_details && (
+        {(property.bedrooms || property.bathrooms || property.square_feet) && (
           <div className="flex gap-4 text-sm text-muted-foreground">
-            {property.property_details.bedrooms && (
-              <span>{property.property_details.bedrooms} beds</span>
+            {property.bedrooms && (
+              <span>{property.bedrooms} beds</span>
             )}
-            {property.property_details.bathrooms && (
-              <span>{property.property_details.bathrooms} baths</span>
+            {property.bathrooms && (
+              <span>{property.bathrooms} baths</span>
             )}
-            {property.property_details.square_feet && (
-              <span>{property.property_details.square_feet} sqft</span>
+            {property.square_feet && (
+              <span>{property.square_feet} sqft</span>
             )}
           </div>
         )}

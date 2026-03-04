@@ -2,16 +2,36 @@ import type { LatLngBounds } from "leaflet";
 import type { PropertyFilters } from "../hooks/usePropertyMap";
 import { NIGERIAN_STATES, LAGOS_LGAS } from "./nigerianLocations";
 
-// Property type colors for markers
+// Property type colors for markers — keyed by the exact `property_type` DB values
 export const PROPERTY_TYPE_COLORS = {
-  house: "#F59E0B", // Orange
-  apartment: "#3B82F6", // Blue
-  land: "#10B981", // Green
-  commercial: "#8B5CF6", // Purple
-  event_center: "#EC4899", // Pink
-  hotel: "#F97316", // Orange-red
-  shop: "#06B6D4", // Cyan
-  office: "#84CC16", // Lime
+  // Residential
+  duplex: "#F59E0B",          // Amber
+  detached_house: "#F59E0B",  // Amber (same family as duplex)
+  terrace: "#FBBF24",         // Yellow-amber
+  bungalow: "#FCD34D",        // Light amber
+  flat: "#3B82F6",            // Blue
+  mini_flat: "#60A5FA",       // Light blue
+  self_contained: "#93C5FD",  // Lighter blue
+  room_and_parlor: "#BFDBFE", // Pale blue
+  penthouse: "#8B5CF6",       // Purple
+  single_room: "#A78BFA",     // Light purple
+  // Commercial
+  shop: "#06B6D4",            // Cyan
+  office: "#84CC16",          // Lime
+  warehouse: "#6B7280",       // Gray
+  showroom: "#14B8A6",        // Teal
+  // Hospitality & Events
+  hotel: "#F97316",           // Orange-red
+  event_center: "#EC4899",    // Pink
+  restaurant: "#EF4444",      // Red
+  // Land
+  residential_land: "#10B981", // Green
+  commercial_land: "#059669",  // Dark green
+  // Legacy / fallback aliases kept for any old records
+  house: "#F59E0B",
+  apartment: "#3B82F6",
+  land: "#10B981",
+  commercial: "#8B5CF6",
 } as const;
 
 // Nigerian infrastructure colors
@@ -41,17 +61,37 @@ export function getPropertyTypeColor(propertyType: string): string {
  * Get property type icon name
  */
 export function getPropertyTypeIcon(propertyType: string): string {
-  const icons = {
+  const icons: Record<string, string> = {
+    // Residential
+    duplex: "home",
+    detached_house: "home",
+    terrace: "home",
+    bungalow: "home",
+    flat: "building",
+    mini_flat: "building",
+    self_contained: "building",
+    room_and_parlor: "building",
+    penthouse: "building-2",
+    single_room: "building",
+    // Commercial
+    shop: "shopping-bag",
+    office: "briefcase",
+    warehouse: "warehouse",
+    showroom: "briefcase",
+    // Hospitality & Events
+    hotel: "hotel",
+    event_center: "calendar",
+    restaurant: "utensils",
+    // Land
+    residential_land: "map-pin",
+    commercial_land: "map-pin",
+    // Legacy aliases
     house: "home",
     apartment: "building",
     land: "map-pin",
     commercial: "building-2",
-    event_center: "calendar",
-    hotel: "hotel",
-    shop: "shopping-bag",
-    office: "briefcase",
   };
-  return icons[propertyType as keyof typeof icons] || "home";
+  return icons[propertyType] ?? "home";
 }
 
 /**

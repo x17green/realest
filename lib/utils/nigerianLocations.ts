@@ -653,6 +653,9 @@ export function getDefaultMapBounds(): {
   east: number;
   west: number;
 } {
-  // Lagos bounds
-  return { north: 6.8, south: 6.2, east: 4.0, west: 2.7 };
+  // Nigeria-wide bounds — covers all 36 states (lat 4°N–14°N, lng 2.7°E–14.7°E).
+  // Using a wider initial viewport ensures properties in any state (Bayelsa, Rivers,
+  // Lagos, Abuja, etc.) are included on the first map load. The bounds will tighten
+  // progressively as the user pans/zooms via MapEventHandler.
+  return { north: 14.0, south: 4.0, east: 14.7, west: 2.7 };
 }

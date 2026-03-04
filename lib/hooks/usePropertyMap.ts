@@ -5,28 +5,54 @@ import { createClient } from "@/lib/supabase/client";
 import type { Database } from "@/lib/supabase/types";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 
+/**
+ * Property row joined with its relations as returned by Supabase.
+ *
+ * Key layout facts (from prisma/schema.prisma):
+ *  - bedrooms / bathrooms / square_feet / year_built  →  on the `properties` table directly
+ *  - Nigerian infra (has_bq, nepa_status, water_source, internet_type, security_type)
+ *    →  stored in  property_details[].metadata  (JSON column, NOT direct columns)
+ *  - property_details is a one-to-many relation   →  returns as an array
+ */
+export type PropertyDetailMetadata = {
+  has_bq?: boolean;
+  nepa_status?: string;
+  water_source?: string;
+  internet_type?: string;
+  security_type?: string[];
+  [key: string]: unknown;
+};
+
 export type Property = Database["public"]["Tables"]["properties"]["Row"] & {
-  property_details:
-    | Database["public"]["Tables"]["property_details"]["Row"]
-    | null;
+  property_details: (Database["public"]["Tables"]["property_details"]["Row"] & {
+    metadata: PropertyDetailMetadata | null;
+  })[];
   property_media: Database["public"]["Tables"]["property_media"]["Row"][];
   owners: {
-    profiles: Database["public"]["Tables"]["profiles"]["Row"] | null;
+    profiles: Pick<
+      Database["public"]["Tables"]["profiles"]["Row"],
+      "full_name" | "avatar_url" | "phone"
+    > | null;
   } | null;
   agents: {
-    profiles: Database["public"]["Tables"]["profiles"]["Row"] | null;
+    profiles: Pick<
+      Database["public"]["Tables"]["profiles"]["Row"],
+      "full_name" | "avatar_url" | "phone"
+    > | null;
   } | null;
 };
 
 export interface PropertyFilters {
   propertyType?: string;
-  listingType?: "sale" | "rent" | "lease";
+  listingType?: string;
   state?: string;
-  lga?: string;
+  lga?: string; // no DB column — used only for display/label mapping
   minPrice?: number;
   maxPrice?: number;
   bedrooms?: number;
   bathrooms?: number;
+  // Nigerian infra filters — live in property_details.metadata JSON
+  // These are applied client-side after the query (PostgREST can't filter nested JSON)
   hasBq?: boolean;
   nepaStatus?: string;
   waterSource?: string;
@@ -75,12 +101,9 @@ export function usePropertyMap({
   // Progressive loading: adjust limit based on zoom level
   const getProgressiveLimit = (zoomLevel: number, baseLimit?: number) => {
     if (baseLimit) return baseLimit;
-
-    // At low zoom (zoomed out), load fewer properties
     if (zoomLevel <= 8) return 50;
     if (zoomLevel <= 10) return 100;
     if (zoomLevel <= 12) return 200;
-    // At high zoom (zoomed in), load more properties
     return 500;
   };
 
@@ -92,7 +115,6 @@ export function usePropertyMap({
 
     try {
       const supabase = createClient();
-
       const progressiveLimit = getProgressiveLimit(zoom, limit);
 
       let query = supabase
@@ -102,8 +124,8 @@ export function usePropertyMap({
           *,
           property_details (*),
           property_media (*),
-          owners (profiles (*)),
-          agents (profiles (*))
+          owners (profiles (full_name, avatar_url, phone)),
+          agents (profiles (full_name, avatar_url, phone))
         `,
         )
         .eq("status", "live")
@@ -111,7 +133,7 @@ export function usePropertyMap({
         .order("created_at", { ascending: false })
         .limit(progressiveLimit);
 
-      // Apply geospatial bounds filtering
+      // Geospatial bounds filtering
       if (bounds) {
         query = query
           .gte("latitude", bounds.south)
@@ -120,7 +142,7 @@ export function usePropertyMap({
           .lte("longitude", bounds.east);
       }
 
-      // Apply filters
+      // Server-side filters (direct columns on `properties` table)
       if (filters) {
         if (filters.propertyType) {
           query = query.eq("property_type", filters.propertyType);
@@ -129,10 +151,7 @@ export function usePropertyMap({
           query = query.eq("listing_type", filters.listingType);
         }
         if (filters.state) {
-          query = query.eq("state", filters.state);
-        }
-        if (filters.lga) {
-          query = query.eq("lga", filters.lga);
+          query = query.ilike("state", filters.state);
         }
         if (filters.minPrice !== undefined) {
           query = query.gte("price", filters.minPrice);
@@ -140,51 +159,54 @@ export function usePropertyMap({
         if (filters.maxPrice !== undefined) {
           query = query.lte("price", filters.maxPrice);
         }
+        // bedrooms / bathrooms are on the `properties` table (NOT property_details)
         if (filters.bedrooms !== undefined) {
-          query = query.gte("property_details.bedrooms", filters.bedrooms);
+          query = query.gte("bedrooms", filters.bedrooms);
         }
         if (filters.bathrooms !== undefined) {
-          query = query.gte("property_details.bathrooms", filters.bathrooms);
+          query = query.gte("bathrooms", filters.bathrooms);
         }
-        if (filters.hasBq !== undefined) {
-          query = query.eq("property_details.has_bq", filters.hasBq);
-        }
-        if (filters.nepaStatus) {
-          query = query.eq("property_details.nepa_status", filters.nepaStatus);
-        }
-        if (filters.waterSource) {
-          query = query.eq(
-            "property_details.water_source",
-            filters.waterSource,
-          );
-        }
-        if (filters.internetType) {
-          query = query.eq(
-            "property_details.internet_type",
-            filters.internetType,
-          );
-        }
-        if (filters.securityTypes && filters.securityTypes.length > 0) {
-          // Filter properties that have at least one of the specified security types
-          query = query.overlaps(
-            "property_details.security_type",
-            filters.securityTypes,
-          );
-        }
+        // NOTE: lga has no column on `properties` — skipped at query level
       }
 
       const { data, error: queryError } = await query;
 
-      if (queryError) {
-        throw queryError;
+      if (queryError) throw queryError;
+
+      // Filter out properties without valid coordinates
+      let validProperties = (data || []).filter(
+        (p) => p.latitude !== null && p.longitude !== null,
+      ) as Property[];
+
+      // Client-side post-filter: Nigerian infra attributes live in
+      // property_details[0].metadata (JSON) — cannot be filtered server-side
+      // via standard PostgREST without raw SQL functions.
+      if (filters) {
+        const { hasBq, nepaStatus, waterSource, internetType, securityTypes } = filters;
+        const needsMetaFilter = hasBq !== undefined || nepaStatus || waterSource || internetType || (securityTypes && securityTypes.length > 0);
+
+        if (needsMetaFilter) {
+          validProperties = validProperties.filter((p) => {
+            const meta = p.property_details?.[0]?.metadata ?? {};
+
+            if (hasBq !== undefined && meta.has_bq !== hasBq) return false;
+            if (nepaStatus && meta.nepa_status !== nepaStatus) return false;
+            if (waterSource && meta.water_source !== waterSource) return false;
+            if (internetType && meta.internet_type !== internetType) return false;
+            if (securityTypes && securityTypes.length > 0) {
+              const propSecurity: string[] = Array.isArray(meta.security_type)
+                ? (meta.security_type as string[])
+                : [];
+              const hasOverlap = securityTypes.some((s) => propSecurity.includes(s));
+              if (!hasOverlap) return false;
+            }
+
+            return true;
+          });
+        }
       }
 
-      // Filter out properties without coordinates
-      const validProperties = (data || []).filter(
-        (property) => property.latitude !== null && property.longitude !== null,
-      );
-
-      setProperties(validProperties as Property[]);
+      setProperties(validProperties);
     } catch (err) {
       console.error("Error fetching properties for map:", err);
       setError(
@@ -205,14 +227,11 @@ export function usePropertyMap({
 
     const supabase = createClient();
     const channel: RealtimeChannel = supabase
-      .channel("properties-updates")
+      .channel("properties-map-updates")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "properties" },
-        () => {
-          // Refetch properties when any change occurs
-          fetchProperties();
-        },
+        () => { fetchProperties(); },
       )
       .subscribe();
 

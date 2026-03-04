@@ -9,39 +9,82 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
+      /**
+       * Lightweight auth mirror — no role column.
+       * Role lives in public.users.role (UserRole enum).
+       */
       profiles: {
         Row: {
           id: string;
           email: string;
           full_name: string | null;
-          user_type: "owner" | "agent" | "user" | "admin";
           avatar_url: string | null;
           phone: string | null;
           bio: string | null;
-          created_at: string;
-          updated_at: string;
+          created_at: string | null;
+          updated_at: string | null;
         };
         Insert: {
           id: string;
           email: string;
           full_name?: string | null;
-          user_type: "owner" | "agent" | "user" | "admin";
           avatar_url?: string | null;
           phone?: string | null;
           bio?: string | null;
-          created_at?: string;
-          updated_at?: string;
+          created_at?: string | null;
+          updated_at?: string | null;
         };
         Update: {
           id?: string;
           email?: string;
           full_name?: string | null;
-          user_type?: "owner" | "agent" | "user" | "admin";
           avatar_url?: string | null;
           phone?: string | null;
           bio?: string | null;
-          created_at?: string;
-          updated_at?: string;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+      };
+      /** Role source-of-truth; mirrors auth.users */
+      users: {
+        Row: {
+          id: string;
+          email: string | null;
+          phone: string | null;
+          full_name: string | null;
+          avatar_url: string | null;
+          role: "user" | "agent" | "owner" | "admin";
+          is_active: boolean;
+          metadata: Json | null;
+          created_at: string | null;
+          updated_at: string | null;
+          deleted_at: string | null;
+        };
+        Insert: {
+          id: string;
+          email?: string | null;
+          phone?: string | null;
+          full_name?: string | null;
+          avatar_url?: string | null;
+          role?: "user" | "agent" | "owner" | "admin";
+          is_active?: boolean;
+          metadata?: Json | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+          deleted_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          email?: string | null;
+          phone?: string | null;
+          full_name?: string | null;
+          avatar_url?: string | null;
+          role?: "user" | "agent" | "owner" | "admin";
+          is_active?: boolean;
+          metadata?: Json | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+          deleted_at?: string | null;
         };
       };
       owners: {
@@ -49,9 +92,10 @@ export interface Database {
           id: string;
           profile_id: string;
           business_name: string | null;
-          property_types: string[] | null;
+          /** NOT NULL array (empty array by default is fine) */
+          property_types: string[];
           phone: string | null;
-          verified: boolean;
+          verified: boolean | null;
           verification_date: string | null;
           years_experience: number | null;
           bio: string | null;
@@ -59,16 +103,16 @@ export interface Database {
           rating: number | null;
           total_properties: number | null;
           whatsapp: string | null;
-          created_at: string;
-          updated_at: string;
+          created_at: string | null;
+          updated_at: string | null;
         };
         Insert: {
           id?: string;
           profile_id: string;
           business_name?: string | null;
-          property_types?: string[] | null;
+          property_types?: string[];
           phone?: string | null;
-          verified?: boolean;
+          verified?: boolean | null;
           verification_date?: string | null;
           years_experience?: number | null;
           bio?: string | null;
@@ -76,16 +120,16 @@ export interface Database {
           rating?: number | null;
           total_properties?: number | null;
           whatsapp?: string | null;
-          created_at?: string;
-          updated_at?: string;
+          created_at?: string | null;
+          updated_at?: string | null;
         };
         Update: {
           id?: string;
           profile_id?: string;
           business_name?: string | null;
-          property_types?: string[] | null;
+          property_types?: string[];
           phone?: string | null;
-          verified?: boolean;
+          verified?: boolean | null;
           verification_date?: string | null;
           years_experience?: number | null;
           bio?: string | null;
@@ -93,19 +137,20 @@ export interface Database {
           rating?: number | null;
           total_properties?: number | null;
           whatsapp?: string | null;
-          created_at?: string;
-          updated_at?: string;
+          created_at?: string | null;
+          updated_at?: string | null;
         };
       };
       agents: {
         Row: {
           id: string;
           profile_id: string;
-          license_number: string | null;
+          /** NOT NULL UNIQUE in database */
+          license_number: string;
           agency_name: string | null;
-          specialization: string[] | null;
+          specialization: string[];
           phone: string | null;
-          verified: boolean;
+          verified: boolean | null;
           verification_date: string | null;
           years_experience: number | null;
           bio: string | null;
@@ -114,17 +159,17 @@ export interface Database {
           total_sales: number | null;
           total_listings: number | null;
           whatsapp: string | null;
-          created_at: string;
-          updated_at: string;
+          created_at: string | null;
+          updated_at: string | null;
         };
         Insert: {
           id?: string;
           profile_id: string;
-          license_number?: string | null;
+          license_number: string;
           agency_name?: string | null;
-          specialization?: string[] | null;
+          specialization?: string[];
           phone?: string | null;
-          verified?: boolean;
+          verified?: boolean | null;
           verification_date?: string | null;
           years_experience?: number | null;
           bio?: string | null;
@@ -133,17 +178,17 @@ export interface Database {
           total_sales?: number | null;
           total_listings?: number | null;
           whatsapp?: string | null;
-          created_at?: string;
-          updated_at?: string;
+          created_at?: string | null;
+          updated_at?: string | null;
         };
         Update: {
           id?: string;
           profile_id?: string;
-          license_number?: string | null;
+          license_number?: string;
           agency_name?: string | null;
-          specialization?: string[] | null;
+          specialization?: string[];
           phone?: string | null;
-          verified?: boolean;
+          verified?: boolean | null;
           verification_date?: string | null;
           years_experience?: number | null;
           bio?: string | null;
@@ -152,61 +197,63 @@ export interface Database {
           total_sales?: number | null;
           total_listings?: number | null;
           whatsapp?: string | null;
-          created_at?: string;
-          updated_at?: string;
+          created_at?: string | null;
+          updated_at?: string | null;
         };
       };
       kyc_requests: {
         Row: {
           id: string;
           user_id: string;
-          user_type: "agent" | "owner";
-          status: "pending" | "approved" | "rejected";
+          /** Plain string in DB — typical values: "agent" | "owner" */
+          user_type: string;
+          status: string | null;
           kyc_provider: string;
           kyc_reference_id: string | null;
           documents: Json | null;
-          submitted_at: string;
+          submitted_at: string | null;
           approved_at: string | null;
           rejected_at: string | null;
           rejection_reason: string | null;
-          created_at: string;
-          updated_at: string;
+          created_at: string | null;
+          updated_at: string | null;
         };
         Insert: {
           id?: string;
           user_id: string;
-          user_type: "agent" | "owner";
-          status?: "pending" | "approved" | "rejected";
+          user_type: string;
+          status?: string | null;
           kyc_provider: string;
           kyc_reference_id?: string | null;
           documents?: Json | null;
-          submitted_at?: string;
+          submitted_at?: string | null;
           approved_at?: string | null;
           rejected_at?: string | null;
           rejection_reason?: string | null;
-          created_at?: string;
-          updated_at?: string;
+          created_at?: string | null;
+          updated_at?: string | null;
         };
         Update: {
           id?: string;
           user_id?: string;
-          user_type?: "agent" | "owner";
-          status?: "pending" | "approved" | "rejected";
+          user_type?: string;
+          status?: string | null;
           kyc_provider?: string;
           kyc_reference_id?: string | null;
           documents?: Json | null;
-          submitted_at?: string;
+          submitted_at?: string | null;
           approved_at?: string | null;
           rejected_at?: string | null;
           rejection_reason?: string | null;
-          created_at?: string;
-          updated_at?: string;
+          created_at?: string | null;
+          updated_at?: string | null;
         };
       };
       properties: {
         Row: {
           id: string;
-          owner_id: string;
+          /** Nullable — a property can be listed by an agent without a direct owner link */
+          owner_id: string | null;
           agent_id: string | null;
           title: string;
           description: string | null;
@@ -219,17 +266,22 @@ export interface Database {
           country: string;
           latitude: number | null;
           longitude: number | null;
+          /** Columns on properties table (NOT in property_details) */
+          bedrooms: number | null;
+          bathrooms: number | null;
+          square_feet: number | null;
+          year_built: number | null;
           property_type: string;
-          listing_type: "for_sale" | "for_rent" | "for_lease" | "short_let" | "location";
+          listing_type: string;
           listing_source: string | null;
-          status: "draft" | "live" | "pending_ml_validation" | "pending_vetting" | "rejected" | "sold" | "rented" | "inactive";
-          verification_status: "pending" | "verified" | "rejected";
-          created_at: string;
-          updated_at: string;
+          status: string;
+          verification_status: string;
+          created_at: string | null;
+          updated_at: string | null;
         };
         Insert: {
           id?: string;
-          owner_id: string;
+          owner_id?: string | null;
           agent_id?: string | null;
           title: string;
           description?: string | null;
@@ -242,17 +294,21 @@ export interface Database {
           country?: string;
           latitude?: number | null;
           longitude?: number | null;
+          bedrooms?: number | null;
+          bathrooms?: number | null;
+          square_feet?: number | null;
+          year_built?: number | null;
           property_type: string;
-          listing_type: "for_sale" | "for_rent" | "for_lease" | "short_let" | "location";
+          listing_type?: string;
           listing_source?: string | null;
-          status?: "draft" | "live" | "pending_ml_validation" | "pending_vetting" | "rejected" | "sold" | "rented" | "inactive";
-          verification_status?: "pending" | "verified" | "rejected";
-          created_at?: string;
-          updated_at?: string;
+          status?: string;
+          verification_status?: string;
+          created_at?: string | null;
+          updated_at?: string | null;
         };
         Update: {
           id?: string;
-          owner_id?: string;
+          owner_id?: string | null;
           agent_id?: string | null;
           title?: string;
           description?: string | null;
@@ -265,63 +321,81 @@ export interface Database {
           country?: string;
           latitude?: number | null;
           longitude?: number | null;
+          bedrooms?: number | null;
+          bathrooms?: number | null;
+          square_feet?: number | null;
+          year_built?: number | null;
           property_type?: string;
-          listing_type?: "for_sale" | "for_rent" | "for_lease" | "short_let" | "location";
+          listing_type?: string;
           listing_source?: string | null;
-          status?: "draft" | "live" | "pending_ml_validation" | "pending_vetting" | "rejected" | "sold" | "rented" | "inactive";
-          verification_status?: "pending" | "verified" | "rejected";
-          created_at?: string;
-          updated_at?: string;
+          status?: string;
+          verification_status?: string;
+          created_at?: string | null;
+          updated_at?: string | null;
         };
       };
       property_details: {
+        /**
+         * Nigerian infra attributes (has_bq, nepa_status, water_source,
+         * internet_type, security_type) live in the `metadata` JSON column,
+         * NOT as direct columns. Filter them client-side after fetching.
+         */
         Row: {
           id: string;
           property_id: string;
-          bedrooms: number | null;
-          bathrooms: number | null;
-          square_feet: number | null;
-          lot_size: number | null;
-          year_built: number | null;
           parking_spaces: number | null;
-          furnished: boolean | null;
-          pets_allowed: boolean | null;
-          amenities: string[] | null;
-          utilities_included: string[] | null;
-          created_at: string;
-          updated_at: string;
+          has_pool: boolean | null;
+          has_garage: boolean | null;
+          has_garden: boolean | null;
+          heating_type: string | null;
+          cooling_type: string | null;
+          flooring_type: string | null;
+          roof_type: string | null;
+          foundation_type: string | null;
+          /** JSON blob: { has_bq, nepa_status, water_source, internet_type, security_type, … } */
+          metadata: Json | null;
+          /** JSON blob of amenity IDs */
+          amenities: Json | null;
+          /** JSON blob of feature flags */
+          features: Json | null;
+          created_at: string | null;
+          updated_at: string | null;
         };
         Insert: {
           id?: string;
           property_id: string;
-          bedrooms?: number | null;
-          bathrooms?: number | null;
-          square_feet?: number | null;
-          lot_size?: number | null;
-          year_built?: number | null;
           parking_spaces?: number | null;
-          furnished?: boolean | null;
-          pets_allowed?: boolean | null;
-          amenities?: string[] | null;
-          utilities_included?: string[] | null;
-          created_at?: string;
-          updated_at?: string;
+          has_pool?: boolean | null;
+          has_garage?: boolean | null;
+          has_garden?: boolean | null;
+          heating_type?: string | null;
+          cooling_type?: string | null;
+          flooring_type?: string | null;
+          roof_type?: string | null;
+          foundation_type?: string | null;
+          metadata?: Json | null;
+          amenities?: Json | null;
+          features?: Json | null;
+          created_at?: string | null;
+          updated_at?: string | null;
         };
         Update: {
           id?: string;
           property_id?: string;
-          bedrooms?: number | null;
-          bathrooms?: number | null;
-          square_feet?: number | null;
-          lot_size?: number | null;
-          year_built?: number | null;
           parking_spaces?: number | null;
-          furnished?: boolean | null;
-          pets_allowed?: boolean | null;
-          amenities?: string[] | null;
-          utilities_included?: string[] | null;
-          created_at?: string;
-          updated_at?: string;
+          has_pool?: boolean | null;
+          has_garage?: boolean | null;
+          has_garden?: boolean | null;
+          heating_type?: string | null;
+          cooling_type?: string | null;
+          flooring_type?: string | null;
+          roof_type?: string | null;
+          foundation_type?: string | null;
+          metadata?: Json | null;
+          amenities?: Json | null;
+          features?: Json | null;
+          created_at?: string | null;
+          updated_at?: string | null;
         };
       };
       property_documents: {
@@ -329,92 +403,114 @@ export interface Database {
           id: string;
           property_id: string;
           document_type: string;
-          file_url: string;
+          /** Column is `document_url` (not `file_url`) */
+          document_url: string;
           file_name: string;
-          ml_validation_status: "pending" | "passed" | "failed";
-          admin_vetting_status: "pending" | "approved" | "rejected";
-          uploaded_at: string;
+          file_size: number | null;
+          verification_status: string;
+          verified_by: string | null;
+          verified_at: string | null;
+          notes: string | null;
+          created_at: string | null;
+          updated_at: string | null;
         };
         Insert: {
           id?: string;
           property_id: string;
           document_type: string;
-          file_url: string;
+          document_url: string;
           file_name: string;
-          ml_validation_status?: "pending" | "passed" | "failed";
-          admin_vetting_status?: "pending" | "approved" | "rejected";
-          uploaded_at?: string;
+          file_size?: number | null;
+          verification_status?: string;
+          verified_by?: string | null;
+          verified_at?: string | null;
+          notes?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
         };
         Update: {
           id?: string;
           property_id?: string;
           document_type?: string;
-          file_url?: string;
+          document_url?: string;
           file_name?: string;
-          ml_validation_status?: "pending" | "passed" | "failed";
-          admin_vetting_status?: "pending" | "approved" | "rejected";
-          uploaded_at?: string;
+          file_size?: number | null;
+          verification_status?: string;
+          verified_by?: string | null;
+          verified_at?: string | null;
+          notes?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
         };
       };
       property_media: {
         Row: {
           id: string;
           property_id: string;
-          media_type: "image" | "video" | "virtual_tour";
-          file_url: string;
+          /** Plain string — typical values: "image" | "video" | "virtual_tour" */
+          media_type: string;
+          /** Column is `media_url` (not `file_url`) */
+          media_url: string;
           file_name: string;
-          is_primary: boolean;
-          sort_order: number;
-          uploaded_at: string;
+          /** Column is `display_order` (not `sort_order`) */
+          display_order: number | null;
+          /** Column is `is_featured` (not `is_primary`) */
+          is_featured: boolean | null;
+          created_at: string | null;
         };
         Insert: {
           id?: string;
           property_id: string;
-          media_type: "image" | "video" | "virtual_tour";
-          file_url: string;
+          media_type: string;
+          media_url: string;
           file_name: string;
-          is_primary?: boolean;
-          sort_order?: number;
-          uploaded_at?: string;
+          display_order?: number | null;
+          is_featured?: boolean | null;
+          created_at?: string | null;
         };
         Update: {
           id?: string;
           property_id?: string;
-          media_type?: "image" | "video" | "virtual_tour";
-          file_url?: string;
+          media_type?: string;
+          media_url?: string;
           file_name?: string;
-          is_primary?: boolean;
-          sort_order?: number;
-          uploaded_at?: string;
+          display_order?: number | null;
+          is_featured?: boolean | null;
+          created_at?: string | null;
         };
       };
       inquiries: {
         Row: {
           id: string;
           property_id: string;
-          user_id: string;
+          /** The user who sent the inquiry — column is `sender_id` (not `user_id`) */
+          sender_id: string;
+          owner_id: string;
           message: string;
-          status: "pending" | "responded" | "closed";
-          created_at: string;
-          updated_at: string;
+          /** Plain string — defaults to "new" */
+          status: string;
+          created_at: string | null;
+          updated_at: string | null;
         };
         Insert: {
           id?: string;
           property_id: string;
-          user_id: string;
+          sender_id: string;
+          owner_id: string;
           message: string;
-          status?: "pending" | "responded" | "closed";
-          created_at?: string;
-          updated_at?: string;
+          status?: string;
+          created_at?: string | null;
+          updated_at?: string | null;
         };
         Update: {
           id?: string;
           property_id?: string;
-          user_id?: string;
+          sender_id?: string;
+          owner_id?: string;
           message?: string;
-          status?: "pending" | "responded" | "closed";
-          created_at?: string;
-          updated_at?: string;
+          status?: string;
+          created_at?: string | null;
+          updated_at?: string | null;
         };
       };
       waitlist: {
@@ -499,18 +595,44 @@ export interface Database {
           id: string;
           user_id: string;
           property_id: string;
-          created_at: string;
+          created_at: string | null;
         };
         Insert: {
           id?: string;
           user_id: string;
           property_id: string;
-          created_at?: string;
+          created_at?: string | null;
         };
         Update: {
           id?: string;
           user_id?: string;
           property_id?: string;
+          created_at?: string | null;
+        };
+      };
+      admin_audit_log: {
+        Row: {
+          id: string;
+          actor_id: string;
+          action: string;
+          target_id: string | null;
+          metadata: Json | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          actor_id: string;
+          action: string;
+          target_id?: string | null;
+          metadata?: Json | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          actor_id?: string;
+          action?: string;
+          target_id?: string | null;
+          metadata?: Json | null;
           created_at?: string;
         };
       };
@@ -518,53 +640,35 @@ export interface Database {
         Row: {
           id: string;
           user_id: string;
-          type:
-            | "inquiry_received"
-            | "property_status_changed"
-            | "property_approved"
-            | "property_rejected"
-            | "duplicate_detected"
-            | "system_message";
+          /** Plain string in DB — typical values: inquiry_received, property_status_changed, etc. */
+          type: string;
           title: string;
           message: string;
           data: Json | null;
-          is_read: boolean;
+          is_read: boolean | null;
           read_at: string | null;
-          created_at: string;
+          created_at: string | null;
         };
         Insert: {
           id?: string;
           user_id: string;
-          type:
-            | "inquiry_received"
-            | "property_status_changed"
-            | "property_approved"
-            | "property_rejected"
-            | "duplicate_detected"
-            | "system_message";
+          type: string;
           title: string;
           message: string;
           data?: Json | null;
-          is_read?: boolean;
+          is_read?: boolean | null;
           read_at?: string | null;
-          created_at?: string;
+          created_at?: string | null;
         };
         Update: {
           id?: string;
           user_id?: string;
-          type?:
-            | "inquiry_received"
-            | "property_status_changed"
-            | "property_approved"
-            | "property_rejected"
-            | "duplicate_detected"
-            | "system_message";
+          type?: string;
           title?: string;
           message?: string;
           data?: Json | null;
-          is_read?: boolean;
+          is_read?: boolean | null;
           read_at?: string | null;
-          created_at?: string;
         };
       };
       reviews: {
@@ -572,28 +676,28 @@ export interface Database {
           id: string;
           property_id: string;
           reviewer_id: string;
-          target_type: "property" | "agent" | "owner";
+          target_type: string;
           rating: number;
           comment: string | null;
-          created_at: string;
+          created_at: string | null;
         };
         Insert: {
           id?: string;
           property_id: string;
           reviewer_id: string;
-          target_type: "property" | "agent" | "owner";
+          target_type: string;
           rating: number;
           comment?: string | null;
-          created_at?: string;
+          created_at?: string | null;
         };
         Update: {
           id?: string;
           property_id?: string;
           reviewer_id?: string;
-          target_type?: "property" | "agent" | "owner";
+          target_type?: string;
           rating?: number;
           comment?: string | null;
-          created_at?: string;
+          created_at?: string | null;
         };
       };
       payments: {
@@ -602,33 +706,34 @@ export interface Database {
           user_id: string;
           property_id: string | null;
           amount: number;
-          currency: string;
-          type: "listing_fee" | "premium_feature";
-          status: "pending" | "completed" | "failed";
+          currency: string | null;
+          /** Plain string — typical values: "listing_fee" | "premium_feature" */
+          type: string;
+          status: string | null;
           transaction_id: string | null;
-          created_at: string;
+          created_at: string | null;
         };
         Insert: {
           id?: string;
           user_id: string;
           property_id?: string | null;
           amount: number;
-          currency?: string;
-          type: "listing_fee" | "premium_feature";
-          status?: "pending" | "completed" | "failed";
+          currency?: string | null;
+          type: string;
+          status?: string | null;
           transaction_id?: string | null;
-          created_at?: string;
+          created_at?: string | null;
         };
         Update: {
           id?: string;
           user_id?: string;
           property_id?: string | null;
           amount?: number;
-          currency?: string;
-          type?: "listing_fee" | "premium_feature";
-          status?: "pending" | "completed" | "failed";
+          currency?: string | null;
+          type?: string;
+          status?: string | null;
           transaction_id?: string | null;
-          created_at?: string;
+          created_at?: string | null;
         };
       };
     };
