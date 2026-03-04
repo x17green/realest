@@ -13,10 +13,11 @@ import {
 } from "@/components/ui";
 import {
   getCurrentUser,
+  getUserProfile,
   resendEmailVerification,
-  verifyEmail,
 } from "@/lib/auth";
 import { CheckCircle, Mail, AlertCircle, RefreshCw } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 function VerifyEmailContent() {
   const router = useRouter();
@@ -32,48 +33,68 @@ function VerifyEmailContent() {
   useEffect(() => {
     const handleEmailVerification = async () => {
       try {
-        // Get current user
-        const userResponse = await getCurrentUser();
-        if (userResponse.success && userResponse.user?.email) {
-          setEmail(userResponse.user.email);
-        }
+        const supabase = createClient();
 
-        // Check for verification tokens in URL
-        const accessToken = searchParams.get("access_token");
-        const refreshToken = searchParams.get("refresh_token");
-        const type = searchParams.get("type");
+        // Supabase sends either:
+        //   token_hash + type=signup  (direct OTP verification)
+        //   code                      (PKCE code exchange flow)
+        const tokenHash = searchParams.get("token_hash");
+        const code = searchParams.get("code");
+        const type = (searchParams.get("type") ?? "signup") as
+          | "signup"
+          | "email";
 
-        if (accessToken && refreshToken && type === "email") {
-          // Verify the email using centralized function
-          const verifyResponse = await verifyEmail(accessToken);
+        if (tokenHash) {
+          // Standard Supabase email-link flow
+          const { data, error: verifyError } = await supabase.auth.verifyOtp({
+            token_hash: tokenHash,
+            type,
+          });
 
-          if (!verifyResponse.success) {
-            if (verifyResponse.error?.includes("expired")) {
+          if (verifyError) {
+            if (verifyError.message.toLowerCase().includes("expired")) {
               setVerificationStatus("expired");
             } else {
               setVerificationStatus("error");
-              setError(verifyResponse.error || "Email verification failed");
+              setError(verifyError.message);
             }
-          } else {
-            setVerificationStatus("success");
+            return;
+          }
 
-            // Redirect to login after successful verification
-            setTimeout(() => {
-              router.push("/login?verified=true");
-            }, 3000);
-          }
-        } else {
-          // No verification tokens, show manual resend option
-          if (userResponse.success && userResponse.user?.email_confirmed_at) {
-            setVerificationStatus("success");
-          } else {
-            setVerificationStatus("error");
-            setError(
-              "No verification token found. Please check your email or resend verification.",
-            );
-          }
+          if (data.user?.email) setEmail(data.user.email);
+          await redirectToDestination(data.user?.id);
+          return;
         }
-      } catch (err) {
+
+        if (code) {
+          // PKCE flow — exchange code for session
+          const { data, error: exchangeError } =
+            await supabase.auth.exchangeCodeForSession(code);
+
+          if (exchangeError) {
+            setVerificationStatus("error");
+            setError(exchangeError.message);
+            return;
+          }
+
+          if (data.user?.email) setEmail(data.user.email);
+          await redirectToDestination(data.user?.id);
+          return;
+        }
+
+        // No token in URL — check if user is already confirmed
+        const userResponse = await getCurrentUser();
+        if (userResponse.success && userResponse.user?.email_confirmed_at) {
+          if (userResponse.user.email) setEmail(userResponse.user.email);
+          await redirectToDestination(userResponse.user.id);
+        } else {
+          if (userResponse.user?.email) setEmail(userResponse.user.email);
+          setVerificationStatus("error");
+          setError(
+            "No verification token found. Please check your email for the activation link.",
+          );
+        }
+      } catch {
         setVerificationStatus("error");
         setError("An unexpected error occurred during verification.");
       } finally {
@@ -83,6 +104,38 @@ function VerifyEmailContent() {
 
     handleEmailVerification();
   }, [searchParams, router]);
+
+  /** Determine the correct destination after successful email verification */
+  async function redirectToDestination(userId?: string) {
+    setVerificationStatus("success");
+
+    if (!userId) {
+      // Fallback — no user id, go to login
+      setTimeout(() => router.push("/login?verified=true"), 2000);
+      return;
+    }
+
+    const profileResponse = await getUserProfile(userId);
+    if (!profileResponse.success || !profileResponse.profile) {
+      setTimeout(() => router.push("/login?verified=true"), 2000);
+      return;
+    }
+
+    const userType = profileResponse.profile.user_type;
+    setTimeout(() => {
+      switch (userType) {
+        case "owner":
+        case "agent":
+          router.push("/onboarding");
+          break;
+        case "admin":
+          router.push("/admin");
+          break;
+        default:
+          router.push("/profile");
+      }
+    }, 2000);
+  }
 
   const handleResendVerification = async () => {
     if (!email) {
@@ -99,11 +152,14 @@ function VerifyEmailContent() {
       if (!resendResponse.success) {
         setError(resendResponse.error || "Failed to resend verification email");
       } else {
-        // Show success message
         setError("");
-        alert("Verification email sent! Please check your inbox.");
+        setVerificationStatus("error");
+        // Reset to show "check your email" hint
+        setError(
+          "A new verification email has been sent. Please check your inbox.",
+        );
       }
-    } catch (err) {
+    } catch {
       setError("Failed to resend verification email. Please try again.");
     } finally {
       setIsResending(false);
@@ -150,19 +206,19 @@ function VerifyEmailContent() {
             <div className="text-center space-y-4">
               <div className="bg-success-50 border border-success-200 p-4 rounded-lg">
                 <p className="text-sm text-success-700">
-                  Welcome to RealEST! Your account is now active and you can
-                  access all features.
+                  Welcome to RealEST! Your account is now active. Redirecting
+                  you to your dashboard…
                 </p>
               </div>
 
               <p className="text-sm text-muted-foreground">
-                Redirecting to sign in page...
+                Taking a moment longer? Click below.
               </p>
             </div>
 
             <div className="space-y-3">
               <Button asChild variant="default" className="w-full">
-                <Link href="/login">Continue to Sign In</Link>
+                <Link href="/profile">Continue to Dashboard</Link>
               </Button>
 
               <div className="text-center">

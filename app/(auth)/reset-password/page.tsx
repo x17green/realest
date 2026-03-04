@@ -149,6 +149,12 @@ function ResetPasswordContent() {
       console.log("Password updated successfully");
       setIsSuccess(true);
 
+      // Fire-and-forget: send security notification email before session ends.
+      // We intentionally do NOT await so the UX is never blocked by email latency.
+      fetch("/api/auth/password-changed", { method: "POST" }).catch((err) =>
+        console.warn("[reset-password] Notification email failed:", err),
+      );
+
       // Sign out after password reset for security
       await signOut();
 

@@ -9,6 +9,9 @@ import {
   type AdminNotificationData,
   type PasswordResetEmailData,
   type InquiryEmailData,
+  type WelcomeEmailData,
+  type OnboardingReminderEmailData,
+  type PasswordChangedEmailData,
   type EmailTemplate,
 } from "./email-templates";
 
@@ -314,6 +317,143 @@ export async function sendHybridPasswordResetEmail(
 }
 
 /**
+ * Send welcome email after onboarding completion
+ */
+export async function sendWelcomeEmail(
+  data: WelcomeEmailData,
+): Promise<{ success: boolean; error?: string; messageId?: string; quotaExceeded?: boolean }> {
+  try {
+    if (!process.env.RESEND_API_KEY) {
+      console.warn("⚠️ RESEND_API_KEY not configured. Email sending disabled.");
+      return { success: false, error: "Email service not configured" };
+    }
+
+    if (!data.email || !data.firstName || !data.userType || !data.dashboardUrl) {
+      return { success: false, error: "Invalid welcome email data" };
+    }
+
+    console.log(`📧 Sending welcome email to ${data.email} (${data.userType})`);
+
+    const template = Templates.welcome(data);
+
+    const { data: emailResult, error } = await resend.emails.send({
+      from: FROM_EMAIL_AUTH,
+      to: [data.email],
+      subject: template.subject,
+      html: template.html,
+      text: template.text,
+    });
+
+    if (error) {
+      console.error("❌ Welcome email sending failed:", error);
+      return { success: false, error: error.message, quotaExceeded: isQuotaError(error) };
+    }
+
+    console.log("✅ Welcome email sent:", emailResult?.id);
+    return { success: true, messageId: emailResult?.id };
+  } catch (error) {
+    console.error("❌ Unexpected welcome email error:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown email error",
+    };
+  }
+}
+
+/**
+ * Send onboarding reminder email to users who haven't completed onboarding
+ */
+export async function sendOnboardingReminderEmail(
+  data: OnboardingReminderEmailData,
+): Promise<{ success: boolean; error?: string; messageId?: string; quotaExceeded?: boolean }> {
+  try {
+    if (!process.env.RESEND_API_KEY) {
+      console.warn("⚠️ RESEND_API_KEY not configured. Email sending disabled.");
+      return { success: false, error: "Email service not configured" };
+    }
+
+    if (!data.email || !data.firstName || !data.userType || !data.onboardingUrl) {
+      return { success: false, error: "Invalid onboarding reminder data" };
+    }
+
+    console.log(`📧 Sending onboarding reminder to ${data.email} (${data.userType})`);
+
+    const template = Templates.onboardingReminder(data);
+
+    const { data: emailResult, error } = await resend.emails.send({
+      from: FROM_EMAIL_AUTH,
+      to: [data.email],
+      subject: template.subject,
+      html: template.html,
+      text: template.text,
+    });
+
+    if (error) {
+      console.error("❌ Onboarding reminder email sending failed:", error);
+      return { success: false, error: error.message, quotaExceeded: isQuotaError(error) };
+    }
+
+    console.log("✅ Onboarding reminder email sent:", emailResult?.id);
+    return { success: true, messageId: emailResult?.id };
+  } catch (error) {
+    console.error("❌ Unexpected onboarding reminder email error:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown email error",
+    };
+  }
+}
+
+/**
+ * Send password-changed security notification
+ *
+ * Called immediately after a successful password reset to confirm the change
+ * and give the user a clear remediation path if they did not initiate it.
+ */
+export async function sendPasswordChangedEmail(data: PasswordChangedEmailData): Promise<{
+  success: boolean;
+  error?: string;
+  messageId?: string;
+}> {
+  try {
+    if (!process.env.RESEND_API_KEY) {
+      console.warn("⚠️ RESEND_API_KEY not configured. Password-changed notification skipped.");
+      return { success: false, error: "Email service not configured" };
+    }
+
+    if (!data.email || !data.firstName) {
+      return { success: false, error: "Invalid data for password-changed notification" };
+    }
+
+    console.log(`📧 Sending password-changed notification to ${data.email}`);
+
+    const template = Templates.passwordChanged(data);
+
+    const { data: emailResult, error } = await resend.emails.send({
+      from: FROM_EMAIL_AUTH,
+      to: [data.email],
+      subject: template.subject,
+      html: template.html,
+      text: template.text,
+    });
+
+    if (error) {
+      console.error("❌ Password-changed notification failed:", error);
+      return { success: false, error: error.message };
+    }
+
+    console.log("✅ Password-changed notification sent:", emailResult?.id);
+    return { success: true, messageId: emailResult?.id };
+  } catch (error) {
+    console.error("❌ Unexpected password-changed notification error:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown email error",
+    };
+  }
+}
+
+/**
  * Test email configuration
  */
 export async function testEmailConfiguration(): Promise<{
@@ -361,6 +501,10 @@ export type {
   WaitlistEmailData,
   AdminNotificationData,
   PasswordResetEmailData,
+  InquiryEmailData,
+  WelcomeEmailData,
+  OnboardingReminderEmailData,
+  PasswordChangedEmailData,
   EmailTemplate,
 } from "./email-templates";
 

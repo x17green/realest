@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { 
   Button, 
   Card, 
@@ -12,13 +13,13 @@ import {
 } from "@/components/ui";
 import { Input } from "@/components/ui/input";
 import { sendHybridPasswordReset } from "@/lib/auth";
-import { Mail, ArrowLeft, CheckCircle } from "lucide-react";
+import { Mail, ArrowLeft } from "lucide-react";
 
 export default function ForgotPasswordPage() {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
-  const [isSuccess, setIsSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,75 +34,14 @@ export default function ForgotPasswordPage() {
         return;
       }
 
-      setIsSuccess(true);
-    } catch (err) {
+      // Redirect to OTP page for code entry
+      router.push(`/otp?email=${encodeURIComponent(email)}&type=reset`);
+    } catch {
       setError("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
-
-  if (isSuccess) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-4">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <div className="flex justify-center mb-4">
-              <CheckCircle className="w-16 h-16 text-success" />
-            </div>
-            <CardTitle className="text-2xl font-bold">
-              Check Your Email
-            </CardTitle>
-            <CardDescription>
-              We've sent you password reset options
-            </CardDescription>
-          </CardHeader>
-
-          <CardContent className="space-y-6">
-            <div className="text-center space-y-4">
-              <div className="flex items-center justify-center gap-2 text-muted-foreground">
-                <Mail className="w-4 h-4" />
-                <span className="text-sm">Password reset email sent to</span>
-              </div>
-
-              <div className="bg-muted p-4 rounded-lg">
-                <p className="text-sm font-medium">{email}</p>
-              </div>
-
-              <div className="bg-muted p-4 rounded-lg">
-                <p className="text-sm">
-                  You have two options to reset your password:
-                </p>
-                <ul className="text-sm mt-2 space-y-1">
-                  <li>• Enter the 6-digit code on our website</li>
-                  <li>• Click the direct reset link in your email</li>
-                </ul>
-                <p className="text-sm mt-2 text-muted-foreground">
-                  Both options expire in 15 minutes.
-                </p>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <Button asChild variant="default" className="w-full">
-                <Link href="/login">Back to Sign In</Link>
-              </Button>
-
-              <button
-                onClick={() => {
-                  setIsSuccess(false);
-                  setEmail("");
-                }}
-                className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Try a different email address
-              </button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
@@ -112,7 +52,7 @@ export default function ForgotPasswordPage() {
           </CardTitle>
           <CardDescription>
             Enter your email address and we'll send you secure password reset
-            options
+            code
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">

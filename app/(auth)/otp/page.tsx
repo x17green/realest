@@ -11,8 +11,14 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui";
-import { verifyOTP, getCurrentUser, getUserProfile, sendOTP } from "@/lib/auth";
-import { CheckCircle, Shield, RefreshCw, AlertTriangle } from "lucide-react";
+import {
+  verifyOTP,
+  getCurrentUser,
+  getUserProfile,
+  resendEmailVerification,
+  sendHybridPasswordReset,
+} from "@/lib/auth";
+import { CheckCircle, Shield, RefreshCw, AlertTriangle, Clock } from "lucide-react";
 
 function OTPContent() {
   const router = useRouter();
@@ -22,9 +28,12 @@ function OTPContent() {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [error, setError] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isExpired, setIsExpired] = useState(false);
   const [email, setEmail] = useState("");
-  const [otpType] = useState<"email">("email");
+  // "reset" = password-reset OTP; anything else = signup email OTP (legacy)
+  const otpType = (searchParams.get("type") ?? "email") as "email" | "reset";
   const [timeLeft, setTimeLeft] = useState(300); // 5 minutes in seconds
+  const [isPaused, setIsPaused] = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   // Initialize from URL params
@@ -33,19 +42,48 @@ function OTPContent() {
     if (emailParam) setEmail(emailParam);
 
     if (!emailParam) {
-      router.push("/login");
+      // No email means nothing to verify — send back to appropriate page
+      if (searchParams.get("type") === "reset") {
+        router.push("/forgot-password");
+      } else {
+        router.push("/login");
+      }
     }
   }, [searchParams, router]);
 
-  // Countdown timer
+  // Auto-fill + auto-submit when a pre-filled code arrives via URL param
+  // (e.g. user clicked the OTP code link in their reset email)
   useEffect(() => {
-    if (timeLeft > 0) {
-      const timer = setInterval(() => {
-        setTimeLeft((prev) => prev - 1);
-      }, 1000);
-      return () => clearInterval(timer);
+    const codeParam = searchParams.get("code");
+    if (
+      codeParam &&
+      /^\d{6}$/.test(codeParam) &&
+      searchParams.get("type") === "reset"
+    ) {
+      const digits = codeParam.split("");
+      setOtp(digits);
+      // Small delay so the input boxes render before we trigger verification
+      const tid = setTimeout(() => handleVerifyOtp(codeParam), 400);
+      return () => clearTimeout(tid);
     }
-  }, [timeLeft]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // run once on mount — searchParams is stable
+
+  // Pause timer when the user switches tabs or minimises the window
+  useEffect(() => {
+    const handleVisibility = () => setIsPaused(document.hidden);
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
+  }, []);
+
+  // Countdown timer — does not run while tab is hidden
+  useEffect(() => {
+    if (timeLeft <= 0 || isPaused) return;
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => Math.max(0, prev - 1));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [timeLeft, isPaused]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -96,11 +134,40 @@ function OTPContent() {
     setError("");
 
     try {
+      // --- Password reset OTP path ---
+      if (otpType === "reset") {
+        const res = await fetch("/api/auth/verify-reset-otp", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code: otpCode }),
+        });
+        const data = await res.json();
+
+        if (!data.success) {
+          const isExpiredError =
+            data.error?.toLowerCase().includes("expired") ||
+            data.error?.toLowerCase().includes("not found");
+          if (isExpiredError) {
+            setIsExpired(true);
+            setTimeLeft(0); // unlock the resend button immediately
+          }
+          setError(data.error || "Invalid code. Please try again.");
+          setOtp(["", "", "", "", "", ""]);
+          inputRefs.current[0]?.focus();
+          return;
+        }
+
+        // Session cookies are now set — go to reset-password
+        setIsSuccess(true);
+        setTimeout(() => router.push("/reset-password"), 1500);
+        return;
+      }
+
+      // --- Signup email OTP path (legacy / fallback) ---
       const verifyResponse = await verifyOTP(email, otpCode);
 
       if (!verifyResponse.success) {
         setError(verifyResponse.error || "Invalid OTP code");
-        // Clear OTP on error
         setOtp(["", "", "", "", "", ""]);
         inputRefs.current[0]?.focus();
         return;
@@ -108,7 +175,12 @@ function OTPContent() {
 
       setIsSuccess(true);
 
-      // Get user profile to determine redirect
+      // Get user profile to determine redirect destination.
+      // Do NOT query the onboarding table here — the browser client may not yet
+      // reflect the new session, causing a false "not complete" result that leads
+      // to a chain redirect (OTP → /onboarding → /owner).
+      // Instead redirect straight to the dashboard and let its layout enforce
+      // the onboarding check server-side.
       const userResponse = await getCurrentUser();
       if (userResponse.success && userResponse.user) {
         const profileResponse = await getUserProfile(userResponse.user.id);
@@ -116,43 +188,17 @@ function OTPContent() {
         if (profileResponse.success && profileResponse.profile) {
           const userType = profileResponse.profile.user_type;
 
-          // Check if user needs to complete onboarding
-          if (userType === "owner" || userType === "agent") {
-            // Check if onboarding is complete by verifying role-specific table entry
-            const supabase = (
-              await import("@/lib/supabase/client")
-            ).createClient();
-            const tableName = userType === "owner" ? "owners" : "agents";
-
-            const { data: onboardingComplete } = await supabase
-              .from(tableName)
-              .select("id")
-              .eq("profile_id", userResponse.user.id)
-              .single();
-
-            if (!onboardingComplete) {
-              // User hasn't completed onboarding, redirect to onboarding flow
-              router.push("/onboarding");
-              router.refresh();
-              return;
-            }
-          }
-
-          // User has completed onboarding or doesn't need it, redirect to dashboard
           if (userType === "owner") {
-            router.push("/owner");
+            router.replace("/owner");
           } else if (userType === "admin") {
-            router.push("/admin");
+            router.replace("/admin");
           } else if (userType === "agent") {
-            router.push("/agent");
+            router.replace("/agent");
           } else {
-            router.push("/profile");
+            router.replace("/profile");
           }
-          router.refresh();
         } else {
-          // Fallback to profile if profile fetch fails
-          router.push("/profile");
-          router.refresh();
+          router.replace("/profile");
         }
       }
     } catch (err) {
@@ -169,17 +215,26 @@ function OTPContent() {
     setError("");
 
     try {
-      const resendResponse = await sendOTP(email);
+      let resendResponse: { success: boolean; error?: string };
+
+      if (otpType === "reset") {
+        // Re-trigger the forgot-password API to get a fresh code + cookie
+        resendResponse = await sendHybridPasswordReset(email);
+      } else {
+        // Resend signup confirmation email via Supabase
+        resendResponse = await resendEmailVerification(email);
+      }
 
       if (!resendResponse.success) {
-        setError(resendResponse.error || "Failed to resend OTP");
+        setError(resendResponse.error || "Failed to resend code");
       } else {
-        setTimeLeft(300); // Reset timer
+        setTimeLeft(300);
+        setIsExpired(false);
         setOtp(["", "", "", "", "", ""]);
         inputRefs.current[0]?.focus();
       }
-    } catch (err) {
-      setError("Failed to resend OTP. Please try again.");
+    } catch {
+      setError("Failed to resend code. Please try again.");
     } finally {
       setIsResending(false);
     }
@@ -204,10 +259,12 @@ function OTPContent() {
               <CheckCircle className="w-16 h-16 text-success" />
             </div>
             <CardTitle className="text-2xl font-bold">
-              Verification Complete!
+              {otpType === "reset" ? "Code Verified!" : "Verification Complete!"}
             </CardTitle>
             <CardDescription>
-              You have been successfully authenticated
+              {otpType === "reset"
+                ? "Redirecting you to reset your password…"
+                : "You have been successfully authenticated"}
             </CardDescription>
           </CardHeader>
 
@@ -215,7 +272,9 @@ function OTPContent() {
             <div className="text-center space-y-4">
               <div className="bg-success-50 border border-success-200 p-4 rounded-lg">
                 <p className="text-sm text-success-700">
-                  Welcome to RealEST! Redirecting you to your dashboard...
+                  {otpType === "reset"
+                    ? "Code accepted. Taking you to the password reset page…"
+                    : "Welcome to RealEST! Redirecting you to your dashboard…"}
                 </p>
               </div>
 
@@ -233,19 +292,67 @@ function OTPContent() {
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="flex justify-center mb-4">
-            <Shield className="w-12 h-12 text-primary" />
-          </div>
-          <CardTitle className="text-2xl font-bold">
-            Verify Your Email
-          </CardTitle>
-          <CardDescription>
-            Enter the 6-digit code sent to{" "}
-            <span className="font-medium">{email}</span>
-          </CardDescription>
+          {!isExpired && (
+            <>
+              <div className="flex justify-center mb-4">
+                <Shield className="w-12 h-12 text-primary" />
+              </div>
+              <CardTitle className="text-2xl font-bold">
+                {otpType === "reset" ? "Enter Reset Code" : "Verify Your Email"}
+              </CardTitle>
+              <CardDescription>
+                {otpType === "reset"
+                  ? "Enter the 6-digit code from your password reset email"
+                  : "Enter the 6-digit code sent to"}{" "}
+                {otpType !== "reset" && <span className="font-medium">{email}</span>}
+              </CardDescription>
+            </>
+          )}
         </CardHeader>
 
         <CardContent className="space-y-6">
+          {/* ── Expired state: replace form with a clear call-to-action ── */}
+          {isExpired ? (
+            <div className="space-y-5">
+              <div className="flex flex-col items-center gap-3 py-2 text-center">
+                <div className="rounded-full bg-danger-50 border border-danger-200 p-4">
+                  <Clock className="w-8 h-8 text-danger" />
+                </div>
+                <p className="text-sm font-medium text-danger">Your code has expired</p>
+                  {error && (
+                    <p className="text-sm text-muted-foreground">
+                      {error}
+                    </p>
+                  )}
+              </div>
+
+              <Button
+                onClick={handleResendOtp}
+                variant="default"
+                className="w-full"
+                disabled={isResending}
+              >
+                {isResending ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                    Sending new code…
+                  </>
+                ) : (
+                  "Request New Code"
+                )}
+              </Button>
+
+              <div className="text-center pt-2 border-t border-border">
+                <Link
+                  href="/forgot-password"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Back to Forgot Password
+                </Link>
+              </div>
+            </div>
+          ) : (
+          <>
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* OTP Input */}
             <div className="space-y-4">
@@ -270,7 +377,9 @@ function OTPContent() {
 
               <div className="text-center text-sm text-muted-foreground">
                 {timeLeft > 0 ? (
-                  <>Code expires in {formatTime(timeLeft)}</>
+                  <span className={isPaused ? "text-muted-foreground/50" : ""}>
+                    {isPaused ? "⏸ Timer paused" : `Code expires in ${formatTime(timeLeft)}`}
+                  </span>
                 ) : (
                   <span className="text-danger flex items-center justify-center gap-1">
                     <AlertTriangle className="w-4 h-4" />
@@ -331,6 +440,7 @@ function OTPContent() {
               </Link>
             </div>
           </div>
+          </>)}
         </CardContent>
       </Card>
     </div>

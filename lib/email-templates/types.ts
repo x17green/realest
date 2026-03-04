@@ -21,12 +21,24 @@ export interface AdminNotificationData extends WaitlistEmailData {
   signupDate?: string;
 }
 
+/**
+ * What the OTP code is being used for.
+ * Drives subject line and body copy in the email template.
+ *   "reset"   → password reset flow        (current, active)
+ *   "signup"  → email address verification (future / Supabase-native)
+ */
+export type OtpVerificationType = "reset" | "signup";
+
 export interface PasswordResetEmailData {
   email: string;
   firstName: string;
-  otpCode: string; // 6-digit OTP code
-  resetLink: string; // Direct reset link URL
+  otpCode: string; // 6-digit numeric OTP code
+  resetLink: string; // Direct action link URL (reset link or verify link)
   expiryMinutes?: number; // Default 15 minutes
+  /** Optional URL that opens /otp pre-filled with the code — for one-click auto-fill */
+  otpFillUrl?: string;
+  /** Controls subject and body copy; defaults to "reset" */
+  verificationType?: OtpVerificationType;
 }
 
 export interface InquiryEmailData {
@@ -44,6 +56,24 @@ export interface InquiryEmailData {
   listingType: string; // for_sale | for_rent | for_lease | short_let
   // Message content
   message: string;
+}
+
+export type OnboardingUserType = "agent" | "owner" | "user";
+
+export interface WelcomeEmailData extends BaseEmailData {
+  /** Role the user completed onboarding as */
+  userType: OnboardingUserType;
+  /** URL to their role-specific dashboard */
+  dashboardUrl: string;
+}
+
+export interface OnboardingReminderEmailData extends BaseEmailData {
+  /** Role the user registered as but hasn't fully set up */
+  userType: OnboardingUserType;
+  /** URL to the onboarding flow */
+  onboardingUrl: string;
+  /** How many days since account creation (optional, for copy personalisation) */
+  daysElapsed?: number;
 }
 
 export interface EmailConfig {

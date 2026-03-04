@@ -13,10 +13,12 @@ import {
 } from "lucide-react";
 import { Avatar, Dropdown, Label } from "@heroui/react";
 import { useUser } from "@/lib/hooks/useUser";
+import { useLogoutModal } from "@/components/providers/LogoutModalProvider";
 
 export function ProfileDropdown() {
-  const { user, profile, logout, role } = useUser();
+  const { user, profile, role } = useUser();
   const router = useRouter();
+  const { openLogoutModal } = useLogoutModal();
 
   // Avatar fallback logic: avatar_url -> full_name initial -> email initial -> default
   const avatarUrl = profile?.avatar_url;
@@ -33,9 +35,8 @@ export function ProfileDropdown() {
     router.push("/admin/settings");
   };
 
-  const handleLogoutClick = async () => {
-    // await logout();
-    router.push("/logout");
+  const handleLogoutClick = () => {
+    openLogoutModal();
   };
 
   // Dynamic menu items based on user role

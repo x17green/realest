@@ -155,6 +155,10 @@ export async function signUpWithPassword(
       email,
       password,
       options: {
+        // Supabase will redirect to /verify after the user clicks the
+        // activation link in their email. Handles both token_hash and
+        // PKCE (code) query-param styles.
+        emailRedirectTo: `${typeof window !== "undefined" ? window.location.origin : process.env.NEXT_PUBLIC_SITE_URL ?? ""}/verify`,
         data: {
           full_name: fullName || "",
           user_type: userType || "user",
@@ -272,7 +276,8 @@ export async function signOut(): Promise<{ success: boolean; error?: string }> {
 }
 
 /**
- * Send OTP for email verification
+ * Send OTP for magic-link login (passwordless sign-in for existing, confirmed users).
+ * NOT for signup verification — use resendEmailVerification() for that.
  */
 export async function sendOTP(
   email: string,
@@ -322,14 +327,19 @@ export async function verifyOTP(
 }
 
 /**
- * Verify email using token hash from verification link
+ * Verify email using token hash from a Supabase-generated email link.
+ * type: "signup" — for confirming a new account's email address (default)
+ * type: "email"  — for magic-link login tokens
  */
-export async function verifyEmail(tokenHash: string): Promise<AuthResponse> {
+export async function verifyEmail(
+  tokenHash: string,
+  type: "signup" | "email" = "signup",
+): Promise<AuthResponse> {
   try {
     const supabase = createClient();
     const { data, error } = await supabase.auth.verifyOtp({
       token_hash: tokenHash,
-      type: "email",
+      type,
     });
 
     if (error) {
@@ -543,7 +553,20 @@ export async function handlePasswordResetSession(
       }
     }
 
-    // If no tokens or code, redirect to forgot password
+    // No URL tokens — check if there is already an active session (e.g. the
+    // user arrived here after entering their OTP code, which sets session
+    // cookies server-side without adding tokens to the URL).
+    try {
+      const supabase = createClient();
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (sessionData?.session) {
+        console.log("handlePasswordResetSession: existing session found, allowing reset");
+        return { success: true };
+      }
+    } catch {
+      // fall through to the error below
+    }
+
     return {
       success: false,
       error:

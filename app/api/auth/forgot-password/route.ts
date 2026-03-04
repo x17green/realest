@@ -9,6 +9,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createServiceClient } from "@/lib/supabase/service";
+import { deriveNumericOtp } from "@/lib/utils/otp";
 
 const schema = z.object({
   email: z.string().email("Invalid email address"),
@@ -55,9 +56,14 @@ export async function POST(request: NextRequest) {
 
     const resetLink = linkData.properties.action_link;
 
-    // Use last 6 chars of the hashed token as the display OTP code
+    // Derive a 6-digit numeric OTP from the hashed token (deterministic, digits-only)
     const hashed = linkData.properties.hashed_token ?? "";
-    const otpCode = hashed.slice(-6).toUpperCase() || Math.floor(100000 + Math.random() * 900000).toString();
+    const otpCode = deriveNumericOtp(hashed);
+
+    // Build a click-to-fill URL so the user can click the code in the email
+    // and have it auto-filled into the OTP form
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+    const otpFillUrl = `${siteUrl}/otp?email=${encodeURIComponent(email)}&type=reset&code=${otpCode}`;
 
     // Send the branded password reset email
     const { sendHybridPasswordResetEmail } = await import("@/lib/emailService");
@@ -66,6 +72,7 @@ export async function POST(request: NextRequest) {
       firstName,
       otpCode,
       resetLink,
+      otpFillUrl,
       expiryMinutes: 60,
     });
 
@@ -86,7 +93,19 @@ export async function POST(request: NextRequest) {
     }
 
     console.log("[ForgotPassword] Reset email sent to", email, "— id:", emailResult.messageId);
-    return NextResponse.json({ success: true });
+
+    // Store the hashed token in a short-lived HttpOnly cookie so the
+    // /api/auth/verify-reset-otp endpoint can verify the 6-digit code
+    // without ever exposing the full token hash to the browser.
+    const successResponse = NextResponse.json({ success: true });
+    successResponse.cookies.set("reset_token", hashed, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/api/auth",
+      maxAge: 3600, // 1 hour — matches Supabase recovery link expiry
+    });
+    return successResponse;
   } catch (err) {
     if (err instanceof z.ZodError) {
       return NextResponse.json(
