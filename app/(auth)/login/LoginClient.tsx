@@ -187,10 +187,10 @@ function LoginForm() {
             )}
 
             {error && (
-              <div className="text-xs flex justify-center items-center text-danger gap-2 mt-2 p-3 rounded-lg bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800">
+              <div className="flex justify-center items-center gap-2 mt-2 p-3 ">
                 <AlertCircle className="w-4 h-4 text-orange-600 dark:text-orange-400 mt-0.5 shrink-0" />
                 <div className="text-xs text-orange-800 dark:text-orange-200">
-                  <p className="font-medium text-orange-700 dark:text-orange-300">
+                  <p className="font-medium">
                     {error}
                   </p>
                 </div>

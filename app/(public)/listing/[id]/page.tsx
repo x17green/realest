@@ -101,7 +101,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title,
       description,
       url: `https://realest.ng/listing/${id}`,
-      siteName: "RealEST",
+      siteName: "RealEST Connect",
       type: "website",
       locale: "en_NG",
       ...(ogImageUrl && {

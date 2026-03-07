@@ -21,6 +21,7 @@ import {
   Building,
   Users,
   Briefcase,
+  AlertCircle,
 } from "lucide-react";
 
 export default function SignUpPage() {
@@ -239,8 +240,13 @@ export default function SignUpPage() {
             </div>
 
             {error && (
-              <div className="text-sm text-danger bg-danger-50 border border-danger-200 rounded-md p-3">
-                {error}
+              <div className="flex justify-center items-center gap-2 mt-2 p-3 ">
+                <AlertCircle className="w-4 h-4 text-orange-600 dark:text-orange-400 mt-0.5 shrink-0" />
+                <div className="text-xs text-orange-800 dark:text-orange-200">
+                  <p className="font-medium">
+                    {error}
+                  </p>
+                </div>
               </div>
             )}
 

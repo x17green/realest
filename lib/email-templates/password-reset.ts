@@ -24,24 +24,24 @@ const REALEST_CONFIG: EmailConfig = {
   supportEmail: "hello@realest.ng",
   unsubscribeUrl: "{unsubscribe_url}",
   websiteUrl: "https://realest.ng",
-  logoUrl: "https://realest.ng/realest-logo.svg",
+  logoUrl: process.env.NEXT_PUBLIC_SITE_URL + "/realest-bimi-logo.svg" || "https://realest.ng/realest-bimi-logo.svg",
 };
 
 // ─── Per-type copy ────────────────────────────────────────────────────────────
 const COPY = {
   reset: {
-    subject: (code: string) => `[${code}] Reset your RealEST password`,
+    subject: (code: string) => `RealEST Connect password reset OTP [${code}]`,
     subtitle: "Password Reset",
     context:
-      "We received a request to reset your RealEST password. Use the code below to continue.",
-    linkLabel: "Reset your password directly",
+      "You requested a password reset for your RealEST Connect account. Enter the code below to continue.",
+    linkLabel: "Reset password now",
   },
   signup: {
-    subject: (code: string) => `[${code}] Verify your RealEST email`,
-    subtitle: "Email Verification",
+    subject: (code: string) => `Verify your RealEST Connect account [${code}]`,
+    subtitle: "Email Verification Needed",
     context:
-      "Thanks for signing up! Use the code below to verify your email address.",
-    linkLabel: "Verify your email directly",
+      "Thanks for signing up with RealEST Connect! Use the code below to verify your email address.",
+    linkLabel: "Verify email now",
   },
 } as const;
 
@@ -110,15 +110,15 @@ export const createPasswordResetTemplate: EmailTemplateFunction<
       </div>
 
       <p style="margin: 0 0 32px; font-size: 13px; color: #6B7280; text-align: center; line-height: 1.5;">
-        This code expires in ${expiryMinutes} minutes.${data.otpFillUrl ? "<br>Tap the code above to auto-fill it." : ""}
+        Code expires in ${expiryMinutes} minutes.${data.otpFillUrl ? "<br>Tap the code above to auto-fill it in the app." : ""}
       </p>
 
       <p style="margin: 0 0 24px; font-size: 14px; line-height: 1.6; color: #2E322E;">
-        Prefer a link? ${actionLink} — also expires in ${expiryMinutes} minutes.
+        Prefer the web link? Click here ${actionLink} — expires in ${expiryMinutes} minutes.
       </p>
 
       <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #9CA3AF;">
-        If you didn't request this, you can safely ignore this email.
+        Didn't request this? You can safely ignore this email.
       </p>
     </div>
   `;
@@ -131,13 +131,13 @@ export const createPasswordResetTemplate: EmailTemplateFunction<
     "",
     copy.context,
     "",
-    `Your code: ${data.otpCode}`,
+    `Your verification code: ${data.otpCode}`,
     `Expires in: ${expiryMinutes} minutes`,
     ...(data.otpFillUrl ? [`Auto-fill: ${data.otpFillUrl}`] : []),
     "",
     `${copy.linkLabel}: ${data.resetLink}`,
     "",
-    "If you didn't request this, ignore this email.",
+    "If you didn't request this, please ignore this message.",
     "",
     `— ${config.companyName}`,
   ].join("\n");

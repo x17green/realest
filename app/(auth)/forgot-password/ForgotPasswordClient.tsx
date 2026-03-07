@@ -108,7 +108,7 @@ export default function ForgotPasswordPage() {
     switch (emailStatus) {
       case "not_found":
         return (
-          <div className="flex items-center gap-2 mt-2 p-3 rounded-lg bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800">
+          <div className="flex items-center gap-2 mt-2 p-3 ">
             <AlertCircle className="w-4 h-4 text-orange-600 dark:text-orange-400 mt-0.5 shrink-0" />
             <div className="text-xs text-orange-800 dark:text-orange-200">
               <p className="font-medium">
@@ -191,7 +191,7 @@ export default function ForgotPasswordPage() {
                   Sending code…
                 </>
               ) : (
-                "Send Reset Code"
+                "Send Password Reset Code"
               )}
             </Button>
           </form>

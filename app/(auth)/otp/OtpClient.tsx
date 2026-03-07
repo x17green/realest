@@ -261,11 +261,6 @@ function OTPContent() {
             <CardTitle className="text-2xl font-bold">
               {otpType === "reset" ? "Code Verified!" : "Verification Complete!"}
             </CardTitle>
-            <CardDescription>
-              {otpType === "reset"
-                ? "Redirecting you to reset your password…"
-                : "You have been successfully authenticated"}
-            </CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-6">
@@ -273,7 +268,7 @@ function OTPContent() {
               <div className="bg-success-50 p-4 rounded-lg">
                 <p className="text-sm text-success-700">
                   {otpType === "reset"
-                    ? "Code verified. Proceed to reset password…"
+                    ? "Proceed to set new password…"
                     : "Welcome to RealEST! Redirecting you to your dashboard…"}
                 </p>
               </div>
