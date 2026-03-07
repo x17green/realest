@@ -7,9 +7,9 @@
  *   1. The `/api/auth/forgot-password` endpoint stored the full `hashed_token`
  *      from Supabase's generateLink() inside a short-lived HttpOnly cookie
  *      named `reset_token`.
- *   2. This endpoint reads that cookie, validates the submitted code against
- *      the last 6 characters of the hash (upper-cased), then calls Supabase's
- *      verifyOtp() with the full token hash.
+ *   2. This endpoint reads that cookie, derives the expected numeric OTP from
+ *      the stored hash, validates the submitted 6-digit code against it, and
+ *      then calls Supabase's verifyOtp() with the full token hash.
  *   3. On success, Supabase sets session cookies on the response so the browser
  *      is immediately signed in with a "recovery" session — ready for
  *      /reset-password to call updateUser({ password }).
