@@ -18,7 +18,7 @@ import { Mail, ArrowLeft, AlertCircle, Loader2 } from "lucide-react";
 
 // ── Email validation state ─────────────────────────────────────────────────────
 
-type EmailStatus = "idle" | "checking" | "found" | "not_found" | "invalid";
+type EmailStatus = "idle" | "checking" | "found" | "not_found" | "invalid" | "unknown";
 
 function useEmailExists(email: string): EmailStatus {
   const [status, setStatus] = useState<EmailStatus>("idle");
@@ -51,8 +51,9 @@ function useEmailExists(email: string): EmailStatus {
         const data = await res.json();
         setStatus(data.exists ? "found" : "not_found");
       } catch {
-        // AbortError or network glitch — don't block the user
-        setStatus("found");
+        // AbortError or network glitch — leave status as unknown so the
+        // user can still attempt a reset without falsely assuming existence.
+        setStatus("unknown");
       }
     }, 500);
 
@@ -76,7 +77,7 @@ export default function ForgotPasswordPage() {
   const emailStatus = useEmailExists(email);
 
   const canSubmit =
-    emailStatus === "found" && !isLoading;
+    (emailStatus === "found" || emailStatus === "unknown") && !isLoading;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,6 +107,13 @@ export default function ForgotPasswordPage() {
 
   const inputFeedback = () => {
     switch (emailStatus) {
+      case "unknown":
+        return (
+          <p className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1.5">
+            <AlertCircle className="w-3.5 h-3.5" />
+            Unable to verify email due to a connection issue. You can still attempt to reset your password.
+          </p>
+        );
       case "not_found":
         return (
           <div className="flex items-center gap-2 mt-2 p-3 ">
