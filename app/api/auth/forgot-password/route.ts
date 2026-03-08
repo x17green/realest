@@ -81,7 +81,15 @@ export async function POST(request: NextRequest) {
     const resetLink = linkData.properties.action_link;
 
     // Derive a 6-digit numeric OTP from the hashed token (deterministic, digits-only)
-    const hashed = linkData.properties.hashed_token ?? "";
+    const hashed = linkData.properties.hashed_token;
+
+    if (!hashed) {
+      console.error("[ForgotPassword] Missing hashed_token in generateLink response");
+      return NextResponse.json(
+        { success: false, error: "Failed to generate reset code" },
+        { status: 500 },
+      );
+    }
     const otpCode = deriveNumericOtp(hashed);
 
     // Build a click-to-fill URL so the user can click the code in the email

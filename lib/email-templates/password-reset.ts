@@ -24,7 +24,9 @@ const REALEST_CONFIG: EmailConfig = {
   supportEmail: "hello@realest.ng",
   unsubscribeUrl: "{unsubscribe_url}",
   websiteUrl: "https://realest.ng",
-  logoUrl: process.env.NEXT_PUBLIC_SITE_URL + "/realest-bimi-logo.svg" || "https://realest.ng/realest-bimi-logo.svg",
+  logoUrl: process.env.NEXT_PUBLIC_SITE_URL
+    ? process.env.NEXT_PUBLIC_SITE_URL + "/realest-bimi-logo.svg"
+    : "https://realest.ng/realest-bimi-logo.svg",
 };
 
 // ─── Per-type copy ────────────────────────────────────────────────────────────
