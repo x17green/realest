@@ -7,7 +7,9 @@
  * This guarantees:
  * - Pure numeric output (0-9 only) → compatible with `inputMode="numeric"` inputs
  * - Deterministic: the same hash always yields the same code
- * - Uniform distribution: the 32-bit range (4.29B values) maps cleanly onto 1M codes
+ * - Well-distributed output: the 32-bit range (4.29B values) maps onto 1M codes with
+ *   negligible modulo bias (2^32 is not divisible by 1,000,000, so codes 0–294,967
+ *   appear once more than codes 294,968–999,999 across the full input space)
  * - No security regression: the UI code is only a convenience check; real security
  *   comes from Supabase verifyOtp() validating the full token_hash.
  *
