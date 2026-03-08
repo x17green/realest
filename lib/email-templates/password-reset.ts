@@ -30,14 +30,14 @@ const REALEST_CONFIG: EmailConfig = {
 // ─── Per-type copy ────────────────────────────────────────────────────────────
 const COPY = {
   reset: {
-    subject: (code: string) => `RealEST Connect password reset OTP [${code}]`,
+    subject: (code: string) => ` ${code} - Your RealEST Connect password reset code`,
     subtitle: "Password Reset",
     context:
-      "You requested a password reset for your RealEST Connect account. Enter the code below to continue.",
+      "You requested a password reset code for your RealEST Connect account. Enter the code below to continue.",
     linkLabel: "Reset password now",
   },
   signup: {
-    subject: (code: string) => `Verify your RealEST Connect account [${code}]`,
+    subject: (code: string) => `Verify your RealEST Connect account`,
     subtitle: "Email Verification Needed",
     context:
       "Thanks for signing up with RealEST Connect! Use the code below to verify your email address.",
@@ -51,7 +51,7 @@ const COPY = {
  * `data.verificationType` ("reset" | "signup", defaults to "reset").
  *
  * What changed vs the old template:
- *  • Subject now contains the OTP code:  [123456] Reset your RealEST password
+ *  • Subject now contains the OTP code:  123456 - Reset your RealEST password
  *  • No decorative icons (shield / key / clock images removed)
  *  • No yellow security-warning box
  *  • No "Get Help" support button section
