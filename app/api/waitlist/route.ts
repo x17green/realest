@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { subscribeToWaitlist, checkEmailInWaitlist, getWaitlistStats, unsubscribeFromWaitlist, checkEmailWithPosition, getWaitlistPosition } from '@/lib/waitlist';
 import type { WaitlistSubscriptionData } from '@/lib/waitlist';
 import { sendWaitlistConfirmationEmail, sendWaitlistAdminNotification } from '@/lib/emailService';
+import { syncWaitlistJoin, syncWaitlistUnsubscribe } from '@/lib/resend-audiences';
 
 
 // Rate limiting store (in production, use Redis or database)
@@ -109,6 +110,13 @@ export async function POST(request: NextRequest) {
         lastName: subscriptionData.lastName,
         position: positionData.position,
       }).catch(error => console.error('❌ Admin notification failed:', error));
+
+      // Sync contact to Resend Waitlist audience (fire-and-forget)
+      syncWaitlistJoin(
+        subscriptionData.email,
+        subscriptionData.firstName,
+        subscriptionData.lastName,
+      ).catch(error => console.error('❌ Resend audience sync failed:', error));
     }
 
     return NextResponse.json(
@@ -220,6 +228,10 @@ export async function DELETE(request: NextRequest) {
     }
 
     console.log(`✅ User unsubscribed from waitlist: ${email}`);
+
+    // Sync unsubscribe to Resend Waitlist audience (fire-and-forget)
+    syncWaitlistUnsubscribe(email.trim())
+      .catch(error => console.error('❌ Resend audience unsubscribe sync failed:', error));
 
     return NextResponse.json(
       { message: 'Successfully unsubscribed from waitlist' },

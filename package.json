@@ -26,7 +26,9 @@
     "email:benchmark": "tsx lib/email-templates/dev-utils.ts benchmark",
     "email:preview": "tsx lib/email-templates/dev-utils.ts generate ./public/email-previews && echo 'Open http://localhost:3000/email-previews/index.html'",
     "icons:generate": "node scripts/generate-png-icons.js",
-    "db:seed": "npx tsx prisma/seed.ts"
+    "db:seed": "npx tsx prisma/seed.ts",
+    "audiences:seed": "npx tsx scripts/seed-resend-audiences.ts",
+    "audiences:seed:dry": "npx tsx scripts/seed-resend-audiences.ts --dry-run"
   },
   "prisma": {
     "seed": "npx tsx prisma/seed.ts"
