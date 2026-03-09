@@ -108,7 +108,7 @@ These pages adapt based on the logged-in user's role.
 
 ### 4. Property Owner / Business Pages (`/dashboard/owner/*`)
 
-Accessible only to users with `user_role = 'property_owner'` or `'business_owner'`.
+Accessible only to users with `user_role = 'owner'` or `'business_owner'`.
 
 *   **4.1. Owner Dashboard Home (`/dashboard/owner`):**
     *   **Headline:** "Your RealEST Hub: Manage Your Verified Assets."
@@ -123,7 +123,7 @@ Accessible only to users with `user_role = 'property_owner'` or `'business_owner
     *   **Actions:** "View Details," "Edit" (if not live), "Manage Documents," "Promote Listing" (Premium CTA).
     *   **Business Logic:** Transparency, clear next steps for owners, monetization gateway.
 
-*   **4.3. List New Property/Business Form (`/dashboard/owner/new`):** (Multi-step Wizard)
+*   **4.3. List New Property/Business Form (`/dashboard/owner/listings/new`):** (Multi-step Wizard)
     *   **Step 1: Choose Listing Type:** (e.g., "Residential House for Sale," "Event Center for Rent," "Retail Shop," "Hospital").
     *   **Step 2: Core Details:** Name, description, price (if applicable), **address with mandatory geotagging (map pin drop validation)**.
     *   **Step 3: Dynamic Details:** Form fields adapt based on chosen listing type (beds, baths, specialties, business hours, capacity etc.).

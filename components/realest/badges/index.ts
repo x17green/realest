@@ -10,7 +10,7 @@ export {
   VerificationBadgeGroup,
   verificationBadgeVariants,
   type VerificationBadgeProps,
-} from "./verification-badge";
+} from "./VerificationBadge";
 
 export {
   PropertyStatusChip,
@@ -27,4 +27,46 @@ export {
   propertyStatusChipVariants,
   statusConfig,
   type PropertyStatusChipProps,
-} from "./property-status-chip";
+} from "./PropertyStatusChip";
+
+export {
+  AmenityBadge,
+  PowerBadge,
+  WaterBadge,
+  SecurityBadge,
+  InternetBadge,
+  BoysQuartersBadge,
+  ParkingBadge,
+  PoolBadge,
+  GymBadge,
+  GeneratorBadge,
+  InverterBadge,
+  SolarBadge,
+  WaterTankBadge,
+  WaterTreatmentBadge,
+  AmenityBadgeGroup,
+  createAmenityBadges,
+  amenityBadgeVariants,
+  type AmenityBadgeProps,
+  type AmenityType,
+  type AmenityStatus,
+} from "./AmenityBadge";
+
+export {
+  PropertyTypeBadge,
+  HouseBadge,
+  ApartmentBadge,
+  LandBadge,
+  CommercialBadge,
+  HotelBadge,
+  OfficeBadge,
+  DuplexBadge,
+  BungalowBadge,
+  SelfContainedBadge,
+  BoysQuartersBadge as PropertyTypeBoysQuartersBadge,
+  ResidentialLandBadge,
+  CommercialLandBadge,
+  propertyTypeBadgeVariants,
+  type PropertyTypeBadgeProps,
+  type PropertyType,
+} from "./PropertyTypeBadge";

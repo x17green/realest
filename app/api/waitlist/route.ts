@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { subscribeToWaitlist, checkEmailInWaitlist, getWaitlistStats, unsubscribeFromWaitlist, checkEmailWithPosition, getWaitlistPosition } from '@/lib/waitlist';
 import type { WaitlistSubscriptionData } from '@/lib/waitlist';
-import { sendWaitlistConfirmationEmail, sendWaitlistAdminNotification } from '@/lib/email-service';
+import { sendWaitlistConfirmationEmail, sendWaitlistAdminNotification } from '@/lib/emailService';
+import { syncWaitlistJoin, syncWaitlistUnsubscribe } from '@/lib/resend-audiences';
 
 
 // Rate limiting store (in production, use Redis or database)
@@ -94,21 +95,43 @@ export async function POST(request: NextRequest) {
 
     // Add this after successful subscription in the POST function:
     if (result.success && result.data) {
-      // Send confirmation email (don't block the response)
-      sendWaitlistConfirmationEmail({
-        email: subscriptionData.email,
-        firstName: subscriptionData.firstName,
-        lastName: subscriptionData.lastName,
-        position: positionData.position,
-      }).catch(error => console.error('❌ Email confirmation failed:', error));
+      // Send emails sequentially in the background to respect Resend's
+      // 2 req/sec rate limit — firing both at once always triggers a 429.
+      (async () => {
+        console.log('📧 Sending waitlist confirmation to', subscriptionData.email);
+        try {
+          await sendWaitlistConfirmationEmail({
+            email: subscriptionData.email,
+            firstName: subscriptionData.firstName,
+            lastName: subscriptionData.lastName,
+            position: positionData.position,
+          });
+        } catch (error) {
+          console.error('❌ Email confirmation failed:', error);
+        }
 
-      // Send admin notification (optional)
-      sendWaitlistAdminNotification({
-        email: subscriptionData.email,
-        firstName: subscriptionData.firstName,
-        lastName: subscriptionData.lastName,
-        position: positionData.position,
-      }).catch(error => console.error('❌ Admin notification failed:', error));
+        // 600 ms gap — safely under the 2 req/sec Resend limit
+        await new Promise(resolve => setTimeout(resolve, 600));
+
+        console.log('📧 Sending admin notification for', subscriptionData.email);
+        try {
+          await sendWaitlistAdminNotification({
+            email: subscriptionData.email,
+            firstName: subscriptionData.firstName,
+            lastName: subscriptionData.lastName,
+            position: positionData.position,
+          });
+        } catch (error) {
+          console.error('❌ Admin notification failed:', error);
+        }
+      })();
+
+      // Sync contact to Resend Waitlist audience (fire-and-forget)
+      syncWaitlistJoin(
+        subscriptionData.email,
+        subscriptionData.firstName,
+        subscriptionData.lastName,
+      ).catch(error => console.error('❌ Resend audience sync failed:', error));
     }
 
     return NextResponse.json(
@@ -220,6 +243,10 @@ export async function DELETE(request: NextRequest) {
     }
 
     console.log(`✅ User unsubscribed from waitlist: ${email}`);
+
+    // Sync unsubscribe to Resend Waitlist audience (fire-and-forget)
+    syncWaitlistUnsubscribe(email.trim())
+      .catch(error => console.error('❌ Resend audience unsubscribe sync failed:', error));
 
     return NextResponse.json(
       { message: 'Successfully unsubscribed from waitlist' },

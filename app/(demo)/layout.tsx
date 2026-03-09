@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
-import { shouldShowDemoPages } from "@/lib/app-mode";
-import ComingSoonHero from "@/components/coming-soon-hero";
+import { shouldShowDemoPages } from "@/lib/appMode";
+import { ComingSoonHero } from "@/components/marketing";
 
 export default function DemoLayout({
   children,
@@ -16,7 +16,7 @@ export default function DemoLayout({
   return (
     <div className="min-h-screen bg-background">
       {/* Demo Header Banner */}
-      <div className="bg-gradient-to-r from-orange-500/20 to-red-500/20 border-b border-orange-500/30">
+      <div className="bg-linear-to-r from-orange-500/20 to-red-500/20 border-b border-orange-500/30">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { Monitor, Moon, Sun } from 'lucide-react'
-import { useRealEstTheme } from '@/components/providers/realest-theme-provider'
+import { useRealEstTheme } from '@/components/providers/RealEstThemeProvider'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
