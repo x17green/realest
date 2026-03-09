@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -13,59 +13,8 @@ import {
 } from "@/components/ui";
 import { Input } from "@/components/ui/input";
 import { sendHybridPasswordReset } from "@/lib/auth";
-import { cn } from "@/lib/utils";
+import { cn, isValidEmailFormat } from "@/lib/utils";
 import { Mail, ArrowLeft, AlertCircle, Loader2 } from "lucide-react";
-
-// ── Email validation state ─────────────────────────────────────────────────────
-
-type EmailStatus = "idle" | "checking" | "found" | "not_found" | "invalid" | "unknown";
-
-function useEmailExists(email: string): EmailStatus {
-  const [status, setStatus] = useState<EmailStatus>("idle");
-
-  useEffect(() => {
-    const trimmed = email.trim();
-
-    // Reset when field is empty
-    if (!trimmed) {
-      setStatus("idle");
-      return;
-    }
-
-    // Basic format check first — no fetch yet
-    const isFormatValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed);
-    if (!isFormatValid) {
-      setStatus("invalid");
-      return;
-    }
-
-    setStatus("checking");
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(async () => {
-      try {
-        const res = await fetch(
-          `/api/auth/forgot-password?email=${encodeURIComponent(trimmed)}`,
-          { signal: controller.signal },
-        );
-        const data = await res.json();
-        // Do not reveal whether the email exists; keep existence status generic.
-        setStatus("unknown");
-      } catch {
-        // AbortError or network glitch — leave status as unknown so the
-        // user can still attempt a reset without falsely assuming existence.
-        setStatus("unknown");
-      }
-    }, 500);
-
-    return () => {
-      clearTimeout(timeoutId);
-      controller.abort();
-    };
-  }, [email]);
-
-  return status;
-}
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
@@ -73,12 +22,13 @@ export default function ForgotPasswordPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
+  const [touched, setTouched] = useState(false);
   const [submitError, setSubmitError] = useState("");
 
-  const emailStatus = useEmailExists(email);
+  const emailValid = isValidEmailFormat(email);
+  const showFormatError = touched && email.trim() !== "" && !emailValid;
 
-  const canSubmit =
-    (emailStatus === "found" || emailStatus === "unknown") && !isLoading;
+  const canSubmit = emailValid && !isLoading;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,58 +54,18 @@ export default function ForgotPasswordPage() {
     }
   };
 
-  // ── Inline feedback below the input ──────────────────────────────────────
-
-  const inputFeedback = () => {
-    switch (emailStatus) {
-      case "unknown":
-        return (
-          <p className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1.5">
-            <AlertCircle className="w-3.5 h-3.5" />
-            Unable to verify email due to a connection issue. You can still attempt to reset your password.
-          </p>
-        );
-      case "not_found":
-        return (
-          <div className="flex items-center gap-2 mt-2 p-3 ">
-            <AlertCircle className="w-4 h-4 text-orange-600 dark:text-orange-400 mt-0.5 shrink-0" />
-            <div className="text-xs text-orange-800 dark:text-orange-200">
-              <p className="font-medium">
-                No account found. {" "}
-                <Link href="/register" className="underline font-medium text-orange-700 dark:text-orange-300">
-                  Sign up instead?
-                </Link>
-              </p>
-            </div>
-          </div>
-        );
-      case "invalid":
-        return (
-          <p className="flex items-center gap-1.5 text-xs text-destructive mt-1.5">
-            <AlertCircle className="w-3.5 h-3.5" />
-            Enter a valid email address
-          </p>
-        );
-      default:
-        return null;
-    }
-  };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">Forgot Password?</CardTitle>
           <CardDescription>
-            Enter the email address associated with your account, and we'll send you a code to reset your password.
+            Enter your email address and we'll send a reset code if an account with that address exists.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              {/* <label htmlFor="email" className="text-sm font-medium">
-                Email Address
-              </label> */}
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
@@ -167,18 +77,22 @@ export default function ForgotPasswordPage() {
                     setEmail(e.target.value);
                     if (submitError) setSubmitError("");
                   }}
+                  onBlur={() => setTouched(true)}
                   className={cn(
                     "pl-10 transition-colors",
-                    emailStatus === "found" &&
-                      "border-green-500 focus-visible:ring-green-500/25",
-                    (emailStatus === "invalid" || emailStatus === "not_found") &&
+                    showFormatError &&
                       "border-destructive focus-visible:ring-destructive/25",
                   )}
                   required
                   autoFocus
                 />
               </div>
-              {inputFeedback()}
+              {showFormatError && (
+                <p className="flex items-center gap-1.5 text-xs text-destructive mt-1.5">
+                  <AlertCircle className="w-3.5 h-3.5" />
+                  Enter a valid email address
+                </p>
+              )}
             </div>
 
             {submitError && (

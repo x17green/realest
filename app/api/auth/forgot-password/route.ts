@@ -1,39 +1,15 @@
 /**
- * GET  /api/auth/forgot-password?email=... — check if an account exists (UI validation only)
- * POST /api/auth/forgot-password           — send the password reset email
+ * POST /api/auth/forgot-password — send the password reset email
  *
  * Server-side password reset handler.
  * - Uses service role to look up the profile (avoids anon RLS block)
  * - Uses Supabase Admin generateLink for a real, signed recovery URL
- * - POST always returns success to prevent user enumeration
+ * - Always returns a generic success response to prevent account enumeration
  */
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createServiceClient } from "@/lib/supabase/service";
 import { deriveNumericOtp } from "@/lib/utils/otp";
-
-/**
- * GET /api/auth/forgot-password?email=user@example.com
- *
- * Returns { exists: true } when the email is registered, { exists: false } otherwise.
- * Uses the service-role client so it bypasses RLS on the profiles table.
- */
-export async function GET(request: NextRequest) {
-  const email = request.nextUrl.searchParams.get("email")?.trim();
-
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return NextResponse.json({ exists: false });
-  }
-
-  const supabase = createServiceClient();
-  const { data } = await supabase
-    .from("profiles")
-    .select("id")
-    .eq("email", email)
-    .maybeSingle();
-
-  return NextResponse.json({ exists: !!data });
-}
 
 const schema = z.object({
   email: z.string().email("Invalid email address"),
