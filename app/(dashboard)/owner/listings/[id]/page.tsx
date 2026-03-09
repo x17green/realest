@@ -129,8 +129,8 @@ export default function EditListingPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
-            <Link href={`/owner/listings/${propertyId}`}>
-              <Button variant="ghost" size="icon-sm" >
+            <Link href="/owner/listings">
+              <Button variant="ghost" size="icon-sm">
                 <ArrowLeft className="w-4 h-4" />
               </Button>
             </Link>
