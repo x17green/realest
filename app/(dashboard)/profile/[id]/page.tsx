@@ -88,7 +88,7 @@ export default function PublicProfilePage() {
         const { count: totalInquiries } = await supabase
           .from("inquiries")
           .select("*", { count: "exact", head: true })
-          .eq("property_owner_id", userId);
+          .eq("owner_id", userId);
 
         setStats({
           totalListings: totalListings || 0,
