@@ -8,14 +8,13 @@ import { Avatar, Chip } from "@heroui/react";
 import {
   Card,
   CardContent,
-  CardHeader, CardTitle,
-  Button, Input,
-  Textarea,
+  CardHeader,
+  CardTitle,
+  Button,
 } from "@/components/ui";
 import {
   Mail,
   Phone,
-  MapPin,
   FileText,
   Calendar,
   Home,
