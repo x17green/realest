@@ -49,7 +49,8 @@ function useEmailExists(email: string): EmailStatus {
           { signal: controller.signal },
         );
         const data = await res.json();
-        setStatus(data.exists ? "found" : "not_found");
+        // Do not reveal whether the email exists; keep existence status generic.
+        setStatus("unknown");
       } catch {
         // AbortError or network glitch — leave status as unknown so the
         // user can still attempt a reset without falsely assuming existence.
