@@ -8,7 +8,7 @@ export default async function AgentPropertiesPage() {
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
-    redirect("/auth/login?redirect=/agent/properties")
+    redirect("/login?redirect=/agent/properties")
   }
 
   const { data: userRow } = await supabase
