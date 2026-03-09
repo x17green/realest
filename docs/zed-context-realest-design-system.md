@@ -644,7 +644,7 @@ Before implementing any new component, ensure:
 The RealEST marketplace now includes a comprehensive form patterns library with 8 core patterns:
 
 1. **Property Listing Form** - Multi-step property creation with Nigerian market features
-2. **User Registration Form** - Role-based onboarding (buyer/owner/agent)
+2. **User Registration Form** - Role-based onboarding (user/owner/agent)
 3. **Contact Form** - Property inquiry communication
 4. **Advanced Search Form** - Comprehensive filtering with infrastructure options
 5. **Profile Settings Form** - Tabbed account management interface

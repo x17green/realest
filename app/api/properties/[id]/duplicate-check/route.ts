@@ -1,0 +1,227 @@
+// realest/app/api/properties/[id]/duplicate-check/route.ts
+// realest/app/api/properties/[id]/duplicate-check/route.ts
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
+
+const duplicateCheckSchema = z.object({
+  address: z.string().optional(),
+  latitude: z.number().min(-90).max(90).optional(),
+  longitude: z.number().min(-180).max(180).optional(),
+  radius: z.number().min(0.01).max(10).default(0.1), // km radius for proximity check
+});
+
+// POST /api/properties/[id]/duplicate-check - Check for potential duplicate properties
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  try {
+    const supabase = await createClient();
+    const { id } = await params;
+    const propertyId = id;
+
+    // Get authenticated user
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Check ownership via Prisma (owner_id now references owners.id, not profiles.id)
+    const property = await prisma.properties.findUnique({
+      where: { id: propertyId },
+      select: { owner_id: true, address: true, latitude: true, longitude: true },
+    });
+
+    const ownerRecord = await prisma.owners.findUnique({ where: { profile_id: user.id }, select: { id: true } });
+    if (!property || !ownerRecord || property.owner_id !== ownerRecord.id) {
+      return NextResponse.json(
+        { error: "Property not found or access denied" },
+        { status: 404 },
+      );
+    }
+
+    const body = await request.json();
+    const validatedData = duplicateCheckSchema.parse(body);
+
+    // Use provided data or fall back to property data
+    const checkAddress = validatedData.address || property.address;
+    const checkLatitude = validatedData.latitude ?? (property.latitude ? Number(property.latitude) : null);
+    const checkLongitude = validatedData.longitude ?? (property.longitude ? Number(property.longitude) : null);
+
+    if (!checkAddress && (!checkLatitude || !checkLongitude)) {
+      return NextResponse.json(
+        { error: "Address or coordinates required for duplicate check" },
+        { status: 400 },
+      );
+    }
+
+    const potentialDuplicates: any[] = [];
+
+    // 1. Exact address match check via Prisma
+    if (checkAddress) {
+      const addressMatches = await prisma.properties.findMany({
+        where: {
+          NOT: { id: propertyId },
+          status: "live",
+          address: { contains: checkAddress.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "").toLowerCase(), mode: "insensitive" },
+        },
+        select: {
+          id: true,
+          title: true,
+          address: true,
+          latitude: true,
+          longitude: true,
+          status: true,
+          verification_status: true,
+          created_at: true,
+          owners: { select: { profiles: { select: { full_name: true } } } },
+        },
+      });
+
+      if (addressMatches.length > 0) {
+        potentialDuplicates.push(
+          ...addressMatches.map((match: any) => ({
+            ...match,
+            duplicate_type: "exact_address",
+            confidence: "high",
+          })),
+        );
+      }
+    }
+
+    // 2. Geospatial proximity check (uses Supabase RPC for PostGIS)
+    if (checkLatitude && checkLongitude) {
+      const { data: radiusProperties } = await supabase.rpc("properties_within_radius", {
+        lat: checkLatitude,
+        lng: checkLongitude,
+        radius_km: validatedData.radius,
+      });
+
+      if (radiusProperties && radiusProperties.length > 0) {
+        const radiusIds: string[] = radiusProperties.map((p: any) => p.id).filter((id: string) => id !== propertyId);
+        if (radiusIds.length > 0) {
+          const proximityMatches = await prisma.properties.findMany({
+            where: { id: { in: radiusIds }, status: "live", NOT: { id: propertyId } },
+            select: {
+              id: true,
+              title: true,
+              address: true,
+              latitude: true,
+              longitude: true,
+              status: true,
+              verification_status: true,
+              created_at: true,
+              owners: { select: { profiles: { select: { full_name: true } } } },
+            },
+          });
+
+          const nearbyWithDistance = proximityMatches
+            .map((match: any) => {
+              const distance = calculateDistance(
+                checkLatitude,
+                checkLongitude,
+                Number(match.latitude),
+                Number(match.longitude),
+              );
+              return { ...match, distance, duplicate_type: "geospatial_proximity" };
+            })
+            .filter((m: any) => m.distance <= validatedData.radius)
+            .map((m: any) => ({
+              ...m,
+              confidence: m.distance < 0.05 ? "high" : m.distance < 0.2 ? "medium" : "low",
+            }));
+
+          potentialDuplicates.push(...nearbyWithDistance);
+        }
+      }
+    }
+
+    // 3. Owner-specific check via Prisma
+    const ownerMatches = await prisma.properties.findMany({
+      where: {
+        NOT: { id: propertyId },
+        owner_id: ownerRecord.id,
+        status: { in: ["draft", "pending_ml_validation", "pending_vetting"] },
+      },
+      select: {
+        id: true,
+        title: true,
+        address: true,
+        latitude: true,
+        longitude: true,
+        status: true,
+        verification_status: true,
+        created_at: true,
+      },
+    });
+
+    if (ownerMatches.length > 0) {
+      potentialDuplicates.push(
+        ...ownerMatches.map((match: any) => ({
+          ...match,
+          duplicate_type: "same_owner",
+          confidence: "high",
+          profiles: { full_name: "You" },
+        })),
+      );
+    }
+
+    // Remove duplicates from results
+    const uniqueDuplicates = potentialDuplicates.filter(
+      (duplicate, index, self) =>
+        index === self.findIndex((d) => d.id === duplicate.id),
+    );
+
+    return NextResponse.json({
+      has_duplicates: uniqueDuplicates.length > 0,
+      potential_duplicates: uniqueDuplicates,
+      checked_criteria: {
+        address: !!checkAddress,
+        coordinates: !!(checkLatitude && checkLongitude),
+        radius_km: validatedData.radius,
+        total_checked: uniqueDuplicates.length,
+      },
+    });
+  } catch (error) {
+    console.error("Duplicate check API error:", error);
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: "Invalid check parameters", details: error.errors },
+        { status: 400 },
+      );
+    }
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
+  }
+}
+
+// Helper function to calculate distance between two coordinates (Haversine formula)
+function calculateDistance(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number,
+): number {
+  const R = 6371; // Earth's radius in kilometers
+  const dLat = toRadians(lat2 - lat1);
+  const dLon = toRadians(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRadians(lat1)) *
+      Math.cos(toRadians(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+function toRadians(degrees: number): number {
+  return degrees * (Math.PI / 180);
+}

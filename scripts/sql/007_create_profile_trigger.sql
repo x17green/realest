@@ -10,7 +10,7 @@ begin
   values (
     new.id,
     new.email,
-    coalesce(new.raw_user_meta_data ->> 'user_type', 'buyer')
+    coalesce(new.raw_user_meta_data ->> 'user_type', 'user')
   )
   on conflict (id) do nothing;
 
