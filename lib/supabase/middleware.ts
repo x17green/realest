@@ -61,6 +61,40 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  // Guest-only routes: redirect confirmed + authenticated users to dashboard
+  const guestOnlyRoutes = ["/login", "/register", "/forgot-password"];
+  const isGuestOnlyRoute = guestOnlyRoutes.some(
+    (route) => pathname === route || pathname.startsWith(route + "/"),
+  );
+
+  if (
+    user &&
+    user.email_confirmed_at &&
+    isGuestOnlyRoute &&
+    shouldEnableAuthentication()
+  ) {
+    const { data: roleData } = await supabase
+      .from("users")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    const role = roleData?.role ?? "user";
+    const url = request.nextUrl.clone();
+    switch (role) {
+      case "owner":
+      case "agent":
+        url.pathname = "/onboarding";
+        break;
+      case "admin":
+        url.pathname = "/admin";
+        break;
+      default:
+        url.pathname = "/profile";
+    }
+    return NextResponse.redirect(url);
+  }
+
   // Protected routes that require authentication
   const protectedRoutes = [
     "/admin",
@@ -82,6 +116,20 @@ export async function updateSession(request: NextRequest) {
   ) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
+    return NextResponse.redirect(url);
+  }
+
+  // Email confirmation guard: authenticated but unconfirmed users must
+  // complete email verification before accessing any protected route.
+  if (
+    user &&
+    !user.email_confirmed_at &&
+    isProtectedRoute &&
+    shouldEnableAuthentication()
+  ) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/success";
+    if (user.email) url.searchParams.set("email", user.email);
     return NextResponse.redirect(url);
   }
 

@@ -299,7 +299,7 @@ export function PropertyMap({
     () => ({
       propertyType: filters.propertyType && filters.propertyType !== "all" ? filters.propertyType : undefined,
       listingType:
-        filters.listingType && filters.listingType !== "all" ? (filters.listingType as "sale" | "rent" | "lease") : undefined,
+        filters.listingType && filters.listingType !== "all" ? filters.listingType : undefined,
       state: filters.state || undefined,
       lga: filters.lga || undefined,
       minPrice: filters.minPrice || undefined,
@@ -1078,12 +1078,25 @@ export function PropertyMap({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="house">House</SelectItem>
-                  <SelectItem value="apartment">Apartment</SelectItem>
-                  <SelectItem value="land">Land</SelectItem>
-                  <SelectItem value="commercial">Commercial</SelectItem>
-                  <SelectItem value="event_center">Event Center</SelectItem>
+                  <SelectItem value="duplex">Duplex</SelectItem>
+                  <SelectItem value="detached_house">Detached House</SelectItem>
+                  <SelectItem value="terrace">Terrace / Townhouse</SelectItem>
+                  <SelectItem value="bungalow">Bungalow</SelectItem>
+                  <SelectItem value="penthouse">Penthouse</SelectItem>
+                  <SelectItem value="flat">Flat / Apartment</SelectItem>
+                  <SelectItem value="mini_flat">Mini Flat</SelectItem>
+                  <SelectItem value="self_contained">Self-Contained</SelectItem>
+                  <SelectItem value="room_and_parlor">Room &amp; Parlor</SelectItem>
+                  <SelectItem value="single_room">Single Room</SelectItem>
+                  <SelectItem value="shop">Shop</SelectItem>
+                  <SelectItem value="office">Office Space</SelectItem>
+                  <SelectItem value="warehouse">Warehouse</SelectItem>
+                  <SelectItem value="showroom">Showroom</SelectItem>
                   <SelectItem value="hotel">Hotel</SelectItem>
+                  <SelectItem value="event_center">Event Center</SelectItem>
+                  <SelectItem value="restaurant">Restaurant</SelectItem>
+                  <SelectItem value="residential_land">Residential Land</SelectItem>
+                  <SelectItem value="commercial_land">Commercial Land</SelectItem>
                 </SelectContent>
               </Select> */}
 
@@ -1092,15 +1105,36 @@ export function PropertyMap({
                 aria-label="Property Type (temporary)"
                 value={filters.propertyType}
                 onChange={(e) => updateFilter('propertyType', e.target.value)}
-                className="w-full sm:w-[140px] bg-background/95 backdrop-blur-sm h-11 px-3"
+                className="w-full sm:w-[160px] bg-background/95 backdrop-blur-sm h-11 px-3"
               >
                 <option value="all">All Types</option>
-                <option value="house">House</option>
-                <option value="apartment">Apartment</option>
-                <option value="land">Land</option>
-                <option value="commercial">Commercial</option>
-                <option value="event_center">Event Center</option>
-                <option value="hotel">Hotel</option>
+                <optgroup label="Residential">
+                  <option value="duplex">Duplex</option>
+                  <option value="detached_house">Detached House</option>
+                  <option value="terrace">Terrace / Townhouse</option>
+                  <option value="bungalow">Bungalow</option>
+                  <option value="penthouse">Penthouse</option>
+                  <option value="flat">Flat / Apartment</option>
+                  <option value="mini_flat">Mini Flat</option>
+                  <option value="self_contained">Self-Contained</option>
+                  <option value="room_and_parlor">Room &amp; Parlor</option>
+                  <option value="single_room">Single Room</option>
+                </optgroup>
+                <optgroup label="Commercial">
+                  <option value="shop">Shop</option>
+                  <option value="office">Office Space</option>
+                  <option value="warehouse">Warehouse</option>
+                  <option value="showroom">Showroom</option>
+                </optgroup>
+                <optgroup label="Hospitality">
+                  <option value="hotel">Hotel</option>
+                  <option value="event_center">Event Center</option>
+                  <option value="restaurant">Restaurant</option>
+                </optgroup>
+                <optgroup label="Land">
+                  <option value="residential_land">Residential Land</option>
+                  <option value="commercial_land">Commercial Land</option>
+                </optgroup>
               </select>
 
               <select
@@ -1113,9 +1147,10 @@ export function PropertyMap({
                 )}
               >
                 <option value="all">All Listings</option>
-                <option value="sale">For Sale</option>
-                <option value="rent">For Rent</option>
-                <option value="lease">For Lease</option>
+                <option value="for_sale">For Sale</option>
+                <option value="for_rent">For Rent</option>
+                <option value="for_lease">For Lease</option>
+                <option value="short_let">Short Let</option>
               </select>
 
               <select
@@ -1699,36 +1734,36 @@ export function PropertyMap({
                 </div>
               </div>
 
-              {/* Property Specs */}
-              {selectedProperty.property_details && (
+              {/* Property Specs — bedrooms/bathrooms/square_feet live on `properties` table */}
+              {(selectedProperty.bedrooms || selectedProperty.bathrooms || selectedProperty.square_feet) && (
                 <div className="flex flex-wrap gap-4 py-4 border-y border-border">
-                  {selectedProperty.property_details.bedrooms && (
+                  {selectedProperty.bedrooms && (
                     <div className="flex items-center gap-2">
                       <Bed className="h-5 w-5 text-muted-foreground" />
                       <span className="font-semibold">
-                        {selectedProperty.property_details.bedrooms}
+                        {selectedProperty.bedrooms}
                       </span>
                       <span className="text-sm text-muted-foreground">
                         Beds
                       </span>
                     </div>
                   )}
-                  {selectedProperty.property_details.bathrooms && (
+                  {selectedProperty.bathrooms && (
                     <div className="flex items-center gap-2">
                       <Bath className="h-5 w-5 text-muted-foreground" />
                       <span className="font-semibold">
-                        {selectedProperty.property_details.bathrooms}
+                        {selectedProperty.bathrooms}
                       </span>
                       <span className="text-sm text-muted-foreground">
                         Baths
                       </span>
                     </div>
                   )}
-                  {selectedProperty.property_details.square_feet && (
+                  {selectedProperty.square_feet && (
                     <div className="flex items-center gap-2">
                       <Square className="h-5 w-5 text-muted-foreground" />
                       <span className="font-semibold">
-                        {selectedProperty.property_details.square_feet.toLocaleString()}
+                        {Number(selectedProperty.square_feet).toLocaleString()}
                       </span>
                       <span className="text-sm text-muted-foreground">
                         sqft
@@ -1738,41 +1773,38 @@ export function PropertyMap({
                 </div>
               )}
 
-              {/* Nigerian Infrastructure */}
-              {selectedProperty.property_details && (
+              {/* Nigerian Infrastructure — stored in property_details[0].metadata */}
+              {selectedProperty.property_details?.[0]?.metadata && (
                 <div>
                   <h4 className="font-semibold mb-3">Infrastructure</h4>
                   <div className="grid grid-cols-2 gap-2">
-                    {selectedProperty.property_details.nepa_status && (
+                    {selectedProperty.property_details[0].metadata.nepa_status && (
                       <div className="flex items-center gap-2 text-sm">
                         <Zap className="h-4 w-4 text-orange-500" />
                         <span>
-                          NEPA: {selectedProperty.property_details.nepa_status}
+                          NEPA: {String(selectedProperty.property_details[0].metadata.nepa_status)}
                         </span>
                       </div>
                     )}
-                    {selectedProperty.property_details.water_source && (
+                    {selectedProperty.property_details[0].metadata.water_source && (
                       <div className="flex items-center gap-2 text-sm">
                         <Droplets className="h-4 w-4 text-blue-500" />
                         <span>
                           Water:{" "}
-                          {selectedProperty.property_details.water_source.replace(
-                            "_",
-                            " ",
-                          )}
+                          {String(selectedProperty.property_details[0].metadata.water_source).replace("_", " ")}
                         </span>
                       </div>
                     )}
-                    {selectedProperty.property_details.internet_type && (
+                    {selectedProperty.property_details[0].metadata.internet_type && (
                       <div className="flex items-center gap-2 text-sm">
                         <Wifi className="h-4 w-4 text-purple-500" />
                         <span>
                           Internet:{" "}
-                          {selectedProperty.property_details.internet_type}
+                          {String(selectedProperty.property_details[0].metadata.internet_type)}
                         </span>
                       </div>
                     )}
-                    {selectedProperty.property_details.has_bq && (
+                    {selectedProperty.property_details[0].metadata.has_bq && (
                       <div className="flex items-center gap-2 text-sm">
                         <Home className="h-4 w-4 text-green-500" />
                         <span>Has BQ</span>

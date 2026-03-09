@@ -1,368 +1,205 @@
-import { Resend } from "resend";
+/**
+ * RealEST Email Service
+ *
+ * Thin wrapper around the Resend SDK. All templates are React Email
+ * components rendered server-side. The old lib/email-templates/ TS
+ * string system is preserved for backward compatibility but new code
+ * should only use this service.
+ */
+
+import * as React from 'react';
+import { Resend } from 'resend';
 import {
-  Templates,
-  emailFactory,
-  validateEmailData,
-  validateAdminData,
-  validatePasswordResetData,
+  WaitlistConfirmationEmail,
+  AdminNotificationEmail,
+  PasswordResetEmail,
+  WelcomeEmail,
+  OnboardingReminderEmail,
+  PasswordChangedEmail,
+  InquiryNotificationEmail,
+  SubAdminInvitationEmail,
+  renderEmailFull,
   type WaitlistEmailData,
   type AdminNotificationData,
   type PasswordResetEmailData,
+  type WelcomeEmailData,
+  type OnboardingReminderEmailData,
+  type PasswordChangedEmailData,
   type InquiryEmailData,
-  type EmailTemplate,
-} from "./email-templates";
+  type SubAdminInvitationData,
+} from '@/emails';
 
-// Email service configuration
 const resend = new Resend(process.env.RESEND_API_KEY);
-const FROM_EMAIL = process.env.FROM_EMAIL          || "RealEST Connect <info@connect.realest.ng>";
-const FROM_EMAIL_INQUIRIES = process.env.FROM_EMAIL_INQUIRIES || FROM_EMAIL;
-const FROM_EMAIL_AUTH = process.env.FROM_EMAIL_AUTH     || FROM_EMAIL;
-const FROM_EMAIL_WAITLIST = process.env.FROM_EMAIL_WAITLIST || FROM_EMAIL;
-const COMPANY_NAME = "RealEST Connect";
+const FROM_EMAIL           = process.env.FROM_EMAIL            || 'RealEST Connect <info@connect.realest.ng>';
+const FROM_EMAIL_AUTH      = process.env.FROM_EMAIL_AUTH       || FROM_EMAIL;
+const FROM_EMAIL_INQUIRIES = process.env.FROM_EMAIL_INQUIRIES  || FROM_EMAIL;
+const FROM_EMAIL_WAITLIST  = process.env.FROM_EMAIL_WAITLIST   || FROM_EMAIL;
 
-/** Returns true when Resend rejects due to daily/monthly quota */
+type EmailResult = { success: boolean; error?: string; messageId?: string; quotaExceeded?: boolean };
+
 function isQuotaError(err: unknown): boolean {
-  if (!err || typeof err !== "object") return false;
+  if (!err || typeof err !== 'object') return false;
   const e = err as Record<string, unknown>;
   return (
-    e.name === "daily_quota_exceeded" ||
-    e.name === "monthly_quota_exceeded" ||
-    String(e.message ?? "").toLowerCase().includes("quota")
+    e.name === 'daily_quota_exceeded' ||
+    e.name === 'monthly_quota_exceeded' ||
+    String(e.message ?? '').toLowerCase().includes('quota')
   );
 }
 
-/**
- * Send waitlist confirmation email
- */
-export async function sendWaitlistConfirmationEmail(
-  data: WaitlistEmailData,
-): Promise<{
-  success: boolean;
-  error?: string;
-  messageId?: string;
-  quotaExceeded?: boolean;
-}> {
+async function sendReactEmail({
+  from, to, subject, component, replyTo,
+}: {
+  from: string;
+  to: string | string[];
+  subject: string;
+  component: React.ReactElement;
+  replyTo?: string;
+}): Promise<EmailResult> {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('⚠️  RESEND_API_KEY not configured — email sending disabled.');
+    return { success: false, error: 'Email service not configured' };
+  }
   try {
-    if (!process.env.RESEND_API_KEY) {
-      console.warn("⚠️ RESEND_API_KEY not configured. Email sending disabled.");
-      return { success: false, error: "Email service not configured" };
-    }
-
-    // Validate input data
-    if (!validateEmailData(data)) {
-      console.error("❌ Invalid email data provided:", data);
-      return { success: false, error: "Invalid email data" };
-    }
-
-    console.log(
-      `📧 Sending waitlist email to ${data.email} with position: ${data.position || "undefined"}`,
-    );
-
-    // Generate template using our modular system
-    const template = Templates.waitlistConfirmation(data);
-
-    const { data: emailResult, error } = await resend.emails.send({
-      from: FROM_EMAIL_WAITLIST,
-      to: [data.email],
-      subject: template.subject,
-      html: template.html,
-      text: template.text,
+    const { html, text } = await renderEmailFull(component);
+    const { data, error } = await resend.emails.send({
+      from,
+      to: Array.isArray(to) ? to : [to],
+      subject,
+      html,
+      text,
+      ...(replyTo ? { replyTo } : {}),
     });
-
     if (error) {
-      console.error("❌ Email sending failed:", error);
+      console.error('❌ Email send failed:', error);
       return { success: false, error: error.message, quotaExceeded: isQuotaError(error) };
     }
-
-    console.log("✅ Confirmation email sent:", emailResult?.id);
-    return { success: true, messageId: emailResult?.id };
-  } catch (error) {
-    console.error("❌ Unexpected email error:", error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Unknown email error",
-    };
+    return { success: true, messageId: data?.id };
+  } catch (err) {
+    console.error('❌ Unexpected email error:', err);
+    return { success: false, error: err instanceof Error ? err.message : 'Unknown email error' };
   }
 }
 
-/**
- * Send admin notification email when someone joins waitlist
- */
-export async function sendWaitlistAdminNotification(
-  data: AdminNotificationData,
-): Promise<{
-  success: boolean;
-  error?: string;
-  quotaExceeded?: boolean;
-}> {
+export async function sendWaitlistConfirmationEmail(data: WaitlistEmailData): Promise<EmailResult> {
+  console.log(`📧 Sending waitlist confirmation to ${data.email}`);
+  return sendReactEmail({
+    from: FROM_EMAIL_WAITLIST,
+    to: data.email,
+    subject: WaitlistConfirmationEmail.subject(data),
+    component: React.createElement(WaitlistConfirmationEmail, data),
+  });
+}
+
+export async function sendWaitlistAdminNotification(data: AdminNotificationData): Promise<EmailResult> {
+  if (!process.env.RESEND_API_KEY || !process.env.ADMIN_EMAIL) {
+    return { success: false, error: 'Admin notifications not configured' };
+  }
+  console.log(`📧 Sending admin notification for ${data.email}`);
+  return sendReactEmail({
+    from: FROM_EMAIL,
+    to: process.env.ADMIN_EMAIL,
+    subject: AdminNotificationEmail.subject(data),
+    component: React.createElement(AdminNotificationEmail, data),
+  });
+}
+
+export async function sendHybridPasswordResetEmail(data: PasswordResetEmailData): Promise<EmailResult> {
+  if (!data.email || !data.firstName || !data.otpCode || !data.resetLink) {
+    return { success: false, error: 'Invalid password reset data' };
+  }
+  console.log(`📧 Sending password reset to ${data.email}`);
+  return sendReactEmail({
+    from: FROM_EMAIL_AUTH,
+    to: data.email,
+    subject: PasswordResetEmail.subject(data),
+    component: React.createElement(PasswordResetEmail, data),
+  });
+}
+
+export async function sendWelcomeEmail(data: WelcomeEmailData): Promise<EmailResult> {
+  if (!data.email || !data.firstName || !data.userType || !data.dashboardUrl) {
+    return { success: false, error: 'Invalid welcome email data' };
+  }
+  console.log(`📧 Sending welcome email to ${data.email} (${data.userType})`);
+  return sendReactEmail({
+    from: FROM_EMAIL_AUTH,
+    to: data.email,
+    subject: WelcomeEmail.subject(data),
+    component: React.createElement(WelcomeEmail, data),
+  });
+}
+
+export async function sendOnboardingReminderEmail(data: OnboardingReminderEmailData): Promise<EmailResult> {
+  if (!data.email || !data.firstName || !data.userType || !data.onboardingUrl) {
+    return { success: false, error: 'Invalid onboarding reminder data' };
+  }
+  console.log(`📧 Sending onboarding reminder to ${data.email}`);
+  return sendReactEmail({
+    from: FROM_EMAIL_AUTH,
+    to: data.email,
+    subject: OnboardingReminderEmail.subject(data),
+    component: React.createElement(OnboardingReminderEmail, data),
+  });
+}
+
+export async function sendPasswordChangedEmail(data: PasswordChangedEmailData): Promise<EmailResult> {
+  if (!data.email || !data.firstName) {
+    return { success: false, error: 'Invalid data for password-changed notification' };
+  }
+  console.log(`📧 Sending password-changed notification to ${data.email}`);
+  return sendReactEmail({
+    from: FROM_EMAIL_AUTH,
+    to: data.email,
+    subject: PasswordChangedEmail.subject(data),
+    component: React.createElement(PasswordChangedEmail, data),
+  });
+}
+
+export async function sendInquiryEmail(data: InquiryEmailData): Promise<EmailResult> {
+  console.log(`📧 Sending inquiry email to ${data.recipientEmail} for "${data.propertyTitle}"`);
+  return sendReactEmail({
+    from: FROM_EMAIL_INQUIRIES,
+    to: data.recipientEmail,
+    replyTo: data.senderEmail,
+    subject: InquiryNotificationEmail.subject(data),
+    component: React.createElement(InquiryNotificationEmail, data),
+  });
+}
+
+export async function sendSubAdminInvitationEmail(data: SubAdminInvitationData): Promise<EmailResult> {
+  console.log(`📧 Sending sub-admin invitation to ${data.email}`);
+  return sendReactEmail({
+    from: FROM_EMAIL_AUTH,
+    to: data.email,
+    subject: SubAdminInvitationEmail.subject(data),
+    component: React.createElement(SubAdminInvitationEmail, data),
+  });
+}
+
+export async function testEmailConfiguration(): Promise<{ success: boolean; error?: string }> {
+  if (!process.env.RESEND_API_KEY) {
+    return { success: false, error: 'RESEND_API_KEY not configured' };
+  }
   try {
-    if (!process.env.RESEND_API_KEY || !process.env.ADMIN_EMAIL) {
-      return { success: false, error: "Admin notifications not configured" };
-    }
-
-    // Validate input data
-    if (!validateAdminData(data)) {
-      console.error("❌ Invalid admin notification data provided:", data);
-      return { success: false, error: "Invalid admin notification data" };
-    }
-
-    console.log(
-      `📧 Sending admin notification for ${data.email} with position: ${data.position || "undefined"}`,
-    );
-
-    // Generate template using our modular system
-    const template = Templates.adminNotification(data);
-
-    const { error } = await resend.emails.send({
-      from: FROM_EMAIL,
-      to: [process.env.ADMIN_EMAIL],
-      subject: template.subject,
-      html: template.html,
-      text: template.text,
+    const response = await fetch('https://api.resend.com/domains', {
+      headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}` },
     });
-
-    if (error) {
-      console.error("❌ Admin notification failed:", error);
-      return { success: false, error: error.message, quotaExceeded: isQuotaError(error) };
-    }
-
-    console.log("✅ Admin notification sent successfully");
-    return { success: true };
-  } catch (error) {
-    console.error("❌ Admin notification error:", error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Unknown error",
-    };
+    return response.ok
+      ? { success: true }
+      : { success: false, error: 'Invalid API key or configuration' };
+  } catch (err) {
+    return { success: false, error: err instanceof Error ? err.message : 'Unknown error' };
   }
 }
 
-/**
- * Batch email sending utility
- */
-export async function sendBatchEmails(
-  emails: Array<{
-    type: "waitlist" | "admin";
-    data: WaitlistEmailData | AdminNotificationData;
-  }>,
-): Promise<{
-  success: boolean;
-  results: Array<{ success: boolean; error?: string }>;
-}> {
-  try {
-    const results = await Promise.allSettled(
-      emails.map(async ({ type, data }) => {
-        if (type === "waitlist") {
-          return await sendWaitlistConfirmationEmail(data as WaitlistEmailData);
-        } else {
-          return await sendWaitlistAdminNotification(
-            data as AdminNotificationData,
-          );
-        }
-      }),
-    );
-
-    const formattedResults = results.map((result) =>
-      result.status === "fulfilled"
-        ? result.value
-        : { success: false, error: result.reason?.message || "Unknown error" },
-    );
-
-    const allSuccessful = formattedResults.every((result) => result.success);
-
-    return {
-      success: allSuccessful,
-      results: formattedResults,
-    };
-  } catch (error) {
-    console.error("❌ Batch email sending error:", error);
-    return {
-      success: false,
-      results: [
-        {
-          success: false,
-          error: error instanceof Error ? error.message : "Unknown error",
-        },
-      ],
-    };
-  }
-}
-
-/**
- * Email template preview utility for development
- */
-export async function previewEmailTemplate(
-  type: "waitlist" | "admin",
-  sampleData?: Partial<WaitlistEmailData>,
-): Promise<EmailTemplate> {
-  const mockData: WaitlistEmailData = {
-    email: "preview@example.com",
-    firstName: "Preview",
-    lastName: "User",
-    position: 42,
-    ...sampleData,
-  };
-
-  if (type === "waitlist") {
-    return Templates.waitlistConfirmation(mockData);
-  } else {
-    return Templates.adminNotification({
-      ...mockData,
-      totalCount: 150,
-      signupDate: new Date().toISOString(),
-    });
-  }
-}
-
-/**
- * Send property inquiry notification to the listing contact (owner or agent)
- */
-export async function sendInquiryEmail(data: InquiryEmailData): Promise<{
-  success: boolean;
-  error?: string;
-  messageId?: string;
-  quotaExceeded?: boolean;
-}> {
-  try {
-    if (!process.env.RESEND_API_KEY) {
-      console.warn("⚠️ RESEND_API_KEY not configured. Email sending disabled.");
-      return { success: false, error: "Email service not configured" };
-    }
-
-    console.log(
-      `📧 Sending inquiry email to ${data.recipientEmail} for property: ${data.propertyTitle}`,
-    );
-
-    const template = Templates.inquiryNotification(data);
-
-    const { data: emailResult, error } = await resend.emails.send({
-      from: FROM_EMAIL_INQUIRIES,
-      to: [data.recipientEmail],
-      replyTo: data.senderEmail,
-      subject: template.subject,
-      html: template.html,
-      text: template.text,
-    });
-
-    if (error) {
-      console.error("❌ Inquiry email sending failed:", error);
-      return { success: false, error: error.message, quotaExceeded: isQuotaError(error) };
-    }
-
-    console.log("✅ Inquiry email sent:", emailResult?.id);
-    return { success: true, messageId: emailResult?.id };
-  } catch (error) {
-    console.error("❌ Unexpected inquiry email error:", error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Unknown email error",
-    };
-  }
-}
-
-/**
- * Send hybrid password reset email (OTP + Link)
- * Provides users with both OTP code entry and direct reset link options
- */
-export async function sendHybridPasswordResetEmail(
-  data: PasswordResetEmailData,
-): Promise<{
-  success: boolean;
-  error?: string;
-  messageId?: string;
-  quotaExceeded?: boolean;
-}> {
-  try {
-    if (!process.env.RESEND_API_KEY) {
-      console.warn("⚠️ RESEND_API_KEY not configured. Email sending disabled.");
-      return { success: false, error: "Email service not configured" };
-    }
-
-    // Validate input data
-    if (!validatePasswordResetData(data)) {
-      console.error("❌ Invalid password reset data provided:", data);
-      return { success: false, error: "Invalid password reset data" };
-    }
-
-    console.log(`📧 Sending hybrid password reset email to ${data.email}`);
-
-    // Generate template using our modular system
-    const template = Templates.passwordReset(data);
-
-    const { data: emailResult, error } = await resend.emails.send({
-      from: FROM_EMAIL_AUTH,
-      to: [data.email],
-      subject: template.subject,
-      html: template.html,
-      text: template.text,
-    });
-
-    if (error) {
-      console.error("❌ Password reset email sending failed:", error);
-      return { success: false, error: error.message, quotaExceeded: isQuotaError(error) };
-    }
-
-    console.log("✅ Password reset email sent:", emailResult?.id);
-    return { success: true, messageId: emailResult?.id };
-  } catch (error) {
-    console.error("❌ Unexpected password reset email error:", error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Unknown email error",
-    };
-  }
-}
-
-/**
- * Test email configuration
- */
-export async function testEmailConfiguration(): Promise<{
-  success: boolean;
-  error?: string;
-}> {
-  try {
-    if (!process.env.RESEND_API_KEY) {
-      return { success: false, error: "RESEND_API_KEY not configured" };
-    }
-
-    // Test with a simple API call to Resend
-    const response = await fetch("https://api.resend.com/domains", {
-      headers: {
-        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-      },
-    });
-
-    if (response.ok) {
-      return { success: true };
-    } else {
-      return { success: false, error: "Invalid API key or configuration" };
-    }
-  } catch (error) {
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Unknown error",
-    };
-  }
-}
-
-/**
- * Environment variables needed:
- *
- * RESEND_API_KEY=re_xxxxxxxx (get from resend.com)
- * FROM_EMAIL=hello@realest.ng (verified domain in Resend)
- * ADMIN_EMAIL=admin@realest.ng (optional, for admin notifications)
- * SUPPORT_EMAIL=hello@realest.ng (optional, for email footers)
- * WEBSITE_URL=https://realest.ng (optional, for email links)
- * UNSUBSCRIBE_URL={unsubscribe_url} (optional, for unsubscribe functionality)
- */
-
-// Re-export types for convenience
 export type {
   WaitlistEmailData,
   AdminNotificationData,
   PasswordResetEmailData,
-  EmailTemplate,
-} from "./email-templates";
-
-// Export email factory for advanced usage
-export { emailFactory, Templates } from "./email-templates";
+  WelcomeEmailData,
+  OnboardingReminderEmailData,
+  PasswordChangedEmailData,
+  InquiryEmailData,
+  SubAdminInvitationData,
+} from '@/emails';

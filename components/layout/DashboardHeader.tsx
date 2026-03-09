@@ -21,6 +21,7 @@ import { HeaderLogo } from "@/components/ui/RealEstLogo";
 import { ThemeToggleCompact } from "@/components/ui/theme-toggle-wrapper";
 import { useUser } from "@/lib/hooks/useUser";
 import { ProfileDropdown } from "@/components/realest";
+import { useLogoutModal } from "@/components/providers/LogoutModalProvider";
 
 interface DashboardHeaderProps {
   userRole: string | null;
@@ -28,7 +29,8 @@ interface DashboardHeaderProps {
 
 export function DashboardHeader({ userRole }: DashboardHeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { user, profile, logout } = useUser();
+  const { user, profile } = useUser();
+  const { openLogoutModal } = useLogoutModal();
 
   const getRoleDisplayName = (role: string | null) => {
     switch (role) {
@@ -206,7 +208,7 @@ export function DashboardHeader({ userRole }: DashboardHeaderProps) {
                   className="w-full justify-start gap-3 text-danger hover:text-danger hover:bg-error/10"
                   onClick={() => {
                     setIsMobileMenuOpen(false);
-                    logout();
+                    openLogoutModal();
                   }}
                 >
                   <LogOut className="w-4 h-4" />

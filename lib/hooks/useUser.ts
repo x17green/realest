@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
-import type { Database } from "@/lib/supabase/types";
 
 // Base user types
 export type UserRole = "user" | "owner" | "agent" | "admin" | "system_owner";

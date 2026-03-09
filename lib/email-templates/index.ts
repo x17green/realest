@@ -1,3 +1,9 @@
+/**
+ * @deprecated — This module (lib/email-templates/) is preserved for rollback safety only.
+ * Use the React Email system at /emails instead via lib/emailService.ts.
+ * New email templates should be added as React Email components under emails/templates/.
+ */
+
 // Email Templates Module - Central Export Hub
 // Provides clean exports for all email templates with context support
 
@@ -25,6 +31,22 @@ export {
   default as inquiryNotification,
 } from "./inquiry";
 
+export {
+  createWelcomeTemplate,
+  default as welcome,
+} from "./welcome";
+
+export {
+  createOnboardingReminderTemplate,
+  default as onboardingReminder,
+} from "./onboarding-reminder";
+
+export {
+  createPasswordChangedTemplate,
+  default as passwordChanged,
+  type PasswordChangedEmailData,
+} from "./password-changed";
+
 // Re-export types for convenience
 export type {
   EmailTemplate,
@@ -32,6 +54,9 @@ export type {
   AdminNotificationData,
   PasswordResetEmailData,
   InquiryEmailData,
+  WelcomeEmailData,
+  OnboardingReminderEmailData,
+  OnboardingUserType,
   EmailConfig,
   TemplateContext,
   EmailTemplateFunction,
@@ -43,12 +68,17 @@ import { createWaitlistConfirmationTemplate } from "./waitlist-confirmation";
 import { createAdminNotificationTemplate } from "./admin-notification";
 import { createPasswordResetTemplate } from "./password-reset";
 import { createInquiryTemplate } from "./inquiry";
+import { createWelcomeTemplate } from "./welcome";
+import { createOnboardingReminderTemplate } from "./onboarding-reminder";
+import { createPasswordChangedTemplate, PasswordChangedEmailData } from "./password-changed";
 import {
   EmailConfig,
   WaitlistEmailData,
   AdminNotificationData,
   PasswordResetEmailData,
   InquiryEmailData,
+  WelcomeEmailData,
+  OnboardingReminderEmailData,
 } from "./types";
 
 // RealEST email configuration
@@ -109,6 +139,27 @@ export class EmailTemplateFactory {
   }
 
   /**
+   * Create post-onboarding welcome email
+   */
+  createWelcome(data: WelcomeEmailData) {
+    return createWelcomeTemplate(data, { company: this.config });
+  }
+
+  /**
+   * Create onboarding reminder email
+   */
+  createOnboardingReminder(data: OnboardingReminderEmailData) {
+    return createOnboardingReminderTemplate(data, { company: this.config });
+  }
+
+  /**
+   * Create password changed security notification email
+   */
+  createPasswordChanged(data: PasswordChangedEmailData) {
+    return createPasswordChangedTemplate(data);
+  }
+
+  /**
    * Update configuration
    */
   updateConfig(newConfig: Partial<EmailConfig>) {
@@ -150,6 +201,15 @@ export const Templates = {
 
   inquiryNotification: (data: InquiryEmailData) =>
     emailFactory.createInquiryNotification(data),
+
+  welcome: (data: WelcomeEmailData) =>
+    emailFactory.createWelcome(data),
+
+  onboardingReminder: (data: OnboardingReminderEmailData) =>
+    emailFactory.createOnboardingReminder(data),
+
+  passwordChanged: (data: PasswordChangedEmailData) =>
+    emailFactory.createPasswordChanged(data),
 };
 
 // Template validation utilities

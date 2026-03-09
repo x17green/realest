@@ -235,9 +235,23 @@ export function useOnboarding(
 
       setState((prev) => ({ ...prev, success: true }));
 
-      // Redirect after success
+      // Fire-and-forget: send welcome email (non-blocking — onboarding is complete either way)
       const redirectTo =
         redirectPath || (userType === "agent" ? "/agent" : "/owner");
+      const siteUrl =
+        process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+      fetch("/api/email/welcome", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userType,
+          dashboardUrl: `${siteUrl}${redirectTo}`,
+        }),
+      }).catch((err) =>
+        console.warn("[Onboarding] Welcome email request failed:", err),
+      );
+
+      // Redirect after success
       setTimeout(() => {
         router.push(redirectTo);
       }, 2000);

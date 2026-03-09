@@ -9,11 +9,13 @@ import { HeaderLogo } from "@/components/ui/RealEstLogo";
 import { ThemeToggleCompact } from "@/components/ui/theme-toggle-wrapper";
 import { useUser } from "@/lib/hooks/useUser";
 import { ProfileDropdown } from "@/components/realest";
+import { useLogoutModal } from "@/components/providers/LogoutModalProvider";
 
 export function AdminHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { user, profile, logout } = useUser();
+  const { user, profile } = useUser();
   const router = useRouter();
+  const { openLogoutModal } = useLogoutModal();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-accent/20 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 shadow-sm">
@@ -141,7 +143,7 @@ export function AdminHeader() {
                   className="w-full justify-start gap-3 text-danger hover:text-danger hover:bg-error/10"
                   onPress={() => {
                     setIsMobileMenuOpen(false);
-                    logout();
+                    openLogoutModal();
                   }}
                 >
                   <LogOut className="w-4 h-4" />

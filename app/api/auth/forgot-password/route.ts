@@ -1,14 +1,39 @@
 /**
- * POST /api/auth/forgot-password
+ * GET  /api/auth/forgot-password?email=... — check if an account exists (UI validation only)
+ * POST /api/auth/forgot-password           — send the password reset email
  *
  * Server-side password reset handler.
  * - Uses service role to look up the profile (avoids anon RLS block)
  * - Uses Supabase Admin generateLink for a real, signed recovery URL
- * - Always returns success to prevent user enumeration
+ * - POST always returns success to prevent user enumeration
  */
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createServiceClient } from "@/lib/supabase/service";
+import { deriveNumericOtp } from "@/lib/utils/otp";
+
+/**
+ * GET /api/auth/forgot-password?email=user@example.com
+ *
+ * Returns { exists: true } when the email is registered, { exists: false } otherwise.
+ * Uses the service-role client so it bypasses RLS on the profiles table.
+ */
+export async function GET(request: NextRequest) {
+  const email = request.nextUrl.searchParams.get("email")?.trim();
+
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return NextResponse.json({ exists: false });
+  }
+
+  const supabase = createServiceClient();
+  const { data } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("email", email)
+    .maybeSingle();
+
+  return NextResponse.json({ exists: !!data });
+}
 
 const schema = z.object({
   email: z.string().email("Invalid email address"),
@@ -55,9 +80,22 @@ export async function POST(request: NextRequest) {
 
     const resetLink = linkData.properties.action_link;
 
-    // Use last 6 chars of the hashed token as the display OTP code
-    const hashed = linkData.properties.hashed_token ?? "";
-    const otpCode = hashed.slice(-6).toUpperCase() || Math.floor(100000 + Math.random() * 900000).toString();
+    // Derive a 6-digit numeric OTP from the hashed token (deterministic, digits-only)
+    const hashed = linkData.properties.hashed_token;
+
+    if (!hashed) {
+      console.error("[ForgotPassword] Missing hashed_token in generateLink response");
+      return NextResponse.json(
+        { success: false, error: "Failed to generate reset code" },
+        { status: 500 },
+      );
+    }
+    const otpCode = deriveNumericOtp(hashed);
+
+    // Build a click-to-fill URL so the user can click the code in the email
+    // and have it auto-filled into the OTP form
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+    const otpFillUrl = `${siteUrl}/otp?email=${encodeURIComponent(email)}&type=reset&code=${otpCode}`;
 
     // Send the branded password reset email
     const { sendHybridPasswordResetEmail } = await import("@/lib/emailService");
@@ -66,7 +104,8 @@ export async function POST(request: NextRequest) {
       firstName,
       otpCode,
       resetLink,
-      expiryMinutes: 60,
+      otpFillUrl,
+      expiryMinutes: 15,
     });
 
     if (!emailResult.success) {
@@ -86,7 +125,19 @@ export async function POST(request: NextRequest) {
     }
 
     console.log("[ForgotPassword] Reset email sent to", email, "— id:", emailResult.messageId);
-    return NextResponse.json({ success: true });
+
+    // Store the hashed token in a short-lived HttpOnly cookie so the
+    // /api/auth/verify-reset-otp endpoint can verify the 6-digit code
+    // without ever exposing the full token hash to the browser.
+    const successResponse = NextResponse.json({ success: true });
+    successResponse.cookies.set("reset_token", hashed, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/api/auth",
+      maxAge: 900, // 15 minutes — OWASP recommended OTP expiry
+    });
+    return successResponse;
   } catch (err) {
     if (err instanceof z.ZodError) {
       return NextResponse.json(

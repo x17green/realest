@@ -1,6 +1,13 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AgentOnboarding, OwnerOnboarding } from "@/components/onboarding";
+
+export const metadata: Metadata = {
+  title: "Complete Your Profile | RealEST",
+  description: "Finish setting up your RealEST account to start listing or browsing verified properties.",
+  robots: { index: false, follow: false },
+};
 
 export default async function OnboardingLayout({
   children,

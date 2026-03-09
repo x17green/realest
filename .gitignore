@@ -41,3 +41,8 @@ next-env.d.ts
 .vault/
 .obsidian/*
 /lib/generated/prisma
+
+# React Email build cache and temp artifacts
+.react-email/
+_build-log.txt
+_server-log.txt
