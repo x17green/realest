@@ -109,25 +109,16 @@ export default function ForgotPasswordPage() {
   const inputFeedback = () => {
     switch (emailStatus) {
       case "unknown":
+      case "not_found":
         return (
           <p className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1.5">
             <AlertCircle className="w-3.5 h-3.5" />
-            Unable to verify email due to a connection issue. You can still attempt to reset your password.
+            Unable to verify this email. If an account exists, you can continue to request a password reset or{" "}
+            <Link href="/register" className="underline font-medium">
+              sign up
+            </Link>
+            .
           </p>
-        );
-      case "not_found":
-        return (
-          <div className="flex items-center gap-2 mt-2 p-3 ">
-            <AlertCircle className="w-4 h-4 text-orange-600 dark:text-orange-400 mt-0.5 shrink-0" />
-            <div className="text-xs text-orange-800 dark:text-orange-200">
-              <p className="font-medium">
-                No account found. {" "}
-                <Link href="/register" className="underline font-medium text-orange-700 dark:text-orange-300">
-                  Sign up instead?
-                </Link>
-              </p>
-            </div>
-          </div>
         );
       case "invalid":
         return (
