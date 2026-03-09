@@ -5,7 +5,7 @@ import { PropertyForm } from "@/components/agent/PropertyForm"
 export default async function NewPropertyPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect("/auth/login?redirect=/agent/properties/new")
+  if (!user) redirect("/login?redirect=/agent/properties/new")
 
   const { data: userData } = await supabase
     .from("users")
