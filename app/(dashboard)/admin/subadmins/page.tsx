@@ -5,7 +5,7 @@ import { SubAdminForm } from "@/components/admin/SubAdminForm"
 export default async function SubAdminsPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect("/auth/login?redirect=/admin/subadmins")
+  if (!user) redirect("/login?redirect=/admin/subadmins")
 
   const { data: userRow } = await supabase
     .from("users")
