@@ -5,7 +5,7 @@ import { PropertyForm } from "@/components/agent/PropertyForm"
 export default async function EditPropertyPage({ params }: { params: { id: string } }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect(`/auth/login?redirect=/agent/properties/${params.id}/edit`)
+  if (!user) redirect(`/login?redirect=/agent/properties/${params.id}/edit`)
 
   const { data: userRow } = await supabase
     .from("users")

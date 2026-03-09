@@ -71,7 +71,7 @@ export function PropertyForm({ initial, mode }: { initial?: Partial<PropertyForm
       const { data: session } = await supabase.auth.getUser()
       const user = session.user
       if (!user) {
-        router.push("/auth/login?redirect=/agent/properties")
+        router.push("/login?redirect=/agent/properties")
         return
       }
 

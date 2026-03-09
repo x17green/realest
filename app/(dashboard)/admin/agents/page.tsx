@@ -6,7 +6,7 @@ import { VerifyAgentsList } from "@/components/admin/VerifyAgentsList"
 export default async function VerifyAgentsPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect("/auth/login?redirect=/admin/verify-agents")
+  if (!user) redirect("/login?redirect=/admin/verify-agents")
 
   const { data: userData } = await supabase
     .from("users")
