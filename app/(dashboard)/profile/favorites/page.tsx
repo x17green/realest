@@ -36,41 +36,46 @@ export default function FavoritesPage() {
       const supabase = createClient();
       const { data: user } = await supabase.auth.getUser();
 
-      if (!user.user) {
-        setIsLoading(false);
-        return;
-      }
+      try {
+        const supabase = createClient();
+        const { data: user } = await supabase.auth.getUser();
 
-      const { data, error } = await supabase
-        .from("saved_properties")
-        .select(
-          `
-          id,
-          property_id,
-          saved_at,
-          properties (
+        if (!user || !user.user) {
+          return;
+        }
+
+        const { data, error } = await supabase
+          .from("saved_properties")
+          .select(
+            `
             id,
-            title,
-            price,
-            address,
-            city,
-            bedrooms,
-            bathrooms,
-            square_feet,
-            listing_type,
-            property_type,
-            verification_status,
-            status
+            property_id,
+            saved_at,
+            properties (
+              id,
+              title,
+              price,
+              address,
+              city,
+              bedrooms,
+              bathrooms,
+              square_feet,
+              listing_type,
+              property_type,
+              verification_status,
+              status
+            )
+          `,
           )
-        `,
-        )
-        .eq("user_id", user.user.id)
-        .order("saved_at", { ascending: false });
+          .eq("user_id", user.user.id)
+          .order("saved_at", { ascending: false });
 
-      if (!error && data) {
-        setSavedProperties(data);
+        if (!error && data) {
+          setSavedProperties(data);
+        }
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
 
     fetchFavorites();
