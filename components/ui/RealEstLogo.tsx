@@ -116,7 +116,7 @@ export const HeaderLogo = (props: Omit<RealEstLogoProps, 'variant' | 'size'>) =>
 
 /** Wordmark only, auto theme, sm size */
 export const FooterLogo = (props: Omit<RealEstLogoProps, 'variant' | 'size'>) => (
-  <RealEstLogo variant="wordmark" size="lg" {...props} />
+  <RealEstLogo variant="wordmark" size="2xl" {...props} />
 );
 
 /** Large full logo for hero sections */
