@@ -32,7 +32,7 @@ function OTPContent() {
   const [email, setEmail] = useState("");
   // "reset" = password-reset OTP; anything else = signup email OTP (legacy)
   const otpType = (searchParams.get("type") ?? "email") as "email" | "reset";
-  const [timeLeft, setTimeLeft] = useState(300); // 5 minutes in seconds
+  const [timeLeft, setTimeLeft] = useState(900); // 15 minutes in seconds — matches server-side token expiry
   const [isPaused, setIsPaused] = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -228,7 +228,7 @@ function OTPContent() {
       if (!resendResponse.success) {
         setError(resendResponse.error || "Failed to resend code");
       } else {
-        setTimeLeft(300);
+        setTimeLeft(900);
         setIsExpired(false);
         setOtp(["", "", "", "", "", ""]);
         inputRefs.current[0]?.focus();

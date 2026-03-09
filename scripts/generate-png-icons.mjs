@@ -1,7 +1,9 @@
-const sharp = require('sharp');
-const { Resvg } = require('@resvg/resvg-js');
-const fs = require('fs').promises;
-const path = require('path');
+import sharp from 'sharp';
+import { Resvg } from '@resvg/resvg-js';
+import { promises as fs } from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Icon configurations - SVG file and desired PNG output
 const iconConfigs = [
@@ -78,7 +80,19 @@ const iconConfigs = [
     input: 'public/realest-logo-square.svg',
     output: 'public/realest-logo-square.png',
     size: 300
-  }
+  },
+
+  // Email wordmark PNGs — 2× retina (displayed at 160px wide in EmailHeader)
+  {
+    input: 'public/realest-wordmark-dark.svg',
+    output: 'public/realest-wordmark-dark.png',
+    size: 320
+  },
+  {
+    input: 'public/realest-wordmark-light.svg',
+    output: 'public/realest-wordmark-light.png',
+    size: 320
+  },
 ];
 
 async function convertSvgToPng(svgPath, pngPath, size) {
@@ -103,7 +117,7 @@ async function convertSvgToPng(svgPath, pngPath, size) {
 
     // Optimize with Sharp (optional, for better compression)
     const optimizedBuffer = await sharp(pngBuffer)
-      .resize(size, size)
+      .resize(size, null)  // constrain width only, preserve aspect ratio
       .png({
         compressionLevel: 9,
         quality: 95
@@ -159,11 +173,9 @@ async function generateAllIcons() {
 }
 
 // Handle command line execution
-if (require.main === module) {
-  generateAllIcons().catch((error) => {
-    console.error('💥 Script failed:', error);
-    process.exit(1);
-  });
-}
+generateAllIcons().catch((error) => {
+  console.error('💥 Script failed:', error);
+  process.exit(1);
+});
 
-module.exports = { convertSvgToPng, generateAllIcons };
+export { convertSvgToPng, generateAllIcons };

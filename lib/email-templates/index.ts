@@ -1,3 +1,9 @@
+/**
+ * @deprecated — This module (lib/email-templates/) is preserved for rollback safety only.
+ * Use the React Email system at /emails instead via lib/emailService.ts.
+ * New email templates should be added as React Email components under emails/templates/.
+ */
+
 // Email Templates Module - Central Export Hub
 // Provides clean exports for all email templates with context support
 

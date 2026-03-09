@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
       otpCode,
       resetLink,
       otpFillUrl,
-      expiryMinutes: 60,
+      expiryMinutes: 15,
     });
 
     if (!emailResult.success) {
@@ -135,7 +135,7 @@ export async function POST(request: NextRequest) {
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/api/auth",
-      maxAge: 3600, // 1 hour — matches Supabase recovery link expiry
+      maxAge: 900, // 15 minutes — OWASP recommended OTP expiry
     });
     return successResponse;
   } catch (err) {

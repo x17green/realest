@@ -7,7 +7,7 @@ import { CookieBanner } from "@/components/shared";
 import "@/lib/styles/globals.css";
 
 export const metadata: Metadata = {
-  title: "RealEST - Nigeria’s Most Trusted Real Estate Platform",
+  title: "RealEST Connect - Nigeria’s Most Trusted Real Estate Platform",
   description:
     "Discover geo-verified, authentic properties with RealEST's proof-first marketplace. No duplicates, only verified listings.",
   keywords: [
