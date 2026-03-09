@@ -36,7 +36,10 @@ export default function FavoritesPage() {
       const supabase = createClient();
       const { data: user } = await supabase.auth.getUser();
 
-      if (!user.user) return;
+      if (!user.user) {
+        setIsLoading(false);
+        return;
+      }
 
       const { data, error } = await supabase
         .from("saved_properties")
