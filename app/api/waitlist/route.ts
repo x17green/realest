@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, after } from 'next/server';
 import { subscribeToWaitlist, checkEmailInWaitlist, getWaitlistStats, unsubscribeFromWaitlist, checkEmailWithPosition, getWaitlistPosition } from '@/lib/waitlist';
 import type { WaitlistSubscriptionData } from '@/lib/waitlist';
 import { sendWaitlistConfirmationEmail, sendWaitlistAdminNotification } from '@/lib/emailService';
@@ -95,10 +95,10 @@ export async function POST(request: NextRequest) {
 
     // Add this after successful subscription in the POST function:
     if (result.success && result.data) {
-      // Send emails sequentially in the background to respect Resend's
-      // 2 req/sec rate limit — firing both at once always triggers a 429.
-      (async () => {
-        console.log('📧 Sending waitlist confirmation to', subscriptionData.email);
+      // Use after() so email sending continues even after the response is returned.
+      // In Vercel's serverless runtime, a fire-and-forget IIFE is killed as soon as
+      // the response is sent — after() guarantees the work completes.
+      after(async () => {
         try {
           await sendWaitlistConfirmationEmail({
             email: subscriptionData.email,
@@ -113,7 +113,6 @@ export async function POST(request: NextRequest) {
         // 600 ms gap — safely under the 2 req/sec Resend limit
         await new Promise(resolve => setTimeout(resolve, 600));
 
-        console.log('📧 Sending admin notification for', subscriptionData.email);
         try {
           await sendWaitlistAdminNotification({
             email: subscriptionData.email,
@@ -124,7 +123,7 @@ export async function POST(request: NextRequest) {
         } catch (error) {
           console.error('❌ Admin notification failed:', error);
         }
-      })();
+      });
 
       // Sync contact to Resend Waitlist audience (fire-and-forget)
       syncWaitlistJoin(
