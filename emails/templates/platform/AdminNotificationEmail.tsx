@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { Section, Text } from '@react-email/components';
-import { EmailLayout } from '../layouts/EmailLayout';
-import { EmailHeader } from '../components/EmailHeader';
-import { EmailFooter } from '../components/EmailFooter';
-import { EmailSection } from '../components/EmailUI';
-import { BASE_URL, colors, fonts, fontSize, spacing } from '../styles/tokens';
+import { EmailLayout } from '../../layouts/EmailLayout';
+import { EmailHeader } from '../../components/EmailHeader';
+import { EmailFooter } from '../../components/EmailFooter';
+import { EmailSection } from '../../components/EmailUI';
+import { BASE_URL, colors, fonts, fontSize, spacing } from '../../styles/tokens';
 
 export interface AdminNotificationData {
   email: string;

@@ -539,7 +539,7 @@ Email clients strip `<style>` tags and class-based CSS. All styling must be **in
 
 ## 🔧 Adding a New Template
 
-1. **Create** `emails/templates/MyNewEmail.tsx` — follow the template anatomy pattern above.
+1. **Create** `emails/templates/{category}/MyNewEmail.tsx` — pick the right folder (`platform/`, `listing/`, `engagement/`, `financial/`, `security/`, `marketing/`) and follow the template anatomy pattern above.
 2. **Add defaults** for all array and string props in the destructuring signature.
 3. **Add `previewProps`** export with realistic Nigerian market data.
 4. **Export** the component, its data type, and any union types from `emails/index.ts`.

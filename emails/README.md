@@ -1,13 +1,13 @@
 # emails/
 
-React Email template system for RealEST. All 24 user-facing emails live here.
+React Email template system for RealEST. All 34 user-facing emails live here.
 
 ---
 
 ## Quick Start
 
 ```bash
-# Start the visual preview server (all 24 templates with live reload)
+# Start the visual preview server (all 34 templates with live reload)
 npm run email:dev
 # → opens at http://localhost:3001
 
@@ -34,7 +34,13 @@ emails/
 │   ├── EmailAlert.tsx          ← success / warning / error / info / brand callouts
 │   └── EmailUI.tsx             ← EmailSection, EmailDivider, EmailDetailRow,
 │                                   EmailHeading, EmailText, OtpBlock, VerifiedBadge
-├── templates/                  ← 24 templates, one per user-facing email
+├── templates/
+│   ├── platform/               ← core auth, account, onboarding (8)
+│   ├── listing/                ← listing lifecycle from submit → live/rejected (6)
+│   ├── engagement/             ← inquiries, viewings, price alerts (3)
+│   ├── financial/              ← invoices, receipts, renewals, failures (4)
+│   ├── security/               ← login alerts, vetting task assignments (2)
+│   └── marketing/              ← digest + 10-email waitlist warm-up series (11)
 └── utils/
     └── renderEmail.ts          ← renderEmail / renderEmailText / renderEmailFull
 ```
@@ -43,59 +49,76 @@ emails/
 
 ## Template Inventory
 
-### Platform
+### Platform (`templates/platform/`) — 8 templates
 
 | Import name | File | Use case |
 |---|---|---|
-| `WaitlistConfirmationEmail` | `WaitlistConfirmationEmail.tsx` | User joins waitlist |
-| `AdminNotificationEmail` | `AdminNotificationEmail.tsx` | Admin copy of new waitlist sign-up |
-| `PasswordResetEmail` | `PasswordResetEmail.tsx` | Password reset OTP |
-| `WelcomeEmail` | `WelcomeEmail.tsx` | Account verified, onboarding starts |
-| `OnboardingReminderEmail` | `OnboardingReminderEmail.tsx` | Incomplete onboarding (D+3 reminder) |
-| `PasswordChangedEmail` | `PasswordChangedEmail.tsx` | Password changed confirmation |
-| `InquiryNotificationEmail` | `InquiryNotificationEmail.tsx` | Owner receives buyer inquiry |
-| `SubAdminInvitationEmail` | `SubAdminInvitationEmail.tsx` | Admin invites sub-admin |
+| `WaitlistConfirmationEmail` | `platform/WaitlistConfirmationEmail.tsx` | User joins waitlist |
+| `AdminNotificationEmail` | `platform/AdminNotificationEmail.tsx` | Admin copy of new waitlist sign-up |
+| `PasswordResetEmail` | `platform/PasswordResetEmail.tsx` | Password reset OTP |
+| `WelcomeEmail` | `platform/WelcomeEmail.tsx` | Account verified, onboarding starts |
+| `OnboardingReminderEmail` | `platform/OnboardingReminderEmail.tsx` | Incomplete onboarding (D+3 reminder) |
+| `PasswordChangedEmail` | `platform/PasswordChangedEmail.tsx` | Password changed confirmation |
+| `InquiryNotificationEmail` | `platform/InquiryNotificationEmail.tsx` | Owner receives buyer inquiry |
+| `SubAdminInvitationEmail` | `platform/SubAdminInvitationEmail.tsx` | Admin invites sub-admin |
 
-### Listing Lifecycle
-
-| Import name | File | Use case |
-|---|---|---|
-| `ListingSubmissionEmail` | `ListingSubmissionEmail.tsx` | Owner submits property |
-| `MLValidationPassedEmail` | `MLValidationPassedEmail.tsx` | Auto-checks passed |
-| `MLValidationActionEmail` | `MLValidationActionEmail.tsx` | Auto-checks flagged issues |
-| `VettingAppointmentEmail` | `VettingAppointmentEmail.tsx` | Physical inspection booked |
-| `ListingLiveEmail` | `ListingLiveEmail.tsx` | Listing approved and live |
-| `ListingRejectedEmail` | `ListingRejectedEmail.tsx` | Listing not approved |
-
-### Engagement
+### Listing Lifecycle (`templates/listing/`) — 6 templates
 
 | Import name | File | Use case |
 |---|---|---|
-| `InquirySentEmail` | `InquirySentEmail.tsx` | Buyer's copy of sent inquiry |
-| `ViewingReminderEmail` | `ViewingReminderEmail.tsx` | Upcoming viewing reminder (D-1) |
-| `PriceDropAlertEmail` | `PriceDropAlertEmail.tsx` | Saved search price drop |
+| `ListingSubmissionEmail` | `listing/ListingSubmissionEmail.tsx` | Owner submits property |
+| `MLValidationPassedEmail` | `listing/MLValidationPassedEmail.tsx` | Auto-checks passed |
+| `MLValidationActionEmail` | `listing/MLValidationActionEmail.tsx` | Auto-checks flagged issues |
+| `VettingAppointmentEmail` | `listing/VettingAppointmentEmail.tsx` | Physical inspection booked |
+| `ListingLiveEmail` | `listing/ListingLiveEmail.tsx` | Listing approved and live |
+| `ListingRejectedEmail` | `listing/ListingRejectedEmail.tsx` | Listing not approved |
 
-### Financial
-
-| Import name | File | Use case |
-|---|---|---|
-| `InvoiceEmail` | `InvoiceEmail.tsx` | Invoice issued |
-| `PaymentReceiptEmail` | `PaymentReceiptEmail.tsx` | Successful payment |
-| `ListingRenewalEmail` | `ListingRenewalEmail.tsx` | Listing approaching expiry |
-| `PaymentFailedEmail` | `PaymentFailedEmail.tsx` | Payment declined |
-
-### Security & Admin
+### Engagement (`templates/engagement/`) — 3 templates
 
 | Import name | File | Use case |
 |---|---|---|
-| `LoginAlertEmail` | `LoginAlertEmail.tsx` | New device sign-in detected |
-| `VettingTaskEmail` | `VettingTaskEmail.tsx` | Field agent inspection task assignment |
+| `InquirySentEmail` | `engagement/InquirySentEmail.tsx` | Buyer's copy of sent inquiry |
+| `ViewingReminderEmail` | `engagement/ViewingReminderEmail.tsx` | Upcoming viewing reminder (D-1) |
+| `PriceDropAlertEmail` | `engagement/PriceDropAlertEmail.tsx` | Saved search price drop |
 
-### Marketing
+### Financial (`templates/financial/`) — 4 templates
 
 | Import name | File | Use case |
 |---|---|---|
-| `WeeklyDigestEmail` | `WeeklyDigestEmail.tsx` | Weekly new-listings digest |
+| `InvoiceEmail` | `financial/InvoiceEmail.tsx` | Invoice issued |
+| `PaymentReceiptEmail` | `financial/PaymentReceiptEmail.tsx` | Successful payment |
+| `ListingRenewalEmail` | `financial/ListingRenewalEmail.tsx` | Listing approaching expiry |
+| `PaymentFailedEmail` | `financial/PaymentFailedEmail.tsx` | Payment declined |
+
+### Security & Admin (`templates/security/`) — 2 templates
+
+| Import name | File | Use case |
+|---|---|---|
+| `LoginAlertEmail` | `security/LoginAlertEmail.tsx` | New device sign-in detected |
+| `VettingTaskEmail` | `security/VettingTaskEmail.tsx` | Field agent inspection task assignment |
+
+### Marketing (`templates/marketing/`) — 11 templates
+
+#### Digest
+
+| Import name | File | Use case |
+|---|---|---|
+| `WeeklyDigestEmail` | `marketing/WeeklyDigestEmail.tsx` | Weekly new-listings digest |
+
+#### Waitlist Warm-Up Series (10 emails)
+
+| Import name | File | Use case |
+|---|---|---|
+| `FrontierReengagementEmail` | `marketing/FrontierReengagementEmail.tsx` | Re-engage long-term waitlist; "why we've been quiet" |
+| `AuthorityGeotagEmail` | `marketing/AuthorityGeotagEmail.tsx` | Authority series pt.1 — GPS-first verification standard |
+| `AuthorityBootsGroundEmail` | `marketing/AuthorityBootsGroundEmail.tsx` | Authority series pt.2 — physical field vetting |
+| `LaunchWindowEmail` | `marketing/LaunchWindowEmail.tsx` | Launch delay explanation + waitlist reward (free listings) |
+| `SystemUpdateEmail` | `marketing/SystemUpdateEmail.tsx` | Modular system maintenance / update notification |
+| `WaitlistMilestoneEmail` | `marketing/WaitlistMilestoneEmail.tsx` | Celebrate user count milestone |
+| `AgentVsLandlordEmail` | `marketing/AgentVsLandlordEmail.tsx` | 1% vs 2% listing fee explainer |
+| `PropertyCategoriesEmail` | `marketing/PropertyCategoriesEmail.tsx` | 7 property types — BQ, event centers, schools, etc. |
+| `LaunchEveEmail` | `marketing/LaunchEveEmail.tsx` | T-24hr countdown with role-specific document checklist |
+| `ReferralInviteEmail` | `marketing/ReferralInviteEmail.tsx` | Referral invite with dual reward block |
 
 ---
 
@@ -137,20 +160,22 @@ export async function POST(req: NextRequest) {
 
 ## Adding a New Template
 
-1. Copy an existing simple template (e.g. `PasswordChangedEmail.tsx`) as your starting point.
-2. Name the file `MyNewEmail.tsx` and export a component named `MyNewEmail`.
-3. Add default values for **all** props in the destructuring signature:
+1. Pick the right category folder: `platform/`, `listing/`, `engagement/`, `financial/`, `security/`, or `marketing/`.
+2. Copy an existing template in that folder as your starting point.
+3. Name the file `MyNewEmail.tsx` and export a component named `MyNewEmail`.
+4. Add default values for **all** props in the destructuring signature:
    - Arrays: `items = []`
    - Strings: `name = ''`
    - Enum/union props: a sensible literal default, e.g. `status = 'pending'`
-4. Add `MyNewEmail.subject = (data) => '...'` static subject line.
-5. Export `previewProps` with realistic data.
-6. Add to `emails/index.ts`:
-   - Named export of the component
+5. Add `MyNewEmail.subject = (data) => '...'` static subject line.
+6. Export `previewProps` with realistic data.
+7. Add `export default MyNewEmail;` at the bottom.
+8. Add to `emails/index.ts`:
+   - Named export of the component (under the correct category comment)
    - Named export of the data type
-7. Add a `sendMyNewEmail()` function in `lib/emailService.ts`.
-8. Run `npx react-email export --dir emails/templates` — must succeed.
-9. Run `npm run typecheck` — must be clean.
+9. Add a `sendMyNewEmail()` function in `lib/emailService.ts`.
+10. Run `npx react-email export --dir emails/templates` — must succeed.
+11. Run `npm run typecheck` — must be clean.
 
 ---
 

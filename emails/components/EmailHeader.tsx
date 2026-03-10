@@ -22,7 +22,7 @@ export function EmailHeader() {
         />
         {/* Light wordmark (light text on dark bg) — email dark mode only */}
         <Img
-          src={`${BASE_URL}/realest-wordmark-light.png`}
+          src={`${BASE_URL}/realest-wordmark-dark.png`}
           alt="RealEST Connect"
           width={LOGO_DISPLAY_WIDTH}
           height={LOGO_DISPLAY_HEIGHT}
