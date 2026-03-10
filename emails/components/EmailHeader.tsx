@@ -9,7 +9,7 @@ const LOGO_DISPLAY_HEIGHT = Math.round(LOGO_DISPLAY_WIDTH / 1.969); // ≈ 81
 
 export function EmailHeader() {
   return (
-    <Section style={{ padding: '40px 16px' }}>
+    <Section style={{ padding: '10px 16px' }}>
       <Link href={BASE_URL} style={{ textDecoration: 'none' }}>
         {/* Dark wordmark (dark text on light bg) — default */}
         <Img
@@ -22,7 +22,7 @@ export function EmailHeader() {
         />
         {/* Light wordmark (light text on dark bg) — email dark mode only */}
         <Img
-          src={`${BASE_URL}/realest-wordmark-dark.png`}
+          src={`${BASE_URL}/realest-wordmark-light.png`}
           alt="RealEST Connect"
           width={LOGO_DISPLAY_WIDTH}
           height={LOGO_DISPLAY_HEIGHT}

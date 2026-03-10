@@ -281,15 +281,44 @@ export default async function CMSEmailsPage() {
 
           <TabsContent value="templates">
             <Card>
-              <CardContent className="pt-6">
-                <div className="text-center py-12">
-                  <Mail className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground mb-4">
-                    Email templates feature coming soon
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Create reusable email templates for common communications
-                  </p>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <Mail className="w-5 h-5" />
+                    Email Templates
+                    <Badge variant="secondary">34 templates</Badge>
+                  </CardTitle>
+                  <Button asChild>
+                    <Link href="/admin/emails">
+                      <Eye className="w-4 h-4 mr-2" />
+                      Open Preview Dashboard
+                    </Link>
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-6">
+                  All 34 transactional and marketing email templates used by the platform.
+                  Use the interactive preview dashboard to inspect, toggle dark mode, and view each
+                  template at desktop or mobile widths.
+                </p>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {([
+                    { label: "Platform",   count: 8,  description: "Auth, onboarding, account events" },
+                    { label: "Listing",    count: 6,  description: "Property submission & verification" },
+                    { label: "Engagement", count: 3,  description: "Inquiries, viewings, alerts" },
+                    { label: "Financial",  count: 4,  description: "Invoices, payments, renewals" },
+                    { label: "Security",   count: 2,  description: "Login alerts, vetting tasks" },
+                    { label: "Marketing",  count: 11, description: "Waitlist, launch, warm-up series" },
+                  ] as const).map((cat) => (
+                    <div key={cat.label} className="rounded-lg border border-border p-3">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-medium">{cat.label}</span>
+                        <Badge variant="outline">{cat.count}</Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">{cat.description}</p>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>

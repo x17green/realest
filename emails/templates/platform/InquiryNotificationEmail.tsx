@@ -82,22 +82,6 @@ export function InquiryNotificationEmail({
           </Link>
         </Section>
 
-        {/* Sender details */}
-        <Section style={{
-          border: `1px solid ${colors.border}`,
-          padding: `${spacing['5']} ${spacing['6']}`,
-          marginBottom: spacing['6'],
-        }}>
-          <Text style={{ fontFamily: fonts.heading, fontSize: fontSize.sm, fontWeight: 700, color: colors.text, margin: `0 0 ${spacing['4']}`, textTransform: 'uppercase' as const, letterSpacing: '0.8px' }}>
-            Contact Details
-          </Text>
-          {contactRows.map(([label, value]) => (
-            <Text key={label} style={{ fontFamily: fonts.body, fontSize: fontSize.sm, color: colors.text, margin: `0 0 ${spacing['3']}`, paddingBottom: spacing['2'], borderBottom: `1px solid ${colors.borderLight}` }}>
-              <strong style={{ fontFamily: fonts.body, fontSize: fontSize.xs, color: colors.textMuted, textTransform: 'uppercase' as const, letterSpacing: '0.8px', fontWeight: 600 }}>{label}:</strong>{' '}{value}
-            </Text>
-          ))}
-        </Section>
-
         {/* Message */}
         <Section style={{
           backgroundColor: colors.pageBg,
@@ -112,6 +96,22 @@ export function InquiryNotificationEmail({
           <Text style={{ fontFamily: fonts.body, fontSize: fontSize.base, color: colors.text, lineHeight: '1.7', margin: '0', fontStyle: 'italic' }}>
             "{message}"
           </Text>
+        </Section>
+
+        {/* Sender details */}
+        <Section style={{
+          border: `1px solid ${colors.border}`,
+          padding: `${spacing['5']} ${spacing['6']}`,
+          marginBottom: spacing['6'],
+        }}>
+          <Text style={{ fontFamily: fonts.heading, fontSize: fontSize.sm, fontWeight: 700, color: colors.text, margin: `0 0 ${spacing['4']}`, textTransform: 'uppercase' as const, letterSpacing: '0.8px' }}>
+            Contact Details
+          </Text>
+          {contactRows.map(([label, value]) => (
+            <Text key={label} style={{ fontFamily: fonts.body, fontSize: fontSize.sm, color: colors.text, margin: `0 0 ${spacing['3']}`, paddingBottom: spacing['2'], borderBottom: `1px solid ${colors.borderLight}` }}>
+              <strong style={{ fontFamily: fonts.body, fontSize: fontSize.xs, color: colors.textMuted, textTransform: 'uppercase' as const, letterSpacing: '0.8px', fontWeight: 600 }}>{label}:</strong>{' '}{value}
+            </Text>
+          ))}
         </Section>
 
         {/* CTA */}

@@ -22,6 +22,7 @@ import {
   UserCheck2,
   Layout,
   HelpCircle,
+  Mail,
 } from "lucide-react";
 
 interface AdminSidebarProps {
@@ -107,6 +108,12 @@ export function AdminSidebar({
       label: "Support Center",
       icon: HelpCircle,
       description: "Support tickets and inquiries",
+    },
+    {
+      href: "/admin/emails",
+      label: "Email Templates",
+      icon: Mail,
+      description: "Preview all email templates",
     },
   ];
 
