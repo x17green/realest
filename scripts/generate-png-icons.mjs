@@ -72,11 +72,6 @@ const iconConfigs = [
     size: 200
   },
   {
-    input: 'public/realest-logo-with-text.svg',
-    output: 'public/realest-logo-with-text.png',
-    size: 400
-  },
-  {
     input: 'public/realest-logo-square.svg',
     output: 'public/realest-logo-square.png',
     size: 300

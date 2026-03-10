@@ -34,6 +34,32 @@ export { PasswordChangedEmail }       from './templates/PasswordChangedEmail';
 export { InquiryNotificationEmail }   from './templates/InquiryNotificationEmail';
 export { SubAdminInvitationEmail }    from './templates/SubAdminInvitationEmail';
 
+// Listing lifecycle
+export { ListingSubmissionEmail }     from './templates/ListingSubmissionEmail';
+export { MLValidationPassedEmail }    from './templates/MLValidationPassedEmail';
+export { MLValidationActionEmail }    from './templates/MLValidationActionEmail';
+export { VettingAppointmentEmail }    from './templates/VettingAppointmentEmail';
+export { ListingLiveEmail }           from './templates/ListingLiveEmail';
+export { ListingRejectedEmail }       from './templates/ListingRejectedEmail';
+
+// Engagement
+export { InquirySentEmail }           from './templates/InquirySentEmail';
+export { ViewingReminderEmail }       from './templates/ViewingReminderEmail';
+export { PriceDropAlertEmail }        from './templates/PriceDropAlertEmail';
+
+// Financial
+export { InvoiceEmail }               from './templates/InvoiceEmail';
+export { PaymentReceiptEmail }        from './templates/PaymentReceiptEmail';
+export { ListingRenewalEmail }        from './templates/ListingRenewalEmail';
+export { PaymentFailedEmail }         from './templates/PaymentFailedEmail';
+
+// Security & admin
+export { LoginAlertEmail }            from './templates/LoginAlertEmail';
+export { VettingTaskEmail }           from './templates/VettingTaskEmail';
+
+// Marketing
+export { WeeklyDigestEmail }          from './templates/WeeklyDigestEmail';
+
 // ── Data types ────────────────────────────────────────────────────────────────
 export type { WaitlistEmailData }           from './templates/WaitlistConfirmationEmail';
 export type { AdminNotificationData }       from './templates/AdminNotificationEmail';
@@ -43,6 +69,32 @@ export type { OnboardingReminderEmailData } from './templates/OnboardingReminder
 export type { PasswordChangedEmailData }    from './templates/PasswordChangedEmail';
 export type { InquiryEmailData }            from './templates/InquiryNotificationEmail';
 export type { SubAdminInvitationData }      from './templates/SubAdminInvitationEmail';
+
+// Listing lifecycle
+export type { ListingSubmissionEmailData }  from './templates/ListingSubmissionEmail';
+export type { MLValidationPassedEmailData } from './templates/MLValidationPassedEmail';
+export type { MLValidationActionEmailData, MLFlagReason } from './templates/MLValidationActionEmail';
+export type { VettingAppointmentEmailData } from './templates/VettingAppointmentEmail';
+export type { ListingLiveEmailData }        from './templates/ListingLiveEmail';
+export type { ListingRejectedEmailData, RejectionReason } from './templates/ListingRejectedEmail';
+
+// Engagement
+export type { InquirySentEmailData }        from './templates/InquirySentEmail';
+export type { ViewingReminderEmailData }    from './templates/ViewingReminderEmail';
+export type { PriceDropAlertEmailData }     from './templates/PriceDropAlertEmail';
+
+// Financial
+export type { InvoiceEmailData }                    from './templates/InvoiceEmail';
+export type { PaymentReceiptEmailData }     from './templates/PaymentReceiptEmail';
+export type { ListingRenewalEmailData }     from './templates/ListingRenewalEmail';
+export type { PaymentFailedEmailData, PaymentFailureReason } from './templates/PaymentFailedEmail';
+
+// Security & admin
+export type { LoginAlertEmailData }         from './templates/LoginAlertEmail';
+export type { VettingTaskEmailData }        from './templates/VettingTaskEmail';
+
+// Marketing
+export type { WeeklyDigestEmailData, DigestListing } from './templates/WeeklyDigestEmail';
 
 // ── Render utilities ──────────────────────────────────────────────────────────
 export { renderEmail, renderEmailText, renderEmailFull } from './utils/renderEmail';

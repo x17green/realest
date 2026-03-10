@@ -107,7 +107,7 @@ export function InquiryNotificationEmail({
           marginBottom: spacing['8'],
         }}>
           <Text style={{ fontFamily: fonts.body, fontSize: fontSize.xs, color: colors.textMuted, margin: `0 0 ${spacing['3']}`, textTransform: 'uppercase' as const, letterSpacing: '0.8px' }}>
-            Their Message
+            Inquiry Message
           </Text>
           <Text style={{ fontFamily: fonts.body, fontSize: fontSize.base, color: colors.text, lineHeight: '1.7', margin: '0', fontStyle: 'italic' }}>
             "{message}"
