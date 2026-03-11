@@ -114,14 +114,20 @@ export function isRouteAccessible(pathname: string): boolean {
   if (config.mode === 'coming-soon') {
     // Only allow specific essential routes
     const allowedRoutes = [
-      '/',           // Home page (coming soon)
-      '/not-found',  // 404 page
-      '/favicon.ico', // Browser favicon
+      '/',              // Home page (coming soon)
+      '/not-found',     // 404 page
+      '/favicon.ico',   // Browser favicon
+      '/sneak-peek',    // Email link: sneak peek preview
+      '/early-access',  // Email link: early access sign-up
+      '/refer',         // Email link: referral landing
+      '/waitlist',      // Email link: waitlist join page
+      '/poll/city',     // Email link: city poll response
     ];
 
     // Allow specific API routes for coming-soon functionality
     const allowedApiRoutes = [
-      '/api/waitlist',   // Waitlist subscription endpoint
+      '/api/waitlist',    // Waitlist subscription endpoint
+      '/api/poll/city',   // City poll vote endpoint
     ];
 
     // Allow exact matches or static assets
