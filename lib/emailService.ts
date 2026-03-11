@@ -10,6 +10,7 @@
 import * as React from 'react';
 import { Resend } from 'resend';
 import {
+  // Platform (existing)
   WaitlistConfirmationEmail,
   AdminNotificationEmail,
   PasswordResetEmail,
@@ -18,7 +19,39 @@ import {
   PasswordChangedEmail,
   InquiryNotificationEmail,
   SubAdminInvitationEmail,
+  // Listing lifecycle
+  ListingSubmissionEmail,
+  MLValidationPassedEmail,
+  MLValidationActionEmail,
+  VettingAppointmentEmail,
+  ListingLiveEmail,
+  ListingRejectedEmail,
+  // Engagement
+  InquirySentEmail,
+  ViewingReminderEmail,
+  PriceDropAlertEmail,
+  // Financial
+  InvoiceEmail,
+  PaymentReceiptEmail,
+  ListingRenewalEmail,
+  PaymentFailedEmail,
+  // Security & admin
+  LoginAlertEmail,
+  VettingTaskEmail,
+  // Marketing / broadcast
+  WeeklyDigestEmail,
+  FrontierReengagementEmail,
+  AuthorityGeotagEmail,
+  AuthorityBootsGroundEmail,
+  LaunchWindowEmail,
+  SystemUpdateEmail,
+  WaitlistMilestoneEmail,
+  AgentVsLandlordEmail,
+  PropertyCategoriesEmail,
+  LaunchEveEmail,
+  ReferralInviteEmail,
   renderEmailFull,
+  // Types — platform (existing)
   type WaitlistEmailData,
   type AdminNotificationData,
   type PasswordResetEmailData,
@@ -27,6 +60,37 @@ import {
   type PasswordChangedEmailData,
   type InquiryEmailData,
   type SubAdminInvitationData,
+  // Types — listing lifecycle
+  type ListingSubmissionEmailData,
+  type MLValidationPassedEmailData,
+  type MLValidationActionEmailData,
+  type VettingAppointmentEmailData,
+  type ListingLiveEmailData,
+  type ListingRejectedEmailData,
+  // Types — engagement
+  type InquirySentEmailData,
+  type ViewingReminderEmailData,
+  type PriceDropAlertEmailData,
+  // Types — financial
+  type InvoiceEmailData,
+  type PaymentReceiptEmailData,
+  type ListingRenewalEmailData,
+  type PaymentFailedEmailData,
+  // Types — security & admin
+  type LoginAlertEmailData,
+  type VettingTaskEmailData,
+  // Types — marketing
+  type WeeklyDigestEmailData,
+  type FrontierReengagementEmailData,
+  type AuthorityGeotagEmailData,
+  type AuthorityBootsGroundEmailData,
+  type LaunchWindowEmailData,
+  type SystemUpdateEmailData,
+  type WaitlistMilestoneEmailData,
+  type AgentVsLandlordEmailData,
+  type PropertyCategoriesEmailData,
+  type LaunchEveEmailData,
+  type ReferralInviteEmailData,
 } from '@/emails';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -177,6 +241,276 @@ export async function sendSubAdminInvitationEmail(data: SubAdminInvitationData):
   });
 }
 
+// ─── Listing lifecycle ────────────────────────────────────────────────────────
+
+export async function sendListingSubmissionEmail(data: ListingSubmissionEmailData): Promise<EmailResult> {
+  console.log(`📧 Sending listing submission confirmation to ${data.ownerEmail}`);
+  return sendReactEmail({
+    from: FROM_EMAIL,
+    to: data.ownerEmail,
+    subject: ListingSubmissionEmail.subject(data),
+    component: React.createElement(ListingSubmissionEmail, data),
+  });
+}
+
+export async function sendMLValidationPassedEmail(data: MLValidationPassedEmailData): Promise<EmailResult> {
+  console.log(`📧 Sending ML validation passed to ${data.ownerEmail}`);
+  return sendReactEmail({
+    from: FROM_EMAIL,
+    to: data.ownerEmail,
+    subject: MLValidationPassedEmail.subject(data),
+    component: React.createElement(MLValidationPassedEmail, data),
+  });
+}
+
+export async function sendMLValidationActionEmail(data: MLValidationActionEmailData): Promise<EmailResult> {
+  console.log(`📧 Sending ML validation action required to ${data.ownerEmail}`);
+  return sendReactEmail({
+    from: FROM_EMAIL,
+    to: data.ownerEmail,
+    subject: MLValidationActionEmail.subject(data),
+    component: React.createElement(MLValidationActionEmail, data),
+  });
+}
+
+export async function sendVettingAppointmentEmail(data: VettingAppointmentEmailData): Promise<EmailResult> {
+  console.log(`📧 Sending vetting appointment to ${data.ownerEmail}`);
+  return sendReactEmail({
+    from: FROM_EMAIL,
+    to: data.ownerEmail,
+    subject: VettingAppointmentEmail.subject(data),
+    component: React.createElement(VettingAppointmentEmail, data),
+  });
+}
+
+export async function sendListingLiveEmail(data: ListingLiveEmailData): Promise<EmailResult> {
+  console.log(`📧 Sending listing-live notification to ${data.ownerEmail}`);
+  return sendReactEmail({
+    from: FROM_EMAIL,
+    to: data.ownerEmail,
+    subject: ListingLiveEmail.subject(data),
+    component: React.createElement(ListingLiveEmail, data),
+  });
+}
+
+export async function sendListingRejectedEmail(data: ListingRejectedEmailData): Promise<EmailResult> {
+  console.log(`📧 Sending listing-rejected notification to ${data.ownerEmail}`);
+  return sendReactEmail({
+    from: FROM_EMAIL,
+    to: data.ownerEmail,
+    subject: ListingRejectedEmail.subject(data),
+    component: React.createElement(ListingRejectedEmail, data),
+  });
+}
+
+// ─── Engagement ───────────────────────────────────────────────────────────────
+
+export async function sendInquirySentEmail(data: InquirySentEmailData): Promise<EmailResult> {
+  console.log(`📧 Sending inquiry-sent confirmation to ${data.buyerEmail}`);
+  return sendReactEmail({
+    from: FROM_EMAIL_INQUIRIES,
+    to: data.buyerEmail,
+    subject: InquirySentEmail.subject(data),
+    component: React.createElement(InquirySentEmail, data),
+  });
+}
+
+export async function sendViewingReminderEmail(data: ViewingReminderEmailData): Promise<EmailResult> {
+  console.log(`📧 Sending viewing reminder to ${data.recipientEmail}`);
+  return sendReactEmail({
+    from: FROM_EMAIL,
+    to: data.recipientEmail,
+    subject: ViewingReminderEmail.subject(data),
+    component: React.createElement(ViewingReminderEmail, data),
+  });
+}
+
+export async function sendPriceDropAlertEmail(data: PriceDropAlertEmailData): Promise<EmailResult> {
+  console.log(`📧 Sending price-drop alert to ${data.recipientEmail}`);
+  return sendReactEmail({
+    from: FROM_EMAIL,
+    to: data.recipientEmail,
+    subject: PriceDropAlertEmail.subject(data),
+    component: React.createElement(PriceDropAlertEmail, data),
+  });
+}
+
+// ─── Financial ────────────────────────────────────────────────────────────────
+
+export async function sendInvoiceEmail(data: InvoiceEmailData): Promise<EmailResult> {
+  console.log(`📧 Sending invoice ${data.invoiceNumber} to ${data.ownerEmail}`);
+  return sendReactEmail({
+    from: FROM_EMAIL,
+    to: data.ownerEmail,
+    subject: InvoiceEmail.subject(data),
+    component: React.createElement(InvoiceEmail, data),
+  });
+}
+
+export async function sendPaymentReceiptEmail(data: PaymentReceiptEmailData): Promise<EmailResult> {
+  console.log(`📧 Sending payment receipt ${data.receiptNumber} to ${data.ownerEmail}`);
+  return sendReactEmail({
+    from: FROM_EMAIL,
+    to: data.ownerEmail,
+    subject: PaymentReceiptEmail.subject(data),
+    component: React.createElement(PaymentReceiptEmail, data),
+  });
+}
+
+export async function sendListingRenewalEmail(email: string, data: ListingRenewalEmailData): Promise<EmailResult> {
+  console.log(`📧 Sending listing renewal reminder to ${email}`);
+  return sendReactEmail({
+    from: FROM_EMAIL,
+    to: email,
+    subject: ListingRenewalEmail.subject(data),
+    component: React.createElement(ListingRenewalEmail, data),
+  });
+}
+
+export async function sendPaymentFailedEmail(email: string, data: PaymentFailedEmailData): Promise<EmailResult> {
+  console.log(`📧 Sending payment-failed notification to ${email}`);
+  return sendReactEmail({
+    from: FROM_EMAIL,
+    to: email,
+    subject: PaymentFailedEmail.subject(data),
+    component: React.createElement(PaymentFailedEmail, data),
+  });
+}
+
+// ─── Security & admin ─────────────────────────────────────────────────────────
+
+export async function sendLoginAlertEmail(data: LoginAlertEmailData): Promise<EmailResult> {
+  console.log(`📧 Sending login alert to ${data.email}`);
+  return sendReactEmail({
+    from: FROM_EMAIL_AUTH,
+    to: data.email,
+    subject: LoginAlertEmail.subject(data),
+    component: React.createElement(LoginAlertEmail, data),
+  });
+}
+
+export async function sendVettingTaskEmail(data: VettingTaskEmailData): Promise<EmailResult> {
+  console.log(`📧 Sending vetting task ${data.taskId} to ${data.agentEmail}`);
+  return sendReactEmail({
+    from: FROM_EMAIL,
+    to: data.agentEmail,
+    subject: VettingTaskEmail.subject(data),
+    component: React.createElement(VettingTaskEmail, data),
+  });
+}
+
+// ─── Marketing / broadcast ────────────────────────────────────────────────────
+
+export async function sendWeeklyDigestEmail(email: string, data: WeeklyDigestEmailData): Promise<EmailResult> {
+  console.log(`📧 Sending weekly digest to ${email}`);
+  return sendReactEmail({
+    from: FROM_EMAIL,
+    to: email,
+    subject: WeeklyDigestEmail.subject(data),
+    component: React.createElement(WeeklyDigestEmail, data),
+  });
+}
+
+export async function sendFrontierReengagementEmail(email: string, data: FrontierReengagementEmailData): Promise<EmailResult> {
+  console.log(`📧 Sending frontier re-engagement to ${email}`);
+  return sendReactEmail({
+    from: FROM_EMAIL_WAITLIST,
+    to: email,
+    subject: FrontierReengagementEmail.subject(data),
+    component: React.createElement(FrontierReengagementEmail, data),
+  });
+}
+
+export async function sendAuthorityGeotagEmail(email: string, data: AuthorityGeotagEmailData): Promise<EmailResult> {
+  console.log(`📧 Sending authority geotag to ${email}`);
+  return sendReactEmail({
+    from: FROM_EMAIL_WAITLIST,
+    to: email,
+    subject: AuthorityGeotagEmail.subject(data),
+    component: React.createElement(AuthorityGeotagEmail, data),
+  });
+}
+
+export async function sendAuthorityBootsGroundEmail(email: string, data: AuthorityBootsGroundEmailData): Promise<EmailResult> {
+  console.log(`📧 Sending authority boots-on-ground to ${email}`);
+  return sendReactEmail({
+    from: FROM_EMAIL_WAITLIST,
+    to: email,
+    subject: AuthorityBootsGroundEmail.subject(data),
+    component: React.createElement(AuthorityBootsGroundEmail, data),
+  });
+}
+
+export async function sendLaunchWindowEmail(email: string, data: LaunchWindowEmailData): Promise<EmailResult> {
+  console.log(`📧 Sending launch window to ${email}`);
+  return sendReactEmail({
+    from: FROM_EMAIL_WAITLIST,
+    to: email,
+    subject: LaunchWindowEmail.subject(data),
+    component: React.createElement(LaunchWindowEmail, data),
+  });
+}
+
+export async function sendSystemUpdateEmail(email: string, data: SystemUpdateEmailData): Promise<EmailResult> {
+  console.log(`📧 Sending system update to ${email}`);
+  return sendReactEmail({
+    from: FROM_EMAIL,
+    to: email,
+    subject: SystemUpdateEmail.subject(data),
+    component: React.createElement(SystemUpdateEmail, data),
+  });
+}
+
+export async function sendWaitlistMilestoneEmail(email: string, data: WaitlistMilestoneEmailData): Promise<EmailResult> {
+  console.log(`📧 Sending waitlist milestone to ${email}`);
+  return sendReactEmail({
+    from: FROM_EMAIL_WAITLIST,
+    to: email,
+    subject: WaitlistMilestoneEmail.subject(data),
+    component: React.createElement(WaitlistMilestoneEmail, data),
+  });
+}
+
+export async function sendAgentVsLandlordEmail(email: string, data: AgentVsLandlordEmailData): Promise<EmailResult> {
+  console.log(`📧 Sending agent-vs-landlord to ${email}`);
+  return sendReactEmail({
+    from: FROM_EMAIL_WAITLIST,
+    to: email,
+    subject: AgentVsLandlordEmail.subject(data),
+    component: React.createElement(AgentVsLandlordEmail, data),
+  });
+}
+
+export async function sendPropertyCategoriesEmail(email: string, data: PropertyCategoriesEmailData): Promise<EmailResult> {
+  console.log(`📧 Sending property categories to ${email}`);
+  return sendReactEmail({
+    from: FROM_EMAIL_WAITLIST,
+    to: email,
+    subject: PropertyCategoriesEmail.subject(data),
+    component: React.createElement(PropertyCategoriesEmail, data),
+  });
+}
+
+export async function sendLaunchEveEmail(email: string, data: LaunchEveEmailData): Promise<EmailResult> {
+  console.log(`📧 Sending launch-eve to ${email}`);
+  return sendReactEmail({
+    from: FROM_EMAIL_WAITLIST,
+    to: email,
+    subject: LaunchEveEmail.subject(data),
+    component: React.createElement(LaunchEveEmail, data),
+  });
+}
+
+export async function sendReferralInviteEmail(email: string, data: ReferralInviteEmailData): Promise<EmailResult> {
+  console.log(`📧 Sending referral invite to ${email}`);
+  return sendReactEmail({
+    from: FROM_EMAIL,
+    to: email,
+    subject: ReferralInviteEmail.subject(data),
+    component: React.createElement(ReferralInviteEmail, data),
+  });
+}
+
 export async function testEmailConfiguration(): Promise<{ success: boolean; error?: string }> {
   if (!process.env.RESEND_API_KEY) {
     return { success: false, error: 'RESEND_API_KEY not configured' };
@@ -194,6 +528,7 @@ export async function testEmailConfiguration(): Promise<{ success: boolean; erro
 }
 
 export type {
+  // Platform
   WaitlistEmailData,
   AdminNotificationData,
   PasswordResetEmailData,
@@ -202,4 +537,35 @@ export type {
   PasswordChangedEmailData,
   InquiryEmailData,
   SubAdminInvitationData,
+  // Listing lifecycle
+  ListingSubmissionEmailData,
+  MLValidationPassedEmailData,
+  MLValidationActionEmailData,
+  VettingAppointmentEmailData,
+  ListingLiveEmailData,
+  ListingRejectedEmailData,
+  // Engagement
+  InquirySentEmailData,
+  ViewingReminderEmailData,
+  PriceDropAlertEmailData,
+  // Financial
+  InvoiceEmailData,
+  PaymentReceiptEmailData,
+  ListingRenewalEmailData,
+  PaymentFailedEmailData,
+  // Security & admin
+  LoginAlertEmailData,
+  VettingTaskEmailData,
+  // Marketing
+  WeeklyDigestEmailData,
+  FrontierReengagementEmailData,
+  AuthorityGeotagEmailData,
+  AuthorityBootsGroundEmailData,
+  LaunchWindowEmailData,
+  SystemUpdateEmailData,
+  WaitlistMilestoneEmailData,
+  AgentVsLandlordEmailData,
+  PropertyCategoriesEmailData,
+  LaunchEveEmailData,
+  ReferralInviteEmailData,
 } from '@/emails';
