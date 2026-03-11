@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LogoWithText, LoadingLogo } from "@/components/ui/RealEstLogo";
+import { LogoWithText, LoadingLogo, HeaderLogo, HeroLogo } from "@/components/ui/RealEstLogo";
 
 export default function EmailLinksLayout({
   children,
@@ -12,7 +12,7 @@ export default function EmailLinksLayout({
       <header className="border-b border-border/40 bg-background/95 backdrop-blur-sm">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" aria-label="RealEST Home">
-            <LoadingLogo size="sm" className="sm:hidden" />
+            <HeaderLogo animated className="sm:hidden animate-fade-in" />
             <LoadingLogo size="md" className="hidden sm:block md:hidden" />
             <LoadingLogo size="2xl" className="hidden md:block" />
           </Link>
