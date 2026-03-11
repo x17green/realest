@@ -68,12 +68,15 @@ async function fetchWaitlistRecipients(): Promise<CampaignRecipient[]> {
 
   if (error) throw new Error(`Waitlist query failed: ${error.message}`);
 
-  return (data ?? []).map((row) => {
-    const firstName = (row.first_name as string | null) ?? undefined;
-    const lastName = (row.last_name as string | null) ?? undefined;
-    const fullName = [firstName, lastName].filter(Boolean).join(' ') || undefined;
-    return { email: row.email as string, firstName, fullName };
-  });
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return (data ?? [])
+    .filter((row) => typeof row.email === 'string' && EMAIL_RE.test((row.email as string).trim()))
+    .map((row) => {
+      const firstName = (row.first_name as string | null) ?? undefined;
+      const lastName = (row.last_name as string | null) ?? undefined;
+      const fullName = [firstName, lastName].filter(Boolean).join(' ') || undefined;
+      return { email: (row.email as string).trim(), firstName: firstName?.trim() || undefined, fullName: fullName?.trim() || undefined };
+    });
 }
 
 // ── DB segment recipient query ─────────────────────────────────────────────────
