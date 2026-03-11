@@ -5,10 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { List, Users, Mail, Search, Trash2, Send, Download } from "lucide-react";
+import { List, Users, Mail, Search, Download } from "lucide-react";
+import { WaitlistRowActions } from "@/components/admin/WaitlistRowActions";
 import Link from "next/link";
 
 export default async function WaitlistManagementPage() {
@@ -124,43 +122,12 @@ export default async function WaitlistManagementPage() {
 
         {/* Actions */}
         <div className="flex gap-4 mb-6">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button>
-                <Mail className="w-4 h-4 mr-2" />
-                Send Email Campaign
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>Send Email Campaign</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="campaignSubject">Subject</Label>
-                  <Input id="campaignSubject" placeholder="Enter email subject" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="campaignMessage">Message</Label>
-                  <Textarea
-                    id="campaignMessage"
-                    placeholder="Enter your message..."
-                    className="min-h-32"
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <Button className="flex-1">
-                    <Send className="w-4 h-4 mr-2" />
-                    Send to All
-                  </Button>
-                  <Button variant="outline" className="flex-1">
-                    Send Test Email
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
-
+          <Button asChild>
+            <Link href="/admin/emails/campaigns/new">
+              <Mail className="w-4 h-4 mr-2" />
+              Send Email Campaign
+            </Link>
+          </Button>
           <Button variant="outline">
             <Download className="w-4 h-4 mr-2" />
             Export List
@@ -221,14 +188,14 @@ export default async function WaitlistManagementPage() {
                       {new Date(subscriber.created_at).toLocaleDateString()}
                     </TableCell>
                     <TableCell>
-                      <div className="flex gap-2">
-                        <Button size="sm" variant="outline">
-                          <Mail className="w-4 h-4" />
-                        </Button>
-                        <Button size="sm" variant="outline" className="text-red-600 hover:text-red-700">
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
+                      <WaitlistRowActions
+                        subscriber={{
+                          id: subscriber.id,
+                          email: subscriber.email,
+                          first_name: subscriber.first_name,
+                          last_name: subscriber.last_name,
+                        }}
+                      />
                     </TableCell>
                   </TableRow>
                 )) || (
