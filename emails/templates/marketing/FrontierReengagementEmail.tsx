@@ -262,7 +262,7 @@ export function FrontierReengagementEmail({
 }
 
 FrontierReengagementEmail.subject = (data: FrontierReengagementEmailData) =>
-  `${data.firstName}, why we've been quiet (and why it's good news for you)`;
+  `${data.firstName}, we've been building something you asked for`;
 
 export default FrontierReengagementEmail;
 

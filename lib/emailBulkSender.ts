@@ -16,6 +16,7 @@
 import * as React from 'react';
 import { Resend } from 'resend';
 import { renderEmailFull } from '@/emails';
+import { interpolateSubject } from '@/lib/utils/interpolateSubject';
 
 // ── Config ────────────────────────────────────────────────────────────────────
 /** Max emails per Resend batch request (Resend hard limit is 100). */
@@ -208,7 +209,11 @@ async function sendBatch(opts: BatchSendOptions): Promise<BulkSendResult> {
         return {
           from: opts.from,
           to: [recipient.email],
-          subject: opts.subject,
+          subject: interpolateSubject(opts.subject, {
+            firstName: recipient.firstName,
+            fullName: recipient.fullName,
+            email: recipient.email,
+          }),
           html,
           text,
         };
