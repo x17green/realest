@@ -13,7 +13,7 @@ import {
   Hr,
   Font,
 } from '@react-email/components';
-import { colors, fonts, fontSize, spacing, radius } from '../styles/tokens';
+import { colors, fonts, fontSize } from '../styles/tokens';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface EmailLayoutProps {
@@ -37,7 +37,6 @@ const bodyStyle: React.CSSProperties = {
 const wrapperStyle: React.CSSProperties = {
   width: '100%',
   backgroundColor: colors.pageBg,
-  padding: `${spacing['8']} 0`,
 };
 
 const containerStyle: React.CSSProperties = {
@@ -92,8 +91,6 @@ export function EmailLayout({ preview, children, pageBg }: EmailLayoutProps) {
           </Container>
         </Section>
 
-        {/* ── Outlook spacer ── */}
-        <Section style={{ height: spacing['8'] }} />
       </Body>
     </Html>
   );
