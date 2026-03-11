@@ -93,6 +93,9 @@ import {
   type ReferralInviteEmailData,
 } from '@/emails';
 
+if (!process.env.RESEND_API_KEY) {
+  throw new Error('Missing required environment variable: RESEND_API_KEY');
+}
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM_EMAIL           = process.env.FROM_EMAIL            || 'RealEST Connect <info@connect.realest.ng>';
 const FROM_EMAIL_AUTH      = process.env.FROM_EMAIL_AUTH       || FROM_EMAIL;
