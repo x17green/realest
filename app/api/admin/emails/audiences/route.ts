@@ -79,6 +79,14 @@ const DB_SEGMENTS = [
     sendMode: 'batch' as const,
     filter: { role: 'user' as const, deleted_at: null },
   },
+  {
+    id: 'db_waitlist',
+    key: 'db_waitlist',
+    name: 'Waitlist Subscribers (DB)',
+    description: 'Active waitlist sign-ups from the waitlist table',
+    sendMode: 'batch' as const,
+    filter: { source: 'waitlist' as const },
+  },
 ] as const;
 
 export async function GET() {
@@ -130,6 +138,15 @@ export async function GET() {
   const dbSegmentsWithCounts = await Promise.all(
     DB_SEGMENTS.map(async (segment) => {
       try {
+        // Waitlist segment queries a separate table
+        if (segment.id === 'db_waitlist') {
+          const { count } = await supabase
+            .from('waitlist')
+            .select('id', { count: 'exact', head: true })
+            .eq('status', 'active');
+          return { ...segment, contactCount: count ?? 0 };
+        }
+
         let query = supabase
           .from('users')
           .select('id', { count: 'exact', head: true })

@@ -56,6 +56,26 @@ async function requireAdmin() {
   return { user, error: null, status: 200 };
 }
 
+// ── Waitlist recipient query ───────────────────────────────────────────────────
+
+async function fetchWaitlistRecipients(): Promise<CampaignRecipient[]> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('waitlist')
+    .select('email, first_name, last_name')
+    .eq('status', 'active');
+
+  if (error) throw new Error(`Waitlist query failed: ${error.message}`);
+
+  return (data ?? []).map((row) => {
+    const firstName = (row.first_name as string | null) ?? undefined;
+    const lastName = (row.last_name as string | null) ?? undefined;
+    const fullName = [firstName, lastName].filter(Boolean).join(' ') || undefined;
+    return { email: row.email as string, firstName, fullName };
+  });
+}
+
 // ── DB segment recipient query ─────────────────────────────────────────────────
 
 async function fetchDbSegmentRecipients(
@@ -139,7 +159,10 @@ export async function POST(
       // db_segment: fetch recipients then render per-person so firstName / email
       // are injected into the template for each individual email
       const audienceFilter = (campaign.audience_filter as Record<string, unknown>) ?? {};
-      const recipients = await fetchDbSegmentRecipients(audienceFilter);
+      const recipients =
+        audienceFilter.source === 'waitlist'
+          ? await fetchWaitlistRecipients()
+          : await fetchDbSegmentRecipients(audienceFilter);
 
       result = await executeBulkSend({
         mode: 'batch',
