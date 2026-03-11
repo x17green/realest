@@ -3,27 +3,23 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
   CheckCircle,
   ArrowRight,
-  Loader2,
   Users,
   ShieldCheck,
 } from "lucide-react";
+import WaitlistModal from "@/components/shared/WaitlistModal";
 
 export default function WaitlistPage() {
   const [totalCount, setTotalCount] = useState<number | null>(null);
-
-  const [form, setForm] = useState({ firstName: "", email: "" });
-  const [loading, setLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [result, setResult] = useState<{
     position?: number;
     totalCount?: number;
     firstName?: string;
   } | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/waitlist?stats=true")
@@ -36,42 +32,6 @@ export default function WaitlistPage() {
       .catch(() => {});
   }, []);
 
-  const set = (k: keyof typeof form, v: string) =>
-    setForm((f) => ({ ...f, [k]: v }));
-
-  const handleSubmit = async () => {
-    if (!form.firstName || !form.email) {
-      setError("Name and email are required.");
-      return;
-    }
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch("/api/waitlist", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: form.email.trim().toLowerCase(),
-          firstName: form.firstName.trim(),
-          source: "waitlist_page",
-        }),
-      });
-      const json = await res.json();
-      if (res.ok || json.isExistingUser) {
-        setResult({
-          position: json.data?.position,
-          totalCount: json.data?.totalCount,
-          firstName: json.data?.firstName,
-        });
-      } else {
-        setError(json.error ?? "Something went wrong. Please try again.");
-      }
-    } catch {
-      setError("Network error. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (result !== null) {
     return (
@@ -146,35 +106,12 @@ export default function WaitlistPage() {
       {/* Form */}
       <section className="py-16 px-4">
         <div className="container mx-auto max-w-sm">
-          {/* <h2 className="text-xl font-bold text-center mb-6">
-            Secure your spot
-          </h2> */}
-          {/* <div className="space-y-3">
-            <Input
-              placeholder="First name *"
-              value={form.firstName}
-              onChange={(e) => set("firstName", e.target.value)}
-            />
-            <Input
-              type="email"
-              placeholder="Email address *"
-              value={form.email}
-              onChange={(e) => set("email", e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-            />
-          </div> */}
-          {/* {error && <p className="mt-3 text-sm text-destructive">{error}</p>} */}
           <Button
             className="w-full mt-5"
             size="lg"
-            onClick={handleSubmit}
-            disabled={loading}
+            onClick={() => setIsModalOpen(true)}
           >
-            {loading ? (
-              <Loader2 className="w-4 h-4 animate-spin mr-2" />
-            ) : (
-              <ArrowRight className="w-4 h-4 mr-2" />
-            )}
+            <ArrowRight className="w-4 h-4 mr-2" />
             Join Waitlist
           </Button>
           <p className="text-xs text-muted-foreground mt-3 text-center">
@@ -182,6 +119,19 @@ export default function WaitlistPage() {
           </p>
         </div>
       </section>
+
+      <WaitlistModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={(data) => {
+          setIsModalOpen(false);
+          setResult({
+            position: data.position,
+            totalCount: data.totalCount,
+            firstName: data.firstName,
+          });
+        }}
+      />
 
       {/* Social proof */}
       <section className="py-12 px-4 bg-muted/30 border-t border-border">
