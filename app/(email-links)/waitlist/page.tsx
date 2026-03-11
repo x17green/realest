@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Header, Footer } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -77,7 +76,6 @@ export default function WaitlistPage() {
   if (result !== null) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
         <section className="py-32 px-4">
           <div className="container mx-auto max-w-md text-center">
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
@@ -115,15 +113,12 @@ export default function WaitlistPage() {
             </div>
           </div>
         </section>
-        <Footer />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-
       {/* Hero */}
       <section
         className="py-24 px-4 text-center text-white"
@@ -151,10 +146,10 @@ export default function WaitlistPage() {
       {/* Form */}
       <section className="py-16 px-4">
         <div className="container mx-auto max-w-sm">
-          <h2 className="text-xl font-bold text-center mb-6">
+          {/* <h2 className="text-xl font-bold text-center mb-6">
             Secure your spot
-          </h2>
-          <div className="space-y-3">
+          </h2> */}
+          {/* <div className="space-y-3">
             <Input
               placeholder="First name *"
               value={form.firstName}
@@ -167,8 +162,8 @@ export default function WaitlistPage() {
               onChange={(e) => set("email", e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
             />
-          </div>
-          {error && <p className="mt-3 text-sm text-destructive">{error}</p>}
+          </div> */}
+          {/* {error && <p className="mt-3 text-sm text-destructive">{error}</p>} */}
           <Button
             className="w-full mt-5"
             size="lg"
@@ -204,8 +199,6 @@ export default function WaitlistPage() {
           ))}
         </div>
       </section>
-
-      <Footer />
     </div>
   );
 }

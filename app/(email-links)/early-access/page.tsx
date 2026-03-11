@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Header, Footer } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -93,7 +92,6 @@ export default function EarlyAccessPage() {
   if (result !== null) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
         <section className="py-32 px-4 text-center">
           <div className="container mx-auto max-w-md">
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
@@ -123,15 +121,12 @@ export default function EarlyAccessPage() {
             </Button>
           </div>
         </section>
-        <Footer />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-
       {/* Hero */}
       <section className="py-20 px-4 bg-muted/30 border-b border-border">
         <div className="container mx-auto max-w-2xl text-center">
@@ -252,8 +247,6 @@ export default function EarlyAccessPage() {
           </div>
         </div>
       </section>
-
-      <Footer />
     </div>
   );
 }
