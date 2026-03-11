@@ -1,16 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import prisma from "@/lib/prisma";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Mail, Send, Users, Clock, CheckCircle, XCircle, Eye, Plus, Search } from "lucide-react";
+import { Mail, Send, Clock, CheckCircle, XCircle, Eye, Plus } from "lucide-react";
 import Link from "next/link";
 
 export default async function CMSEmailsPage() {
@@ -34,51 +30,40 @@ export default async function CMSEmailsPage() {
     redirect("/");
   }
 
-  // Mock email statistics (in a real app, this would come from email service logs)
+  // Fetch real campaign data
+  const campaigns = await prisma.email_campaigns.findMany({
+    orderBy: { created_at: "desc" },
+    take: 100,
+  });
+
   const emailStats = {
-    totalSent: 15420,
-    delivered: 14850,
-    opened: 6230,
-    clicked: 1246,
-    bounced: 320,
-    unsubscribed: 250,
-    pendingCampaigns: 3,
-    activeCampaigns: 1,
+    totalSent: campaigns.reduce((s, c) => s + (c.sent_count ?? 0), 0),
+    totalFailed: campaigns.reduce((s, c) => s + (c.failed_count ?? 0), 0),
+    pendingCampaigns: campaigns.filter(
+      (c) => c.status === "draft" || c.status === "scheduled"
+    ).length,
+    sentCampaigns: campaigns.filter((c) => c.status === "sent").length,
   };
 
-  // Mock email campaigns
-  const emailCampaigns = [
-    {
-      id: "1",
-      name: "Welcome Email",
-      subject: "Welcome to RealEST!",
-      status: "sent",
-      sentCount: 1250,
-      openRate: 45.2,
-      clickRate: 8.3,
-      sentAt: "2024-01-15T10:00:00Z",
-    },
-    {
-      id: "2",
-      name: "Property Updates",
-      subject: "New Properties in Your Area",
-      status: "scheduled",
-      sentCount: 0,
-      openRate: 0,
-      clickRate: 0,
-      sentAt: "2024-01-20T09:00:00Z",
-    },
-    {
-      id: "3",
-      name: "Waitlist Update",
-      subject: "You're #1,247 on the waitlist",
-      status: "draft",
-      sentCount: 0,
-      openRate: 0,
-      clickRate: 0,
-      sentAt: null,
-    },
-  ];
+  const recentLogs = campaigns.filter(
+    (c) => c.status === "sent" || c.status === "failed"
+  );
+
+  const statusVariant = (
+    status: string
+  ): "default" | "secondary" | "destructive" | "outline" => {
+    switch (status) {
+      case "sent":
+        return "default";
+      case "sending":
+      case "scheduled":
+        return "secondary";
+      case "failed":
+        return "destructive";
+      default:
+        return "outline";
+    }
+  };
 
   return (
     <>
@@ -112,8 +97,8 @@ export default async function CMSEmailsPage() {
             <CardContent className="pt-4">
               <div className="text-center">
                 <CheckCircle className="w-6 h-6 text-green-600 mx-auto mb-2" />
-                <p className="text-xl font-bold">{emailStats.delivered.toLocaleString()}</p>
-                <p className="text-xs text-muted-foreground">Delivered</p>
+                <p className="text-xl font-bold">{emailStats.sentCampaigns.toLocaleString()}</p>
+                <p className="text-xs text-muted-foreground">Campaigns Sent</p>
               </div>
             </CardContent>
           </Card>
@@ -121,9 +106,9 @@ export default async function CMSEmailsPage() {
           <Card>
             <CardContent className="pt-4">
               <div className="text-center">
-                <Eye className="w-6 h-6 text-purple-600 mx-auto mb-2" />
-                <p className="text-xl font-bold">{emailStats.opened.toLocaleString()}</p>
-                <p className="text-xs text-muted-foreground">Opened</p>
+                <Clock className="w-6 h-6 text-orange-600 mx-auto mb-2" />
+                <p className="text-xl font-bold">{emailStats.pendingCampaigns}</p>
+                <p className="text-xs text-muted-foreground">Pending Campaigns</p>
               </div>
             </CardContent>
           </Card>
@@ -131,9 +116,9 @@ export default async function CMSEmailsPage() {
           <Card>
             <CardContent className="pt-4">
               <div className="text-center">
-                <Mail className="w-6 h-6 text-orange-600 mx-auto mb-2" />
-                <p className="text-xl font-bold">{emailStats.clicked.toLocaleString()}</p>
-                <p className="text-xs text-muted-foreground">Clicked</p>
+                <XCircle className="w-6 h-6 text-red-600 mx-auto mb-2" />
+                <p className="text-xl font-bold">{emailStats.totalFailed.toLocaleString()}</p>
+                <p className="text-xs text-muted-foreground">Failed Deliveries</p>
               </div>
             </CardContent>
           </Card>
@@ -141,60 +126,17 @@ export default async function CMSEmailsPage() {
 
         {/* Quick Actions */}
         <div className="flex gap-4 mb-6">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="w-4 h-4 mr-2" />
-                New Campaign
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>Create New Email Campaign</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="campaignName">Campaign Name</Label>
-                  <Input id="campaignName" placeholder="Enter campaign name" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="campaignSubject">Subject Line</Label>
-                  <Input id="campaignSubject" placeholder="Enter email subject" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="recipientGroup">Recipient Group</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select recipients" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Users</SelectItem>
-                      <SelectItem value="owners">Property Owners</SelectItem>
-                      <SelectItem value="agents">Agents</SelectItem>
-                      <SelectItem value="waitlist">Waitlist Subscribers</SelectItem>
-                      <SelectItem value="verified">Verified Users</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="campaignContent">Email Content</Label>
-                  <Textarea
-                    id="campaignContent"
-                    placeholder="Enter your email content..."
-                    className="min-h-32"
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <Button className="flex-1">Save as Draft</Button>
-                  <Button className="flex-1">Send Now</Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
-
-          <Button variant="outline">
-            <Mail className="w-4 h-4 mr-2" />
-            Send Test Email
+          <Button asChild>
+            <Link href="/admin/emails/campaigns/new">
+              <Plus className="w-4 h-4 mr-2" />
+              New Campaign
+            </Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link href="/admin/emails/campaigns">
+              <Mail className="w-4 h-4 mr-2" />
+              View All Campaigns
+            </Link>
           </Button>
         </div>
 
@@ -203,7 +145,7 @@ export default async function CMSEmailsPage() {
           <TabsList>
             <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
             <TabsTrigger value="templates">Templates</TabsTrigger>
-            <TabsTrigger value="logs">Email Logs</TabsTrigger>
+            <TabsTrigger value="logs">Campaign History</TabsTrigger>
           </TabsList>
 
           <TabsContent value="campaigns">
@@ -212,84 +154,128 @@ export default async function CMSEmailsPage() {
                 <CardTitle>Email Campaigns</CardTitle>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Campaign</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Sent</TableHead>
-                      <TableHead>Open Rate</TableHead>
-                      <TableHead>Click Rate</TableHead>
-                      <TableHead>Sent At</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {emailCampaigns.map((campaign) => (
-                      <TableRow key={campaign.id}>
-                        <TableCell>
-                          <div>
-                            <p className="font-medium">{campaign.name}</p>
-                            <p className="text-sm text-muted-foreground">
-                              {campaign.subject}
-                            </p>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            variant={
-                              campaign.status === "sent"
-                                ? "default"
-                                : campaign.status === "scheduled"
-                                ? "secondary"
-                                : "outline"
-                            }
-                          >
-                            {campaign.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>{campaign.sentCount.toLocaleString()}</TableCell>
-                        <TableCell>{campaign.openRate}%</TableCell>
-                        <TableCell>{campaign.clickRate}%</TableCell>
-                        <TableCell>
-                          {campaign.sentAt
-                            ? new Date(campaign.sentAt).toLocaleDateString()
-                            : "Not sent"}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex gap-2">
-                            <Button size="sm" variant="outline">
-                              <Eye className="w-4 h-4" />
-                            </Button>
-                            <Button size="sm" variant="outline">
-                              Edit
-                            </Button>
-                            {campaign.status === "draft" && (
-                              <Button size="sm">
-                                <Send className="w-4 h-4" />
-                              </Button>
-                            )}
-                          </div>
-                        </TableCell>
+                {campaigns.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Mail className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">No campaigns yet.</p>
+                    <Button asChild className="mt-4">
+                      <Link href="/admin/emails/campaigns/new">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Create your first campaign
+                      </Link>
+                    </Button>
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Campaign</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Recipients</TableHead>
+                        <TableHead>Sent</TableHead>
+                        <TableHead>Failed</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Actions</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {campaigns.map((campaign) => (
+                        <TableRow key={campaign.id}>
+                          <TableCell>
+                            <div>
+                              <p className="font-medium">{campaign.name}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {campaign.subject}
+                              </p>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={statusVariant(campaign.status)}>
+                              {campaign.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {(campaign.total_recipients ?? 0).toLocaleString()}
+                          </TableCell>
+                          <TableCell>
+                            {(campaign.sent_count ?? 0).toLocaleString()}
+                          </TableCell>
+                          <TableCell>
+                            {(campaign.failed_count ?? 0) > 0 ? (
+                              <span className="text-destructive font-medium">
+                                {campaign.failed_count}
+                              </span>
+                            ) : (
+                              "0"
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {campaign.sent_at
+                              ? new Date(campaign.sent_at).toLocaleDateString()
+                              : campaign.scheduled_at
+                              ? `Sched. ${new Date(campaign.scheduled_at).toLocaleDateString()}`
+                              : campaign.created_at
+                              ? new Date(campaign.created_at).toLocaleDateString()
+                              : "—"}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex gap-2">
+                              <Button size="sm" variant="outline" asChild>
+                                <Link href={`/admin/emails/campaigns/${campaign.id}`}>
+                                  <Eye className="w-4 h-4" />
+                                </Link>
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
 
           <TabsContent value="templates">
             <Card>
-              <CardContent className="pt-6">
-                <div className="text-center py-12">
-                  <Mail className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground mb-4">
-                    Email templates feature coming soon
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Create reusable email templates for common communications
-                  </p>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <Mail className="w-5 h-5" />
+                    Email Templates
+                    <Badge variant="secondary">34 templates</Badge>
+                  </CardTitle>
+                  <Button asChild>
+                    <Link href="/admin/emails">
+                      <Eye className="w-4 h-4 mr-2" />
+                      Open Preview Dashboard
+                    </Link>
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-6">
+                  All 34 transactional and marketing email templates used by the platform.
+                  Use the interactive preview dashboard to inspect, toggle dark mode, and view each
+                  template at desktop or mobile widths.
+                </p>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {([
+                    { label: "Platform",   count: 8,  description: "Auth, onboarding, account events" },
+                    { label: "Listing",    count: 6,  description: "Property submission & verification" },
+                    { label: "Engagement", count: 3,  description: "Inquiries, viewings, alerts" },
+                    { label: "Financial",  count: 4,  description: "Invoices, payments, renewals" },
+                    { label: "Security",   count: 2,  description: "Login alerts, vetting tasks" },
+                    { label: "Marketing",  count: 11, description: "Waitlist, launch, warm-up series" },
+                  ] as const).map((cat) => (
+                    <div key={cat.label} className="rounded-lg border border-border p-3">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-medium">{cat.label}</span>
+                        <Badge variant="outline">{cat.count}</Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">{cat.description}</p>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
@@ -298,42 +284,78 @@ export default async function CMSEmailsPage() {
           <TabsContent value="logs">
             <Card>
               <CardHeader>
-                <CardTitle>Email Logs</CardTitle>
+                <CardTitle>Campaign History</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="flex gap-4">
-                    <Input
-                      placeholder="Search emails..."
-                      className="max-w-sm"
-                    />
-                    <Select>
-                      <SelectTrigger className="w-32">
-                        <SelectValue placeholder="Status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Status</SelectItem>
-                        <SelectItem value="delivered">Delivered</SelectItem>
-                        <SelectItem value="bounced">Bounced</SelectItem>
-                        <SelectItem value="opened">Opened</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Button variant="outline">
-                      <Search className="w-4 h-4 mr-2" />
-                      Search
-                    </Button>
-                  </div>
-
+                {recentLogs.length === 0 ? (
                   <div className="text-center py-12">
                     <Clock className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">
-                      Email logs will be displayed here
-                    </p>
+                    <p className="text-muted-foreground">No completed campaigns yet.</p>
                     <p className="text-sm text-muted-foreground mt-2">
-                      Track delivery status, opens, clicks, and bounces
+                      Sent and failed campaigns will appear here.
                     </p>
                   </div>
-                </div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Campaign</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Recipients</TableHead>
+                        <TableHead>Sent</TableHead>
+                        <TableHead>Failed</TableHead>
+                        <TableHead>Sent At</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {recentLogs.map((campaign) => (
+                        <TableRow key={campaign.id}>
+                          <TableCell>
+                            <div>
+                              <p className="font-medium">{campaign.name}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {campaign.subject}
+                              </p>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={statusVariant(campaign.status)}>
+                              {campaign.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {(campaign.total_recipients ?? 0).toLocaleString()}
+                          </TableCell>
+                          <TableCell>
+                            {(campaign.sent_count ?? 0).toLocaleString()}
+                          </TableCell>
+                          <TableCell>
+                            {(campaign.failed_count ?? 0) > 0 ? (
+                              <span className="text-destructive font-medium">
+                                {campaign.failed_count}
+                              </span>
+                            ) : (
+                              "0"
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {campaign.sent_at
+                              ? new Date(campaign.sent_at).toLocaleString()
+                              : "—"}
+                          </TableCell>
+                          <TableCell>
+                            <Button size="sm" variant="outline" asChild>
+                              <Link href={`/admin/emails/campaigns/${campaign.id}`}>
+                                <Eye className="w-4 h-4" />
+                              </Link>
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

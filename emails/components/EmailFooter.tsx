@@ -5,11 +5,14 @@ import { colors, fonts, BASE_URL } from '../styles/tokens';
 interface EmailFooterProps {
   showUnsubscribe?: boolean;
   unsubscribeUrl?: string;
+  /** Optional line rendered above copyright, e.g. mission reminder for marketing emails */
+  footerNote?: string;
 }
 
 export function EmailFooter({
   showUnsubscribe = true,
   unsubscribeUrl = '{unsubscribe_url}',
+  footerNote,
 }: EmailFooterProps) {
   const year = new Date().getFullYear();
   // Don't render unsubscribe link if URL is an ESP template placeholder (preview / dev mode)
@@ -65,6 +68,22 @@ export function EmailFooter({
           </Link>
         )}
       </Text>
+
+      {/* Optional mission-reminder note (used by marketing emails) */}
+      {footerNote && (
+        <Text
+          style={{
+            fontFamily: fonts.body,
+            fontSize: '11.5px',
+            color: colors.textMuted,
+            fontStyle: 'italic',
+            lineHeight: '1.6',
+            margin: '0 0 10px',
+          }}
+        >
+          {footerNote}
+        </Text>
+      )}
 
       {/* Copyright + contact */}
       <Text

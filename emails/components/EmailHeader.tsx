@@ -9,7 +9,7 @@ const LOGO_DISPLAY_HEIGHT = Math.round(LOGO_DISPLAY_WIDTH / 1.969); // ≈ 81
 
 export function EmailHeader() {
   return (
-    <Section style={{ padding: '40px 16px' }}>
+    <Section style={{ padding: '10px 16px' }}>
       <Link href={BASE_URL} style={{ textDecoration: 'none' }}>
         {/* Dark wordmark (dark text on light bg) — default */}
         <Img

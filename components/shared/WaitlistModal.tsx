@@ -448,29 +448,12 @@ const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSucces
                   />
                 </div>
               </div>
-
-              <div className="bg-linear-to-r from-primary/5 to-accent/5 border border-primary/20 rounded-xl p-4">
-                <div className="flex gap-3">
-                  <Shield className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                  <div className="space-y-2">
-                    <p className="font-semibold text-sm text-foreground">What you'll get:</p>
-                    <ul className="space-y-1.5 text-xs text-muted-foreground">
-                      <li className="flex items-center gap-2">
-                        <CheckCircle className="w-3.5 h-3.5 text-green-600" />
-                        Early access to verified properties
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <BellRing className="w-3.5 h-3.5 text-yellow-600" />
-                        Launch notifications & exclusive updates
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <Shield className="w-3.5 h-3.5 text-purple-600" />
-                        No spam, unsubscribe anytime
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
+              {errors.submit && (
+                <p className="text-xs text-red-600 flex items-center gap-1 mt-2">
+                  <AlertCircle className="w-3.5 h-3.5" />
+                  {errors.submit}
+                </p>
+              )}
             </div>
           )}
 
@@ -545,7 +528,7 @@ const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSucces
 
               <div className="space-y-1.5">
                 <label className="text-sm font-semibold text-foreground">
-                  Preferred Location <span className="text-muted-foreground text-xs font-normal">(Optional)</span>
+                  Location <span className="text-muted-foreground text-xs font-normal">(Optional)</span>
                 </label>
                 <div className="relative">
                   <input
@@ -644,32 +627,6 @@ const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSucces
                   </p>
                 </div>
               )}
-
-              <div className="max-w-md mx-auto bg-linear-to-r from-primary/5 to-accent/5 border border-primary/20 rounded-xl p-5">
-                <h3 className="font-semibold text-foreground mb-3 text-sm">
-                  What happens next?
-                </h3>
-                <div className="space-y-2.5 text-xs text-muted-foreground">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                      <MailCheck className="w-4 h-4 text-primary" />
-                    </div>
-                    <span className="text-left">Confirmation email sent to your inbox</span>
-                  </div>
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
-                      <Rocket className="w-4 h-4 text-accent" />
-                    </div>
-                    <span className="text-left">Early access when we launch</span>
-                  </div>
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900 flex items-center justify-center shrink-0">
-                      <Gift className="w-4 h-4 text-green-600" />
-                    </div>
-                    <span className="text-left">Exclusive updates and property previews</span>
-                  </div>
-                </div>
-              </div>
             </div>
           )}
         </div>

@@ -65,17 +65,41 @@ const RealEstLogo: React.FC<RealEstLogoProps> = ({
     style: { height: h, width: resolved === 'icon' ? h : w } as React.CSSProperties,
   };
 
-  const renderIcon = () => (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img src="/realest-logo.svg" alt="RealEST Connect" {...imgProps} className="block" />
-  );
+  const renderIcon = () => {
+    // icon variant: plain mark — no dark/light file variants exist, use CSS invert for dark mode
+    if (theme === 'light') {
+      // explicit request for light-on-dark: invert the dark mark
+      return (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src="/realest-logo.svg" alt="RealEST Connect" {...imgProps} className="block" style={{ ...imgProps.style, filter: 'invert(1)' }} />
+      );
+    }
+    if (theme === 'dark') {
+      // explicit request for dark-on-light: use mark as-is
+      return (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src="/realest-logo.svg" alt="RealEST Connect" {...imgProps} className="block" />
+      );
+    }
+    // auto — dark mark in light mode, CSS-inverted (light) mark in dark mode
+    return (
+      <>
+        {/* Light mode: dark mark on light bg */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/realest-logo.svg" alt="RealEST Connect" {...imgProps} className="block dark:hidden" />
+        {/* Dark mode: light mark on dark bg (CSS invert) */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/realest-logo.svg" alt="RealEST Connect" {...imgProps} className="hidden dark:block" style={{ ...imgProps.style, filter: 'invert(1)' }} />
+      </>
+    );
+  };
 
   const renderThemed = (fileBase: 'realest-wordmark' | 'realest-logo-wordmark', alt: string) => {
     if (theme === 'dark') {
-      return <img src={`/${fileBase}-dark.svg`} alt={alt} {...imgProps} className="block" />;// eslint-disable-line @next/next/no-img-element
+      return <img src={`/${fileBase}-.svg`} alt={alt} {...imgProps} className="block" />;// eslint-disable-line @next/next/no-img-element
     }
     if (theme === 'light') {
-      return <img src={`/${fileBase}-light.svg`} alt={alt} {...imgProps} className="block" />;// eslint-disable-line @next/next/no-img-element
+      return <img src={`/${fileBase}-dark.svg`} alt={alt} {...imgProps} className="block" />;// eslint-disable-line @next/next/no-img-element
     }
     // auto — show/hide via Tailwind dark mode
     return (

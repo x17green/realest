@@ -133,7 +133,7 @@ export function PropertyForm({ initial, mode }: { initial?: Partial<PropertyForm
       <div>
         <label className="block text-sm font-medium mb-1">Title</label>
         <input
-          className="w-full rounded-md border border-[var(--border)] bg-background px-3 py-2"
+          className="w-full rounded-md border border-border bg-background px-3 py-2"
           value={values.title}
           onChange={(e: ChangeEvent<HTMLInputElement>) => setValues({ ...values, title: e.target.value })}
           placeholder="e.g., 3 Bedroom Flat in Lekki"
@@ -143,7 +143,7 @@ export function PropertyForm({ initial, mode }: { initial?: Partial<PropertyForm
       <div>
         <label className="block text-sm font-medium mb-1">Description</label>
         <textarea
-          className="w-full rounded-md border border-[var(--border)] bg-background px-3 py-2"
+          className="w-full rounded-md border border-border bg-background px-3 py-2"
           value={values.description}
           onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setValues({ ...values, description: e.target.value })}
           placeholder="Describe your property..."
@@ -156,7 +156,7 @@ export function PropertyForm({ initial, mode }: { initial?: Partial<PropertyForm
                   <div>
                     <label className="block text-sm font-medium mb-1">Listing Type</label>
                     <select
-                      className="w-full rounded-md border border-[var(--border)] bg-background px-3 py-2"
+                      className="w-full rounded-md border border-border bg-background px-3 py-2"
                       value={values.listing_type}
                       onChange={(e: ChangeEvent<HTMLSelectElement>) => setValues({ ...values, listing_type: e.target.value as PropertyFormValues["listing_type"] })}
                     >
@@ -167,7 +167,7 @@ export function PropertyForm({ initial, mode }: { initial?: Partial<PropertyForm
                   </div>
           <label className="block text-sm font-medium mb-1">Address</label>
           <input
-            className="w-full rounded-md border border-[var(--border)] bg-background px-3 py-2"
+            className="w-full rounded-md border border-border bg-background px-3 py-2"
             value={values.address}
             onChange={(e: ChangeEvent<HTMLInputElement>) => setValues({ ...values, address: e.target.value })}
           />
@@ -175,7 +175,7 @@ export function PropertyForm({ initial, mode }: { initial?: Partial<PropertyForm
         <div>
           <label className="block text-sm font-medium mb-1">State</label>
           <input
-            className="w-full rounded-md border border-[var(--border)] bg-background px-3 py-2"
+            className="w-full rounded-md border border-border bg-background px-3 py-2"
             value={values.state}
             onChange={(e: ChangeEvent<HTMLInputElement>) => setValues({ ...values, state: e.target.value })}
           />
@@ -183,7 +183,7 @@ export function PropertyForm({ initial, mode }: { initial?: Partial<PropertyForm
         <div>
           <label className="block text-sm font-medium mb-1">City</label>
           <input
-            className="w-full rounded-md border border-[var(--border)] bg-background px-3 py-2"
+            className="w-full rounded-md border border-border bg-background px-3 py-2"
             value={values.city}
             onChange={(e: ChangeEvent<HTMLInputElement>) => setValues({ ...values, city: e.target.value })}
           />
@@ -191,7 +191,7 @@ export function PropertyForm({ initial, mode }: { initial?: Partial<PropertyForm
         <div>
           <label className="block text-sm font-medium mb-1">Property Type</label>
           <select
-            className="w-full rounded-md border border-[var(--border)] bg-background px-3 py-2"
+            className="w-full rounded-md border border-border bg-background px-3 py-2"
             value={values.property_type}
             onChange={(e: ChangeEvent<HTMLSelectElement>) => setValues({ ...values, property_type: e.target.value })}
           >
@@ -203,7 +203,7 @@ export function PropertyForm({ initial, mode }: { initial?: Partial<PropertyForm
         <div>
           <label className="block text-sm font-medium mb-1">Price (₦)</label>
           <input
-            className="w-full rounded-md border border-[var(--border)] bg-background px-3 py-2"
+            className="w-full rounded-md border border-border bg-background px-3 py-2"
             type="number"
             value={String(values.price)}
             onChange={(e: ChangeEvent<HTMLInputElement>) => setValues({ ...values, price: Number(e.target.value) })}
@@ -212,7 +212,7 @@ export function PropertyForm({ initial, mode }: { initial?: Partial<PropertyForm
         <div>
           <label className="block text-sm font-medium mb-1">Price Frequency</label>
           <select
-            className="w-full rounded-md border border-[var(--border)] bg-background px-3 py-2"
+            className="w-full rounded-md border border-border bg-background px-3 py-2"
             value={values.price_frequency}
             onChange={(e: ChangeEvent<HTMLSelectElement>) => setValues({ ...values, price_frequency: e.target.value as PropertyFormValues["price_frequency"] })}
           >
