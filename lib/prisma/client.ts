@@ -141,3 +141,8 @@ export type users = Prisma.usersModel
  * This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
  */
 export type waitlist = Prisma.waitlistModel
+/**
+ * Model email_campaigns
+ * Email marketing campaign records — tracks both Resend broadcast and DB-segment batch sends.
+ */
+export type email_campaigns = Prisma.email_campaignsModel
