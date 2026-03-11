@@ -3,7 +3,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Header, Footer } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Gift, Users, Star } from "lucide-react";
@@ -18,8 +17,6 @@ function ReferContent() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-
       {/* Hero */}
       <section
         className="py-24 px-4 text-center text-white"
@@ -139,8 +136,6 @@ function ReferContent() {
           </div>
         </div>
       </section>
-
-      <Footer />
     </div>
   );
 }

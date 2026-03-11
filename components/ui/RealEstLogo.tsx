@@ -11,7 +11,7 @@ export interface RealEstLogoProps {
    * minimal     → alias for icon
    * text        → alias for wordmark
    */
-  variant?: 'icon' | 'wordmark' | 'full' | 'minimal' | 'text';
+  variant?: 'icon' | 'wordmark' | 'full' | 'with-text' | 'minimal' | 'text';
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   /**
    * dark → use -dark.svg variant (dark logo, for light backgrounds)
@@ -36,15 +36,16 @@ const HEIGHT: Record<NonNullable<RealEstLogoProps['size']>, number> = {
 
 // Aspect ratios (width / height) measured from SVG viewBox
 const ASPECT = {
-  icon:     1,     // 17.653 × 17.653
-  wordmark: 1.969, // 249.23 × 126.59
-  full:     3.011, // 387.49 × 128.69
+  icon:        1,     // 17.653 × 17.653
+  wordmark:    1.969, // 249.23 × 126.59
+  full:        3.011, // 387.49 × 128.69
+  'with-text': 5.852, // 76.8 × 13.128 — realest-logo-with-text-{dark|light}.svg
 } as const;
 
 function resolveVariant(v: NonNullable<RealEstLogoProps['variant']>) {
   if (v === 'minimal') return 'icon';
   if (v === 'text') return 'wordmark';
-  return v;
+  return v as 'icon' | 'wordmark' | 'full' | 'with-text';
 }
 
 const RealEstLogo: React.FC<RealEstLogoProps> = ({
@@ -57,7 +58,7 @@ const RealEstLogo: React.FC<RealEstLogoProps> = ({
 }) => {
   const resolved = resolveVariant(variant);
   const h = HEIGHT[size];
-  const w = Math.round(h * ASPECT[resolved]);
+  const w = Math.round(h * ASPECT[resolved as keyof typeof ASPECT]);
 
   const imgProps = {
     height: h,
@@ -94,7 +95,7 @@ const RealEstLogo: React.FC<RealEstLogoProps> = ({
     );
   };
 
-  const renderThemed = (fileBase: 'realest-wordmark' | 'realest-logo-wordmark', alt: string) => {
+  const renderThemed = (fileBase: 'realest-wordmark' | 'realest-logo-wordmark' | 'realest-logo-with-text', alt: string) => {
     if (theme === 'dark') {
       return <img src={`/${fileBase}-.svg`} alt={alt} {...imgProps} className="block" />;// eslint-disable-line @next/next/no-img-element
     }
@@ -124,9 +125,10 @@ const RealEstLogo: React.FC<RealEstLogoProps> = ({
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
     >
-      {resolved === 'icon'     && renderIcon()}
-      {resolved === 'wordmark' && renderThemed('realest-wordmark', 'RealEST Connect')}
-      {resolved === 'full'     && renderThemed('realest-logo-wordmark', 'RealEST Connect — Find Your Next Move Seamlessly')}
+      {resolved === 'icon'        && renderIcon()}
+      {resolved === 'wordmark'    && renderThemed('realest-wordmark', 'RealEST Connect')}
+      {resolved === 'full'         && renderThemed('realest-logo-wordmark', 'RealEST Connect — Find Your Next Move Seamlessly')}
+      {resolved === 'with-text'   && renderThemed('realest-logo-with-text', 'RealEST Connect')}
     </div>
   );
 };
@@ -155,6 +157,11 @@ export const MobileLogo = (props: Omit<RealEstLogoProps, 'variant' | 'size'>) =>
 
 export const LoadingLogo = (props: Omit<RealEstLogoProps, 'animated'>) => (
   <RealEstLogo animated={true} {...props} />
+);
+
+/** Logo + text lockup, auto theme — for slim headers/footers */
+export const LogoWithText = (props: Omit<RealEstLogoProps, 'variant'>) => (
+  <RealEstLogo variant="with-text" {...props} />
 );
 
 export default RealEstLogo;

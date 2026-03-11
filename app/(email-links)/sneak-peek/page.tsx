@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Header, Footer } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -92,8 +91,6 @@ export default function SneakPeekPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-
       {/* Hero */}
       <section className="bg-(--color-brand-dark,#07402F) text-white py-24 px-4">
         <div className="container mx-auto max-w-3xl text-center">
@@ -215,8 +212,6 @@ export default function SneakPeekPage() {
           </Button>
         </div>
       </section>
-
-      <Footer />
     </div>
   );
 }
