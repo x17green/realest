@@ -400,7 +400,8 @@ export const ModelName = {
   saved_properties: 'saved_properties',
   spatial_ref_sys: 'spatial_ref_sys',
   users: 'users',
-  waitlist: 'waitlist'
+  waitlist: 'waitlist',
+  email_campaigns: 'email_campaigns'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -416,7 +417,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "admin_audit_log" | "agents" | "inquiries" | "kyc_requests" | "notifications" | "owners" | "payments" | "profiles" | "properties" | "property_details" | "property_documents" | "property_media" | "reviews" | "saved_properties" | "spatial_ref_sys" | "users" | "waitlist"
+    modelProps: "admin_audit_log" | "agents" | "inquiries" | "kyc_requests" | "notifications" | "owners" | "payments" | "profiles" | "properties" | "property_details" | "property_documents" | "property_media" | "reviews" | "saved_properties" | "spatial_ref_sys" | "users" | "waitlist" | "email_campaigns"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1678,6 +1679,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    email_campaigns: {
+      payload: Prisma.$email_campaignsPayload<ExtArgs>
+      fields: Prisma.email_campaignsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.email_campaignsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$email_campaignsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.email_campaignsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$email_campaignsPayload>
+        }
+        findFirst: {
+          args: Prisma.email_campaignsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$email_campaignsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.email_campaignsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$email_campaignsPayload>
+        }
+        findMany: {
+          args: Prisma.email_campaignsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$email_campaignsPayload>[]
+        }
+        create: {
+          args: Prisma.email_campaignsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$email_campaignsPayload>
+        }
+        createMany: {
+          args: Prisma.email_campaignsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.email_campaignsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$email_campaignsPayload>[]
+        }
+        delete: {
+          args: Prisma.email_campaignsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$email_campaignsPayload>
+        }
+        update: {
+          args: Prisma.email_campaignsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$email_campaignsPayload>
+        }
+        deleteMany: {
+          args: Prisma.email_campaignsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.email_campaignsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.email_campaignsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$email_campaignsPayload>[]
+        }
+        upsert: {
+          args: Prisma.email_campaignsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$email_campaignsPayload>
+        }
+        aggregate: {
+          args: Prisma.Email_campaignsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateEmail_campaigns>
+        }
+        groupBy: {
+          args: Prisma.email_campaignsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Email_campaignsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.email_campaignsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Email_campaignsCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2015,6 +2090,31 @@ export const WaitlistScalarFieldEnum = {
 export type WaitlistScalarFieldEnum = (typeof WaitlistScalarFieldEnum)[keyof typeof WaitlistScalarFieldEnum]
 
 
+export const Email_campaignsScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  template_name: 'template_name',
+  subject: 'subject',
+  audience_type: 'audience_type',
+  audience_id: 'audience_id',
+  audience_filter: 'audience_filter',
+  send_mode: 'send_mode',
+  status: 'status',
+  template_props: 'template_props',
+  scheduled_at: 'scheduled_at',
+  sent_at: 'sent_at',
+  total_recipients: 'total_recipients',
+  sent_count: 'sent_count',
+  failed_count: 'failed_count',
+  resend_id: 'resend_id',
+  created_by: 'created_by',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Email_campaignsScalarFieldEnum = (typeof Email_campaignsScalarFieldEnum)[keyof typeof Email_campaignsScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -2278,6 +2378,7 @@ export type GlobalOmitConfig = {
   spatial_ref_sys?: Prisma.spatial_ref_sysOmit
   users?: Prisma.usersOmit
   waitlist?: Prisma.waitlistOmit
+  email_campaigns?: Prisma.email_campaignsOmit
 }
 
 /* Types for Logging */

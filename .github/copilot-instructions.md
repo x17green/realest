@@ -100,11 +100,10 @@ NEXT_PUBLIC_APP_MODE=development npm run dev  # Demo pages enabled
 ```
 
 ### Email Templates
-Email system uses Resend with pre-built templates in `lib/email-templates/`:
+Email system uses React Email templates in `emails/templates/` (see `copilot-instructions/06-email-system.md`):
 ```bash
-npm run email:generate  # Render templates to HTML
-npm run email:preview   # Generate and open preview at http://localhost:3000/email-previews/index.html
-npm run email:test      # Send test email
+npm run email:dev     # Visual preview server at http://localhost:3001
+npm run email:export  # Validate all 24 templates build cleanly (run before commits)
 ```
 
 ### Route Access Control

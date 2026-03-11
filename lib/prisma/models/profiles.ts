@@ -208,6 +208,7 @@ export type profilesWhereInput = {
   updated_at?: Prisma.DateTimeNullableFilter<"profiles"> | Date | string | null
   admin_audit_log?: Prisma.Admin_audit_logListRelationFilter
   agents?: Prisma.XOR<Prisma.AgentsNullableScalarRelationFilter, Prisma.agentsWhereInput> | null
+  email_campaigns?: Prisma.Email_campaignsListRelationFilter
   inquiries_inquiries_owner_idToprofiles?: Prisma.InquiriesListRelationFilter
   inquiries_inquiries_sender_idToprofiles?: Prisma.InquiriesListRelationFilter
   kyc_requests?: Prisma.Kyc_requestsListRelationFilter
@@ -231,6 +232,7 @@ export type profilesOrderByWithRelationInput = {
   updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
   admin_audit_log?: Prisma.admin_audit_logOrderByRelationAggregateInput
   agents?: Prisma.agentsOrderByWithRelationInput
+  email_campaigns?: Prisma.email_campaignsOrderByRelationAggregateInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesOrderByRelationAggregateInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesOrderByRelationAggregateInput
   kyc_requests?: Prisma.kyc_requestsOrderByRelationAggregateInput
@@ -257,6 +259,7 @@ export type profilesWhereUniqueInput = Prisma.AtLeast<{
   updated_at?: Prisma.DateTimeNullableFilter<"profiles"> | Date | string | null
   admin_audit_log?: Prisma.Admin_audit_logListRelationFilter
   agents?: Prisma.XOR<Prisma.AgentsNullableScalarRelationFilter, Prisma.agentsWhereInput> | null
+  email_campaigns?: Prisma.Email_campaignsListRelationFilter
   inquiries_inquiries_owner_idToprofiles?: Prisma.InquiriesListRelationFilter
   inquiries_inquiries_sender_idToprofiles?: Prisma.InquiriesListRelationFilter
   kyc_requests?: Prisma.Kyc_requestsListRelationFilter
@@ -307,6 +310,7 @@ export type profilesCreateInput = {
   updated_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
+  email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_sender_idToprofilesInput
   kyc_requests?: Prisma.kyc_requestsCreateNestedManyWithoutProfilesInput
@@ -330,6 +334,7 @@ export type profilesUncheckedCreateInput = {
   updated_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
+  email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_sender_idToprofilesInput
   kyc_requests?: Prisma.kyc_requestsUncheckedCreateNestedManyWithoutProfilesInput
@@ -351,6 +356,7 @@ export type profilesUpdateInput = {
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
+  email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_sender_idToprofilesNestedInput
   kyc_requests?: Prisma.kyc_requestsUpdateManyWithoutProfilesNestedInput
@@ -374,6 +380,7 @@ export type profilesUncheckedUpdateInput = {
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
+  email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUncheckedUpdateManyWithoutProfiles_inquiries_sender_idToprofilesNestedInput
   kyc_requests?: Prisma.kyc_requestsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -648,6 +655,20 @@ export type profilesUncheckedUpdateOneWithoutUsersNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.profilesUpdateToOneWithWhereWithoutUsersInput, Prisma.profilesUpdateWithoutUsersInput>, Prisma.profilesUncheckedUpdateWithoutUsersInput>
 }
 
+export type profilesCreateNestedOneWithoutEmail_campaignsInput = {
+  create?: Prisma.XOR<Prisma.profilesCreateWithoutEmail_campaignsInput, Prisma.profilesUncheckedCreateWithoutEmail_campaignsInput>
+  connectOrCreate?: Prisma.profilesCreateOrConnectWithoutEmail_campaignsInput
+  connect?: Prisma.profilesWhereUniqueInput
+}
+
+export type profilesUpdateOneRequiredWithoutEmail_campaignsNestedInput = {
+  create?: Prisma.XOR<Prisma.profilesCreateWithoutEmail_campaignsInput, Prisma.profilesUncheckedCreateWithoutEmail_campaignsInput>
+  connectOrCreate?: Prisma.profilesCreateOrConnectWithoutEmail_campaignsInput
+  upsert?: Prisma.profilesUpsertWithoutEmail_campaignsInput
+  connect?: Prisma.profilesWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.profilesUpdateToOneWithWhereWithoutEmail_campaignsInput, Prisma.profilesUpdateWithoutEmail_campaignsInput>, Prisma.profilesUncheckedUpdateWithoutEmail_campaignsInput>
+}
+
 export type profilesCreateWithoutAdmin_audit_logInput = {
   email: string
   full_name?: string | null
@@ -657,6 +678,7 @@ export type profilesCreateWithoutAdmin_audit_logInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
+  email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_sender_idToprofilesInput
   kyc_requests?: Prisma.kyc_requestsCreateNestedManyWithoutProfilesInput
@@ -679,6 +701,7 @@ export type profilesUncheckedCreateWithoutAdmin_audit_logInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
+  email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_sender_idToprofilesInput
   kyc_requests?: Prisma.kyc_requestsUncheckedCreateNestedManyWithoutProfilesInput
@@ -715,6 +738,7 @@ export type profilesUpdateWithoutAdmin_audit_logInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
+  email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_sender_idToprofilesNestedInput
   kyc_requests?: Prisma.kyc_requestsUpdateManyWithoutProfilesNestedInput
@@ -737,6 +761,7 @@ export type profilesUncheckedUpdateWithoutAdmin_audit_logInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
+  email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUncheckedUpdateManyWithoutProfiles_inquiries_sender_idToprofilesNestedInput
   kyc_requests?: Prisma.kyc_requestsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -757,6 +782,7 @@ export type profilesCreateWithoutAgentsInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
+  email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_sender_idToprofilesInput
   kyc_requests?: Prisma.kyc_requestsCreateNestedManyWithoutProfilesInput
@@ -779,6 +805,7 @@ export type profilesUncheckedCreateWithoutAgentsInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
+  email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_sender_idToprofilesInput
   kyc_requests?: Prisma.kyc_requestsUncheckedCreateNestedManyWithoutProfilesInput
@@ -815,6 +842,7 @@ export type profilesUpdateWithoutAgentsInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
+  email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_sender_idToprofilesNestedInput
   kyc_requests?: Prisma.kyc_requestsUpdateManyWithoutProfilesNestedInput
@@ -837,6 +865,7 @@ export type profilesUncheckedUpdateWithoutAgentsInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
+  email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUncheckedUpdateManyWithoutProfiles_inquiries_sender_idToprofilesNestedInput
   kyc_requests?: Prisma.kyc_requestsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -858,6 +887,7 @@ export type profilesCreateWithoutInquiries_inquiries_owner_idToprofilesInput = {
   updated_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
+  email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_sender_idToprofilesInput
   kyc_requests?: Prisma.kyc_requestsCreateNestedManyWithoutProfilesInput
   notifications?: Prisma.notificationsCreateNestedManyWithoutProfilesInput
@@ -880,6 +910,7 @@ export type profilesUncheckedCreateWithoutInquiries_inquiries_owner_idToprofiles
   updated_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
+  email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_sender_idToprofilesInput
   kyc_requests?: Prisma.kyc_requestsUncheckedCreateNestedManyWithoutProfilesInput
   notifications?: Prisma.notificationsUncheckedCreateNestedManyWithoutProfilesInput
@@ -905,6 +936,7 @@ export type profilesCreateWithoutInquiries_inquiries_sender_idToprofilesInput = 
   updated_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
+  email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
   kyc_requests?: Prisma.kyc_requestsCreateNestedManyWithoutProfilesInput
   notifications?: Prisma.notificationsCreateNestedManyWithoutProfilesInput
@@ -927,6 +959,7 @@ export type profilesUncheckedCreateWithoutInquiries_inquiries_sender_idToprofile
   updated_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
+  email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
   kyc_requests?: Prisma.kyc_requestsUncheckedCreateNestedManyWithoutProfilesInput
   notifications?: Prisma.notificationsUncheckedCreateNestedManyWithoutProfilesInput
@@ -963,6 +996,7 @@ export type profilesUpdateWithoutInquiries_inquiries_owner_idToprofilesInput = {
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
+  email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_sender_idToprofilesNestedInput
   kyc_requests?: Prisma.kyc_requestsUpdateManyWithoutProfilesNestedInput
   notifications?: Prisma.notificationsUpdateManyWithoutProfilesNestedInput
@@ -985,6 +1019,7 @@ export type profilesUncheckedUpdateWithoutInquiries_inquiries_owner_idToprofiles
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
+  email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUncheckedUpdateManyWithoutProfiles_inquiries_sender_idToprofilesNestedInput
   kyc_requests?: Prisma.kyc_requestsUncheckedUpdateManyWithoutProfilesNestedInput
   notifications?: Prisma.notificationsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -1016,6 +1051,7 @@ export type profilesUpdateWithoutInquiries_inquiries_sender_idToprofilesInput = 
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
+  email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
   kyc_requests?: Prisma.kyc_requestsUpdateManyWithoutProfilesNestedInput
   notifications?: Prisma.notificationsUpdateManyWithoutProfilesNestedInput
@@ -1038,6 +1074,7 @@ export type profilesUncheckedUpdateWithoutInquiries_inquiries_sender_idToprofile
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
+  email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
   kyc_requests?: Prisma.kyc_requestsUncheckedUpdateManyWithoutProfilesNestedInput
   notifications?: Prisma.notificationsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -1058,6 +1095,7 @@ export type profilesCreateWithoutKyc_requestsInput = {
   updated_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
+  email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_sender_idToprofilesInput
   notifications?: Prisma.notificationsCreateNestedManyWithoutProfilesInput
@@ -1080,6 +1118,7 @@ export type profilesUncheckedCreateWithoutKyc_requestsInput = {
   updated_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
+  email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_sender_idToprofilesInput
   notifications?: Prisma.notificationsUncheckedCreateNestedManyWithoutProfilesInput
@@ -1116,6 +1155,7 @@ export type profilesUpdateWithoutKyc_requestsInput = {
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
+  email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_sender_idToprofilesNestedInput
   notifications?: Prisma.notificationsUpdateManyWithoutProfilesNestedInput
@@ -1138,6 +1178,7 @@ export type profilesUncheckedUpdateWithoutKyc_requestsInput = {
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
+  email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUncheckedUpdateManyWithoutProfiles_inquiries_sender_idToprofilesNestedInput
   notifications?: Prisma.notificationsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -1158,6 +1199,7 @@ export type profilesCreateWithoutNotificationsInput = {
   updated_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
+  email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_sender_idToprofilesInput
   kyc_requests?: Prisma.kyc_requestsCreateNestedManyWithoutProfilesInput
@@ -1180,6 +1222,7 @@ export type profilesUncheckedCreateWithoutNotificationsInput = {
   updated_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
+  email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_sender_idToprofilesInput
   kyc_requests?: Prisma.kyc_requestsUncheckedCreateNestedManyWithoutProfilesInput
@@ -1216,6 +1259,7 @@ export type profilesUpdateWithoutNotificationsInput = {
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
+  email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_sender_idToprofilesNestedInput
   kyc_requests?: Prisma.kyc_requestsUpdateManyWithoutProfilesNestedInput
@@ -1238,6 +1282,7 @@ export type profilesUncheckedUpdateWithoutNotificationsInput = {
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
+  email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUncheckedUpdateManyWithoutProfiles_inquiries_sender_idToprofilesNestedInput
   kyc_requests?: Prisma.kyc_requestsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -1258,6 +1303,7 @@ export type profilesCreateWithoutOwnersInput = {
   updated_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
+  email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_sender_idToprofilesInput
   kyc_requests?: Prisma.kyc_requestsCreateNestedManyWithoutProfilesInput
@@ -1280,6 +1326,7 @@ export type profilesUncheckedCreateWithoutOwnersInput = {
   updated_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
+  email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_sender_idToprofilesInput
   kyc_requests?: Prisma.kyc_requestsUncheckedCreateNestedManyWithoutProfilesInput
@@ -1316,6 +1363,7 @@ export type profilesUpdateWithoutOwnersInput = {
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
+  email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_sender_idToprofilesNestedInput
   kyc_requests?: Prisma.kyc_requestsUpdateManyWithoutProfilesNestedInput
@@ -1338,6 +1386,7 @@ export type profilesUncheckedUpdateWithoutOwnersInput = {
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
+  email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUncheckedUpdateManyWithoutProfiles_inquiries_sender_idToprofilesNestedInput
   kyc_requests?: Prisma.kyc_requestsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -1358,6 +1407,7 @@ export type profilesCreateWithoutPaymentsInput = {
   updated_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
+  email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_sender_idToprofilesInput
   kyc_requests?: Prisma.kyc_requestsCreateNestedManyWithoutProfilesInput
@@ -1380,6 +1430,7 @@ export type profilesUncheckedCreateWithoutPaymentsInput = {
   updated_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
+  email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_sender_idToprofilesInput
   kyc_requests?: Prisma.kyc_requestsUncheckedCreateNestedManyWithoutProfilesInput
@@ -1416,6 +1467,7 @@ export type profilesUpdateWithoutPaymentsInput = {
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
+  email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_sender_idToprofilesNestedInput
   kyc_requests?: Prisma.kyc_requestsUpdateManyWithoutProfilesNestedInput
@@ -1438,6 +1490,7 @@ export type profilesUncheckedUpdateWithoutPaymentsInput = {
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
+  email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUncheckedUpdateManyWithoutProfiles_inquiries_sender_idToprofilesNestedInput
   kyc_requests?: Prisma.kyc_requestsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -1458,6 +1511,7 @@ export type profilesCreateWithoutProperty_documentsInput = {
   updated_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
+  email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_sender_idToprofilesInput
   kyc_requests?: Prisma.kyc_requestsCreateNestedManyWithoutProfilesInput
@@ -1480,6 +1534,7 @@ export type profilesUncheckedCreateWithoutProperty_documentsInput = {
   updated_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
+  email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_sender_idToprofilesInput
   kyc_requests?: Prisma.kyc_requestsUncheckedCreateNestedManyWithoutProfilesInput
@@ -1516,6 +1571,7 @@ export type profilesUpdateWithoutProperty_documentsInput = {
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
+  email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_sender_idToprofilesNestedInput
   kyc_requests?: Prisma.kyc_requestsUpdateManyWithoutProfilesNestedInput
@@ -1538,6 +1594,7 @@ export type profilesUncheckedUpdateWithoutProperty_documentsInput = {
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
+  email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUncheckedUpdateManyWithoutProfiles_inquiries_sender_idToprofilesNestedInput
   kyc_requests?: Prisma.kyc_requestsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -1558,6 +1615,7 @@ export type profilesCreateWithoutReviewsInput = {
   updated_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
+  email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_sender_idToprofilesInput
   kyc_requests?: Prisma.kyc_requestsCreateNestedManyWithoutProfilesInput
@@ -1580,6 +1638,7 @@ export type profilesUncheckedCreateWithoutReviewsInput = {
   updated_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
+  email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_sender_idToprofilesInput
   kyc_requests?: Prisma.kyc_requestsUncheckedCreateNestedManyWithoutProfilesInput
@@ -1616,6 +1675,7 @@ export type profilesUpdateWithoutReviewsInput = {
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
+  email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_sender_idToprofilesNestedInput
   kyc_requests?: Prisma.kyc_requestsUpdateManyWithoutProfilesNestedInput
@@ -1638,6 +1698,7 @@ export type profilesUncheckedUpdateWithoutReviewsInput = {
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
+  email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUncheckedUpdateManyWithoutProfiles_inquiries_sender_idToprofilesNestedInput
   kyc_requests?: Prisma.kyc_requestsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -1658,6 +1719,7 @@ export type profilesCreateWithoutSaved_propertiesInput = {
   updated_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
+  email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_sender_idToprofilesInput
   kyc_requests?: Prisma.kyc_requestsCreateNestedManyWithoutProfilesInput
@@ -1680,6 +1742,7 @@ export type profilesUncheckedCreateWithoutSaved_propertiesInput = {
   updated_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
+  email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_sender_idToprofilesInput
   kyc_requests?: Prisma.kyc_requestsUncheckedCreateNestedManyWithoutProfilesInput
@@ -1716,6 +1779,7 @@ export type profilesUpdateWithoutSaved_propertiesInput = {
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
+  email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_sender_idToprofilesNestedInput
   kyc_requests?: Prisma.kyc_requestsUpdateManyWithoutProfilesNestedInput
@@ -1738,6 +1802,7 @@ export type profilesUncheckedUpdateWithoutSaved_propertiesInput = {
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
+  email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUncheckedUpdateManyWithoutProfiles_inquiries_sender_idToprofilesNestedInput
   kyc_requests?: Prisma.kyc_requestsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -1758,6 +1823,7 @@ export type profilesCreateWithoutUsersInput = {
   updated_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
+  email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_sender_idToprofilesInput
   kyc_requests?: Prisma.kyc_requestsCreateNestedManyWithoutProfilesInput
@@ -1779,6 +1845,7 @@ export type profilesUncheckedCreateWithoutUsersInput = {
   updated_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
+  email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_sender_idToprofilesInput
   kyc_requests?: Prisma.kyc_requestsUncheckedCreateNestedManyWithoutProfilesInput
@@ -1816,6 +1883,7 @@ export type profilesUpdateWithoutUsersInput = {
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
+  email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
   inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_sender_idToprofilesNestedInput
   kyc_requests?: Prisma.kyc_requestsUpdateManyWithoutProfilesNestedInput
@@ -1828,6 +1896,111 @@ export type profilesUpdateWithoutUsersInput = {
 }
 
 export type profilesUncheckedUpdateWithoutUsersInput = {
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  full_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
+  agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
+  email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
+  inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
+  inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUncheckedUpdateManyWithoutProfiles_inquiries_sender_idToprofilesNestedInput
+  kyc_requests?: Prisma.kyc_requestsUncheckedUpdateManyWithoutProfilesNestedInput
+  notifications?: Prisma.notificationsUncheckedUpdateManyWithoutProfilesNestedInput
+  owners?: Prisma.ownersUncheckedUpdateOneWithoutProfilesNestedInput
+  payments?: Prisma.paymentsUncheckedUpdateManyWithoutProfilesNestedInput
+  property_documents?: Prisma.property_documentsUncheckedUpdateManyWithoutProfilesNestedInput
+  reviews?: Prisma.reviewsUncheckedUpdateManyWithoutProfilesNestedInput
+  saved_properties?: Prisma.saved_propertiesUncheckedUpdateManyWithoutProfilesNestedInput
+}
+
+export type profilesCreateWithoutEmail_campaignsInput = {
+  email: string
+  full_name?: string | null
+  avatar_url?: string | null
+  phone?: string | null
+  bio?: string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
+  agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
+  inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
+  inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_sender_idToprofilesInput
+  kyc_requests?: Prisma.kyc_requestsCreateNestedManyWithoutProfilesInput
+  notifications?: Prisma.notificationsCreateNestedManyWithoutProfilesInput
+  owners?: Prisma.ownersCreateNestedOneWithoutProfilesInput
+  payments?: Prisma.paymentsCreateNestedManyWithoutProfilesInput
+  users: Prisma.usersCreateNestedOneWithoutProfilesInput
+  property_documents?: Prisma.property_documentsCreateNestedManyWithoutProfilesInput
+  reviews?: Prisma.reviewsCreateNestedManyWithoutProfilesInput
+  saved_properties?: Prisma.saved_propertiesCreateNestedManyWithoutProfilesInput
+}
+
+export type profilesUncheckedCreateWithoutEmail_campaignsInput = {
+  id: string
+  email: string
+  full_name?: string | null
+  avatar_url?: string | null
+  phone?: string | null
+  bio?: string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
+  agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
+  inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
+  inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_sender_idToprofilesInput
+  kyc_requests?: Prisma.kyc_requestsUncheckedCreateNestedManyWithoutProfilesInput
+  notifications?: Prisma.notificationsUncheckedCreateNestedManyWithoutProfilesInput
+  owners?: Prisma.ownersUncheckedCreateNestedOneWithoutProfilesInput
+  payments?: Prisma.paymentsUncheckedCreateNestedManyWithoutProfilesInput
+  property_documents?: Prisma.property_documentsUncheckedCreateNestedManyWithoutProfilesInput
+  reviews?: Prisma.reviewsUncheckedCreateNestedManyWithoutProfilesInput
+  saved_properties?: Prisma.saved_propertiesUncheckedCreateNestedManyWithoutProfilesInput
+}
+
+export type profilesCreateOrConnectWithoutEmail_campaignsInput = {
+  where: Prisma.profilesWhereUniqueInput
+  create: Prisma.XOR<Prisma.profilesCreateWithoutEmail_campaignsInput, Prisma.profilesUncheckedCreateWithoutEmail_campaignsInput>
+}
+
+export type profilesUpsertWithoutEmail_campaignsInput = {
+  update: Prisma.XOR<Prisma.profilesUpdateWithoutEmail_campaignsInput, Prisma.profilesUncheckedUpdateWithoutEmail_campaignsInput>
+  create: Prisma.XOR<Prisma.profilesCreateWithoutEmail_campaignsInput, Prisma.profilesUncheckedCreateWithoutEmail_campaignsInput>
+  where?: Prisma.profilesWhereInput
+}
+
+export type profilesUpdateToOneWithWhereWithoutEmail_campaignsInput = {
+  where?: Prisma.profilesWhereInput
+  data: Prisma.XOR<Prisma.profilesUpdateWithoutEmail_campaignsInput, Prisma.profilesUncheckedUpdateWithoutEmail_campaignsInput>
+}
+
+export type profilesUpdateWithoutEmail_campaignsInput = {
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  full_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
+  agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
+  inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
+  inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_sender_idToprofilesNestedInput
+  kyc_requests?: Prisma.kyc_requestsUpdateManyWithoutProfilesNestedInput
+  notifications?: Prisma.notificationsUpdateManyWithoutProfilesNestedInput
+  owners?: Prisma.ownersUpdateOneWithoutProfilesNestedInput
+  payments?: Prisma.paymentsUpdateManyWithoutProfilesNestedInput
+  users?: Prisma.usersUpdateOneRequiredWithoutProfilesNestedInput
+  property_documents?: Prisma.property_documentsUpdateManyWithoutProfilesNestedInput
+  reviews?: Prisma.reviewsUpdateManyWithoutProfilesNestedInput
+  saved_properties?: Prisma.saved_propertiesUpdateManyWithoutProfilesNestedInput
+}
+
+export type profilesUncheckedUpdateWithoutEmail_campaignsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   full_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1855,6 +2028,7 @@ export type profilesUncheckedUpdateWithoutUsersInput = {
 
 export type ProfilesCountOutputType = {
   admin_audit_log: number
+  email_campaigns: number
   inquiries_inquiries_owner_idToprofiles: number
   inquiries_inquiries_sender_idToprofiles: number
   kyc_requests: number
@@ -1867,6 +2041,7 @@ export type ProfilesCountOutputType = {
 
 export type ProfilesCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   admin_audit_log?: boolean | ProfilesCountOutputTypeCountAdmin_audit_logArgs
+  email_campaigns?: boolean | ProfilesCountOutputTypeCountEmail_campaignsArgs
   inquiries_inquiries_owner_idToprofiles?: boolean | ProfilesCountOutputTypeCountInquiries_inquiries_owner_idToprofilesArgs
   inquiries_inquiries_sender_idToprofiles?: boolean | ProfilesCountOutputTypeCountInquiries_inquiries_sender_idToprofilesArgs
   kyc_requests?: boolean | ProfilesCountOutputTypeCountKyc_requestsArgs
@@ -1892,6 +2067,13 @@ export type ProfilesCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Ext
  */
 export type ProfilesCountOutputTypeCountAdmin_audit_logArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.admin_audit_logWhereInput
+}
+
+/**
+ * ProfilesCountOutputType without action
+ */
+export type ProfilesCountOutputTypeCountEmail_campaignsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.email_campaignsWhereInput
 }
 
 /**
@@ -1962,6 +2144,7 @@ export type profilesSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   updated_at?: boolean
   admin_audit_log?: boolean | Prisma.profiles$admin_audit_logArgs<ExtArgs>
   agents?: boolean | Prisma.profiles$agentsArgs<ExtArgs>
+  email_campaigns?: boolean | Prisma.profiles$email_campaignsArgs<ExtArgs>
   inquiries_inquiries_owner_idToprofiles?: boolean | Prisma.profiles$inquiries_inquiries_owner_idToprofilesArgs<ExtArgs>
   inquiries_inquiries_sender_idToprofiles?: boolean | Prisma.profiles$inquiries_inquiries_sender_idToprofilesArgs<ExtArgs>
   kyc_requests?: boolean | Prisma.profiles$kyc_requestsArgs<ExtArgs>
@@ -2014,6 +2197,7 @@ export type profilesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs =
 export type profilesInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   admin_audit_log?: boolean | Prisma.profiles$admin_audit_logArgs<ExtArgs>
   agents?: boolean | Prisma.profiles$agentsArgs<ExtArgs>
+  email_campaigns?: boolean | Prisma.profiles$email_campaignsArgs<ExtArgs>
   inquiries_inquiries_owner_idToprofiles?: boolean | Prisma.profiles$inquiries_inquiries_owner_idToprofilesArgs<ExtArgs>
   inquiries_inquiries_sender_idToprofiles?: boolean | Prisma.profiles$inquiries_inquiries_sender_idToprofilesArgs<ExtArgs>
   kyc_requests?: boolean | Prisma.profiles$kyc_requestsArgs<ExtArgs>
@@ -2038,6 +2222,7 @@ export type $profilesPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   objects: {
     admin_audit_log: Prisma.$admin_audit_logPayload<ExtArgs>[]
     agents: Prisma.$agentsPayload<ExtArgs> | null
+    email_campaigns: Prisma.$email_campaignsPayload<ExtArgs>[]
     inquiries_inquiries_owner_idToprofiles: Prisma.$inquiriesPayload<ExtArgs>[]
     inquiries_inquiries_sender_idToprofiles: Prisma.$inquiriesPayload<ExtArgs>[]
     kyc_requests: Prisma.$kyc_requestsPayload<ExtArgs>[]
@@ -2454,6 +2639,7 @@ export interface Prisma__profilesClient<T, Null = never, ExtArgs extends runtime
   readonly [Symbol.toStringTag]: "PrismaPromise"
   admin_audit_log<T extends Prisma.profiles$admin_audit_logArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.profiles$admin_audit_logArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$admin_audit_logPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   agents<T extends Prisma.profiles$agentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.profiles$agentsArgs<ExtArgs>>): Prisma.Prisma__agentsClient<runtime.Types.Result.GetResult<Prisma.$agentsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  email_campaigns<T extends Prisma.profiles$email_campaignsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.profiles$email_campaignsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$email_campaignsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   inquiries_inquiries_owner_idToprofiles<T extends Prisma.profiles$inquiries_inquiries_owner_idToprofilesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.profiles$inquiries_inquiries_owner_idToprofilesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$inquiriesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   inquiries_inquiries_sender_idToprofiles<T extends Prisma.profiles$inquiries_inquiries_sender_idToprofilesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.profiles$inquiries_inquiries_sender_idToprofilesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$inquiriesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   kyc_requests<T extends Prisma.profiles$kyc_requestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.profiles$kyc_requestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$kyc_requestsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2937,6 +3123,30 @@ export type profiles$agentsArgs<ExtArgs extends runtime.Types.Extensions.Interna
    */
   include?: Prisma.agentsInclude<ExtArgs> | null
   where?: Prisma.agentsWhereInput
+}
+
+/**
+ * profiles.email_campaigns
+ */
+export type profiles$email_campaignsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the email_campaigns
+   */
+  select?: Prisma.email_campaignsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the email_campaigns
+   */
+  omit?: Prisma.email_campaignsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.email_campaignsInclude<ExtArgs> | null
+  where?: Prisma.email_campaignsWhereInput
+  orderBy?: Prisma.email_campaignsOrderByWithRelationInput | Prisma.email_campaignsOrderByWithRelationInput[]
+  cursor?: Prisma.email_campaignsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Email_campaignsScalarFieldEnum | Prisma.Email_campaignsScalarFieldEnum[]
 }
 
 /**

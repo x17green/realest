@@ -1,0 +1,110 @@
+/**
+ * POST /api/admin/waitlist/[id]/email  — send a single email template to one waitlist subscriber
+ *
+ * Body: { template_name: string; template_props?: Record<string, unknown> }
+ * Merges subscriber data (firstName, email, position) with template_props before rendering.
+ *
+ * Admin-only.
+ */
+import { NextRequest, NextResponse } from 'next/server';
+import * as React from 'react';
+import { createClient } from '@/lib/supabase/server';
+import { renderEmailFull } from '@/emails';
+import { Resend } from 'resend';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+const FROM_EMAIL_WAITLIST = process.env.FROM_EMAIL_WAITLIST ?? process.env.FROM_EMAIL ?? 'RealEST <hello@connect.realest.ng>';
+
+async function requireAdmin() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { supabase, error: 'Unauthorized', status: 401 as const };
+
+  const { data: userRow } = await supabase
+    .from('users')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  if (userRow?.role !== 'admin') return { supabase, error: 'Forbidden', status: 403 as const };
+  return { supabase, error: null, status: 200 as const };
+}
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const { supabase, error, status } = await requireAdmin();
+  if (error) return NextResponse.json({ error }, { status });
+
+  const { id } = await params;
+
+  // Fetch subscriber (no 'position' column in waitlist table — position is computed client-side)
+  const { data: subscriber, error: fetchError } = await supabase
+    .from('waitlist')
+    .select('id, email, first_name, last_name')
+    .eq('id', id)
+    .single();
+
+  if (fetchError || !subscriber) {
+    return NextResponse.json({ error: 'Subscriber not found' }, { status: 404 });
+  }
+
+  const body = await request.json() as {
+    template_name: string;
+    template_props?: Record<string, unknown>;
+    subject?: string;
+  };
+
+  const { template_name, template_props = {}, subject } = body;
+
+  if (!template_name) {
+    return NextResponse.json({ error: 'template_name is required' }, { status: 400 });
+  }
+
+  if (!process.env.RESEND_API_KEY) {
+    return NextResponse.json({ error: 'Email service not configured' }, { status: 500 });
+  }
+
+  // Dynamically load the template component
+  const emailModule = await import('@/emails');
+  const Component = (emailModule as Record<string, unknown>)[template_name] as
+    | React.ComponentType<Record<string, unknown>>
+    | undefined;
+
+  if (!Component) {
+    return NextResponse.json(
+      { error: `Template "${template_name}" not found` },
+      { status: 400 },
+    );
+  }
+
+  // Merge subscriber data with provided template_props (subscriber data takes precedence for personalisation)
+  const mergedProps: Record<string, unknown> = {
+    ...template_props,
+    email: subscriber.email,
+    firstName: subscriber.first_name ?? 'there',
+    fullName: [subscriber.first_name, subscriber.last_name].filter(Boolean).join(' ') || undefined,
+  };
+
+  const { html, text } = await renderEmailFull(React.createElement(Component, mergedProps));
+
+  const emailSubject = subject ?? `A message from RealEST`;
+
+  const { data, error: sendError } = await resend.emails.send({
+    from: FROM_EMAIL_WAITLIST,
+    to: [subscriber.email as string],
+    subject: emailSubject,
+    html,
+    text,
+  });
+
+  if (sendError) {
+    console.error('❌ Waitlist individual email send failed:', sendError);
+    return NextResponse.json({ error: sendError.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ success: true, messageId: data?.id });
+}

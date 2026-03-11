@@ -22,6 +22,8 @@ import {
   UserCheck2,
   Layout,
   HelpCircle,
+  Mail,
+  Megaphone,
 } from "lucide-react";
 
 interface AdminSidebarProps {
@@ -108,11 +110,25 @@ export function AdminSidebar({
       icon: HelpCircle,
       description: "Support tickets and inquiries",
     },
+    {
+      href: "/admin/emails",
+      label: "Email Templates",
+      icon: Mail,
+      description: "Preview all email templates",
+    },
+    {
+      href: "/admin/emails/campaigns",
+      label: "Email Campaigns",
+      icon: Megaphone,
+      description: "Create and send email campaigns",
+    },
   ];
 
   const isActive = (href: string) => {
     if (href === "/admin" && currentPath === "/admin") return true;
-    return currentPath.startsWith(href) && href !== "/admin";
+    if (href === "/admin") return false;
+    // Exact match or starts with href followed by / (prevents /admin/emails matching /admin/emails/campaigns)
+    return currentPath === href || currentPath.startsWith(href + "/");
   };
 
   // Handle mouse enter - expand immediately

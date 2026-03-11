@@ -67,7 +67,8 @@ export const ModelName = {
   saved_properties: 'saved_properties',
   spatial_ref_sys: 'spatial_ref_sys',
   users: 'users',
-  waitlist: 'waitlist'
+  waitlist: 'waitlist',
+  email_campaigns: 'email_campaigns'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -382,6 +383,31 @@ export const WaitlistScalarFieldEnum = {
 } as const
 
 export type WaitlistScalarFieldEnum = (typeof WaitlistScalarFieldEnum)[keyof typeof WaitlistScalarFieldEnum]
+
+
+export const Email_campaignsScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  template_name: 'template_name',
+  subject: 'subject',
+  audience_type: 'audience_type',
+  audience_id: 'audience_id',
+  audience_filter: 'audience_filter',
+  send_mode: 'send_mode',
+  status: 'status',
+  template_props: 'template_props',
+  scheduled_at: 'scheduled_at',
+  sent_at: 'sent_at',
+  total_recipients: 'total_recipients',
+  sent_count: 'sent_count',
+  failed_count: 'failed_count',
+  resend_id: 'resend_id',
+  created_by: 'created_by',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Email_campaignsScalarFieldEnum = (typeof Email_campaignsScalarFieldEnum)[keyof typeof Email_campaignsScalarFieldEnum]
 
 
 export const SortOrder = {

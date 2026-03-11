@@ -1,13 +1,10 @@
 import { NextResponse } from "next/server"
 import { randomBytes } from "crypto"
-import { Resend } from "resend"
 import { createClient } from "@/lib/supabase/server"
 import { createServiceClient } from "@/lib/supabase/service"
 import { logAdminAction } from "@/lib/audit"
-import { generateSubAdminInvitationEmail } from "@/lib/email-templates/subadmin-invitation"
+import { sendSubAdminInvitationEmail } from "@/lib/emailService"
 import { prisma } from "@/lib/prisma"
-
-const resend = new Resend(process.env.RESEND_API_KEY!)
 
 export async function POST(request: Request) {
   try {
@@ -81,19 +78,12 @@ export async function POST(request: Request) {
 
     const resetLink = resetData.properties.action_link
 
-    // Send invitation email via Resend
-    const htmlContent = generateSubAdminInvitationEmail({
+    // Send invitation email via React Email + Resend
+    await sendSubAdminInvitationEmail({
       email,
       full_name,
       inviter_name: adminProfile?.full_name ?? "RealEST Admin",
       reset_link: resetLink,
-    })
-
-    await resend.emails.send({
-      from: "RealEST Admin <admin@realest.ng>",
-      to: email,
-      subject: "Welcome to the RealEST Admin Team",
-      html: htmlContent,
     })
 
     // Log the admin action
