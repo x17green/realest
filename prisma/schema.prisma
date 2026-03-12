@@ -366,17 +366,45 @@ model waitlist {
   referrer_url             String?
   user_agent               String?
   ip_address               String?   @db.Inet
-  utm_source               String?   @db.VarChar(100)
-  utm_medium               String?   @db.VarChar(100)
-  utm_campaign             String?   @db.VarChar(100)
-  created_at               DateTime? @default(now()) @db.Timestamptz(6)
-  updated_at               DateTime? @default(now()) @db.Timestamptz(6)
+  utm_source               String?    @db.VarChar(100)
+  utm_medium               String?    @db.VarChar(100)
+  utm_campaign             String?    @db.VarChar(100)
+  /// Auto-generated unique invite code, e.g. "A3F9B2C1"
+  referral_code            String?    @unique @db.VarChar(20)
+  /// UUID of the waitlist entry whose referral_code was used at signup
+  referred_by              String?    @db.Uuid
+  /// Cached count of successful referrals (incremented atomically)
+  referral_count           Int?       @default(0)
+  created_at               DateTime?  @default(now()) @db.Timestamptz(6)
+  updated_at               DateTime?  @default(now()) @db.Timestamptz(6)
+
+  referrer                 waitlist?  @relation("WaitlistReferrals", fields: [referred_by], references: [id], onDelete: SetNull)
+  referrals                waitlist[] @relation("WaitlistReferrals")
 
   @@index([email], map: "idx_waitlist_email")
   @@index([location_preference], map: "idx_waitlist_location_preference")
+  @@index([referral_code], map: "idx_waitlist_referral_code")
+  @@index([referred_by], map: "idx_waitlist_referred_by")
   @@index([source], map: "idx_waitlist_source")
   @@index([status], map: "idx_waitlist_status")
   @@index([subscribed_at], map: "idx_waitlist_subscribed_at")
+}
+
+/// Anonymous poll votes collected from email links (e.g. city preference polls).
+model poll_responses {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  /// Identifies the poll question, e.g. 'city'
+  question_key String
+  /// The selected answer, e.g. 'Lagos'
+  answer       String
+  /// Campaign reference tag, e.g. 'frontier' | 'milestone'
+  ref          String?
+  ip_address   String?
+  created_at   DateTime? @default(now()) @db.Timestamptz(6)
+
+  @@index([question_key], map: "idx_poll_responses_question_key")
+  @@index([answer], map: "idx_poll_responses_answer")
+  @@index([created_at(sort: Desc)], map: "idx_poll_responses_created_at")
 }
 
 /// Email marketing campaign records — tracks both Resend broadcast and DB-segment batch sends.

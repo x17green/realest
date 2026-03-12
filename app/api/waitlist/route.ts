@@ -3,6 +3,7 @@ import { subscribeToWaitlist, checkEmailInWaitlist, getWaitlistStats, unsubscrib
 import type { WaitlistSubscriptionData } from '@/lib/waitlist';
 import { sendWaitlistConfirmationEmail, sendWaitlistAdminNotification } from '@/lib/emailService';
 import { syncWaitlistJoin, syncWaitlistUnsubscribe } from '@/lib/resend-audiences';
+import { createServiceClient } from '@/lib/supabase/service';
 
 
 // Rate limiting store (in production, use Redis or database)
@@ -43,7 +44,7 @@ export async function POST(request: NextRequest) {
 
     // Parse request body
     const body = await request.json();
-    const { email, firstName, lastName, phone, source } = body;
+    const { email, firstName, lastName, phone, source, ref } = body;
 
     console.log('📧 Received subscription data:', { email, firstName, lastName, phone, source });
 
@@ -95,6 +96,29 @@ export async function POST(request: NextRequest) {
 
     // Add this after successful subscription in the POST function:
     if (result.success && result.data) {
+      // Referral attribution — best-effort, never blocks the response
+      const refCode = (typeof ref === 'string' ? ref.trim().toUpperCase() : '') || null;
+      if (refCode && result.data.id) {
+        after(async () => {
+          try {
+            const svc = createServiceClient();
+            const { data: referrer } = await svc
+              .from('waitlist')
+              .select('id')
+              .eq('referral_code', refCode)
+              .neq('id', result.data!.id) // can't refer yourself
+              .single();
+            if (referrer) {
+              await svc.from('waitlist').update({ referred_by: referrer.id }).eq('id', result.data!.id);
+              await svc.rpc('increment_waitlist_referral_count', { p_id: referrer.id });
+              console.log(`✅ Referral attributed: ${result.data!.id} ← ${referrer.id}`);
+            }
+          } catch (err) {
+            console.error('❌ Referral attribution failed:', err);
+          }
+        });
+      }
+
       // Use after() so email sending continues even after the response is returned.
       // In Vercel's serverless runtime, a fire-and-forget IIFE is killed as soon as
       // the response is sent — after() guarantees the work completes.

@@ -63,7 +63,7 @@ async function fetchWaitlistRecipients(): Promise<CampaignRecipient[]> {
 
   const { data, error } = await supabase
     .from('waitlist')
-    .select('email, first_name, last_name')
+    .select('email, first_name, last_name, referral_code')
     .eq('status', 'active');
 
   if (error) throw new Error(`Waitlist query failed: ${error.message}`);
@@ -72,10 +72,13 @@ async function fetchWaitlistRecipients(): Promise<CampaignRecipient[]> {
   return (data ?? [])
     .filter((row) => typeof row.email === 'string' && EMAIL_RE.test((row.email as string).trim()))
     .map((row) => {
-      const firstName = (row.first_name as string | null) ?? undefined;
-      const lastName = (row.last_name as string | null) ?? undefined;
+      const firstName = (row.first_name as string | null)?.trim() || undefined;
+      const lastName = (row.last_name as string | null)?.trim() || undefined;
       const fullName = [firstName, lastName].filter(Boolean).join(' ') || undefined;
-      return { email: (row.email as string).trim(), firstName: firstName?.trim() || undefined, fullName: fullName?.trim() || undefined };
+      const referralCode = (row.referral_code as string | null)?.trim() || undefined;
+      const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://realest.ng';
+      const referralUrl = referralCode ? `${BASE_URL}/refer?ref=${referralCode}` : undefined;
+      return { email: (row.email as string).trim(), firstName: firstName?.trim() || undefined, fullName: fullName?.trim() || undefined, referralCode, referralUrl };
     });
 }
 
@@ -179,6 +182,9 @@ export async function POST(
             email: recipient.email,
             firstName: recipient.firstName ?? 'there',
             fullName: recipient.fullName ?? recipient.firstName ?? '',
+            // Referral personalisation — populated for waitlist sends
+            referralCode: recipient.referralCode ?? (templateProps.referralCode as string | undefined) ?? '',
+            referralUrl: recipient.referralUrl ?? (templateProps.referralUrl as string | undefined) ?? '',
           };
           return renderCampaignTemplate(campaign.template_name, mergedProps);
         },

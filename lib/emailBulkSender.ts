@@ -32,6 +32,10 @@ export interface CampaignRecipient {
   email: string;
   firstName?: string;
   fullName?: string;
+  /** Per-recipient unique referral code (e.g. "A3F9B2C1") */
+  referralCode?: string;
+  /** Full referral landing URL, e.g. https://realest.ng/refer?ref=A3F9B2C1 */
+  referralUrl?: string;
 }
 
 export interface BroadcastSendOptions {
