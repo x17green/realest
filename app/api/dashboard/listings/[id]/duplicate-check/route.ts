@@ -69,7 +69,7 @@ export async function GET(request: Request, { params }: RouteParams) {
         state: true,
         status: true,
         created_at: true,
-        profiles: { select: { full_name: true, email: true } },
+        owners: { select: { profiles: { select: { full_name: true, email: true } } } },
       },
       take: 5,
     });
@@ -110,7 +110,7 @@ export async function GET(request: Request, { params }: RouteParams) {
           address: true,
           state: true,
           status: true,
-          profiles: { select: { full_name: true } },
+          owners: { select: { profiles: { select: { full_name: true } } } },
         },
         take: 5,
       });

@@ -90,20 +90,22 @@ export async function PUT(
         break
     }
 
-    await prisma.notifications.create({
-      data: {
-        user_id: property.owner_id,
-        type: 'ml_validation',
-        title: notificationTitle,
-        message: notificationMessage,
+    if (property.owner_id) {
+      await prisma.notifications.create({
         data: {
-          property_id: propertyId,
-          ml_status: validatedData.status,
-          confidence_score: validatedData.confidence_score ?? null,
-          notes: validatedData.notes ?? null,
+          user_id: property.owner_id,
+          type: 'ml_validation',
+          title: notificationTitle,
+          message: notificationMessage,
+          data: {
+            property_id: propertyId,
+            ml_status: validatedData.status,
+            confidence_score: validatedData.confidence_score ?? null,
+            notes: validatedData.notes ?? null,
+          },
         },
-      },
-    })
+      })
+    }
 
     // Log admin action
     await prisma.admin_audit_log.create({

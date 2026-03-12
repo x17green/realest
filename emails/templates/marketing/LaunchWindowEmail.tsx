@@ -185,8 +185,8 @@ export function LaunchWindowEmail({
 
         <Section style={s.timelineItem}>
           <Text style={s.timelineLabel}>✓ Done</Text>
-          <Text style={s.timelineTitle}>Field agent network — Lagos & Abuja</Text>
-          <Text style={s.timelineDesc}>Trained inspectors active in 8 LGAs across both cities.</Text>
+          <Text style={s.timelineTitle}>Field agent network — Lagos & Port Harcourt</Text>
+          <Text style={s.timelineDesc}>Trained field inspectors active across both cities.</Text>
         </Section>
 
         <Section style={{ ...s.timelineItem, borderLeft: `2px solid ${colors.border}` }}>
@@ -229,7 +229,7 @@ export function LaunchWindowEmail({
       <EmailFooter
         showUnsubscribe={true}
         unsubscribeUrl={unsubscribeUrl || undefined}
-        footerNote="You're receiving this because you want a fraud-free Nigeria."
+        footerNote="Verified properties only. No fake agents. No scams. No movement fees!"
       />
     </EmailLayout>
   );

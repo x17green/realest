@@ -82,15 +82,17 @@ export async function PUT(
         ? `Your property "${property.title}" has been verified and is now live on RealEST!`
         : `Your property "${property.title}" has been rejected. Reason: ${validatedData.rejection_reason}`;
 
-    await prisma.notifications.create({
-      data: {
-        user_id: property.owner_id,
-        type: 'property_status',
-        title: validatedData.status === 'live' ? 'Property Verified' : 'Property Rejected',
-        message: notificationMessage,
-        data: { property_id: propertyId, status: validatedData.status, rejection_reason: validatedData.rejection_reason ?? null },
-      },
-    })
+    if (property.owner_id) {
+      await prisma.notifications.create({
+        data: {
+          user_id: property.owner_id,
+          type: 'property_status',
+          title: validatedData.status === 'live' ? 'Property Verified' : 'Property Rejected',
+          message: notificationMessage,
+          data: { property_id: propertyId, status: validatedData.status, rejection_reason: validatedData.rejection_reason ?? null },
+        },
+      })
+    }
 
     // Log admin action
     await prisma.admin_audit_log.create({

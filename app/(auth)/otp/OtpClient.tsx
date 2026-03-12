@@ -66,7 +66,6 @@ function OTPContent() {
       const tid = setTimeout(() => handleVerifyOtp(codeParam), 400);
       return () => clearTimeout(tid);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // run once on mount — searchParams is stable
 
   // Pause timer when the user switches tabs or minimises the window

@@ -110,6 +110,9 @@ import PropertyCategoriesEmail, {
 import ReferralInviteEmail, {
   previewProps as referralProps,
 } from "./templates/marketing/ReferralInviteEmail";
+import ReferralSuccessEmail, {
+  previewProps as referralSuccessProps,
+} from "./templates/marketing/ReferralSuccessEmail";
 import SystemUpdateEmail, {
   previewProps as systemUpdateProps,
 } from "./templates/marketing/SystemUpdateEmail";
@@ -463,6 +466,14 @@ export const templateRegistry: TemplateRegistryEntry[] = [
     description: "Encourages users to refer friends for waitlist rewards",
     subject: ReferralInviteEmail.subject(referralProps),
     element: <ReferralInviteEmail {...referralProps} />,
+  },
+  {
+    name: "ReferralSuccessEmail",
+    label: "Referral Success",
+    category: "marketing",
+    description: "Notifies referrer when someone joins via their referral link",
+    subject: ReferralSuccessEmail.subject(referralSuccessProps),
+    element: <ReferralSuccessEmail {...referralSuccessProps} />,
   },
   {
     name: "SystemUpdateEmail",

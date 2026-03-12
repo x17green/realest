@@ -228,7 +228,7 @@ export function PropertyCategoriesEmail({
       <EmailFooter
         showUnsubscribe={true}
         unsubscribeUrl={unsubscribeUrl || undefined}
-        footerNote="You're receiving this because you want a fraud-free Nigeria."
+        footerNote="Verified properties only. No fake agents. No scams. No movement fees!"
       />
     </EmailLayout>
   );

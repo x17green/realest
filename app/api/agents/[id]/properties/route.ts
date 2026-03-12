@@ -15,7 +15,7 @@ export async function GET(
     // Verify agent exists and is verified
     const agentRow = await prisma.agents.findFirst({
       where: { profile_id: agentId },
-      select: { id: true, verified: true, profiles: { select: { full_name: true } } },
+      select: { id: true, verified: true, profiles: { select: { id: true, full_name: true } } },
     });
 
     if (!agentRow) {

@@ -328,7 +328,7 @@ function SearchPageContent() {
                     {lister?.avatar_url && (
                       <img
                         src={lister.avatar_url}
-                        alt={lister.full_name}
+                        alt={lister.full_name ?? undefined}
                         className="w-7 h-7 rounded-full object-cover"
                       />
                     )}
