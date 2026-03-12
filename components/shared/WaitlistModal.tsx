@@ -43,8 +43,8 @@ import { Button } from '@/components/ui/button'
 interface WaitlistModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess?: (data: { firstName: string; lastName?: string; position?: number; totalCount?: number }) => void;
-}
+  onSuccess?: (data: { firstName: string; lastName?: string; position?: number; totalCount?: number }) => void;  /** Referral code to attribute this signup to a referrer. Passed as `ref` in the POST body. */
+  referralCode?: string;}
 
 interface SubmittedData {
   firstName: string;
@@ -53,7 +53,7 @@ interface SubmittedData {
   totalCount?: number;
 }
 
-const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSuccess }) => {
+const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSuccess, referralCode }) => {
   // Form states
   const [currentStage, setCurrentStage] = useState(1);
   const [email, setEmail] = useState("");
@@ -204,7 +204,8 @@ const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSucces
           lastName: lastName.trim() || undefined,
           phone: phone.trim() || undefined,
           interests: interests,
-          location: location || undefined
+          location: location || undefined,
+          ref: referralCode ?? undefined,
         }),
       });
 

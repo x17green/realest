@@ -1,19 +1,17 @@
 "use client";
 
-import { Suspense } from "react";
-import Link from "next/link";
+import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Gift, Users, Star } from "lucide-react";
+import { ArrowRight, Gift, Users, Star, CheckCircle } from "lucide-react";
+import WaitlistModal from "@/components/shared/WaitlistModal";
 
 function ReferContent() {
   const params = useSearchParams();
   const ref = params.get("ref");
-
-  const registerUrl = ref
-    ? `/register?ref=${encodeURIComponent(ref)}`
-    : "/register";
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [joined, setJoined] = useState(false);
 
   return (
     <div className="min-h-screen bg-background">
@@ -45,16 +43,20 @@ function ReferContent() {
               <p className="text-white/60 text-sm mb-8">
                 Create your account to lock in your spot before it expires.
               </p>
-              <Button
-                asChild
-                size="lg"
-                className="font-semibold"
-                style={{ backgroundColor: "#ADF434", color: "#07402F" }}
-              >
-                <Link href={registerUrl}>
+              {joined ? (
+                <p className="inline-flex items-center gap-2 px-5 py-3 rounded-lg font-semibold text-sm" style={{ backgroundColor: "#ADF434", color: "#07402F" }}>
+                  <CheckCircle className="w-4 h-4" /> You&apos;re on the list!
+                </p>
+              ) : (
+                <Button
+                  size="lg"
+                  className="font-semibold"
+                  style={{ backgroundColor: "#ADF434", color: "#07402F" }}
+                  onClick={() => setIsModalOpen(true)}
+                >
                   Claim My Spot <ArrowRight className="w-4 h-4 ml-2" />
-                </Link>
-              </Button>
+                </Button>
+              )}
             </>
           ) : (
             <>
@@ -68,16 +70,20 @@ function ReferContent() {
                 Refer friends, colleagues, and landlords to RealEST. When they
                 join, both of you unlock exclusive perks at launch.
               </p>
-              <Button
-                asChild
-                size="lg"
-                className="font-semibold"
-                style={{ backgroundColor: "#ADF434", color: "#07402F" }}
-              >
-                <Link href="/register">
+              {joined ? (
+                <p className="inline-flex items-center gap-2 px-5 py-3 rounded-lg font-semibold text-sm" style={{ backgroundColor: "#ADF434", color: "#07402F" }}>
+                  <CheckCircle className="w-4 h-4" /> You&apos;re on the list!
+                </p>
+              ) : (
+                <Button
+                  size="lg"
+                  className="font-semibold"
+                  style={{ backgroundColor: "#ADF434", color: "#07402F" }}
+                  onClick={() => setIsModalOpen(true)}
+                >
                   Join &amp; Get Your Code <ArrowRight className="w-4 h-4 ml-2" />
-                </Link>
-              </Button>
+                </Button>
+              )}
             </>
           )}
         </div>
@@ -127,15 +133,21 @@ function ReferContent() {
           </div>
 
           <div className="mt-12 text-center">
-            <Button asChild size="lg">
-              <Link href={registerUrl}>
+            {!joined && (
+              <Button size="lg" onClick={() => setIsModalOpen(true)}>
                 {ref ? "Claim My Referral Spot" : "Get My Referral Link"}{" "}
                 <ArrowRight className="w-4 h-4 ml-2" />
-              </Link>
-            </Button>
+              </Button>
+            )}
           </div>
         </div>
       </section>
+      <WaitlistModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        referralCode={ref ?? undefined}
+        onSuccess={() => setJoined(true)}
+      />
     </div>
   );
 }
