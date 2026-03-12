@@ -71,6 +71,7 @@ export { AgentVsLandlordEmail }       from './templates/marketing/AgentVsLandlor
 export { PropertyCategoriesEmail }    from './templates/marketing/PropertyCategoriesEmail';
 export { LaunchEveEmail }             from './templates/marketing/LaunchEveEmail';
 export { ReferralInviteEmail }        from './templates/marketing/ReferralInviteEmail';
+export { ReferralSuccessEmail }       from './templates/marketing/ReferralSuccessEmail';
 
 // ── Data types ────────────────────────────────────────────────────────────────
 
@@ -119,6 +120,7 @@ export type { AgentVsLandlordEmailData, ListingUserType } from './templates/mark
 export type { PropertyCategoriesEmailData, PropertyCategory } from './templates/marketing/PropertyCategoriesEmail';
 export type { LaunchEveEmailData, LaunchUserType } from './templates/marketing/LaunchEveEmail';
 export type { ReferralInviteEmailData }          from './templates/marketing/ReferralInviteEmail';
+export type { ReferralSuccessEmailData }         from './templates/marketing/ReferralSuccessEmail';
 
 // ── Render utilities ──────────────────────────────────────────────────────────
 export { renderEmail, renderEmailText, renderEmailFull } from './utils/renderEmail';

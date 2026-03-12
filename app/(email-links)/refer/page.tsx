@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +12,10 @@ function ReferContent() {
   const ref = params.get("ref");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [joined, setJoined] = useState(false);
+
+  useEffect(() => {
+    if (ref) sessionStorage.setItem('referralCode', ref);
+  }, [ref]);
 
   return (
     <div className="min-h-screen bg-background">

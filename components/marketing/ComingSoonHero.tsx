@@ -178,7 +178,7 @@ const ComingSoonHero = () => {
             {/* Status Badge */}
             <div className="inline-flex items-center gap-2 animate-pulse bg-linear-to-l from-primary/10 to-accent/10 border border-primary/20 rounded-full px-4 py-2 mb-6 backdrop-blur-md">
               <MapPinCheck className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium bg-linear-to-bl from-primary to-accent bg-clip-text text-transparent">
+              <span className="text-sm md:text-xs font-medium bg-linear-to-bl from-primary to-accent bg-clip-text text-transparent">
                 Geo-Tagged & Verified Property Marketplace
               </span>
             </div>

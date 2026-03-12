@@ -50,6 +50,7 @@ import {
   PropertyCategoriesEmail,
   LaunchEveEmail,
   ReferralInviteEmail,
+  ReferralSuccessEmail,
   renderEmailFull,
   // Types — platform (existing)
   type WaitlistEmailData,
@@ -91,6 +92,7 @@ import {
   type PropertyCategoriesEmailData,
   type LaunchEveEmailData,
   type ReferralInviteEmailData,
+  type ReferralSuccessEmailData,
 } from '@/emails';
 
 if (!process.env.RESEND_API_KEY) {
@@ -514,6 +516,16 @@ export async function sendReferralInviteEmail(email: string, data: ReferralInvit
   });
 }
 
+export async function sendReferralSuccessEmail(email: string, data: ReferralSuccessEmailData): Promise<EmailResult> {
+  console.log(`📧 Sending referral success notification to ${email}`);
+  return sendReactEmail({
+    from: FROM_EMAIL_WAITLIST,
+    to: email,
+    subject: ReferralSuccessEmail.subject(data),
+    component: React.createElement(ReferralSuccessEmail, data),
+  });
+}
+
 export async function testEmailConfiguration(): Promise<{ success: boolean; error?: string }> {
   if (!process.env.RESEND_API_KEY) {
     return { success: false, error: 'RESEND_API_KEY not configured' };
@@ -571,4 +583,5 @@ export type {
   PropertyCategoriesEmailData,
   LaunchEveEmailData,
   ReferralInviteEmailData,
+  ReferralSuccessEmailData,
 } from '@/emails';

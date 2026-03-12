@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse, after } from 'next/server';
 import { subscribeToWaitlist, checkEmailInWaitlist, getWaitlistStats, unsubscribeFromWaitlist, checkEmailWithPosition, getWaitlistPosition } from '@/lib/waitlist';
 import type { WaitlistSubscriptionData } from '@/lib/waitlist';
-import { sendWaitlistConfirmationEmail, sendWaitlistAdminNotification } from '@/lib/emailService';
+import { sendWaitlistConfirmationEmail, sendWaitlistAdminNotification, sendReferralSuccessEmail } from '@/lib/emailService';
 import { syncWaitlistJoin, syncWaitlistUnsubscribe } from '@/lib/resend-audiences';
 import { createServiceClient } from '@/lib/supabase/service';
 
@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
             const svc = createServiceClient();
             const { data: referrer } = await svc
               .from('waitlist')
-              .select('id')
+              .select('id, email, first_name, referral_code, referral_count')
               .eq('referral_code', refCode)
               .neq('id', result.data!.id) // can't refer yourself
               .single();
@@ -112,6 +112,15 @@ export async function POST(request: NextRequest) {
               await svc.from('waitlist').update({ referred_by: referrer.id }).eq('id', result.data!.id);
               await svc.rpc('increment_waitlist_referral_count', { p_id: referrer.id });
               console.log(`✅ Referral attributed: ${result.data!.id} ← ${referrer.id}`);
+              const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://realest.ng';
+              await sendReferralSuccessEmail(referrer.email, {
+                referrerFirstName: referrer.first_name ?? 'there',
+                referredFirstName: result.data!.first_name ?? 'Someone',
+                referralCount: (referrer.referral_count ?? 0) + 1,
+                referralCode: referrer.referral_code ?? refCode,
+                referralUrl: `${BASE_URL}/refer?ref=${referrer.referral_code ?? refCode}`,
+                contextType: 'waitlist',
+              });
             }
           } catch (err) {
             console.error('❌ Referral attribution failed:', err);
@@ -124,11 +133,15 @@ export async function POST(request: NextRequest) {
       // the response is sent — after() guarantees the work completes.
       after(async () => {
         try {
+          const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://realest.ng';
+          const code = result.data?.referral_code ?? undefined;
           await sendWaitlistConfirmationEmail({
             email: subscriptionData.email,
             firstName: subscriptionData.firstName,
             lastName: subscriptionData.lastName,
             position: positionData.position,
+            referralCode: code,
+            referralUrl: code ? `${BASE_URL}/refer?ref=${code}` : undefined,
           });
         } catch (error) {
           console.error('❌ Email confirmation failed:', error);

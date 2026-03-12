@@ -16,6 +16,7 @@ import {
   ArrowRight,
   Loader2,
 } from "lucide-react";
+import { useEmailValidation } from "@/lib/hooks/useEmailValidation";
 
 const FEATURES = [
   {
@@ -40,7 +41,7 @@ const FEATURES = [
     icon: Lock,
     title: "Agent Licensing",
     description:
-      "All agents are verified against ESVARBON records before they can list on RealEST.",
+      "All agents are verified against ESVARBON and CAC records before they can list on RealEST.",
   },
   {
     icon: TrendingUp,
@@ -63,11 +64,14 @@ export default function SneakPeekPage() {
   const [joined, setJoined] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const emailValidation = useEmailValidation(email, { debounceMs: 500, minLength: 3 });
+
   const handleJoin = async () => {
     if (!email || !firstName) {
       setError("Please enter your name and email.");
       return;
     }
+    if (!emailValidation.isAvailable) return;
     setLoading(true);
     setError(null);
     try {
@@ -112,36 +116,50 @@ export default function SneakPeekPage() {
               You&apos;re on the list! We&apos;ll be in touch soon.
             </div>
           ) : (
-            <div className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
-              <Input
-                placeholder="First name"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                className="bg-white/10 border-white/20 text-white placeholder:text-white/40 flex-1"
-              />
-              <Input
-                type="email"
-                placeholder="Email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleJoin()}
-                className="bg-white/10 border-white/20 text-white placeholder:text-white/40 flex-1"
-              />
-              <Button
-                onClick={handleJoin}
-                disabled={loading}
-                className="bg-[#ADF434] text-[#07402F] hover:bg-[#ADF434]/90 font-semibold shrink-0"
-              >
-                {loading ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <>
-                    Get Early Access
-                    <ArrowRight className="w-4 h-4 ml-1" />
-                  </>
-                )}
-              </Button>
-            </div>
+            <>
+              <div className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
+                <Input
+                  placeholder="First name"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="bg-white/10 border-white/20 text-white placeholder:text-white/40 flex-1"
+                />
+                <Input
+                  type="email"
+                  placeholder="Email address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleJoin()}
+                  className="bg-white/10 border-white/20 text-white placeholder:text-white/40 flex-1"
+                />
+                <Button
+                  onClick={handleJoin}
+                  disabled={loading || !emailValidation.isAvailable || emailValidation.isLoading}
+                  className="bg-[#ADF434] text-[#07402F] hover:bg-[#ADF434]/90 font-semibold shrink-0 disabled:opacity-60"
+                >
+                  {loading || emailValidation.isLoading ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <>
+                      {!emailValidation.isAvailable ? "Already joined" : "Get Early Access"}
+                      {emailValidation.isAvailable && <ArrowRight className="w-4 h-4 ml-1" />}
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              {/* Already on list */}
+              {!emailValidation.isAvailable && emailValidation.userInfo && (
+                <div className="mt-3 flex gap-1 items-start text-sm text-white/80 max-w-lg mx-auto">
+                  <CheckCircle className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                  <span>
+                    <strong className="text-white">{emailValidation.userInfo.firstName}</strong>, you&apos;re already on the waitlist
+                    {emailValidation.userInfo.position ? <> at <strong className="text-white">#{emailValidation.userInfo.position}</strong></> : null}.{" "}
+                    <Link href="/refer" className="text-primary underline underline-offset-2">Refer a friend to move up.</Link>
+                  </span>
+                </div>
+              )}
+            </>
           )}
 
           {error && (

@@ -176,6 +176,15 @@ model profiles {
   property_documents                      property_documents[]
   reviews                                 reviews[]
   saved_properties                        saved_properties[]
+  referral_code                           String?              @unique @db.VarChar(20)
+  referred_by                             String?              @db.Uuid
+  referred_by_code                        String?              @db.VarChar(20)
+  referral_count                          Int                  @default(0)
+  referrer                                profiles?            @relation("ProfileReferrals", fields: [referred_by], references: [id], onDelete: SetNull)
+  referrals                               profiles[]           @relation("ProfileReferrals")
+
+  @@index([referral_code], map: "idx_profiles_referral_code")
+  @@index([referred_by],   map: "idx_profiles_referred_by")
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.

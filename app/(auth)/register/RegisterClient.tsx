@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { 
@@ -36,6 +36,14 @@ export default function SignUpPage() {
     confirmPassword: "",
   });
   const [error, setError] = useState("");
+  const [refCode, setRefCode] = useState<string | undefined>();
+
+  useEffect(() => {
+    const fromUrl = new URLSearchParams(window.location.search).get('ref');
+    const fromStorage = sessionStorage.getItem('referralCode');
+    const code = (fromUrl || fromStorage)?.trim().toUpperCase() || undefined;
+    if (code) setRefCode(code);
+  }, []);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -76,6 +84,14 @@ export default function SignUpPage() {
       }
 
       if (response.user) {
+        if (refCode) {
+          fetch('/api/auth/attribute-referral', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: formData.email, refCode }),
+          }).catch(() => {});
+          sessionStorage.removeItem('referralCode');
+        }
         router.push(`/success?email=${encodeURIComponent(formData.email)}`);
       }
     } catch (err) {
