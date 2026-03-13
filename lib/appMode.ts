@@ -121,13 +121,16 @@ export function isRouteAccessible(pathname: string): boolean {
       '/early-access',  // Email link: early access sign-up
       '/refer',         // Email link: referral landing
       '/waitlist',      // Email link: waitlist join page
+      '/poll',          // Full poll form page
       '/poll/city',     // Email link: city poll response
     ];
 
     // Allow specific API routes for coming-soon functionality
     const allowedApiRoutes = [
-      '/api/waitlist',    // Waitlist subscription endpoint
-      '/api/poll/city',   // City poll vote endpoint
+      '/api/waitlist',      // Waitlist subscription endpoint
+      '/api/poll/city',     // City poll vote endpoint
+      '/api/poll/catalog',  // Poll catalog endpoint
+      '/api/poll/submit',   // Poll submission endpoint
     ];
 
     // Allow exact matches or static assets

@@ -72,6 +72,7 @@ export { PropertyCategoriesEmail }    from './templates/marketing/PropertyCatego
 export { LaunchEveEmail }             from './templates/marketing/LaunchEveEmail';
 export { ReferralInviteEmail }        from './templates/marketing/ReferralInviteEmail';
 export { ReferralSuccessEmail }       from './templates/marketing/ReferralSuccessEmail';
+export { PollResultsSummaryEmail }    from './templates/marketing/PollResultsSummaryEmail';
 
 // ── Data types ────────────────────────────────────────────────────────────────
 
@@ -121,6 +122,7 @@ export type { PropertyCategoriesEmailData, PropertyCategory } from './templates/
 export type { LaunchEveEmailData, LaunchUserType } from './templates/marketing/LaunchEveEmail';
 export type { ReferralInviteEmailData }          from './templates/marketing/ReferralInviteEmail';
 export type { ReferralSuccessEmailData }         from './templates/marketing/ReferralSuccessEmail';
+export type { PollResultsSummaryEmailData }      from './templates/marketing/PollResultsSummaryEmail';
 
 // ── Render utilities ──────────────────────────────────────────────────────────
 export { renderEmail, renderEmailText, renderEmailFull } from './utils/renderEmail';

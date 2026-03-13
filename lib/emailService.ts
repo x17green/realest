@@ -51,6 +51,7 @@ import {
   LaunchEveEmail,
   ReferralInviteEmail,
   ReferralSuccessEmail,
+  PollResultsSummaryEmail,
   renderEmailFull,
   // Types — platform (existing)
   type WaitlistEmailData,
@@ -93,6 +94,7 @@ import {
   type LaunchEveEmailData,
   type ReferralInviteEmailData,
   type ReferralSuccessEmailData,
+  type PollResultsSummaryEmailData,
 } from '@/emails';
 
 if (!process.env.RESEND_API_KEY) {
@@ -526,6 +528,16 @@ export async function sendReferralSuccessEmail(email: string, data: ReferralSucc
   });
 }
 
+export async function sendPollResultsSummaryEmail(email: string, data: PollResultsSummaryEmailData): Promise<EmailResult> {
+  console.log(`📧 Sending poll summary to ${email}`);
+  return sendReactEmail({
+    from: FROM_EMAIL_WAITLIST,
+    to: email,
+    subject: PollResultsSummaryEmail.subject(data),
+    component: React.createElement(PollResultsSummaryEmail, data),
+  });
+}
+
 export async function testEmailConfiguration(): Promise<{ success: boolean; error?: string }> {
   if (!process.env.RESEND_API_KEY) {
     return { success: false, error: 'RESEND_API_KEY not configured' };
@@ -584,4 +596,5 @@ export type {
   LaunchEveEmailData,
   ReferralInviteEmailData,
   ReferralSuccessEmailData,
+  PollResultsSummaryEmailData,
 } from '@/emails';
