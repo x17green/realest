@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { propertyListingSchema } from '@/lib/validations/property'
+import { redeemFirstListingWaiver } from '@/lib/reward-engine'
 
 const querySchema = z.object({
   page: z.string().optional().transform(val => val ? parseInt(val) : 1),
@@ -197,9 +198,14 @@ export async function POST(request: Request) {
       console.log('Property flagged as potential duplicate:', property.id)
     }
 
+    const launchRewardRedemption = userRowPost.role === 'owner'
+      ? await redeemFirstListingWaiver(user.id, property.id)
+      : { redeemed: false, reason: 'Not applicable for this account.' }
+
     return NextResponse.json({
       data: property,
-      message: 'Property listing created successfully. It will be reviewed by our team before going live.'
+      message: 'Property listing created successfully. It will be reviewed by our team before going live.',
+      launchRewardRedemption,
     }, { status: 201 })
 
   } catch (error) {

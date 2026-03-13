@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse, after } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/service';
 import { sendReferralSuccessEmail } from '@/lib/emailService';
+import {
+  ensureReferralMilestoneRewards,
+  recomputeWaitlistRankings,
+  recordReferralEvent,
+} from '@/lib/reward-engine';
+import { buildReferralShareUrl } from '@/lib/referral-system';
 
 /**
  * POST /api/auth/attribute-referral
@@ -60,8 +66,12 @@ export async function POST(request: NextRequest) {
   // Fire attribution + notification asynchronously after the response is sent
   after(async () => {
     try {
-      const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://realest.ng';
       const referredFirstName = newProfile.full_name?.split(' ')[0] ?? 'Someone';
+      const { data: linkedWaitlistProfile } = await svc
+        .from('waitlist')
+        .select('id')
+        .eq('email', email)
+        .maybeSingle();
 
       // ── 1. Check registered referrer first ───────────────────────────────
       const { data: registeredReferrer } = await svc
@@ -74,19 +84,54 @@ export async function POST(request: NextRequest) {
       if (registeredReferrer) {
         await svc
           .from('profiles')
-          .update({ referred_by: registeredReferrer.id })
+          .update({ referred_by: registeredReferrer.id, referred_by_code: refCode })
           .eq('id', newProfile.id);
 
-        await svc.rpc('increment_profile_referral_count', { p_id: registeredReferrer.id });
-
         const newCount = (registeredReferrer.referral_count ?? 0) + 1;
+        await svc
+          .from('profiles')
+          .update({ referral_count: newCount })
+          .eq('id', registeredReferrer.id);
+
+        const { data: referrerWaitlist } = await svc
+          .from('waitlist')
+          .select('id, email, referral_code, referral_count')
+          .eq('email', registeredReferrer.email)
+          .maybeSingle();
+
+        if (referrerWaitlist) {
+          await svc
+            .from('waitlist')
+            .update({ referral_count: Math.max(referrerWaitlist.referral_count ?? 0, newCount) })
+            .eq('id', referrerWaitlist.id);
+        }
+
+        await recordReferralEvent({
+          referrerWaitlistId: referrerWaitlist?.id,
+          referrerProfileId: registeredReferrer.id,
+          referredWaitlistId: linkedWaitlistProfile?.id,
+          referredProfileId: newProfile.id,
+          referralCode: registeredReferrer.referral_code ?? refCode,
+          eventType: 'registration_referral_attributed',
+          metadata: { referred_email: email },
+        }, svc);
+
+        await ensureReferralMilestoneRewards({
+          userEmail: registeredReferrer.email,
+          referralCount: newCount,
+          referralCode: registeredReferrer.referral_code ?? refCode,
+          waitlistId: referrerWaitlist?.id,
+          profileId: registeredReferrer.id,
+        }, svc);
+
+        await recomputeWaitlistRankings(svc);
 
         await sendReferralSuccessEmail(registeredReferrer.email, {
           referrerFirstName: registeredReferrer.full_name?.split(' ')[0] ?? 'there',
           referredFirstName,
           referralCount: newCount,
           referralCode: registeredReferrer.referral_code ?? refCode,
-          referralUrl: `${BASE_URL}/refer?ref=${registeredReferrer.referral_code ?? refCode}`,
+          referralUrl: buildReferralShareUrl(registeredReferrer.referral_code ?? refCode),
           contextType: 'registration',
         });
 
@@ -107,16 +152,36 @@ export async function POST(request: NextRequest) {
           .update({ referred_by_code: refCode })
           .eq('id', newProfile.id);
 
-        await svc.rpc('increment_waitlist_referral_count', { p_id: waitlistReferrer.id });
-
         const newCount = (waitlistReferrer.referral_count ?? 0) + 1;
+        await svc
+          .from('waitlist')
+          .update({ referral_count: newCount })
+          .eq('id', waitlistReferrer.id);
+
+        await recordReferralEvent({
+          referrerWaitlistId: waitlistReferrer.id,
+          referredWaitlistId: linkedWaitlistProfile?.id,
+          referredProfileId: newProfile.id,
+          referralCode: waitlistReferrer.referral_code ?? refCode,
+          eventType: 'registration_referral_attributed',
+          metadata: { referred_email: email },
+        }, svc);
+
+        await ensureReferralMilestoneRewards({
+          userEmail: waitlistReferrer.email,
+          referralCount: newCount,
+          referralCode: waitlistReferrer.referral_code ?? refCode,
+          waitlistId: waitlistReferrer.id,
+        }, svc);
+
+        await recomputeWaitlistRankings(svc);
 
         await sendReferralSuccessEmail(waitlistReferrer.email, {
           referrerFirstName: waitlistReferrer.first_name ?? 'there',
           referredFirstName,
           referralCount: newCount,
           referralCode: waitlistReferrer.referral_code ?? refCode,
-          referralUrl: `${BASE_URL}/refer?ref=${waitlistReferrer.referral_code ?? refCode}`,
+          referralUrl: buildReferralShareUrl(waitlistReferrer.referral_code ?? refCode),
           contextType: 'registration',
         });
 

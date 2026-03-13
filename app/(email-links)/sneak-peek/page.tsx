@@ -24,36 +24,42 @@ const FEATURES = [
     title: "Document Verification",
     description:
       "C of O, survey plans, and ID documents are verified by our vetting team before any listing goes live.",
+    illustration: "/assets/undraw_document-ready_o5d5.svg",
   },
   {
     icon: MapPin,
     title: "Geo-Tagging",
     description:
       "Every property is pinned using real coordinates — no more fake addresses or wrong neighbourhoods.",
+    illustration: "/assets/undraw_delivery-location_um5t.svg",
   },
   {
     icon: CheckCircle,
     title: "Zero Duplicates",
     description:
       "Our ML layer flags duplicate listings in real time. One property, one listing — always.",
+    illustration: "/assets/undraw_searching-everywhere_tffi.svg",
   },
   {
     icon: Lock,
     title: "Agent Licensing",
     description:
       "All agents are verified against ESVARBON and CAC records before they can list on RealEST.",
+    illustration: "/assets/undraw_certification_i2m0.svg",
   },
   {
     icon: TrendingUp,
     title: "Market Analytics",
     description:
       "Real-time price trends by LGA so buyers and owners make data-driven decisions.",
+    illustration: "/assets/undraw_progress-tracking_9m3o.svg",
   },
   {
     icon: Zap,
     title: "Instant Inquiries",
     description:
       "Connect with verified owners directly — no middlemen, no ghost numbers.",
+    illustration: "/assets/undraw_house-searching_g2b8.svg",
   },
 ];
 
@@ -183,8 +189,36 @@ export default function SneakPeekPage() {
             {FEATURES.map((f) => (
               <div
                 key={f.title}
-                className="bg-background rounded-xl border border-border p-6 hover:border-primary/40 transition-colors"
+                className="relative overflow-hidden bg-background rounded-xl border border-border p-6 hover:border-primary/40 transition-colors"
               >
+                <div className="pointer-events-none absolute right-3 top-3 h-14 w-14 opacity-25">
+                  <div
+                    className="absolute inset-0 rounded-sm bg-primary/65"
+                    style={{
+                      WebkitMaskImage: `url(${f.illustration})`,
+                      maskImage: `url(${f.illustration})`,
+                      WebkitMaskSize: "contain",
+                      maskSize: "contain",
+                      WebkitMaskRepeat: "no-repeat",
+                      maskRepeat: "no-repeat",
+                      WebkitMaskPosition: "center",
+                      maskPosition: "center",
+                    }}
+                  />
+                  <div
+                    className="absolute -right-1 -top-1 h-full w-full rounded-sm bg-secondary/45"
+                    style={{
+                      WebkitMaskImage: `url(${f.illustration})`,
+                      maskImage: `url(${f.illustration})`,
+                      WebkitMaskSize: "contain",
+                      maskSize: "contain",
+                      WebkitMaskRepeat: "no-repeat",
+                      maskRepeat: "no-repeat",
+                      WebkitMaskPosition: "center",
+                      maskPosition: "center",
+                    }}
+                  />
+                </div>
                 <f.icon className="w-8 h-8 text-primary mb-4" />
                 <h3 className="font-semibold text-lg mb-2">{f.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">

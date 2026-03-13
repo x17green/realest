@@ -515,44 +515,56 @@ export type Database = {
         Row: {
           avatar_url: string | null
           bio: string | null
+          candidate_role: string | null
           created_at: string | null
           email: string
           full_name: string | null
           id: string
+          launch_reward_window_ends_at: string | null
           phone: string | null
           referral_code: string | null
           referral_count: number
           referred_by: string | null
           referred_by_code: string | null
+          role_activated_at: string | null
           updated_at: string | null
+          waitlist_persona: string | null
         }
         Insert: {
           avatar_url?: string | null
           bio?: string | null
+          candidate_role?: string | null
           created_at?: string | null
           email: string
           full_name?: string | null
           id: string
+          launch_reward_window_ends_at?: string | null
           phone?: string | null
           referral_code?: string | null
           referral_count?: number
           referred_by?: string | null
           referred_by_code?: string | null
+          role_activated_at?: string | null
           updated_at?: string | null
+          waitlist_persona?: string | null
         }
         Update: {
           avatar_url?: string | null
           bio?: string | null
+          candidate_role?: string | null
           created_at?: string | null
           email?: string
           full_name?: string | null
           id?: string
+          launch_reward_window_ends_at?: string | null
           phone?: string | null
           referral_code?: string | null
           referral_count?: number
           referred_by?: string | null
           referred_by_code?: string | null
+          role_activated_at?: string | null
           updated_at?: string | null
+          waitlist_persona?: string | null
         }
         Relationships: [
           {
@@ -986,6 +998,7 @@ export type Database = {
       waitlist: {
         Row: {
           budget_range: string | null
+          candidate_role: string | null
           contact_count: number | null
           created_at: string | null
           email: string
@@ -996,8 +1009,13 @@ export type Database = {
           last_contacted_at: string | null
           last_name: string | null
           location_preference: string | null
+          persona: string
+          persona_details: Json | null
           phone: string | null
+          poll_completion_count: number
           property_type_preference: string | null
+          queue_rank: number | null
+          queue_score: number
           referral_code: string | null
           referral_count: number
           referred_by: string | null
@@ -1011,9 +1029,11 @@ export type Database = {
           utm_campaign: string | null
           utm_medium: string | null
           utm_source: string | null
+          waitlist_reward_eligible: boolean
         }
         Insert: {
           budget_range?: string | null
+          candidate_role?: string | null
           contact_count?: number | null
           created_at?: string | null
           email: string
@@ -1024,8 +1044,13 @@ export type Database = {
           last_contacted_at?: string | null
           last_name?: string | null
           location_preference?: string | null
+          persona?: string
+          persona_details?: Json | null
           phone?: string | null
+          poll_completion_count?: number
           property_type_preference?: string | null
+          queue_rank?: number | null
+          queue_score?: number
           referral_code?: string | null
           referral_count?: number
           referred_by?: string | null
@@ -1039,9 +1064,11 @@ export type Database = {
           utm_campaign?: string | null
           utm_medium?: string | null
           utm_source?: string | null
+          waitlist_reward_eligible?: boolean
         }
         Update: {
           budget_range?: string | null
+          candidate_role?: string | null
           contact_count?: number | null
           created_at?: string | null
           email?: string
@@ -1052,8 +1079,13 @@ export type Database = {
           last_contacted_at?: string | null
           last_name?: string | null
           location_preference?: string | null
+          persona?: string
+          persona_details?: Json | null
           phone?: string | null
+          poll_completion_count?: number
           property_type_preference?: string | null
+          queue_rank?: number | null
+          queue_score?: number
           referral_code?: string | null
           referral_count?: number
           referred_by?: string | null
@@ -1067,6 +1099,7 @@ export type Database = {
           utm_campaign?: string | null
           utm_medium?: string | null
           utm_source?: string | null
+          waitlist_reward_eligible?: boolean
         }
         Relationships: [
           {
