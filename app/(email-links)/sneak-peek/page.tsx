@@ -191,34 +191,13 @@ export default function SneakPeekPage() {
                 key={f.title}
                 className="relative overflow-hidden bg-background rounded-xl border border-border p-6 hover:border-primary/40 transition-colors"
               >
-                <div className="pointer-events-none absolute right-3 top-3 h-14 w-14 opacity-25">
-                  <div
-                    className="absolute inset-0 rounded-sm bg-primary/65"
-                    style={{
-                      WebkitMaskImage: `url(${f.illustration})`,
-                      maskImage: `url(${f.illustration})`,
-                      WebkitMaskSize: "contain",
-                      maskSize: "contain",
-                      WebkitMaskRepeat: "no-repeat",
-                      maskRepeat: "no-repeat",
-                      WebkitMaskPosition: "center",
-                      maskPosition: "center",
-                    }}
-                  />
-                  <div
-                    className="absolute -right-1 -top-1 h-full w-full rounded-sm bg-secondary/45"
-                    style={{
-                      WebkitMaskImage: `url(${f.illustration})`,
-                      maskImage: `url(${f.illustration})`,
-                      WebkitMaskSize: "contain",
-                      maskSize: "contain",
-                      WebkitMaskRepeat: "no-repeat",
-                      maskRepeat: "no-repeat",
-                      WebkitMaskPosition: "center",
-                      maskPosition: "center",
-                    }}
-                  />
-                </div>
+                <img
+                  src={f.illustration}
+                  alt=""
+                  aria-hidden="true"
+                  className="pointer-events-none absolute right-3 top-3 h-14 w-14 object-contain opacity-70"
+                  loading="lazy"
+                />
                 <f.icon className="w-8 h-8 text-primary mb-4" />
                 <h3 className="font-semibold text-lg mb-2">{f.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">

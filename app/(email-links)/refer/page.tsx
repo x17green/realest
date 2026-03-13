@@ -218,7 +218,7 @@ function ReferContent() {
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               <a href={socialLinks.x} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-border py-2 text-sm hover:bg-muted/50">
-                <XIcon size={15} /> X
+                <XIcon size={15} /> X (Twitter)
               </a>
               <a href={socialLinks.facebook} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-border py-2 text-sm hover:bg-muted/50">
                 <FacebookIcon size={15} /> Facebook
