@@ -124,6 +124,8 @@ export function isRouteAccessible(pathname: string): boolean {
       '/poll',          // Full poll form page
       '/poll/city',     // Email link: city poll response
     ];
+    // Allow /poll/[id] dynamic detail pages
+    const isPollDetail = /^\/poll\/[0-9a-f-]{36}$/i.test(pathname);
 
     // Allow specific API routes for coming-soon functionality
     const allowedApiRoutes = [
@@ -132,9 +134,13 @@ export function isRouteAccessible(pathname: string): boolean {
       '/api/poll/catalog',  // Poll catalog endpoint
       '/api/poll/submit',   // Poll submission endpoint
     ];
+    // Allow /api/poll/submission/[id] dynamic routes
+    const isPollSubmissionApi = /^\/api\/poll\/submission\/[0-9a-f-]{36}$/i.test(pathname);
 
     // Allow exact matches or static assets
     return allowedRoutes.includes(pathname) ||
+           isPollDetail ||
+           isPollSubmissionApi ||
            allowedApiRoutes.includes(pathname) || // Essential API routes
            pathname.startsWith('/_next/') ||     // Next.js static assets
            pathname.startsWith('/api/_') ||       // Next.js internal API routes

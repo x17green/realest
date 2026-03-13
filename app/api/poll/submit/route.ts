@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/service';
 import { sendPollResultsSummaryEmail } from '@/lib/emailService';
 
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://realest.ng';
+
 const DEFAULT_FORM_SLUG = 'realest-launch-intelligence-2026';
 
 const SEGMENT_LABELS: Record<string, string> = {
@@ -202,6 +204,7 @@ export async function POST(request: NextRequest) {
         segmentLabel: SEGMENT_LABELS[segment] ?? segment,
         submissionId: submission.id,
         answers: summary,
+        detailsUrl: `${BASE_URL}/poll/${submission.id}`,
       });
     }
 
