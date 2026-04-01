@@ -1,8 +1,21 @@
 import { NextRequest, NextResponse, after } from 'next/server';
 import { subscribeToWaitlist, checkEmailInWaitlist, getWaitlistStats, unsubscribeFromWaitlist, checkEmailWithPosition, getWaitlistPosition } from '@/lib/waitlist';
 import type { WaitlistSubscriptionData } from '@/lib/waitlist';
-import { sendWaitlistConfirmationEmail, sendWaitlistAdminNotification } from '@/lib/emailService';
+import { sendWaitlistConfirmationEmail, sendWaitlistAdminNotification, sendReferralSuccessEmail } from '@/lib/emailService';
 import { syncWaitlistJoin, syncWaitlistUnsubscribe } from '@/lib/resend-audiences';
+import {
+  ensureReferralMilestoneRewards,
+  ensureWaitlistCohortReward,
+  recomputeWaitlistRankings,
+  recordReferralEvent,
+} from '@/lib/reward-engine';
+import {
+  buildReferralShareUrl,
+  getCurrentMilestone,
+  getWaitlistRewardCopy,
+  isWaitlistPersona,
+} from '@/lib/referral-system';
+import { createServiceClient } from '@/lib/supabase/service';
 
 
 // Rate limiting store (in production, use Redis or database)
@@ -43,9 +56,22 @@ export async function POST(request: NextRequest) {
 
     // Parse request body
     const body = await request.json();
-    const { email, firstName, lastName, phone, source } = body;
+    const {
+      email,
+      firstName,
+      lastName,
+      phone,
+      source,
+      ref,
+      persona,
+      interests,
+      locationPreference,
+      propertyTypePreference,
+      budgetRange,
+      personaDetails,
+    } = body;
 
-    console.log('📧 Received subscription data:', { email, firstName, lastName, phone, source });
+    console.log('📧 Received subscription data:', { email, firstName, lastName, phone, source, persona });
 
     // Basic validation
     if (!email || typeof email !== 'string') {
@@ -62,13 +88,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!persona || typeof persona !== 'string' || !isWaitlistPersona(persona)) {
+      return NextResponse.json(
+        { error: 'A valid persona is required' },
+        { status: 400 }
+      );
+    }
+
     // Prepare subscription data
     const subscriptionData: WaitlistSubscriptionData = {
       email: email.trim(),
       firstName: firstName.trim(),
       lastName: lastName?.trim() || undefined,
       phone: phone?.trim() || undefined,
+      persona,
       source: source || 'coming_soon_modal',
+      interests: Array.isArray(interests) ? interests : undefined,
+      locationPreference: typeof locationPreference === 'string' ? locationPreference.trim() : undefined,
+      propertyTypePreference: typeof propertyTypePreference === 'string' ? propertyTypePreference.trim() : undefined,
+      budgetRange: typeof budgetRange === 'string' ? budgetRange.trim() : undefined,
+      personaDetails: typeof personaDetails === 'object' && personaDetails !== null ? personaDetails : undefined,
       referrerUrl: request.headers.get('referer') || undefined,
     };
 
@@ -88,6 +127,20 @@ export async function POST(request: NextRequest) {
     // Log successful subscription
     console.log(`New waitlist subscriber: ${subscriptionData.email} (${subscriptionData.firstName} ${subscriptionData.lastName || ''})`);
 
+    if (result.data) {
+      await ensureWaitlistCohortReward({
+        id: result.data.id,
+        email: result.data.email,
+        first_name: result.data.first_name,
+        referral_code: result.data.referral_code,
+        referral_count: result.data.referral_count,
+        persona: result.data.persona,
+        poll_completion_count: result.data.poll_completion_count,
+        subscribed_at: result.data.subscribed_at,
+      });
+      await recomputeWaitlistRankings();
+    }
+
     // Get the user's position in the waitlist
     const positionData = await getWaitlistPosition(subscriptionData.email);
 
@@ -95,16 +148,67 @@ export async function POST(request: NextRequest) {
 
     // Add this after successful subscription in the POST function:
     if (result.success && result.data) {
+      // Referral attribution — best-effort, never blocks the response
+      const refCode = (typeof ref === 'string' ? ref.trim().toUpperCase() : '') || null;
+      if (refCode && result.data.id) {
+        after(async () => {
+          try {
+            const svc = createServiceClient();
+            const { data: referrer } = await svc
+              .from('waitlist')
+              .select('id, email, first_name, referral_code, referral_count')
+              .eq('referral_code', refCode)
+              .neq('id', result.data!.id) // can't refer yourself
+              .maybeSingle();
+            if (referrer) {
+              await svc.from('waitlist').update({ referred_by: referrer.id }).eq('id', result.data!.id);
+              const newCount = (referrer.referral_count ?? 0) + 1;
+              await svc.from('waitlist').update({ referral_count: newCount }).eq('id', referrer.id);
+              await recordReferralEvent({
+                referrerWaitlistId: referrer.id,
+                referredWaitlistId: result.data!.id,
+                referralCode: referrer.referral_code ?? refCode,
+                eventType: 'waitlist_referral_attributed',
+                metadata: {
+                  referred_email: result.data!.email,
+                },
+              }, svc);
+              await ensureReferralMilestoneRewards({
+                userEmail: referrer.email,
+                referralCount: newCount,
+                referralCode: referrer.referral_code ?? refCode,
+                waitlistId: referrer.id,
+              }, svc);
+              await recomputeWaitlistRankings(svc);
+              console.log(`✅ Referral attributed: ${result.data!.id} ← ${referrer.id}`);
+              await sendReferralSuccessEmail(referrer.email, {
+                referrerFirstName: referrer.first_name ?? 'there',
+                referredFirstName: result.data!.first_name ?? 'Someone',
+                referralCount: newCount,
+                referralCode: referrer.referral_code ?? refCode,
+                referralUrl: buildReferralShareUrl(referrer.referral_code ?? refCode),
+                contextType: 'waitlist',
+              });
+            }
+          } catch (err) {
+            console.error('❌ Referral attribution failed:', err);
+          }
+        });
+      }
+
       // Use after() so email sending continues even after the response is returned.
       // In Vercel's serverless runtime, a fire-and-forget IIFE is killed as soon as
       // the response is sent — after() guarantees the work completes.
       after(async () => {
         try {
+          const code = result.data?.referral_code ?? undefined;
           await sendWaitlistConfirmationEmail({
             email: subscriptionData.email,
             firstName: subscriptionData.firstName,
             lastName: subscriptionData.lastName,
             position: positionData.position,
+            referralCode: code,
+            referralUrl: code ? buildReferralShareUrl(code) : undefined,
           });
         } catch (error) {
           console.error('❌ Email confirmation failed:', error);
@@ -141,6 +245,12 @@ export async function POST(request: NextRequest) {
         lastName: subscriptionData.lastName,
         position: positionData.position || null,
         totalCount: positionData.totalCount || 0,
+        persona,
+        candidateRole: result.data?.candidate_role ?? null,
+        referralCode: result.data?.referral_code ?? null,
+        referralUrl: result.data?.referral_code ? buildReferralShareUrl(result.data.referral_code) : null,
+        currentMilestone: getCurrentMilestone(result.data?.referral_count ?? 0),
+        waitlistReward: getWaitlistRewardCopy(persona),
         ...(positionData.error && { positionError: positionData.error })
       },
       { status: 201 }
@@ -177,7 +287,15 @@ export async function GET(request: NextRequest) {
         status: emailCheck.status,
         firstName: emailCheck.firstName,
         position: emailCheck.position,
-        totalCount: emailCheck.totalCount
+        totalCount: emailCheck.totalCount,
+        persona: emailCheck.persona,
+        candidateRole: emailCheck.candidateRole,
+        queueScore: emailCheck.queueScore,
+        referralCount: emailCheck.referralCount,
+        referralCode: emailCheck.referralCode,
+        currentMilestone: getCurrentMilestone(emailCheck.referralCount ?? 0),
+        waitlistRewardEligible: emailCheck.waitlistRewardEligible,
+        waitlistReward: emailCheck.persona ? getWaitlistRewardCopy(emailCheck.persona) : null,
       });
     }
 

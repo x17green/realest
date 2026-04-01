@@ -52,7 +52,7 @@ export function RealEstButton({
       variant={mappedVariant}
       className={cn(
         // Base RealEST styling
-        'font-body font-semibold transition-all duration-200 ease-out',
+        'font-body font-semibold transition-all duration-200 ease-out rounded-xl',
         'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
 
         // RealEST-specific variants

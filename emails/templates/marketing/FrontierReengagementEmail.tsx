@@ -255,14 +255,14 @@ export function FrontierReengagementEmail({
       <EmailFooter
         showUnsubscribe={true}
         unsubscribeUrl={unsubscribeUrl || undefined}
-        footerNote="You're receiving this because you want a fraud-free Nigeria."
+        footerNote="Verified properties only. No fake agents. No scams. No movement fees!"
       />
     </EmailLayout>
   );
 }
 
 FrontierReengagementEmail.subject = (data: FrontierReengagementEmailData) =>
-  `${data.firstName}, why we've been quiet (and why it's good news for you)`;
+  `${data.firstName}, we've been building something you asked for`;
 
 export default FrontierReengagementEmail;
 

@@ -63,6 +63,7 @@ const ComingSoonHero = () => {
   const [mounted, setMounted] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [waitlistCount, setWaitlistCount] = useState<number>(0);
+  const [referralCode, setReferralCode] = useState<string | undefined>(undefined);
 
   // Handle waitlist success callback
   const handleWaitlistSuccess = (data: { firstName: string; lastName?: string; position?: number; totalCount?: number }) => {
@@ -74,6 +75,10 @@ const ComingSoonHero = () => {
 
   useEffect(() => {
     setMounted(true);
+
+    // Capture referral code from URL (?ref=CODE) so the modal can attribute the signup
+    const urlRef = new URLSearchParams(window.location.search).get('ref');
+    if (urlRef) setReferralCode(urlRef.trim().toUpperCase());
 
     // Only set up timer if release date is configured
     if (!releaseDate) {
@@ -173,7 +178,7 @@ const ComingSoonHero = () => {
             {/* Status Badge */}
             <div className="inline-flex items-center gap-2 animate-pulse bg-linear-to-l from-primary/10 to-accent/10 border border-primary/20 rounded-full px-4 py-2 mb-6 backdrop-blur-md">
               <MapPinCheck className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium bg-linear-to-bl from-primary to-accent bg-clip-text text-transparent">
+              <span className="text-sm md:text-xs font-medium bg-linear-to-bl from-primary to-accent bg-clip-text text-transparent">
                 Geo-Tagged & Verified Property Marketplace
               </span>
             </div>
@@ -378,6 +383,7 @@ const ComingSoonHero = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSuccess={handleWaitlistSuccess}
+        referralCode={referralCode}
       />
     </div>
   );

@@ -11,6 +11,7 @@ import * as React from 'react';
 import { createClient } from '@/lib/supabase/server';
 import { renderEmailFull } from '@/emails';
 import { Resend } from 'resend';
+import { interpolateSubject } from '@/lib/utils/interpolateSubject';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM_EMAIL_WAITLIST = process.env.FROM_EMAIL_WAITLIST ?? process.env.FROM_EMAIL ?? 'RealEST <hello@connect.realest.ng>';
@@ -91,12 +92,33 @@ export async function POST(
 
   const { html, text } = await renderEmailFull(React.createElement(Component, mergedProps));
 
-  const emailSubject = subject ?? `A message from RealEST`;
+  // Resolve subject: caller-provided > template .subject() > fallback.
+  // Interpolate {{firstName}}/{{fullName}}/{{email}} tokens in all cases.
+  const recipientData = {
+    firstName: subscriber.first_name ?? 'there',
+    fullName: mergedProps.fullName as string | undefined,
+    email: subscriber.email as string,
+  };
+
+  let resolvedSubject: string;
+  if (subject) {
+    resolvedSubject = interpolateSubject(subject, recipientData);
+  } else {
+    const subjectFn = (Component as unknown as Record<string, unknown>).subject;
+    if (typeof subjectFn === 'function') {
+      resolvedSubject = interpolateSubject(
+        (subjectFn as (d: Record<string, unknown>) => string)(mergedProps),
+        recipientData,
+      );
+    } else {
+      resolvedSubject = `A message from RealEST`;
+    }
+  }
 
   const { data, error: sendError } = await resend.emails.send({
     from: FROM_EMAIL_WAITLIST,
     to: [subscriber.email as string],
-    subject: emailSubject,
+    subject: resolvedSubject,
     html,
     text,
   });

@@ -117,7 +117,6 @@ export function EmailPreviewDashboard({ templates, categories, adminEmail }: Pro
       setHtml("");
     }
     setQuery("");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCategory]);
 
   // ── Copy subject to clipboard ────────────────────────────────────────────────

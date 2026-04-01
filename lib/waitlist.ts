@@ -1,4 +1,10 @@
 import { createClient } from '@/lib/supabase/client';
+import {
+  getCandidateRoleFromPersona,
+  isSupplySidePersona,
+  isWaitlistPersona,
+  type WaitlistPersona,
+} from '@/lib/referral-system';
 import type { Database } from '@/lib/supabase/types';
 
 type WaitlistEntry = Database['public']['Tables']['waitlist']['Row'];
@@ -10,6 +16,8 @@ export interface WaitlistSubscriptionData {
   firstName: string;
   lastName?: string;
   phone?: string;
+  persona: WaitlistPersona;
+  personaDetails?: Record<string, string | string[] | null | undefined>;
   source?: string;
   interests?: string[];
   locationPreference?: string;
@@ -26,6 +34,10 @@ export interface WaitlistSubscriptionResult {
   data?: WaitlistEntry;
   error?: string;
   isExistingUser?: boolean;
+}
+
+function normalizePersona(value: string | null | undefined): WaitlistPersona {
+  return isWaitlistPersona(value) ? value : 'buyer_renter';
 }
 
 /**
@@ -75,6 +87,10 @@ export async function subscribeToWaitlist(
           first_name: data.firstName,
           last_name: data.lastName || null,
           phone: data.phone || null,
+          persona: data.persona,
+          persona_details: data.personaDetails ?? null,
+          candidate_role: getCandidateRoleFromPersona(data.persona),
+          waitlist_reward_eligible: isSupplySidePersona(data.persona),
           subscribed_at: new Date().toISOString(),
           unsubscribed_at: null,
           updated_at: new Date().toISOString()
@@ -112,12 +128,17 @@ export async function subscribeToWaitlist(
       first_name: data.firstName,
       last_name: data.lastName || null,
       phone: data.phone || null,
+      persona: data.persona,
+      persona_details: data.personaDetails ?? null,
       source: data.source || 'website',
       status: 'active',
       interests: data.interests || null,
       location_preference: data.locationPreference || null,
       property_type_preference: data.propertyTypePreference || null,
       budget_range: data.budgetRange || null,
+      candidate_role: getCandidateRoleFromPersona(data.persona),
+      queue_score: 0,
+      waitlist_reward_eligible: isSupplySidePersona(data.persona),
       subscribed_at: new Date().toISOString(),
       utm_source: data.utmSource || null,
       utm_medium: data.utmMedium || null,
@@ -307,8 +328,9 @@ export async function getWaitlistPosition(email: string): Promise<{
     // Get all active waitlist entries ordered by subscription date
     const { data: allEntries, error } = await supabase
       .from('waitlist')
-      .select('email, subscribed_at')
+      .select('email, queue_rank, subscribed_at')
       .eq('status', 'active')
+      .order('queue_rank', { ascending: true, nullsFirst: false })
       .order('subscribed_at', { ascending: true });
 
     if (error) {
@@ -343,13 +365,19 @@ export async function checkEmailWithPosition(email: string): Promise<{
   firstName?: string;
   position?: number;
   totalCount?: number;
+  persona?: WaitlistPersona;
+  candidateRole?: string | null;
+  queueScore?: number | null;
+  referralCount?: number;
+  referralCode?: string | null;
+  waitlistRewardEligible?: boolean;
 }> {
   try {
     const supabase = createClient();
 
     const { data, error } = await supabase
       .from('waitlist')
-      .select('status, first_name, subscribed_at')
+      .select('status, first_name, subscribed_at, queue_rank, queue_score, persona, candidate_role, referral_count, referral_code, waitlist_reward_eligible')
       .eq('email', email.toLowerCase())
       .maybeSingle() as { data: any | null; error: any };
 
@@ -375,7 +403,13 @@ export async function checkEmailWithPosition(email: string): Promise<{
       status: data.status as 'active' | 'unsubscribed' | 'bounced',
       firstName: data.first_name,
       position,
-      totalCount
+      totalCount,
+      persona: normalizePersona(data.persona),
+      candidateRole: data.candidate_role ?? null,
+      queueScore: data.queue_score ?? null,
+      referralCount: data.referral_count ?? 0,
+      referralCode: data.referral_code ?? null,
+      waitlistRewardEligible: Boolean(data.waitlist_reward_eligible)
     };
 
   } catch (error) {

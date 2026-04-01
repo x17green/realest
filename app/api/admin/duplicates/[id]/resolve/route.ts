@@ -125,7 +125,7 @@ export async function PUT(
     }
 
     // Create notifications for affected owners
-    if (validatedData.action === 'keep_master') {
+    if (validatedData.action === 'keep_master' && duplicate.owner_id) {
       await prisma.notifications.create({
         data: {
           user_id: duplicate.owner_id,
@@ -135,7 +135,7 @@ export async function PUT(
           data: resolutionDetails,
         },
       })
-    } else if (validatedData.action === 'reject_duplicate') {
+    } else if (validatedData.action === 'reject_duplicate' && duplicate.owner_id) {
       await prisma.notifications.create({
         data: {
           user_id: duplicate.owner_id,

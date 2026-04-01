@@ -46,12 +46,12 @@ interface AudienceOption {
 
 // Static template list (mirrors preview-registry without importing server-only deps)
 const TEMPLATES: TemplateOption[] = [
-  { name: "WelcomeEmail",                label: "Welcome",                       category: "platform",   description: "First email after account creation",                     subject: "Welcome to RealEST" },
-  { name: "WaitlistConfirmationEmail",   label: "Waitlist Confirmation",         category: "platform",   description: "Confirms waitlist spot",                                  subject: "You're on the waitlist!" },
-  { name: "OnboardingReminderEmail",     label: "Onboarding Reminder",           category: "platform",   description: "Nudges users to complete profile",                        subject: "Complete your RealEST profile" },
+  { name: "WelcomeEmail",                label: "Welcome",                       category: "platform",   description: "First email after account creation",                     subject: "Welcome to RealEST, {{firstName}}!" },
+  { name: "WaitlistConfirmationEmail",   label: "Waitlist Confirmation",         category: "platform",   description: "Confirms waitlist spot",                                  subject: "You're on the RealEST waitlist" },
+  { name: "OnboardingReminderEmail",     label: "Onboarding Reminder",           category: "platform",   description: "Nudges users to complete profile",                        subject: "{{firstName}}, finish setting up your RealEST account" },
   { name: "PasswordResetEmail",          label: "Password Reset",                category: "platform",   description: "Delivers magic link to reset password",                   subject: "Reset your password" },
-  { name: "PasswordChangedEmail",        label: "Password Changed",              category: "platform",   description: "Confirms a successful password change",                   subject: "Your password was changed" },
-  { name: "SubAdminInvitationEmail",     label: "Sub-Admin Invitation",          category: "platform",   description: "Invites a new sub-admin",                                 subject: "You've been invited to RealEST admin" },
+  { name: "PasswordChangedEmail",        label: "Password Changed",              category: "platform",   description: "Confirms a successful password change",                   subject: "Your RealEST password has been changed" },
+  { name: "SubAdminInvitationEmail",     label: "Sub-Admin Invitation",          category: "platform",   description: "Invites a new sub-admin",                                 subject: "You've been invited to join the RealEST admin team" },
   { name: "ListingLiveEmail",            label: "Listing Live",                  category: "listing",    description: "Listing is now published",                                subject: "Your listing is live!" },
   { name: "ListingSubmissionEmail",      label: "Listing Submitted",             category: "listing",    description: "Acknowledges new property submission",                    subject: "Listing submission received" },
   { name: "ListingRejectedEmail",        label: "Listing Rejected",              category: "listing",    description: "Notifies owner of rejection with reasons",                subject: "Action required on your listing" },
@@ -65,18 +65,18 @@ const TEMPLATES: TemplateOption[] = [
   { name: "InvoiceEmail",                label: "Invoice",                       category: "financial",  description: "Invoice for listing fee",                                 subject: "Your RealEST invoice" },
   { name: "PaymentReceiptEmail",         label: "Payment Receipt",               category: "financial",  description: "Confirms a successful payment",                           subject: "Payment confirmed" },
   { name: "PaymentFailedEmail",          label: "Payment Failed",                category: "financial",  description: "Notifies owner of a failed payment",                      subject: "Payment failed — action needed" },
-  { name: "LoginAlertEmail",             label: "Login Alert",                   category: "security",   description: "Alerts user of a new login from unknown device",          subject: "New login to your account" },
+  { name: "LoginAlertEmail",             label: "Login Alert",                   category: "security",   description: "Alerts user of a new login from unknown device",          subject: "New sign-in to your RealEST account" },
   { name: "VettingTaskEmail",            label: "Vetting Task",                  category: "security",   description: "Assigns a vetting task to an agent",                      subject: "New vetting task assigned" },
-  { name: "FrontierReengagementEmail",   label: "Frontier Reengagement",         category: "marketing",  description: "Win-back series for inactive waitlist members",            subject: "We miss you at RealEST" },
-  { name: "AuthorityGeotagEmail",        label: "Authority — Geotag",            category: "marketing",  description: "Location-authority positioning email",                    subject: "The RealEST advantage in your area" },
-  { name: "AuthorityBootsGroundEmail",   label: "Authority — Boots on Ground",   category: "marketing",  description: "Physical vetting proof-of-concept email",                 subject: "We verify every property in person" },
-  { name: "LaunchWindowEmail",           label: "Launch Window",                 category: "marketing",  description: "Announces the launch period to waitlist",                 subject: "RealEST is launching soon" },
-  { name: "SystemUpdateEmail",           label: "System Update",                 category: "marketing",  description: "Product update / changelog announcement",                 subject: "What's new at RealEST" },
-  { name: "WaitlistMilestoneEmail",      label: "Waitlist Milestone",            category: "marketing",  description: "Celebrates a waitlist size milestone",                    subject: "We've hit a milestone — and it's thanks to you" },
-  { name: "AgentVsLandlordEmail",        label: "Agent vs Landlord",             category: "marketing",  description: "Educational email on agent vs direct listing",            subject: "Agent or landlord? Here's the difference" },
-  { name: "PropertyCategoriesEmail",     label: "Property Categories",           category: "marketing",  description: "Showcases available property types / BQ etc.",            subject: "Find your perfect property type" },
-  { name: "LaunchEveEmail",              label: "Launch Eve",                    category: "marketing",  description: "Final email before platform launch",                      subject: "Tomorrow is the day — RealEST launches!" },
-  { name: "ReferralInviteEmail",         label: "Referral Invite",               category: "marketing",  description: "Referral chain invite email",                             subject: "You've been invited to RealEST" },
+  { name: "FrontierReengagementEmail",   label: "Frontier Reengagement",         category: "marketing",  description: "Win-back series for inactive waitlist members",            subject: "{{firstName}}, why we've been quiet (and why it's good news for you)" },
+  { name: "AuthorityGeotagEmail",        label: "Authority — Geotag",            category: "marketing",  description: "Location-authority positioning email",                    subject: "If you can't navigate to it, it doesn't exist on RealEST" },
+  { name: "AuthorityBootsGroundEmail",   label: "Authority — Boots on Ground",   category: "marketing",  description: "Physical vetting proof-of-concept email",                 subject: "We visited 50 properties this week. Only 12 made the cut." },
+  { name: "LaunchWindowEmail",           label: "Launch Window",                 category: "marketing",  description: "Announces the launch period to waitlist",                 subject: "{{firstName}}, we're taking a few more weeks — here's why (and your reward for waiting)" },
+  { name: "SystemUpdateEmail",           label: "System Update",                 category: "marketing",  description: "Product update / changelog announcement",                 subject: "RealEST System Notice: [Update Title]" },
+  { name: "WaitlistMilestoneEmail",      label: "Waitlist Milestone",            category: "marketing",  description: "Celebrates a waitlist size milestone",                    subject: "We just hit 1,000 users! Here's what we're building for you" },
+  { name: "AgentVsLandlordEmail",        label: "Agent vs Landlord",             category: "marketing",  description: "Educational email on agent vs direct listing",            subject: "{{firstName}}, the agent fee structure that actually works for you" },
+  { name: "PropertyCategoriesEmail",     label: "Property Categories",           category: "marketing",  description: "Showcases available property types / BQ etc.",            subject: "{{firstName}}, not just houses: 7 property types you'll find on RealEST" },
+  { name: "LaunchEveEmail",              label: "Launch Eve",                    category: "marketing",  description: "Final email before platform launch",                      subject: "{{firstName}}, tomorrow — your early access opens" },
+  { name: "ReferralInviteEmail",         label: "Referral Invite",               category: "marketing",  description: "Referral chain invite email",                             subject: "{{firstName}}, you've earned it — share RealEST and claim your reward" },
   { name: "WeeklyDigestEmail",           label: "Weekly Digest",                 category: "marketing",  description: "Weekly summary of new listings + platform activity",      subject: "Your RealEST weekly digest" },
 ];
 
@@ -463,6 +463,12 @@ export default function NewCampaignPage() {
                   placeholder="Your email subject line"
                   className="mt-1"
                 />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Use <code className="font-mono">{"{{firstName}}"}</code>,{" "}
+                  <code className="font-mono">{"{{fullName}}"}</code>, or{" "}
+                  <code className="font-mono">{"{{email}}"}</code> for per-recipient
+                  personalisation (batch sends only).
+                </p>
               </div>
               <div>
                 <Label htmlFor="props-json">

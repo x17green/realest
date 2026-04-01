@@ -122,6 +122,18 @@ export function AdminSidebar({
       icon: Megaphone,
       description: "Create and send email campaigns",
     },
+    {
+      href: "/admin/analytics/polls",
+      label: "Poll Results",
+      icon: BarChart3,
+      description: "View email poll vote results",
+    },
+    {
+      href: "/admin/analytics/referrals",
+      label: "Referrals",
+      icon: Users2,
+      description: "Referral tracking and attribution",
+    },
   ];
 
   const isActive = (href: string) => {

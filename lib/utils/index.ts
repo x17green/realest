@@ -8,3 +8,5 @@ export function cn(...inputs: ClassValue[]) {
 /** Basic email format check — does not verify account existence. */
 export const isValidEmailFormat = (value: string): boolean =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+
+export { interpolateSubject } from './interpolateSubject';

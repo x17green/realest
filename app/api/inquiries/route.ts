@@ -53,8 +53,8 @@ export async function GET(request: NextRequest) {
               address: true,
               price: true,
               property_media: {
-                where: { is_primary: true },
-                select: { file_url: true, is_primary: true },
+                where: { is_featured: true },
+                select: { media_url: true, is_featured: true },
                 take: 1,
               },
             },
@@ -77,8 +77,8 @@ export async function GET(request: NextRequest) {
               address: true,
               price: true,
               property_media: {
-                where: { is_primary: true },
-                select: { file_url: true, is_primary: true },
+                where: { is_featured: true },
+                select: { media_url: true, is_featured: true },
                 take: 1,
               },
             },

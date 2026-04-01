@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Section, Text } from '@react-email/components';
+import { Link, Section, Text } from '@react-email/components';
 import { EmailLayout } from '../../layouts/EmailLayout';
 import { EmailHeader } from '../../components/EmailHeader';
 import { EmailFooter } from '../../components/EmailFooter';
@@ -12,6 +12,8 @@ export interface WaitlistEmailData {
   firstName: string;
   lastName?: string;
   position?: number;
+  referralCode?: string;
+  referralUrl?: string;
 }
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
@@ -58,6 +60,41 @@ const styles = {
     color: colors.textMuted,
     margin: '0',
   },
+  referralSection: {
+    border: `2px dashed ${colors.brandAccent}`,
+    padding: spacing['6'],
+    textAlign: 'center' as const,
+    margin: `${spacing['6']} 0`,
+  },
+  referralEyebrow: {
+    fontFamily: fonts.body,
+    fontSize: fontSize.xs,
+    fontWeight: 700 as const,
+    color: colors.textMuted,
+    letterSpacing: '0.18em',
+    textTransform: 'uppercase' as const,
+    margin: `0 0 ${spacing['2']}`,
+  },
+  referralCode: {
+    fontFamily: fonts.mono,
+    fontSize: fontSize['2xl'],
+    fontWeight: 700 as const,
+    color: colors.brandDark,
+    letterSpacing: '0.12em',
+    margin: `0 0 ${spacing['3']}`,
+  },
+  referralLink: {
+    fontFamily: fonts.body,
+    fontSize: fontSize.sm,
+    color: colors.brandDark,
+    wordBreak: 'break-all' as const,
+  },
+  referralNote: {
+    fontFamily: fonts.body,
+    fontSize: fontSize.xs,
+    color: colors.textMuted,
+    margin: `${spacing['3']} 0 0`,
+  },
   feature: {
     fontFamily: fonts.body,
     fontSize: fontSize.sm,
@@ -68,7 +105,7 @@ const styles = {
 };
 
 // ─── Component ────────────────────────────────────────────────────────────────
-export function WaitlistConfirmationEmail({ firstName, position }: WaitlistEmailData) {
+export function WaitlistConfirmationEmail({ firstName, position, referralCode, referralUrl }: WaitlistEmailData) {
   return (
     <EmailLayout preview={`${firstName}, your RealEST waitlist spot is confirmed.`}>
       <EmailHeader />
@@ -104,6 +141,21 @@ export function WaitlistConfirmationEmail({ firstName, position }: WaitlistEmail
         <Text style={styles.paragraphMuted}>
           We&apos;ll notify you as soon as RealEST launches.
         </Text>
+
+        {referralCode && (
+          <Section style={styles.referralSection}>
+            <Text style={styles.referralEyebrow}>Your referral code</Text>
+            <Text style={styles.referralCode}>{referralCode}</Text>
+            {referralUrl && (
+              <Link href={referralUrl} style={styles.referralLink}>
+                {referralUrl}
+              </Link>
+            )}
+            <Text style={styles.referralNote}>
+              Share your link — every person you bring in moves you both up the queue.
+            </Text>
+          </Section>
+        )}
       </EmailSection>
 
       <EmailFooter />
@@ -120,6 +172,8 @@ export const previewProps: WaitlistEmailData = {
   firstName: 'Adaeze',
   lastName: 'Okonkwo',
   position: 42,
+  referralCode: 'ADAEZE7K',
+  referralUrl: 'https://realest.ng/refer?ref=ADAEZE7K',
 };
 
 export default WaitlistConfirmationEmail;

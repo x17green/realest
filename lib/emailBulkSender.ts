@@ -16,6 +16,7 @@
 import * as React from 'react';
 import { Resend } from 'resend';
 import { renderEmailFull } from '@/emails';
+import { interpolateSubject } from '@/lib/utils/interpolateSubject';
 
 // ── Config ────────────────────────────────────────────────────────────────────
 /** Max emails per Resend batch request (Resend hard limit is 100). */
@@ -31,6 +32,10 @@ export interface CampaignRecipient {
   email: string;
   firstName?: string;
   fullName?: string;
+  /** Per-recipient unique referral code (e.g. "A3F9B2C1") */
+  referralCode?: string;
+  /** Full referral landing URL, e.g. https://realest.ng/refer?ref=A3F9B2C1 */
+  referralUrl?: string;
 }
 
 export interface BroadcastSendOptions {
@@ -192,9 +197,21 @@ async function sendBatch(opts: BatchSendOptions): Promise<BulkSendResult> {
   let totalFailed = 0;
   let firstMessageId: string | undefined;
 
-  const chunks = chunk(opts.recipients, MAX_BATCH_SIZE);
+  // Filter out recipients with missing, blank, or malformed email addresses.
+  // Resend rejects the entire batch chunk if any single `to` value is invalid.
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const validRecipients = opts.recipients.filter(
+    (r) => typeof r.email === 'string' && EMAIL_RE.test(r.email.trim()),
+  );
+  if (validRecipients.length !== opts.recipients.length) {
+    console.warn(
+      `⚠️ Skipped ${opts.recipients.length - validRecipients.length} recipients with invalid/missing emails`,
+    );
+  }
+
+  const chunks = chunk(validRecipients, MAX_BATCH_SIZE);
   console.log(
-    `📤 Batch send: ${opts.recipients.length} recipients in ${chunks.length} chunk(s)`,
+    `📤 Batch send: ${validRecipients.length} recipients in ${chunks.length} chunk(s)`,
   );
 
   for (let i = 0; i < chunks.length; i++) {
@@ -207,8 +224,12 @@ async function sendBatch(opts: BatchSendOptions): Promise<BulkSendResult> {
           : { html: opts.html ?? '', text: opts.text ?? '' };
         return {
           from: opts.from,
-          to: [recipient.email],
-          subject: opts.subject,
+          to: recipient.email,
+          subject: interpolateSubject(opts.subject, {
+            firstName: recipient.firstName,
+            fullName: recipient.fullName,
+            email: recipient.email,
+          }),
           html,
           text,
         };

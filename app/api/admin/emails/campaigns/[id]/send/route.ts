@@ -56,6 +56,32 @@ async function requireAdmin() {
   return { user, error: null, status: 200 };
 }
 
+// ── Waitlist recipient query ───────────────────────────────────────────────────
+
+async function fetchWaitlistRecipients(): Promise<CampaignRecipient[]> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('waitlist')
+    .select('email, first_name, last_name, referral_code')
+    .eq('status', 'active');
+
+  if (error) throw new Error(`Waitlist query failed: ${error.message}`);
+
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return (data ?? [])
+    .filter((row) => typeof row.email === 'string' && EMAIL_RE.test((row.email as string).trim()))
+    .map((row) => {
+      const firstName = (row.first_name as string | null)?.trim() || undefined;
+      const lastName = (row.last_name as string | null)?.trim() || undefined;
+      const fullName = [firstName, lastName].filter(Boolean).join(' ') || undefined;
+      const referralCode = (row.referral_code as string | null)?.trim() || undefined;
+      const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://realest.ng';
+      const referralUrl = referralCode ? `${BASE_URL}/refer?ref=${referralCode}` : undefined;
+      return { email: (row.email as string).trim(), firstName: firstName?.trim() || undefined, fullName: fullName?.trim() || undefined, referralCode, referralUrl };
+    });
+}
+
 // ── DB segment recipient query ─────────────────────────────────────────────────
 
 async function fetchDbSegmentRecipients(
@@ -139,7 +165,10 @@ export async function POST(
       // db_segment: fetch recipients then render per-person so firstName / email
       // are injected into the template for each individual email
       const audienceFilter = (campaign.audience_filter as Record<string, unknown>) ?? {};
-      const recipients = await fetchDbSegmentRecipients(audienceFilter);
+      const recipients =
+        audienceFilter.source === 'waitlist'
+          ? await fetchWaitlistRecipients()
+          : await fetchDbSegmentRecipients(audienceFilter);
 
       result = await executeBulkSend({
         mode: 'batch',
@@ -153,6 +182,9 @@ export async function POST(
             email: recipient.email,
             firstName: recipient.firstName ?? 'there',
             fullName: recipient.fullName ?? recipient.firstName ?? '',
+            // Referral personalisation — populated for waitlist sends
+            referralCode: recipient.referralCode ?? (templateProps.referralCode as string | undefined) ?? '',
+            referralUrl: recipient.referralUrl ?? (templateProps.referralUrl as string | undefined) ?? '',
           };
           return renderCampaignTemplate(campaign.template_name, mergedProps);
         },

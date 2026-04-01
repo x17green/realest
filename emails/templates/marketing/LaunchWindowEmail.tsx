@@ -13,6 +13,8 @@ export interface LaunchWindowEmailData {
   firstName: string;
   /** e.g. "April 2026" */
   newLaunchTarget: string;
+  /** supply persona gets listing waiver copy, general does not */
+  audience?: 'general' | 'supply';
   /** Number of free listings offered to early waitlist members */
   freeListingsReward?: number;
   referralUrl?: string;
@@ -128,11 +130,13 @@ const s = {
 export function LaunchWindowEmail({
   firstName = '',
   newLaunchTarget = 'Q2 2026',
+  audience = 'general',
   freeListingsReward = 2,
   referralUrl = '',
   unsubscribeUrl = '',
 }: LaunchWindowEmailData) {
   const ctaUrl = referralUrl || `${BASE_URL}/refer`;
+  const isSupplyAudience = audience === 'supply';
 
   return (
     <EmailLayout preview={`${firstName}, we're taking a few more weeks. Here's the honest reason why.`}>
@@ -185,8 +189,8 @@ export function LaunchWindowEmail({
 
         <Section style={s.timelineItem}>
           <Text style={s.timelineLabel}>✓ Done</Text>
-          <Text style={s.timelineTitle}>Field agent network — Lagos & Abuja</Text>
-          <Text style={s.timelineDesc}>Trained inspectors active in 8 LGAs across both cities.</Text>
+          <Text style={s.timelineTitle}>Field agent network — Lagos & Port Harcourt</Text>
+          <Text style={s.timelineDesc}>Trained field inspectors active across both cities.</Text>
         </Section>
 
         <Section style={{ ...s.timelineItem, borderLeft: `2px solid ${colors.border}` }}>
@@ -202,23 +206,36 @@ export function LaunchWindowEmail({
         </Section>
       </EmailSection>
 
-      {/* Reward box */}
+      {/* Waitlist reward (persona-segmented copy) */}
       <Section style={s.rewardBox}>
         <Text style={s.rewardEyebrow}>Waitlist Reward</Text>
-        <Text style={s.rewardNumber}>{freeListingsReward} Free Listings</Text>
-        <Text style={s.rewardTitle}>For Life. Just for waiting.</Text>
-        <Text style={s.rewardDesc}>
-          Since you've been with us from the beginning, your first {freeListingsReward} rental
-          listings on RealEST are <strong style={{ color: colors.brandAccent }}>free for life</strong> —
-          no subscription needed, no expiry date. It's a small thank-you for your patience.
-        </Text>
+        {isSupplyAudience ? (
+          <>
+            <Text style={s.rewardNumber}>1 Free Listing</Text>
+            <Text style={s.rewardTitle}>For your first owner/agent listing.</Text>
+            <Text style={s.rewardDesc}>
+              Since you've been with us from the beginning, your <strong style={{ color: colors.brandAccent }}>first listing</strong>{' '}
+              as an agent or property owner on RealEST will be free if used within <strong style={{ color: colors.brandAccent }}>6 months</strong>{' '}
+              of launch. It's our way of honoring your early support.
+            </Text>
+          </>
+        ) : (
+          <>
+            <Text style={s.rewardNumber}>Priority Waitlist Access</Text>
+            <Text style={s.rewardTitle}>You still get rewarded for staying with us.</Text>
+            <Text style={s.rewardDesc}>
+              You're in our early cohort, so you'll continue receiving launch previews, milestone updates,
+              and prioritized rollout access as we move toward launch.
+            </Text>
+          </>
+        )}
       </Section>
 
       <EmailSection>
         <Text style={s.paragraph}>
-          Know a property owner or landlord who'd benefit from RealEST? Send them your invite
-          link now so they can claim <em>their</em> early-access reward too. More verified
-          owners means a better platform for everyone on launch day.
+          Know someone who should join RealEST early? Send your invite link now so they can claim
+          <em> their</em> pre-launch perks too. Strong referrals help us launch with better demand,
+          better supply, and better trust signals for everyone.
         </Text>
 
         <EmailButton href={ctaUrl} variant="primary">
@@ -229,7 +246,7 @@ export function LaunchWindowEmail({
       <EmailFooter
         showUnsubscribe={true}
         unsubscribeUrl={unsubscribeUrl || undefined}
-        footerNote="You're receiving this because you want a fraud-free Nigeria."
+        footerNote="Verified properties only. No fake agents. No scams. No movement fees!"
       />
     </EmailLayout>
   );
@@ -243,7 +260,8 @@ export default LaunchWindowEmail;
 export const previewProps: LaunchWindowEmailData = {
   firstName: 'Emeka',
   newLaunchTarget: 'April 2026',
-  freeListingsReward: 2,
+  audience: 'supply',
+  freeListingsReward: 1,
   referralUrl: 'https://realest.ng/refer?code=EMEKA2026',
   unsubscribeUrl: 'https://realest.ng/unsubscribe?token=abc123',
 };

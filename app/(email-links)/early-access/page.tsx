@@ -13,6 +13,7 @@ import {
   Building,
   Users,
 } from "lucide-react";
+import { useEmailValidation } from "@/lib/hooks/useEmailValidation";
 
 type UserType = "buyer" | "owner" | "agent" | "";
 
@@ -55,6 +56,8 @@ export default function EarlyAccessPage() {
   const [result, setResult] = useState<{ position?: number; totalCount?: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const emailValidation = useEmailValidation(form.email, { debounceMs: 500, minLength: 3 });
+
   const set = (k: keyof typeof form, v: string) =>
     setForm((f) => ({ ...f, [k]: v }));
 
@@ -63,6 +66,8 @@ export default function EarlyAccessPage() {
       setError("First name and email are required.");
       return;
     }
+    // Block submit without hitting the API if this email is already on the list
+    if (!emailValidation.isAvailable) return;
     setLoading(true);
     setError(null);
     try {
@@ -203,6 +208,20 @@ export default function EarlyAccessPage() {
               />
             </div>
 
+            {/* Already on list — show inline rather than submitting */}
+            {!emailValidation.isAvailable && emailValidation.userInfo && (
+              <div className="mt-3 flex items-start gap-1 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2.5 text-sm">
+                <CheckCircle className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                <span>
+                  <strong>{emailValidation.userInfo.firstName}</strong>, you&apos;re already on the waitlist
+                  {emailValidation.userInfo.position ? (
+                    <> at position <strong>#{emailValidation.userInfo.position}</strong></>
+                  ) : null}.
+                  {" "}<Link href="/refer" className="text-primary underline underline-offset-2">Refer a friend to move up.</Link>
+                </span>
+              </div>
+            )}
+
             {error && (
               <p className="mt-3 text-sm text-destructive">{error}</p>
             )}
@@ -211,14 +230,14 @@ export default function EarlyAccessPage() {
               className="w-full mt-5"
               size="lg"
               onClick={handleSubmit}
-              disabled={loading}
+              disabled={loading || !emailValidation.isAvailable || emailValidation.isLoading}
             >
-              {loading ? (
+              {loading || emailValidation.isLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin mr-2" />
               ) : (
                 <ArrowRight className="w-4 h-4 mr-2" />
               )}
-              Reserve My Spot
+              {!emailValidation.isAvailable ? "Already on the list" : "Reserve My Spot"}
             </Button>
             <p className="text-xs text-muted-foreground mt-3 text-center">
               No spam. Unsubscribe anytime.

@@ -176,6 +176,15 @@ model profiles {
   property_documents                      property_documents[]
   reviews                                 reviews[]
   saved_properties                        saved_properties[]
+  referral_code                           String?              @unique @db.VarChar(20)
+  referred_by                             String?              @db.Uuid
+  referred_by_code                        String?              @db.VarChar(20)
+  referral_count                          Int                  @default(0)
+  referrer                                profiles?            @relation("ProfileReferrals", fields: [referred_by], references: [id], onDelete: SetNull)
+  referrals                               profiles[]           @relation("ProfileReferrals")
+
+  @@index([referral_code], map: "idx_profiles_referral_code")
+  @@index([referred_by],   map: "idx_profiles_referred_by")
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
@@ -366,17 +375,113 @@ model waitlist {
   referrer_url             String?
   user_agent               String?
   ip_address               String?   @db.Inet
-  utm_source               String?   @db.VarChar(100)
-  utm_medium               String?   @db.VarChar(100)
-  utm_campaign             String?   @db.VarChar(100)
-  created_at               DateTime? @default(now()) @db.Timestamptz(6)
-  updated_at               DateTime? @default(now()) @db.Timestamptz(6)
+  utm_source               String?    @db.VarChar(100)
+  utm_medium               String?    @db.VarChar(100)
+  utm_campaign             String?    @db.VarChar(100)
+  /// Auto-generated unique invite code, e.g. "A3F9B2C1"
+  referral_code            String?    @unique @db.VarChar(20)
+  /// UUID of the waitlist entry whose referral_code was used at signup
+  referred_by              String?    @db.Uuid
+  /// Cached count of successful referrals (incremented atomically)
+  referral_count           Int?       @default(0)
+  created_at               DateTime?  @default(now()) @db.Timestamptz(6)
+  updated_at               DateTime?  @default(now()) @db.Timestamptz(6)
+
+  referrer                 waitlist?  @relation("WaitlistReferrals", fields: [referred_by], references: [id], onDelete: SetNull)
+  referrals                waitlist[] @relation("WaitlistReferrals")
 
   @@index([email], map: "idx_waitlist_email")
   @@index([location_preference], map: "idx_waitlist_location_preference")
+  @@index([referral_code], map: "idx_waitlist_referral_code")
+  @@index([referred_by], map: "idx_waitlist_referred_by")
   @@index([source], map: "idx_waitlist_source")
   @@index([status], map: "idx_waitlist_status")
   @@index([subscribed_at], map: "idx_waitlist_subscribed_at")
+}
+
+/// Anonymous poll votes collected from email links (e.g. city preference polls).
+model poll_responses {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  /// Identifies the poll question, e.g. 'city'
+  question_key String
+  /// The selected answer, e.g. 'Lagos'
+  answer       String
+  /// Campaign reference tag, e.g. 'frontier' | 'milestone'
+  ref          String?
+  ip_address   String?
+  created_at   DateTime? @default(now()) @db.Timestamptz(6)
+
+  @@index([question_key], map: "idx_poll_responses_question_key")
+  @@index([answer], map: "idx_poll_responses_answer")
+  @@index([created_at(sort: Desc)], map: "idx_poll_responses_created_at")
+}
+
+/// Persona-segmented launch intelligence poll catalog (form container).
+model poll_forms {
+  id          String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slug        String              @unique
+  title       String
+  description String?
+  is_active   Boolean             @default(true)
+  created_at  DateTime            @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime            @default(now()) @db.Timestamptz(6)
+
+  questions   poll_questions[]
+  submissions poll_submissions[]
+}
+
+/// Questions belonging to a poll form, keyed by segment.
+model poll_questions {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  form_id       String   @db.Uuid
+  question_key  String
+  segment       String
+  prompt        String
+  question_type String
+  options       Json?
+  is_required   Boolean  @default(true)
+  display_order Int
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime @default(now()) @db.Timestamptz(6)
+
+  form          poll_forms @relation(fields: [form_id], references: [id], onDelete: Cascade)
+
+  @@unique([form_id, question_key])
+  @@index([form_id, segment, display_order], map: "poll_questions_form_segment_idx")
+}
+
+/// A single respondent's poll submission (one per person per form).
+model poll_submissions {
+  id                    String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  form_id               String                   @db.Uuid
+  segment               String
+  full_name             String
+  email                 String
+  opt_in_email_results  Boolean                  @default(false)
+  referral_code         String?
+  source                String                   @default("web")
+  created_at            DateTime                 @default(now()) @db.Timestamptz(6)
+
+  form                  poll_forms               @relation(fields: [form_id], references: [id], onDelete: Restrict)
+  answers               poll_submission_answers[]
+
+  @@index([form_id, segment], map: "poll_submissions_form_segment_idx")
+  @@index([email], map: "poll_submissions_email_idx")
+}
+
+/// Individual answers for each question within a submission.
+model poll_submission_answers {
+  id            String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  submission_id String           @db.Uuid
+  question_key  String
+  answer        Json
+  created_at    DateTime         @default(now()) @db.Timestamptz(6)
+
+  submission    poll_submissions @relation(fields: [submission_id], references: [id], onDelete: Cascade)
+
+  @@unique([submission_id, question_key])
+  @@index([submission_id], map: "poll_submission_answers_submission_idx")
+  @@index([question_key], map: "poll_submission_answers_question_key_idx")
 }
 
 /// Email marketing campaign records — tracks both Resend broadcast and DB-segment batch sends.

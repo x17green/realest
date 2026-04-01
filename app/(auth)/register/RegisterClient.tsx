@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { 
@@ -22,7 +22,17 @@ import {
   Users,
   Briefcase,
   AlertCircle,
+  BadgeCheck,
 } from "lucide-react";
+
+type CandidateRole = "user" | "owner" | "agent";
+
+interface WaitlistContextResponse {
+  exists?: boolean;
+  persona?: string;
+  candidateRole?: CandidateRole | null;
+  waitlistReward?: string | null;
+}
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -36,6 +46,15 @@ export default function SignUpPage() {
     confirmPassword: "",
   });
   const [error, setError] = useState("");
+  const [refCode, setRefCode] = useState<string | undefined>();
+  const [waitlistContext, setWaitlistContext] = useState<WaitlistContextResponse | null>(null);
+
+  useEffect(() => {
+    const fromUrl = new URLSearchParams(window.location.search).get('ref');
+    const fromStorage = sessionStorage.getItem('referralCode');
+    const code = (fromUrl || fromStorage)?.trim().toUpperCase() || undefined;
+    if (code) setRefCode(code);
+  }, []);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -63,11 +82,25 @@ export default function SignUpPage() {
     }
 
     try {
+      let effectiveUserType = formData.userType as CandidateRole;
+
+      const waitlistLookup = await fetch(
+        `/api/waitlist?email=${encodeURIComponent(formData.email.trim())}`,
+      );
+
+      if (waitlistLookup.ok) {
+        const waitlistData = (await waitlistLookup.json()) as WaitlistContextResponse;
+        setWaitlistContext(waitlistData);
+        if (waitlistData.exists && waitlistData.candidateRole) {
+          effectiveUserType = waitlistData.candidateRole;
+        }
+      }
+
       const response = await signUpWithPassword(
         formData.email,
         formData.password,
         "", // fullname handled in onboarding
-        formData.userType as "user" | "owner" | "agent",
+        effectiveUserType,
       );
 
       if (!response.success) {
@@ -76,6 +109,20 @@ export default function SignUpPage() {
       }
 
       if (response.user) {
+        fetch('/api/auth/sync-waitlist-context', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: formData.email }),
+        }).catch(() => {});
+
+        if (refCode) {
+          fetch('/api/auth/attribute-referral', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: formData.email, refCode }),
+          }).catch(() => {});
+          sessionStorage.removeItem('referralCode');
+        }
         router.push(`/success?email=${encodeURIComponent(formData.email)}`);
       }
     } catch (err) {
@@ -169,6 +216,21 @@ export default function SignUpPage() {
         </CardHeader>
 
         <CardContent className="space-y-6">
+          {waitlistContext?.exists && waitlistContext.candidateRole ? (
+            <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 text-sm text-foreground">
+              <div className="mb-1 flex items-center gap-2 font-medium">
+                <BadgeCheck className="h-4 w-4 text-primary" />
+                Waitlist role detected
+              </div>
+              <p className="text-muted-foreground">
+                Your waitlist persona will activate the <strong>{waitlistContext.candidateRole}</strong> account flow after signup.
+              </p>
+              {waitlistContext.waitlistReward ? (
+                <p className="mt-2 text-muted-foreground">{waitlistContext.waitlistReward}</p>
+              ) : null}
+            </div>
+          ) : null}
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium">

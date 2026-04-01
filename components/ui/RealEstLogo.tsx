@@ -71,14 +71,12 @@ const RealEstLogo: React.FC<RealEstLogoProps> = ({
     if (theme === 'light') {
       // explicit request for light-on-dark: invert the dark mark
       return (
-        // eslint-disable-next-line @next/next/no-img-element
         <img src="/realest-logo.svg" alt="RealEST Connect" {...imgProps} className="block" style={{ ...imgProps.style, filter: 'invert(1)' }} />
       );
     }
     if (theme === 'dark') {
       // explicit request for dark-on-light: use mark as-is
       return (
-        // eslint-disable-next-line @next/next/no-img-element
         <img src="/realest-logo.svg" alt="RealEST Connect" {...imgProps} className="block" />
       );
     }
@@ -86,10 +84,8 @@ const RealEstLogo: React.FC<RealEstLogoProps> = ({
     return (
       <>
         {/* Light mode: dark mark on light bg */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/realest-logo.svg" alt="RealEST Connect" {...imgProps} className="block dark:hidden" />
         {/* Dark mode: light mark on dark bg (CSS invert) */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/realest-logo.svg" alt="RealEST Connect" {...imgProps} className="hidden dark:block" style={{ ...imgProps.style, filter: 'invert(1)' }} />
       </>
     );
@@ -97,18 +93,18 @@ const RealEstLogo: React.FC<RealEstLogoProps> = ({
 
   const renderThemed = (fileBase: 'realest-wordmark' | 'realest-logo-wordmark' | 'realest-logo-with-text', alt: string) => {
     if (theme === 'dark') {
-      return <img src={`/${fileBase}-.svg`} alt={alt} {...imgProps} className="block" />;// eslint-disable-line @next/next/no-img-element
+      return <img src={`/${fileBase}-.svg`} alt={alt} {...imgProps} className="block" />;
     }
     if (theme === 'light') {
-      return <img src={`/${fileBase}-dark.svg`} alt={alt} {...imgProps} className="block" />;// eslint-disable-line @next/next/no-img-element
+      return <img src={`/${fileBase}-dark.svg`} alt={alt} {...imgProps} className="block" />;
     }
     // auto — show/hide via Tailwind dark mode
     return (
       <>
         {/* Light mode: dark logo (dark text on light bg) */}
-        <img src={`/${fileBase}-dark.svg`} alt={alt} {...imgProps} className="block dark:hidden" />{/* eslint-disable-line @next/next/no-img-element */}
+        <img src={`/${fileBase}-dark.svg`} alt={alt} {...imgProps} className="block dark:hidden" />
         {/* Dark mode: light logo (light text on dark bg) */}
-        <img src={`/${fileBase}-light.svg`} alt={alt} {...imgProps} className="hidden dark:block" />{/* eslint-disable-line @next/next/no-img-element */}
+        <img src={`/${fileBase}-light.svg`} alt={alt} {...imgProps} className="hidden dark:block" />
       </>
     );
   };

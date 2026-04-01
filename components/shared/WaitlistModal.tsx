@@ -16,6 +16,7 @@
 import React, { useState } from 'react';
 import { useEmailValidation, formatWaitlistMessage } from '@/lib/hooks/useEmailValidation';
 import { useLocationSearch, formatLocationName } from '@/lib/hooks/useLocationSearch';
+import { WAITLIST_PERSONAS, type WaitlistPersona } from '@/lib/referral-system';
 import {
   Mail,
   CheckCircle,
@@ -43,23 +44,27 @@ import { Button } from '@/components/ui/button'
 interface WaitlistModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess?: (data: { firstName: string; lastName?: string; position?: number; totalCount?: number }) => void;
-}
+  onSuccess?: (data: { firstName: string; lastName?: string; position?: number; totalCount?: number }) => void;  /** Referral code to attribute this signup to a referrer. Passed as `ref` in the POST body. */
+  referralCode?: string;}
 
 interface SubmittedData {
   firstName: string;
   lastName?: string;
   position?: number;
   totalCount?: number;
+  persona?: WaitlistPersona;
+  candidateRole?: string | null;
+  referralCode?: string | null;
 }
 
-const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSuccess }) => {
+const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSuccess, referralCode }) => {
   // Form states
   const [currentStage, setCurrentStage] = useState(1);
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
+  const [persona, setPersona] = useState<WaitlistPersona | "">("");
   const [interests, setInterests] = useState<string[]>([]);
   const [location, setLocation] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -111,6 +116,9 @@ const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSucces
       case 'phone':
         setPhone(value as string);
         break;
+      case 'persona':
+        setPersona(value as WaitlistPersona | '');
+        break;
       case 'interests':
         setInterests(value as string[]);
         break;
@@ -133,6 +141,7 @@ const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSucces
       if (!email.trim()) newErrors.email = 'Email is required';
       else if (!emailValidation.isValid) newErrors.email = 'Invalid email address';
       else if (!emailValidation.isAvailable) newErrors.email = 'Email already in waitlist';
+      if (!persona) newErrors.persona = 'Please choose the option that best describes you';
     }
 
     if (stage === 2) {
@@ -203,8 +212,10 @@ const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSucces
           firstName: firstName.trim(),
           lastName: lastName.trim() || undefined,
           phone: phone.trim() || undefined,
+          persona: persona || undefined,
           interests: interests,
-          location: location || undefined
+          locationPreference: location || undefined,
+          ref: referralCode ?? undefined,
         }),
       });
 
@@ -219,7 +230,10 @@ const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSucces
         firstName: data.firstName,
         lastName: data.lastName,
         position: data.position,
-        totalCount: data.totalCount
+        totalCount: data.totalCount,
+        persona: data.persona,
+        candidateRole: data.candidateRole,
+        referralCode: data.referralCode,
       };
 
       setSubmittedData(resultData);
@@ -248,6 +262,7 @@ const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSucces
       setFirstName("");
       setLastName("");
       setPhone("");
+      setPersona("");
       setInterests([]);
       setLocation("");
       locationSearch.clearQuery();
@@ -350,6 +365,37 @@ const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSucces
               </div>
 
               <div className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-semibold text-foreground">
+                    I am joining as <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={persona}
+                    onChange={(e) => updateFormData('persona', e.target.value)}
+                    className={`w-full px-4 py-2.5 bg-surface border rounded-lg transition-all duration-200 focus:ring-2 focus:outline-none ${
+                      errors.persona
+                        ? 'border-red-500 focus:ring-red-200/50'
+                        : 'border-border/50 focus:border-primary/50 focus:ring-primary/20'
+                    }`}
+                  >
+                    <option value="">Select a persona</option>
+                    {WAITLIST_PERSONAS.map((item) => (
+                      <option key={item.value} value={item.value}>
+                        {item.label}
+                      </option>
+                    ))}
+                  </select>
+                  {persona ? (
+                    <p className="text-xs text-muted-foreground">{WAITLIST_PERSONAS.find((p) => p.value === persona)?.description}</p>
+                  ) : null}
+                  {errors.persona && (
+                    <p className="text-xs text-red-600 flex items-center gap-1 mt-1">
+                      <AlertCircle className="w-3.5 h-3.5" />
+                      {errors.persona}
+                    </p>
+                  )}
+                </div>
+
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label className="text-sm font-semibold text-foreground">
@@ -627,6 +673,12 @@ const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSucces
                   </p>
                 </div>
               )}
+
+              {submittedData?.candidateRole ? (
+                <p className="text-xs text-muted-foreground">
+                  Candidate role detected: <span className="font-semibold text-foreground">{submittedData.candidateRole}</span>
+                </p>
+              ) : null}
             </div>
           )}
         </div>
@@ -659,7 +711,7 @@ const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSucces
                 {currentStage === 1 ? (
                   <Button 
                     onClick={handleNext} 
-                    disabled={!firstName.trim() || !email.trim() || !emailValidation.isValid || !emailValidation.isAvailable}
+                    disabled={!firstName.trim() || !email.trim() || !persona || !emailValidation.isValid || !emailValidation.isAvailable}
                     variant="neon" 
                     size="lg" 
                     className="flex w-full items-center justify-center gap-2 btn-glow-accent transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:bg-muted disabled:cursor-not-allowed"
