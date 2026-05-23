@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServiceClient } from "@/lib/supabase/service";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(request: NextRequest) {
   let answer: string;
@@ -24,12 +24,13 @@ export async function POST(request: NextRequest) {
 
   // Best-effort insert — table may not exist yet; never block the user experience.
   try {
-    const supabase = createServiceClient();
-    await supabase.from("poll_responses").insert({
-      question_key: "city",
-      answer,
-      ref: ref || null,
-      ip_address: ip,
+    await prisma.poll_responses.create({
+      data: {
+        question_key: "city",
+        answer,
+        ref: ref || null,
+        ip_address: ip,
+      },
     });
   } catch {
     // Silently swallow — poll storage is non-critical.

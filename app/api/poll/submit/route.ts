@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServiceClient } from '@/lib/supabase/service';
+import { prisma } from '@/lib/prisma';
 import { sendPollResultsSummaryEmail } from '@/lib/emailService';
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://realest.ng';
@@ -83,30 +83,29 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const supabase = createServiceClient() as any;
 
-    const { data: form, error: formError } = await supabase
-      .from('poll_forms')
-      .select('id, slug, title')
-      .eq('slug', formSlug)
-      .eq('is_active', true)
-      .maybeSingle();
-
-    if (formError || !form) {
+    // Find the poll form by slug
+    const form = await prisma.poll_forms.findFirst({
+      where: { slug: formSlug, is_active: true },
+      select: { id: true, slug: true, title: true },
+    });
+    if (!form) {
       return NextResponse.json({ ok: false, error: 'Poll form not found.' }, { status: 404 });
     }
 
-    const { data: questions, error: questionError } = await supabase
-      .from('poll_questions')
-      .select('question_key, prompt, question_type, options, is_required, display_order')
-      .eq('form_id', form.id)
-      .eq('segment', segment)
-      .order('display_order', { ascending: true });
-
-    if (questionError) {
-      return NextResponse.json({ ok: false, error: questionError.message }, { status: 500 });
-    }
-
+    // Get all questions for the form and segment, ordered by display_order
+    const questions = await prisma.poll_questions.findMany({
+      where: { form_id: form.id, segment },
+      orderBy: { display_order: 'asc' },
+      select: {
+        question_key: true,
+        prompt: true,
+        question_type: true,
+        options: true,
+        is_required: true,
+        display_order: true,
+      },
+    });
     if (!questions || questions.length === 0) {
       return NextResponse.json({ ok: false, error: 'No questions found for this segment.' }, { status: 400 });
     }
@@ -123,26 +122,29 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { data: submission, error: submissionError } = await supabase
-      .from('poll_submissions')
-      .insert({
-        form_id: form.id,
-        segment,
-        full_name: fullName,
-        email,
-        opt_in_email_results: optInEmailResults,
-        referral_code: ref || null,
-        source: 'web',
-      })
-      .select('id')
-      .single();
 
-    if (submissionError || !submission) {
+    // Create poll submission
+    let submission;
+    try {
+      submission = await prisma.poll_submissions.create({
+        data: {
+          form_id: form.id,
+          segment,
+          full_name: fullName,
+          email,
+          opt_in_email_results: optInEmailResults,
+          referral_code: ref || null,
+          source: 'web',
+        },
+        select: { id: true },
+      });
+    } catch (submissionError: any) {
       return NextResponse.json(
         { ok: false, error: submissionError?.message ?? 'Unable to save submission.' },
         { status: 500 },
       );
     }
+
 
     const answerRows = questions
       .filter((q: any) => isNonEmptyAnswer(answers[q.question_key]))
@@ -153,11 +155,13 @@ export async function POST(request: NextRequest) {
       }));
 
     if (answerRows.length > 0) {
-      const { error: answerError } = await supabase.from('poll_submission_answers').insert(answerRows);
-      if (answerError) {
+      try {
+        await prisma.poll_submission_answers.createMany({ data: answerRows });
+      } catch (answerError: any) {
         return NextResponse.json({ ok: false, error: answerError.message }, { status: 500 });
       }
     }
+
 
     // Keep writing legacy rows for existing admin poll analytics compatibility.
     const legacyRows = questions
@@ -169,7 +173,9 @@ export async function POST(request: NextRequest) {
       }));
 
     if (legacyRows.length > 0) {
-      await supabase.from('poll_responses').insert(legacyRows);
+      try {
+        await prisma.poll_responses.createMany({ data: legacyRows });
+      } catch {}
     }
 
     if (optInEmailResults) {

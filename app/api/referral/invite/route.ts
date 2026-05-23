@@ -89,6 +89,7 @@ export async function POST(request: NextRequest) {
   const currentMilestone = getCurrentMilestone(inviter.referralCount);
   const result = await sendReferralInviteEmail(inviteeEmail, {
     firstName: inviteeName || 'there',
+    inviterName: inviter.firstName,
     referralCode: inviter.referralCode,
     referralUrl: buildReferralShareUrl(inviter.referralCode),
     rewardDescription: currentMilestone?.label ?? 'priority verification on your first listing',

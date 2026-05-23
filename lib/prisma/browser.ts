@@ -118,6 +118,31 @@ export type users = Prisma.usersModel
  */
 export type waitlist = Prisma.waitlistModel
 /**
+ * Model poll_responses
+ * Anonymous poll votes collected from email links (e.g. city preference polls).
+ */
+export type poll_responses = Prisma.poll_responsesModel
+/**
+ * Model poll_forms
+ * Persona-segmented launch intelligence poll catalog (form container).
+ */
+export type poll_forms = Prisma.poll_formsModel
+/**
+ * Model poll_questions
+ * Questions belonging to a poll form, keyed by segment.
+ */
+export type poll_questions = Prisma.poll_questionsModel
+/**
+ * Model poll_submissions
+ * A single respondent's poll submission (one per person per form).
+ */
+export type poll_submissions = Prisma.poll_submissionsModel
+/**
+ * Model poll_submission_answers
+ * Individual answers for each question within a submission.
+ */
+export type poll_submission_answers = Prisma.poll_submission_answersModel
+/**
  * Model email_campaigns
  * Email marketing campaign records — tracks both Resend broadcast and DB-segment batch sends.
  */

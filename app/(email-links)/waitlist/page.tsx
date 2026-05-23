@@ -19,6 +19,7 @@ export default function WaitlistPage() {
     position?: number;
     totalCount?: number;
     firstName?: string;
+    referralCode?: string | null;
   } | null>(null);
 
   useEffect(() => {
@@ -63,7 +64,7 @@ export default function WaitlistPage() {
             </p>
             <div className="flex gap-3 justify-center">
               <Button asChild>
-                <Link href="/refer">
+                <Link href={result.referralCode ? `/refer?ref=${encodeURIComponent(result.referralCode)}` : "/refer"}>
                   Refer a Friend <ArrowRight className="w-4 h-4 ml-2" />
                 </Link>
               </Button>
@@ -129,6 +130,7 @@ export default function WaitlistPage() {
             position: data.position,
             totalCount: data.totalCount,
             firstName: data.firstName,
+            referralCode: data.referralCode,
           });
         }}
       />

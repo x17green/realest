@@ -20,8 +20,18 @@ export type profilesModel = runtime.Types.Result.DefaultSelection<Prisma.$profil
 
 export type AggregateProfiles = {
   _count: ProfilesCountAggregateOutputType | null
+  _avg: ProfilesAvgAggregateOutputType | null
+  _sum: ProfilesSumAggregateOutputType | null
   _min: ProfilesMinAggregateOutputType | null
   _max: ProfilesMaxAggregateOutputType | null
+}
+
+export type ProfilesAvgAggregateOutputType = {
+  referral_count: number | null
+}
+
+export type ProfilesSumAggregateOutputType = {
+  referral_count: number | null
 }
 
 export type ProfilesMinAggregateOutputType = {
@@ -33,6 +43,10 @@ export type ProfilesMinAggregateOutputType = {
   bio: string | null
   created_at: Date | null
   updated_at: Date | null
+  referral_code: string | null
+  referred_by: string | null
+  referred_by_code: string | null
+  referral_count: number | null
 }
 
 export type ProfilesMaxAggregateOutputType = {
@@ -44,6 +58,10 @@ export type ProfilesMaxAggregateOutputType = {
   bio: string | null
   created_at: Date | null
   updated_at: Date | null
+  referral_code: string | null
+  referred_by: string | null
+  referred_by_code: string | null
+  referral_count: number | null
 }
 
 export type ProfilesCountAggregateOutputType = {
@@ -55,9 +73,21 @@ export type ProfilesCountAggregateOutputType = {
   bio: number
   created_at: number
   updated_at: number
+  referral_code: number
+  referred_by: number
+  referred_by_code: number
+  referral_count: number
   _all: number
 }
 
+
+export type ProfilesAvgAggregateInputType = {
+  referral_count?: true
+}
+
+export type ProfilesSumAggregateInputType = {
+  referral_count?: true
+}
 
 export type ProfilesMinAggregateInputType = {
   id?: true
@@ -68,6 +98,10 @@ export type ProfilesMinAggregateInputType = {
   bio?: true
   created_at?: true
   updated_at?: true
+  referral_code?: true
+  referred_by?: true
+  referred_by_code?: true
+  referral_count?: true
 }
 
 export type ProfilesMaxAggregateInputType = {
@@ -79,6 +113,10 @@ export type ProfilesMaxAggregateInputType = {
   bio?: true
   created_at?: true
   updated_at?: true
+  referral_code?: true
+  referred_by?: true
+  referred_by_code?: true
+  referral_count?: true
 }
 
 export type ProfilesCountAggregateInputType = {
@@ -90,6 +128,10 @@ export type ProfilesCountAggregateInputType = {
   bio?: true
   created_at?: true
   updated_at?: true
+  referral_code?: true
+  referred_by?: true
+  referred_by_code?: true
+  referral_count?: true
   _all?: true
 }
 
@@ -131,6 +173,18 @@ export type ProfilesAggregateArgs<ExtArgs extends runtime.Types.Extensions.Inter
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: ProfilesAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: ProfilesSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: ProfilesMinAggregateInputType
@@ -161,6 +215,8 @@ export type profilesGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   _count?: ProfilesCountAggregateInputType | true
+  _avg?: ProfilesAvgAggregateInputType
+  _sum?: ProfilesSumAggregateInputType
   _min?: ProfilesMinAggregateInputType
   _max?: ProfilesMaxAggregateInputType
 }
@@ -174,7 +230,13 @@ export type ProfilesGroupByOutputType = {
   bio: string | null
   created_at: Date | null
   updated_at: Date | null
+  referral_code: string | null
+  referred_by: string | null
+  referred_by_code: string | null
+  referral_count: number
   _count: ProfilesCountAggregateOutputType | null
+  _avg: ProfilesAvgAggregateOutputType | null
+  _sum: ProfilesSumAggregateOutputType | null
   _min: ProfilesMinAggregateOutputType | null
   _max: ProfilesMaxAggregateOutputType | null
 }
@@ -206,6 +268,10 @@ export type profilesWhereInput = {
   bio?: Prisma.StringNullableFilter<"profiles"> | string | null
   created_at?: Prisma.DateTimeNullableFilter<"profiles"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"profiles"> | Date | string | null
+  referral_code?: Prisma.StringNullableFilter<"profiles"> | string | null
+  referred_by?: Prisma.UuidNullableFilter<"profiles"> | string | null
+  referred_by_code?: Prisma.StringNullableFilter<"profiles"> | string | null
+  referral_count?: Prisma.IntFilter<"profiles"> | number
   admin_audit_log?: Prisma.Admin_audit_logListRelationFilter
   agents?: Prisma.XOR<Prisma.AgentsNullableScalarRelationFilter, Prisma.agentsWhereInput> | null
   email_campaigns?: Prisma.Email_campaignsListRelationFilter
@@ -219,6 +285,8 @@ export type profilesWhereInput = {
   property_documents?: Prisma.Property_documentsListRelationFilter
   reviews?: Prisma.ReviewsListRelationFilter
   saved_properties?: Prisma.Saved_propertiesListRelationFilter
+  referrer?: Prisma.XOR<Prisma.ProfilesNullableScalarRelationFilter, Prisma.profilesWhereInput> | null
+  referrals?: Prisma.ProfilesListRelationFilter
 }
 
 export type profilesOrderByWithRelationInput = {
@@ -230,6 +298,10 @@ export type profilesOrderByWithRelationInput = {
   bio?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrderInput | Prisma.SortOrder
   updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  referral_code?: Prisma.SortOrderInput | Prisma.SortOrder
+  referred_by?: Prisma.SortOrderInput | Prisma.SortOrder
+  referred_by_code?: Prisma.SortOrderInput | Prisma.SortOrder
+  referral_count?: Prisma.SortOrder
   admin_audit_log?: Prisma.admin_audit_logOrderByRelationAggregateInput
   agents?: Prisma.agentsOrderByWithRelationInput
   email_campaigns?: Prisma.email_campaignsOrderByRelationAggregateInput
@@ -243,10 +315,13 @@ export type profilesOrderByWithRelationInput = {
   property_documents?: Prisma.property_documentsOrderByRelationAggregateInput
   reviews?: Prisma.reviewsOrderByRelationAggregateInput
   saved_properties?: Prisma.saved_propertiesOrderByRelationAggregateInput
+  referrer?: Prisma.profilesOrderByWithRelationInput
+  referrals?: Prisma.profilesOrderByRelationAggregateInput
 }
 
 export type profilesWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  referral_code?: string
   AND?: Prisma.profilesWhereInput | Prisma.profilesWhereInput[]
   OR?: Prisma.profilesWhereInput[]
   NOT?: Prisma.profilesWhereInput | Prisma.profilesWhereInput[]
@@ -257,6 +332,9 @@ export type profilesWhereUniqueInput = Prisma.AtLeast<{
   bio?: Prisma.StringNullableFilter<"profiles"> | string | null
   created_at?: Prisma.DateTimeNullableFilter<"profiles"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"profiles"> | Date | string | null
+  referred_by?: Prisma.UuidNullableFilter<"profiles"> | string | null
+  referred_by_code?: Prisma.StringNullableFilter<"profiles"> | string | null
+  referral_count?: Prisma.IntFilter<"profiles"> | number
   admin_audit_log?: Prisma.Admin_audit_logListRelationFilter
   agents?: Prisma.XOR<Prisma.AgentsNullableScalarRelationFilter, Prisma.agentsWhereInput> | null
   email_campaigns?: Prisma.Email_campaignsListRelationFilter
@@ -270,7 +348,9 @@ export type profilesWhereUniqueInput = Prisma.AtLeast<{
   property_documents?: Prisma.Property_documentsListRelationFilter
   reviews?: Prisma.ReviewsListRelationFilter
   saved_properties?: Prisma.Saved_propertiesListRelationFilter
-}, "id">
+  referrer?: Prisma.XOR<Prisma.ProfilesNullableScalarRelationFilter, Prisma.profilesWhereInput> | null
+  referrals?: Prisma.ProfilesListRelationFilter
+}, "id" | "referral_code">
 
 export type profilesOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -281,9 +361,15 @@ export type profilesOrderByWithAggregationInput = {
   bio?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrderInput | Prisma.SortOrder
   updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  referral_code?: Prisma.SortOrderInput | Prisma.SortOrder
+  referred_by?: Prisma.SortOrderInput | Prisma.SortOrder
+  referred_by_code?: Prisma.SortOrderInput | Prisma.SortOrder
+  referral_count?: Prisma.SortOrder
   _count?: Prisma.profilesCountOrderByAggregateInput
+  _avg?: Prisma.profilesAvgOrderByAggregateInput
   _max?: Prisma.profilesMaxOrderByAggregateInput
   _min?: Prisma.profilesMinOrderByAggregateInput
+  _sum?: Prisma.profilesSumOrderByAggregateInput
 }
 
 export type profilesScalarWhereWithAggregatesInput = {
@@ -298,6 +384,10 @@ export type profilesScalarWhereWithAggregatesInput = {
   bio?: Prisma.StringNullableWithAggregatesFilter<"profiles"> | string | null
   created_at?: Prisma.DateTimeNullableWithAggregatesFilter<"profiles"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableWithAggregatesFilter<"profiles"> | Date | string | null
+  referral_code?: Prisma.StringNullableWithAggregatesFilter<"profiles"> | string | null
+  referred_by?: Prisma.UuidNullableWithAggregatesFilter<"profiles"> | string | null
+  referred_by_code?: Prisma.StringNullableWithAggregatesFilter<"profiles"> | string | null
+  referral_count?: Prisma.IntWithAggregatesFilter<"profiles"> | number
 }
 
 export type profilesCreateInput = {
@@ -308,6 +398,9 @@ export type profilesCreateInput = {
   bio?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  referral_code?: string | null
+  referred_by_code?: string | null
+  referral_count?: number
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
@@ -321,6 +414,8 @@ export type profilesCreateInput = {
   property_documents?: Prisma.property_documentsCreateNestedManyWithoutProfilesInput
   reviews?: Prisma.reviewsCreateNestedManyWithoutProfilesInput
   saved_properties?: Prisma.saved_propertiesCreateNestedManyWithoutProfilesInput
+  referrer?: Prisma.profilesCreateNestedOneWithoutReferralsInput
+  referrals?: Prisma.profilesCreateNestedManyWithoutReferrerInput
 }
 
 export type profilesUncheckedCreateInput = {
@@ -332,6 +427,10 @@ export type profilesUncheckedCreateInput = {
   bio?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  referral_code?: string | null
+  referred_by?: string | null
+  referred_by_code?: string | null
+  referral_count?: number
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
@@ -344,6 +443,7 @@ export type profilesUncheckedCreateInput = {
   property_documents?: Prisma.property_documentsUncheckedCreateNestedManyWithoutProfilesInput
   reviews?: Prisma.reviewsUncheckedCreateNestedManyWithoutProfilesInput
   saved_properties?: Prisma.saved_propertiesUncheckedCreateNestedManyWithoutProfilesInput
+  referrals?: Prisma.profilesUncheckedCreateNestedManyWithoutReferrerInput
 }
 
 export type profilesUpdateInput = {
@@ -354,6 +454,9 @@ export type profilesUpdateInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referral_count?: Prisma.IntFieldUpdateOperationsInput | number
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
@@ -367,6 +470,8 @@ export type profilesUpdateInput = {
   property_documents?: Prisma.property_documentsUpdateManyWithoutProfilesNestedInput
   reviews?: Prisma.reviewsUpdateManyWithoutProfilesNestedInput
   saved_properties?: Prisma.saved_propertiesUpdateManyWithoutProfilesNestedInput
+  referrer?: Prisma.profilesUpdateOneWithoutReferralsNestedInput
+  referrals?: Prisma.profilesUpdateManyWithoutReferrerNestedInput
 }
 
 export type profilesUncheckedUpdateInput = {
@@ -378,6 +483,10 @@ export type profilesUncheckedUpdateInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referral_count?: Prisma.IntFieldUpdateOperationsInput | number
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -390,6 +499,7 @@ export type profilesUncheckedUpdateInput = {
   property_documents?: Prisma.property_documentsUncheckedUpdateManyWithoutProfilesNestedInput
   reviews?: Prisma.reviewsUncheckedUpdateManyWithoutProfilesNestedInput
   saved_properties?: Prisma.saved_propertiesUncheckedUpdateManyWithoutProfilesNestedInput
+  referrals?: Prisma.profilesUncheckedUpdateManyWithoutReferrerNestedInput
 }
 
 export type profilesCreateManyInput = {
@@ -401,6 +511,10 @@ export type profilesCreateManyInput = {
   bio?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  referral_code?: string | null
+  referred_by?: string | null
+  referred_by_code?: string | null
+  referral_count?: number
 }
 
 export type profilesUpdateManyMutationInput = {
@@ -411,6 +525,9 @@ export type profilesUpdateManyMutationInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referral_count?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type profilesUncheckedUpdateManyInput = {
@@ -422,11 +539,30 @@ export type profilesUncheckedUpdateManyInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referral_count?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type ProfilesScalarRelationFilter = {
   is?: Prisma.profilesWhereInput
   isNot?: Prisma.profilesWhereInput
+}
+
+export type ProfilesNullableScalarRelationFilter = {
+  is?: Prisma.profilesWhereInput | null
+  isNot?: Prisma.profilesWhereInput | null
+}
+
+export type ProfilesListRelationFilter = {
+  every?: Prisma.profilesWhereInput
+  some?: Prisma.profilesWhereInput
+  none?: Prisma.profilesWhereInput
+}
+
+export type profilesOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type profilesCountOrderByAggregateInput = {
@@ -438,6 +574,14 @@ export type profilesCountOrderByAggregateInput = {
   bio?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  referral_code?: Prisma.SortOrder
+  referred_by?: Prisma.SortOrder
+  referred_by_code?: Prisma.SortOrder
+  referral_count?: Prisma.SortOrder
+}
+
+export type profilesAvgOrderByAggregateInput = {
+  referral_count?: Prisma.SortOrder
 }
 
 export type profilesMaxOrderByAggregateInput = {
@@ -449,6 +593,10 @@ export type profilesMaxOrderByAggregateInput = {
   bio?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  referral_code?: Prisma.SortOrder
+  referred_by?: Prisma.SortOrder
+  referred_by_code?: Prisma.SortOrder
+  referral_count?: Prisma.SortOrder
 }
 
 export type profilesMinOrderByAggregateInput = {
@@ -460,11 +608,14 @@ export type profilesMinOrderByAggregateInput = {
   bio?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  referral_code?: Prisma.SortOrder
+  referred_by?: Prisma.SortOrder
+  referred_by_code?: Prisma.SortOrder
+  referral_count?: Prisma.SortOrder
 }
 
-export type ProfilesNullableScalarRelationFilter = {
-  is?: Prisma.profilesWhereInput | null
-  isNot?: Prisma.profilesWhereInput | null
+export type profilesSumOrderByAggregateInput = {
+  referral_count?: Prisma.SortOrder
 }
 
 export type profilesCreateNestedOneWithoutAdmin_audit_logInput = {
@@ -579,6 +730,72 @@ export type profilesUpdateOneRequiredWithoutPaymentsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.profilesUpdateToOneWithWhereWithoutPaymentsInput, Prisma.profilesUpdateWithoutPaymentsInput>, Prisma.profilesUncheckedUpdateWithoutPaymentsInput>
 }
 
+export type profilesCreateNestedOneWithoutReferralsInput = {
+  create?: Prisma.XOR<Prisma.profilesCreateWithoutReferralsInput, Prisma.profilesUncheckedCreateWithoutReferralsInput>
+  connectOrCreate?: Prisma.profilesCreateOrConnectWithoutReferralsInput
+  connect?: Prisma.profilesWhereUniqueInput
+}
+
+export type profilesCreateNestedManyWithoutReferrerInput = {
+  create?: Prisma.XOR<Prisma.profilesCreateWithoutReferrerInput, Prisma.profilesUncheckedCreateWithoutReferrerInput> | Prisma.profilesCreateWithoutReferrerInput[] | Prisma.profilesUncheckedCreateWithoutReferrerInput[]
+  connectOrCreate?: Prisma.profilesCreateOrConnectWithoutReferrerInput | Prisma.profilesCreateOrConnectWithoutReferrerInput[]
+  createMany?: Prisma.profilesCreateManyReferrerInputEnvelope
+  connect?: Prisma.profilesWhereUniqueInput | Prisma.profilesWhereUniqueInput[]
+}
+
+export type profilesUncheckedCreateNestedManyWithoutReferrerInput = {
+  create?: Prisma.XOR<Prisma.profilesCreateWithoutReferrerInput, Prisma.profilesUncheckedCreateWithoutReferrerInput> | Prisma.profilesCreateWithoutReferrerInput[] | Prisma.profilesUncheckedCreateWithoutReferrerInput[]
+  connectOrCreate?: Prisma.profilesCreateOrConnectWithoutReferrerInput | Prisma.profilesCreateOrConnectWithoutReferrerInput[]
+  createMany?: Prisma.profilesCreateManyReferrerInputEnvelope
+  connect?: Prisma.profilesWhereUniqueInput | Prisma.profilesWhereUniqueInput[]
+}
+
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
+export type profilesUpdateOneWithoutReferralsNestedInput = {
+  create?: Prisma.XOR<Prisma.profilesCreateWithoutReferralsInput, Prisma.profilesUncheckedCreateWithoutReferralsInput>
+  connectOrCreate?: Prisma.profilesCreateOrConnectWithoutReferralsInput
+  upsert?: Prisma.profilesUpsertWithoutReferralsInput
+  disconnect?: Prisma.profilesWhereInput | boolean
+  delete?: Prisma.profilesWhereInput | boolean
+  connect?: Prisma.profilesWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.profilesUpdateToOneWithWhereWithoutReferralsInput, Prisma.profilesUpdateWithoutReferralsInput>, Prisma.profilesUncheckedUpdateWithoutReferralsInput>
+}
+
+export type profilesUpdateManyWithoutReferrerNestedInput = {
+  create?: Prisma.XOR<Prisma.profilesCreateWithoutReferrerInput, Prisma.profilesUncheckedCreateWithoutReferrerInput> | Prisma.profilesCreateWithoutReferrerInput[] | Prisma.profilesUncheckedCreateWithoutReferrerInput[]
+  connectOrCreate?: Prisma.profilesCreateOrConnectWithoutReferrerInput | Prisma.profilesCreateOrConnectWithoutReferrerInput[]
+  upsert?: Prisma.profilesUpsertWithWhereUniqueWithoutReferrerInput | Prisma.profilesUpsertWithWhereUniqueWithoutReferrerInput[]
+  createMany?: Prisma.profilesCreateManyReferrerInputEnvelope
+  set?: Prisma.profilesWhereUniqueInput | Prisma.profilesWhereUniqueInput[]
+  disconnect?: Prisma.profilesWhereUniqueInput | Prisma.profilesWhereUniqueInput[]
+  delete?: Prisma.profilesWhereUniqueInput | Prisma.profilesWhereUniqueInput[]
+  connect?: Prisma.profilesWhereUniqueInput | Prisma.profilesWhereUniqueInput[]
+  update?: Prisma.profilesUpdateWithWhereUniqueWithoutReferrerInput | Prisma.profilesUpdateWithWhereUniqueWithoutReferrerInput[]
+  updateMany?: Prisma.profilesUpdateManyWithWhereWithoutReferrerInput | Prisma.profilesUpdateManyWithWhereWithoutReferrerInput[]
+  deleteMany?: Prisma.profilesScalarWhereInput | Prisma.profilesScalarWhereInput[]
+}
+
+export type profilesUncheckedUpdateManyWithoutReferrerNestedInput = {
+  create?: Prisma.XOR<Prisma.profilesCreateWithoutReferrerInput, Prisma.profilesUncheckedCreateWithoutReferrerInput> | Prisma.profilesCreateWithoutReferrerInput[] | Prisma.profilesUncheckedCreateWithoutReferrerInput[]
+  connectOrCreate?: Prisma.profilesCreateOrConnectWithoutReferrerInput | Prisma.profilesCreateOrConnectWithoutReferrerInput[]
+  upsert?: Prisma.profilesUpsertWithWhereUniqueWithoutReferrerInput | Prisma.profilesUpsertWithWhereUniqueWithoutReferrerInput[]
+  createMany?: Prisma.profilesCreateManyReferrerInputEnvelope
+  set?: Prisma.profilesWhereUniqueInput | Prisma.profilesWhereUniqueInput[]
+  disconnect?: Prisma.profilesWhereUniqueInput | Prisma.profilesWhereUniqueInput[]
+  delete?: Prisma.profilesWhereUniqueInput | Prisma.profilesWhereUniqueInput[]
+  connect?: Prisma.profilesWhereUniqueInput | Prisma.profilesWhereUniqueInput[]
+  update?: Prisma.profilesUpdateWithWhereUniqueWithoutReferrerInput | Prisma.profilesUpdateWithWhereUniqueWithoutReferrerInput[]
+  updateMany?: Prisma.profilesUpdateManyWithWhereWithoutReferrerInput | Prisma.profilesUpdateManyWithWhereWithoutReferrerInput[]
+  deleteMany?: Prisma.profilesScalarWhereInput | Prisma.profilesScalarWhereInput[]
+}
+
 export type profilesCreateNestedOneWithoutProperty_documentsInput = {
   create?: Prisma.XOR<Prisma.profilesCreateWithoutProperty_documentsInput, Prisma.profilesUncheckedCreateWithoutProperty_documentsInput>
   connectOrCreate?: Prisma.profilesCreateOrConnectWithoutProperty_documentsInput
@@ -677,6 +894,9 @@ export type profilesCreateWithoutAdmin_audit_logInput = {
   bio?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  referral_code?: string | null
+  referred_by_code?: string | null
+  referral_count?: number
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
@@ -689,6 +909,8 @@ export type profilesCreateWithoutAdmin_audit_logInput = {
   property_documents?: Prisma.property_documentsCreateNestedManyWithoutProfilesInput
   reviews?: Prisma.reviewsCreateNestedManyWithoutProfilesInput
   saved_properties?: Prisma.saved_propertiesCreateNestedManyWithoutProfilesInput
+  referrer?: Prisma.profilesCreateNestedOneWithoutReferralsInput
+  referrals?: Prisma.profilesCreateNestedManyWithoutReferrerInput
 }
 
 export type profilesUncheckedCreateWithoutAdmin_audit_logInput = {
@@ -700,6 +922,10 @@ export type profilesUncheckedCreateWithoutAdmin_audit_logInput = {
   bio?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  referral_code?: string | null
+  referred_by?: string | null
+  referred_by_code?: string | null
+  referral_count?: number
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
@@ -711,6 +937,7 @@ export type profilesUncheckedCreateWithoutAdmin_audit_logInput = {
   property_documents?: Prisma.property_documentsUncheckedCreateNestedManyWithoutProfilesInput
   reviews?: Prisma.reviewsUncheckedCreateNestedManyWithoutProfilesInput
   saved_properties?: Prisma.saved_propertiesUncheckedCreateNestedManyWithoutProfilesInput
+  referrals?: Prisma.profilesUncheckedCreateNestedManyWithoutReferrerInput
 }
 
 export type profilesCreateOrConnectWithoutAdmin_audit_logInput = {
@@ -737,6 +964,9 @@ export type profilesUpdateWithoutAdmin_audit_logInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referral_count?: Prisma.IntFieldUpdateOperationsInput | number
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
@@ -749,6 +979,8 @@ export type profilesUpdateWithoutAdmin_audit_logInput = {
   property_documents?: Prisma.property_documentsUpdateManyWithoutProfilesNestedInput
   reviews?: Prisma.reviewsUpdateManyWithoutProfilesNestedInput
   saved_properties?: Prisma.saved_propertiesUpdateManyWithoutProfilesNestedInput
+  referrer?: Prisma.profilesUpdateOneWithoutReferralsNestedInput
+  referrals?: Prisma.profilesUpdateManyWithoutReferrerNestedInput
 }
 
 export type profilesUncheckedUpdateWithoutAdmin_audit_logInput = {
@@ -760,6 +992,10 @@ export type profilesUncheckedUpdateWithoutAdmin_audit_logInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referral_count?: Prisma.IntFieldUpdateOperationsInput | number
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
@@ -771,6 +1007,7 @@ export type profilesUncheckedUpdateWithoutAdmin_audit_logInput = {
   property_documents?: Prisma.property_documentsUncheckedUpdateManyWithoutProfilesNestedInput
   reviews?: Prisma.reviewsUncheckedUpdateManyWithoutProfilesNestedInput
   saved_properties?: Prisma.saved_propertiesUncheckedUpdateManyWithoutProfilesNestedInput
+  referrals?: Prisma.profilesUncheckedUpdateManyWithoutReferrerNestedInput
 }
 
 export type profilesCreateWithoutAgentsInput = {
@@ -781,6 +1018,9 @@ export type profilesCreateWithoutAgentsInput = {
   bio?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  referral_code?: string | null
+  referred_by_code?: string | null
+  referral_count?: number
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
@@ -793,6 +1033,8 @@ export type profilesCreateWithoutAgentsInput = {
   property_documents?: Prisma.property_documentsCreateNestedManyWithoutProfilesInput
   reviews?: Prisma.reviewsCreateNestedManyWithoutProfilesInput
   saved_properties?: Prisma.saved_propertiesCreateNestedManyWithoutProfilesInput
+  referrer?: Prisma.profilesCreateNestedOneWithoutReferralsInput
+  referrals?: Prisma.profilesCreateNestedManyWithoutReferrerInput
 }
 
 export type profilesUncheckedCreateWithoutAgentsInput = {
@@ -804,6 +1046,10 @@ export type profilesUncheckedCreateWithoutAgentsInput = {
   bio?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  referral_code?: string | null
+  referred_by?: string | null
+  referred_by_code?: string | null
+  referral_count?: number
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
@@ -815,6 +1061,7 @@ export type profilesUncheckedCreateWithoutAgentsInput = {
   property_documents?: Prisma.property_documentsUncheckedCreateNestedManyWithoutProfilesInput
   reviews?: Prisma.reviewsUncheckedCreateNestedManyWithoutProfilesInput
   saved_properties?: Prisma.saved_propertiesUncheckedCreateNestedManyWithoutProfilesInput
+  referrals?: Prisma.profilesUncheckedCreateNestedManyWithoutReferrerInput
 }
 
 export type profilesCreateOrConnectWithoutAgentsInput = {
@@ -841,6 +1088,9 @@ export type profilesUpdateWithoutAgentsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referral_count?: Prisma.IntFieldUpdateOperationsInput | number
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
@@ -853,6 +1103,8 @@ export type profilesUpdateWithoutAgentsInput = {
   property_documents?: Prisma.property_documentsUpdateManyWithoutProfilesNestedInput
   reviews?: Prisma.reviewsUpdateManyWithoutProfilesNestedInput
   saved_properties?: Prisma.saved_propertiesUpdateManyWithoutProfilesNestedInput
+  referrer?: Prisma.profilesUpdateOneWithoutReferralsNestedInput
+  referrals?: Prisma.profilesUpdateManyWithoutReferrerNestedInput
 }
 
 export type profilesUncheckedUpdateWithoutAgentsInput = {
@@ -864,6 +1116,10 @@ export type profilesUncheckedUpdateWithoutAgentsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referral_count?: Prisma.IntFieldUpdateOperationsInput | number
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
@@ -875,6 +1131,7 @@ export type profilesUncheckedUpdateWithoutAgentsInput = {
   property_documents?: Prisma.property_documentsUncheckedUpdateManyWithoutProfilesNestedInput
   reviews?: Prisma.reviewsUncheckedUpdateManyWithoutProfilesNestedInput
   saved_properties?: Prisma.saved_propertiesUncheckedUpdateManyWithoutProfilesNestedInput
+  referrals?: Prisma.profilesUncheckedUpdateManyWithoutReferrerNestedInput
 }
 
 export type profilesCreateWithoutInquiries_inquiries_owner_idToprofilesInput = {
@@ -885,6 +1142,9 @@ export type profilesCreateWithoutInquiries_inquiries_owner_idToprofilesInput = {
   bio?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  referral_code?: string | null
+  referred_by_code?: string | null
+  referral_count?: number
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
@@ -897,6 +1157,8 @@ export type profilesCreateWithoutInquiries_inquiries_owner_idToprofilesInput = {
   property_documents?: Prisma.property_documentsCreateNestedManyWithoutProfilesInput
   reviews?: Prisma.reviewsCreateNestedManyWithoutProfilesInput
   saved_properties?: Prisma.saved_propertiesCreateNestedManyWithoutProfilesInput
+  referrer?: Prisma.profilesCreateNestedOneWithoutReferralsInput
+  referrals?: Prisma.profilesCreateNestedManyWithoutReferrerInput
 }
 
 export type profilesUncheckedCreateWithoutInquiries_inquiries_owner_idToprofilesInput = {
@@ -908,6 +1170,10 @@ export type profilesUncheckedCreateWithoutInquiries_inquiries_owner_idToprofiles
   bio?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  referral_code?: string | null
+  referred_by?: string | null
+  referred_by_code?: string | null
+  referral_count?: number
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
@@ -919,6 +1185,7 @@ export type profilesUncheckedCreateWithoutInquiries_inquiries_owner_idToprofiles
   property_documents?: Prisma.property_documentsUncheckedCreateNestedManyWithoutProfilesInput
   reviews?: Prisma.reviewsUncheckedCreateNestedManyWithoutProfilesInput
   saved_properties?: Prisma.saved_propertiesUncheckedCreateNestedManyWithoutProfilesInput
+  referrals?: Prisma.profilesUncheckedCreateNestedManyWithoutReferrerInput
 }
 
 export type profilesCreateOrConnectWithoutInquiries_inquiries_owner_idToprofilesInput = {
@@ -934,6 +1201,9 @@ export type profilesCreateWithoutInquiries_inquiries_sender_idToprofilesInput = 
   bio?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  referral_code?: string | null
+  referred_by_code?: string | null
+  referral_count?: number
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
@@ -946,6 +1216,8 @@ export type profilesCreateWithoutInquiries_inquiries_sender_idToprofilesInput = 
   property_documents?: Prisma.property_documentsCreateNestedManyWithoutProfilesInput
   reviews?: Prisma.reviewsCreateNestedManyWithoutProfilesInput
   saved_properties?: Prisma.saved_propertiesCreateNestedManyWithoutProfilesInput
+  referrer?: Prisma.profilesCreateNestedOneWithoutReferralsInput
+  referrals?: Prisma.profilesCreateNestedManyWithoutReferrerInput
 }
 
 export type profilesUncheckedCreateWithoutInquiries_inquiries_sender_idToprofilesInput = {
@@ -957,6 +1229,10 @@ export type profilesUncheckedCreateWithoutInquiries_inquiries_sender_idToprofile
   bio?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  referral_code?: string | null
+  referred_by?: string | null
+  referred_by_code?: string | null
+  referral_count?: number
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
@@ -968,6 +1244,7 @@ export type profilesUncheckedCreateWithoutInquiries_inquiries_sender_idToprofile
   property_documents?: Prisma.property_documentsUncheckedCreateNestedManyWithoutProfilesInput
   reviews?: Prisma.reviewsUncheckedCreateNestedManyWithoutProfilesInput
   saved_properties?: Prisma.saved_propertiesUncheckedCreateNestedManyWithoutProfilesInput
+  referrals?: Prisma.profilesUncheckedCreateNestedManyWithoutReferrerInput
 }
 
 export type profilesCreateOrConnectWithoutInquiries_inquiries_sender_idToprofilesInput = {
@@ -994,6 +1271,9 @@ export type profilesUpdateWithoutInquiries_inquiries_owner_idToprofilesInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referral_count?: Prisma.IntFieldUpdateOperationsInput | number
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
@@ -1006,6 +1286,8 @@ export type profilesUpdateWithoutInquiries_inquiries_owner_idToprofilesInput = {
   property_documents?: Prisma.property_documentsUpdateManyWithoutProfilesNestedInput
   reviews?: Prisma.reviewsUpdateManyWithoutProfilesNestedInput
   saved_properties?: Prisma.saved_propertiesUpdateManyWithoutProfilesNestedInput
+  referrer?: Prisma.profilesUpdateOneWithoutReferralsNestedInput
+  referrals?: Prisma.profilesUpdateManyWithoutReferrerNestedInput
 }
 
 export type profilesUncheckedUpdateWithoutInquiries_inquiries_owner_idToprofilesInput = {
@@ -1017,6 +1299,10 @@ export type profilesUncheckedUpdateWithoutInquiries_inquiries_owner_idToprofiles
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referral_count?: Prisma.IntFieldUpdateOperationsInput | number
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -1028,6 +1314,7 @@ export type profilesUncheckedUpdateWithoutInquiries_inquiries_owner_idToprofiles
   property_documents?: Prisma.property_documentsUncheckedUpdateManyWithoutProfilesNestedInput
   reviews?: Prisma.reviewsUncheckedUpdateManyWithoutProfilesNestedInput
   saved_properties?: Prisma.saved_propertiesUncheckedUpdateManyWithoutProfilesNestedInput
+  referrals?: Prisma.profilesUncheckedUpdateManyWithoutReferrerNestedInput
 }
 
 export type profilesUpsertWithoutInquiries_inquiries_sender_idToprofilesInput = {
@@ -1049,6 +1336,9 @@ export type profilesUpdateWithoutInquiries_inquiries_sender_idToprofilesInput = 
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referral_count?: Prisma.IntFieldUpdateOperationsInput | number
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
@@ -1061,6 +1351,8 @@ export type profilesUpdateWithoutInquiries_inquiries_sender_idToprofilesInput = 
   property_documents?: Prisma.property_documentsUpdateManyWithoutProfilesNestedInput
   reviews?: Prisma.reviewsUpdateManyWithoutProfilesNestedInput
   saved_properties?: Prisma.saved_propertiesUpdateManyWithoutProfilesNestedInput
+  referrer?: Prisma.profilesUpdateOneWithoutReferralsNestedInput
+  referrals?: Prisma.profilesUpdateManyWithoutReferrerNestedInput
 }
 
 export type profilesUncheckedUpdateWithoutInquiries_inquiries_sender_idToprofilesInput = {
@@ -1072,6 +1364,10 @@ export type profilesUncheckedUpdateWithoutInquiries_inquiries_sender_idToprofile
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referral_count?: Prisma.IntFieldUpdateOperationsInput | number
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -1083,6 +1379,7 @@ export type profilesUncheckedUpdateWithoutInquiries_inquiries_sender_idToprofile
   property_documents?: Prisma.property_documentsUncheckedUpdateManyWithoutProfilesNestedInput
   reviews?: Prisma.reviewsUncheckedUpdateManyWithoutProfilesNestedInput
   saved_properties?: Prisma.saved_propertiesUncheckedUpdateManyWithoutProfilesNestedInput
+  referrals?: Prisma.profilesUncheckedUpdateManyWithoutReferrerNestedInput
 }
 
 export type profilesCreateWithoutKyc_requestsInput = {
@@ -1093,6 +1390,9 @@ export type profilesCreateWithoutKyc_requestsInput = {
   bio?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  referral_code?: string | null
+  referred_by_code?: string | null
+  referral_count?: number
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
@@ -1105,6 +1405,8 @@ export type profilesCreateWithoutKyc_requestsInput = {
   property_documents?: Prisma.property_documentsCreateNestedManyWithoutProfilesInput
   reviews?: Prisma.reviewsCreateNestedManyWithoutProfilesInput
   saved_properties?: Prisma.saved_propertiesCreateNestedManyWithoutProfilesInput
+  referrer?: Prisma.profilesCreateNestedOneWithoutReferralsInput
+  referrals?: Prisma.profilesCreateNestedManyWithoutReferrerInput
 }
 
 export type profilesUncheckedCreateWithoutKyc_requestsInput = {
@@ -1116,6 +1418,10 @@ export type profilesUncheckedCreateWithoutKyc_requestsInput = {
   bio?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  referral_code?: string | null
+  referred_by?: string | null
+  referred_by_code?: string | null
+  referral_count?: number
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
@@ -1127,6 +1433,7 @@ export type profilesUncheckedCreateWithoutKyc_requestsInput = {
   property_documents?: Prisma.property_documentsUncheckedCreateNestedManyWithoutProfilesInput
   reviews?: Prisma.reviewsUncheckedCreateNestedManyWithoutProfilesInput
   saved_properties?: Prisma.saved_propertiesUncheckedCreateNestedManyWithoutProfilesInput
+  referrals?: Prisma.profilesUncheckedCreateNestedManyWithoutReferrerInput
 }
 
 export type profilesCreateOrConnectWithoutKyc_requestsInput = {
@@ -1153,6 +1460,9 @@ export type profilesUpdateWithoutKyc_requestsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referral_count?: Prisma.IntFieldUpdateOperationsInput | number
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
@@ -1165,6 +1475,8 @@ export type profilesUpdateWithoutKyc_requestsInput = {
   property_documents?: Prisma.property_documentsUpdateManyWithoutProfilesNestedInput
   reviews?: Prisma.reviewsUpdateManyWithoutProfilesNestedInput
   saved_properties?: Prisma.saved_propertiesUpdateManyWithoutProfilesNestedInput
+  referrer?: Prisma.profilesUpdateOneWithoutReferralsNestedInput
+  referrals?: Prisma.profilesUpdateManyWithoutReferrerNestedInput
 }
 
 export type profilesUncheckedUpdateWithoutKyc_requestsInput = {
@@ -1176,6 +1488,10 @@ export type profilesUncheckedUpdateWithoutKyc_requestsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referral_count?: Prisma.IntFieldUpdateOperationsInput | number
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -1187,6 +1503,7 @@ export type profilesUncheckedUpdateWithoutKyc_requestsInput = {
   property_documents?: Prisma.property_documentsUncheckedUpdateManyWithoutProfilesNestedInput
   reviews?: Prisma.reviewsUncheckedUpdateManyWithoutProfilesNestedInput
   saved_properties?: Prisma.saved_propertiesUncheckedUpdateManyWithoutProfilesNestedInput
+  referrals?: Prisma.profilesUncheckedUpdateManyWithoutReferrerNestedInput
 }
 
 export type profilesCreateWithoutNotificationsInput = {
@@ -1197,6 +1514,9 @@ export type profilesCreateWithoutNotificationsInput = {
   bio?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  referral_code?: string | null
+  referred_by_code?: string | null
+  referral_count?: number
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
@@ -1209,6 +1529,8 @@ export type profilesCreateWithoutNotificationsInput = {
   property_documents?: Prisma.property_documentsCreateNestedManyWithoutProfilesInput
   reviews?: Prisma.reviewsCreateNestedManyWithoutProfilesInput
   saved_properties?: Prisma.saved_propertiesCreateNestedManyWithoutProfilesInput
+  referrer?: Prisma.profilesCreateNestedOneWithoutReferralsInput
+  referrals?: Prisma.profilesCreateNestedManyWithoutReferrerInput
 }
 
 export type profilesUncheckedCreateWithoutNotificationsInput = {
@@ -1220,6 +1542,10 @@ export type profilesUncheckedCreateWithoutNotificationsInput = {
   bio?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  referral_code?: string | null
+  referred_by?: string | null
+  referred_by_code?: string | null
+  referral_count?: number
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
@@ -1231,6 +1557,7 @@ export type profilesUncheckedCreateWithoutNotificationsInput = {
   property_documents?: Prisma.property_documentsUncheckedCreateNestedManyWithoutProfilesInput
   reviews?: Prisma.reviewsUncheckedCreateNestedManyWithoutProfilesInput
   saved_properties?: Prisma.saved_propertiesUncheckedCreateNestedManyWithoutProfilesInput
+  referrals?: Prisma.profilesUncheckedCreateNestedManyWithoutReferrerInput
 }
 
 export type profilesCreateOrConnectWithoutNotificationsInput = {
@@ -1257,6 +1584,9 @@ export type profilesUpdateWithoutNotificationsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referral_count?: Prisma.IntFieldUpdateOperationsInput | number
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
@@ -1269,6 +1599,8 @@ export type profilesUpdateWithoutNotificationsInput = {
   property_documents?: Prisma.property_documentsUpdateManyWithoutProfilesNestedInput
   reviews?: Prisma.reviewsUpdateManyWithoutProfilesNestedInput
   saved_properties?: Prisma.saved_propertiesUpdateManyWithoutProfilesNestedInput
+  referrer?: Prisma.profilesUpdateOneWithoutReferralsNestedInput
+  referrals?: Prisma.profilesUpdateManyWithoutReferrerNestedInput
 }
 
 export type profilesUncheckedUpdateWithoutNotificationsInput = {
@@ -1280,6 +1612,10 @@ export type profilesUncheckedUpdateWithoutNotificationsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referral_count?: Prisma.IntFieldUpdateOperationsInput | number
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -1291,6 +1627,7 @@ export type profilesUncheckedUpdateWithoutNotificationsInput = {
   property_documents?: Prisma.property_documentsUncheckedUpdateManyWithoutProfilesNestedInput
   reviews?: Prisma.reviewsUncheckedUpdateManyWithoutProfilesNestedInput
   saved_properties?: Prisma.saved_propertiesUncheckedUpdateManyWithoutProfilesNestedInput
+  referrals?: Prisma.profilesUncheckedUpdateManyWithoutReferrerNestedInput
 }
 
 export type profilesCreateWithoutOwnersInput = {
@@ -1301,6 +1638,9 @@ export type profilesCreateWithoutOwnersInput = {
   bio?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  referral_code?: string | null
+  referred_by_code?: string | null
+  referral_count?: number
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
@@ -1313,6 +1653,8 @@ export type profilesCreateWithoutOwnersInput = {
   property_documents?: Prisma.property_documentsCreateNestedManyWithoutProfilesInput
   reviews?: Prisma.reviewsCreateNestedManyWithoutProfilesInput
   saved_properties?: Prisma.saved_propertiesCreateNestedManyWithoutProfilesInput
+  referrer?: Prisma.profilesCreateNestedOneWithoutReferralsInput
+  referrals?: Prisma.profilesCreateNestedManyWithoutReferrerInput
 }
 
 export type profilesUncheckedCreateWithoutOwnersInput = {
@@ -1324,6 +1666,10 @@ export type profilesUncheckedCreateWithoutOwnersInput = {
   bio?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  referral_code?: string | null
+  referred_by?: string | null
+  referred_by_code?: string | null
+  referral_count?: number
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
@@ -1335,6 +1681,7 @@ export type profilesUncheckedCreateWithoutOwnersInput = {
   property_documents?: Prisma.property_documentsUncheckedCreateNestedManyWithoutProfilesInput
   reviews?: Prisma.reviewsUncheckedCreateNestedManyWithoutProfilesInput
   saved_properties?: Prisma.saved_propertiesUncheckedCreateNestedManyWithoutProfilesInput
+  referrals?: Prisma.profilesUncheckedCreateNestedManyWithoutReferrerInput
 }
 
 export type profilesCreateOrConnectWithoutOwnersInput = {
@@ -1361,6 +1708,9 @@ export type profilesUpdateWithoutOwnersInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referral_count?: Prisma.IntFieldUpdateOperationsInput | number
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
@@ -1373,6 +1723,8 @@ export type profilesUpdateWithoutOwnersInput = {
   property_documents?: Prisma.property_documentsUpdateManyWithoutProfilesNestedInput
   reviews?: Prisma.reviewsUpdateManyWithoutProfilesNestedInput
   saved_properties?: Prisma.saved_propertiesUpdateManyWithoutProfilesNestedInput
+  referrer?: Prisma.profilesUpdateOneWithoutReferralsNestedInput
+  referrals?: Prisma.profilesUpdateManyWithoutReferrerNestedInput
 }
 
 export type profilesUncheckedUpdateWithoutOwnersInput = {
@@ -1384,6 +1736,10 @@ export type profilesUncheckedUpdateWithoutOwnersInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referral_count?: Prisma.IntFieldUpdateOperationsInput | number
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -1395,6 +1751,7 @@ export type profilesUncheckedUpdateWithoutOwnersInput = {
   property_documents?: Prisma.property_documentsUncheckedUpdateManyWithoutProfilesNestedInput
   reviews?: Prisma.reviewsUncheckedUpdateManyWithoutProfilesNestedInput
   saved_properties?: Prisma.saved_propertiesUncheckedUpdateManyWithoutProfilesNestedInput
+  referrals?: Prisma.profilesUncheckedUpdateManyWithoutReferrerNestedInput
 }
 
 export type profilesCreateWithoutPaymentsInput = {
@@ -1405,6 +1762,9 @@ export type profilesCreateWithoutPaymentsInput = {
   bio?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  referral_code?: string | null
+  referred_by_code?: string | null
+  referral_count?: number
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
@@ -1417,6 +1777,8 @@ export type profilesCreateWithoutPaymentsInput = {
   property_documents?: Prisma.property_documentsCreateNestedManyWithoutProfilesInput
   reviews?: Prisma.reviewsCreateNestedManyWithoutProfilesInput
   saved_properties?: Prisma.saved_propertiesCreateNestedManyWithoutProfilesInput
+  referrer?: Prisma.profilesCreateNestedOneWithoutReferralsInput
+  referrals?: Prisma.profilesCreateNestedManyWithoutReferrerInput
 }
 
 export type profilesUncheckedCreateWithoutPaymentsInput = {
@@ -1428,6 +1790,10 @@ export type profilesUncheckedCreateWithoutPaymentsInput = {
   bio?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  referral_code?: string | null
+  referred_by?: string | null
+  referred_by_code?: string | null
+  referral_count?: number
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
@@ -1439,6 +1805,7 @@ export type profilesUncheckedCreateWithoutPaymentsInput = {
   property_documents?: Prisma.property_documentsUncheckedCreateNestedManyWithoutProfilesInput
   reviews?: Prisma.reviewsUncheckedCreateNestedManyWithoutProfilesInput
   saved_properties?: Prisma.saved_propertiesUncheckedCreateNestedManyWithoutProfilesInput
+  referrals?: Prisma.profilesUncheckedCreateNestedManyWithoutReferrerInput
 }
 
 export type profilesCreateOrConnectWithoutPaymentsInput = {
@@ -1465,6 +1832,9 @@ export type profilesUpdateWithoutPaymentsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referral_count?: Prisma.IntFieldUpdateOperationsInput | number
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
@@ -1477,6 +1847,8 @@ export type profilesUpdateWithoutPaymentsInput = {
   property_documents?: Prisma.property_documentsUpdateManyWithoutProfilesNestedInput
   reviews?: Prisma.reviewsUpdateManyWithoutProfilesNestedInput
   saved_properties?: Prisma.saved_propertiesUpdateManyWithoutProfilesNestedInput
+  referrer?: Prisma.profilesUpdateOneWithoutReferralsNestedInput
+  referrals?: Prisma.profilesUpdateManyWithoutReferrerNestedInput
 }
 
 export type profilesUncheckedUpdateWithoutPaymentsInput = {
@@ -1488,6 +1860,10 @@ export type profilesUncheckedUpdateWithoutPaymentsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referral_count?: Prisma.IntFieldUpdateOperationsInput | number
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -1499,6 +1875,229 @@ export type profilesUncheckedUpdateWithoutPaymentsInput = {
   property_documents?: Prisma.property_documentsUncheckedUpdateManyWithoutProfilesNestedInput
   reviews?: Prisma.reviewsUncheckedUpdateManyWithoutProfilesNestedInput
   saved_properties?: Prisma.saved_propertiesUncheckedUpdateManyWithoutProfilesNestedInput
+  referrals?: Prisma.profilesUncheckedUpdateManyWithoutReferrerNestedInput
+}
+
+export type profilesCreateWithoutReferralsInput = {
+  email: string
+  full_name?: string | null
+  avatar_url?: string | null
+  phone?: string | null
+  bio?: string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  referral_code?: string | null
+  referred_by_code?: string | null
+  referral_count?: number
+  admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
+  agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
+  email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
+  inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
+  inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_sender_idToprofilesInput
+  kyc_requests?: Prisma.kyc_requestsCreateNestedManyWithoutProfilesInput
+  notifications?: Prisma.notificationsCreateNestedManyWithoutProfilesInput
+  owners?: Prisma.ownersCreateNestedOneWithoutProfilesInput
+  payments?: Prisma.paymentsCreateNestedManyWithoutProfilesInput
+  users: Prisma.usersCreateNestedOneWithoutProfilesInput
+  property_documents?: Prisma.property_documentsCreateNestedManyWithoutProfilesInput
+  reviews?: Prisma.reviewsCreateNestedManyWithoutProfilesInput
+  saved_properties?: Prisma.saved_propertiesCreateNestedManyWithoutProfilesInput
+  referrer?: Prisma.profilesCreateNestedOneWithoutReferralsInput
+}
+
+export type profilesUncheckedCreateWithoutReferralsInput = {
+  id: string
+  email: string
+  full_name?: string | null
+  avatar_url?: string | null
+  phone?: string | null
+  bio?: string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  referral_code?: string | null
+  referred_by?: string | null
+  referred_by_code?: string | null
+  referral_count?: number
+  admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
+  agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
+  email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
+  inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
+  inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_sender_idToprofilesInput
+  kyc_requests?: Prisma.kyc_requestsUncheckedCreateNestedManyWithoutProfilesInput
+  notifications?: Prisma.notificationsUncheckedCreateNestedManyWithoutProfilesInput
+  owners?: Prisma.ownersUncheckedCreateNestedOneWithoutProfilesInput
+  payments?: Prisma.paymentsUncheckedCreateNestedManyWithoutProfilesInput
+  property_documents?: Prisma.property_documentsUncheckedCreateNestedManyWithoutProfilesInput
+  reviews?: Prisma.reviewsUncheckedCreateNestedManyWithoutProfilesInput
+  saved_properties?: Prisma.saved_propertiesUncheckedCreateNestedManyWithoutProfilesInput
+}
+
+export type profilesCreateOrConnectWithoutReferralsInput = {
+  where: Prisma.profilesWhereUniqueInput
+  create: Prisma.XOR<Prisma.profilesCreateWithoutReferralsInput, Prisma.profilesUncheckedCreateWithoutReferralsInput>
+}
+
+export type profilesCreateWithoutReferrerInput = {
+  email: string
+  full_name?: string | null
+  avatar_url?: string | null
+  phone?: string | null
+  bio?: string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  referral_code?: string | null
+  referred_by_code?: string | null
+  referral_count?: number
+  admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
+  agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
+  email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
+  inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
+  inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_sender_idToprofilesInput
+  kyc_requests?: Prisma.kyc_requestsCreateNestedManyWithoutProfilesInput
+  notifications?: Prisma.notificationsCreateNestedManyWithoutProfilesInput
+  owners?: Prisma.ownersCreateNestedOneWithoutProfilesInput
+  payments?: Prisma.paymentsCreateNestedManyWithoutProfilesInput
+  users: Prisma.usersCreateNestedOneWithoutProfilesInput
+  property_documents?: Prisma.property_documentsCreateNestedManyWithoutProfilesInput
+  reviews?: Prisma.reviewsCreateNestedManyWithoutProfilesInput
+  saved_properties?: Prisma.saved_propertiesCreateNestedManyWithoutProfilesInput
+  referrals?: Prisma.profilesCreateNestedManyWithoutReferrerInput
+}
+
+export type profilesUncheckedCreateWithoutReferrerInput = {
+  id: string
+  email: string
+  full_name?: string | null
+  avatar_url?: string | null
+  phone?: string | null
+  bio?: string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  referral_code?: string | null
+  referred_by_code?: string | null
+  referral_count?: number
+  admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
+  agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
+  email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
+  inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
+  inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_sender_idToprofilesInput
+  kyc_requests?: Prisma.kyc_requestsUncheckedCreateNestedManyWithoutProfilesInput
+  notifications?: Prisma.notificationsUncheckedCreateNestedManyWithoutProfilesInput
+  owners?: Prisma.ownersUncheckedCreateNestedOneWithoutProfilesInput
+  payments?: Prisma.paymentsUncheckedCreateNestedManyWithoutProfilesInput
+  property_documents?: Prisma.property_documentsUncheckedCreateNestedManyWithoutProfilesInput
+  reviews?: Prisma.reviewsUncheckedCreateNestedManyWithoutProfilesInput
+  saved_properties?: Prisma.saved_propertiesUncheckedCreateNestedManyWithoutProfilesInput
+  referrals?: Prisma.profilesUncheckedCreateNestedManyWithoutReferrerInput
+}
+
+export type profilesCreateOrConnectWithoutReferrerInput = {
+  where: Prisma.profilesWhereUniqueInput
+  create: Prisma.XOR<Prisma.profilesCreateWithoutReferrerInput, Prisma.profilesUncheckedCreateWithoutReferrerInput>
+}
+
+export type profilesCreateManyReferrerInputEnvelope = {
+  data: Prisma.profilesCreateManyReferrerInput | Prisma.profilesCreateManyReferrerInput[]
+  skipDuplicates?: boolean
+}
+
+export type profilesUpsertWithoutReferralsInput = {
+  update: Prisma.XOR<Prisma.profilesUpdateWithoutReferralsInput, Prisma.profilesUncheckedUpdateWithoutReferralsInput>
+  create: Prisma.XOR<Prisma.profilesCreateWithoutReferralsInput, Prisma.profilesUncheckedCreateWithoutReferralsInput>
+  where?: Prisma.profilesWhereInput
+}
+
+export type profilesUpdateToOneWithWhereWithoutReferralsInput = {
+  where?: Prisma.profilesWhereInput
+  data: Prisma.XOR<Prisma.profilesUpdateWithoutReferralsInput, Prisma.profilesUncheckedUpdateWithoutReferralsInput>
+}
+
+export type profilesUpdateWithoutReferralsInput = {
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  full_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
+  agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
+  email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
+  inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
+  inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_sender_idToprofilesNestedInput
+  kyc_requests?: Prisma.kyc_requestsUpdateManyWithoutProfilesNestedInput
+  notifications?: Prisma.notificationsUpdateManyWithoutProfilesNestedInput
+  owners?: Prisma.ownersUpdateOneWithoutProfilesNestedInput
+  payments?: Prisma.paymentsUpdateManyWithoutProfilesNestedInput
+  users?: Prisma.usersUpdateOneRequiredWithoutProfilesNestedInput
+  property_documents?: Prisma.property_documentsUpdateManyWithoutProfilesNestedInput
+  reviews?: Prisma.reviewsUpdateManyWithoutProfilesNestedInput
+  saved_properties?: Prisma.saved_propertiesUpdateManyWithoutProfilesNestedInput
+  referrer?: Prisma.profilesUpdateOneWithoutReferralsNestedInput
+}
+
+export type profilesUncheckedUpdateWithoutReferralsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  full_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
+  agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
+  email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
+  inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
+  inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUncheckedUpdateManyWithoutProfiles_inquiries_sender_idToprofilesNestedInput
+  kyc_requests?: Prisma.kyc_requestsUncheckedUpdateManyWithoutProfilesNestedInput
+  notifications?: Prisma.notificationsUncheckedUpdateManyWithoutProfilesNestedInput
+  owners?: Prisma.ownersUncheckedUpdateOneWithoutProfilesNestedInput
+  payments?: Prisma.paymentsUncheckedUpdateManyWithoutProfilesNestedInput
+  property_documents?: Prisma.property_documentsUncheckedUpdateManyWithoutProfilesNestedInput
+  reviews?: Prisma.reviewsUncheckedUpdateManyWithoutProfilesNestedInput
+  saved_properties?: Prisma.saved_propertiesUncheckedUpdateManyWithoutProfilesNestedInput
+}
+
+export type profilesUpsertWithWhereUniqueWithoutReferrerInput = {
+  where: Prisma.profilesWhereUniqueInput
+  update: Prisma.XOR<Prisma.profilesUpdateWithoutReferrerInput, Prisma.profilesUncheckedUpdateWithoutReferrerInput>
+  create: Prisma.XOR<Prisma.profilesCreateWithoutReferrerInput, Prisma.profilesUncheckedCreateWithoutReferrerInput>
+}
+
+export type profilesUpdateWithWhereUniqueWithoutReferrerInput = {
+  where: Prisma.profilesWhereUniqueInput
+  data: Prisma.XOR<Prisma.profilesUpdateWithoutReferrerInput, Prisma.profilesUncheckedUpdateWithoutReferrerInput>
+}
+
+export type profilesUpdateManyWithWhereWithoutReferrerInput = {
+  where: Prisma.profilesScalarWhereInput
+  data: Prisma.XOR<Prisma.profilesUpdateManyMutationInput, Prisma.profilesUncheckedUpdateManyWithoutReferrerInput>
+}
+
+export type profilesScalarWhereInput = {
+  AND?: Prisma.profilesScalarWhereInput | Prisma.profilesScalarWhereInput[]
+  OR?: Prisma.profilesScalarWhereInput[]
+  NOT?: Prisma.profilesScalarWhereInput | Prisma.profilesScalarWhereInput[]
+  id?: Prisma.UuidFilter<"profiles"> | string
+  email?: Prisma.StringFilter<"profiles"> | string
+  full_name?: Prisma.StringNullableFilter<"profiles"> | string | null
+  avatar_url?: Prisma.StringNullableFilter<"profiles"> | string | null
+  phone?: Prisma.StringNullableFilter<"profiles"> | string | null
+  bio?: Prisma.StringNullableFilter<"profiles"> | string | null
+  created_at?: Prisma.DateTimeNullableFilter<"profiles"> | Date | string | null
+  updated_at?: Prisma.DateTimeNullableFilter<"profiles"> | Date | string | null
+  referral_code?: Prisma.StringNullableFilter<"profiles"> | string | null
+  referred_by?: Prisma.UuidNullableFilter<"profiles"> | string | null
+  referred_by_code?: Prisma.StringNullableFilter<"profiles"> | string | null
+  referral_count?: Prisma.IntFilter<"profiles"> | number
 }
 
 export type profilesCreateWithoutProperty_documentsInput = {
@@ -1509,6 +2108,9 @@ export type profilesCreateWithoutProperty_documentsInput = {
   bio?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  referral_code?: string | null
+  referred_by_code?: string | null
+  referral_count?: number
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
@@ -1521,6 +2123,8 @@ export type profilesCreateWithoutProperty_documentsInput = {
   users: Prisma.usersCreateNestedOneWithoutProfilesInput
   reviews?: Prisma.reviewsCreateNestedManyWithoutProfilesInput
   saved_properties?: Prisma.saved_propertiesCreateNestedManyWithoutProfilesInput
+  referrer?: Prisma.profilesCreateNestedOneWithoutReferralsInput
+  referrals?: Prisma.profilesCreateNestedManyWithoutReferrerInput
 }
 
 export type profilesUncheckedCreateWithoutProperty_documentsInput = {
@@ -1532,6 +2136,10 @@ export type profilesUncheckedCreateWithoutProperty_documentsInput = {
   bio?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  referral_code?: string | null
+  referred_by?: string | null
+  referred_by_code?: string | null
+  referral_count?: number
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
@@ -1543,6 +2151,7 @@ export type profilesUncheckedCreateWithoutProperty_documentsInput = {
   payments?: Prisma.paymentsUncheckedCreateNestedManyWithoutProfilesInput
   reviews?: Prisma.reviewsUncheckedCreateNestedManyWithoutProfilesInput
   saved_properties?: Prisma.saved_propertiesUncheckedCreateNestedManyWithoutProfilesInput
+  referrals?: Prisma.profilesUncheckedCreateNestedManyWithoutReferrerInput
 }
 
 export type profilesCreateOrConnectWithoutProperty_documentsInput = {
@@ -1569,6 +2178,9 @@ export type profilesUpdateWithoutProperty_documentsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referral_count?: Prisma.IntFieldUpdateOperationsInput | number
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
@@ -1581,6 +2193,8 @@ export type profilesUpdateWithoutProperty_documentsInput = {
   users?: Prisma.usersUpdateOneRequiredWithoutProfilesNestedInput
   reviews?: Prisma.reviewsUpdateManyWithoutProfilesNestedInput
   saved_properties?: Prisma.saved_propertiesUpdateManyWithoutProfilesNestedInput
+  referrer?: Prisma.profilesUpdateOneWithoutReferralsNestedInput
+  referrals?: Prisma.profilesUpdateManyWithoutReferrerNestedInput
 }
 
 export type profilesUncheckedUpdateWithoutProperty_documentsInput = {
@@ -1592,6 +2206,10 @@ export type profilesUncheckedUpdateWithoutProperty_documentsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referral_count?: Prisma.IntFieldUpdateOperationsInput | number
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -1603,6 +2221,7 @@ export type profilesUncheckedUpdateWithoutProperty_documentsInput = {
   payments?: Prisma.paymentsUncheckedUpdateManyWithoutProfilesNestedInput
   reviews?: Prisma.reviewsUncheckedUpdateManyWithoutProfilesNestedInput
   saved_properties?: Prisma.saved_propertiesUncheckedUpdateManyWithoutProfilesNestedInput
+  referrals?: Prisma.profilesUncheckedUpdateManyWithoutReferrerNestedInput
 }
 
 export type profilesCreateWithoutReviewsInput = {
@@ -1613,6 +2232,9 @@ export type profilesCreateWithoutReviewsInput = {
   bio?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  referral_code?: string | null
+  referred_by_code?: string | null
+  referral_count?: number
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
@@ -1625,6 +2247,8 @@ export type profilesCreateWithoutReviewsInput = {
   users: Prisma.usersCreateNestedOneWithoutProfilesInput
   property_documents?: Prisma.property_documentsCreateNestedManyWithoutProfilesInput
   saved_properties?: Prisma.saved_propertiesCreateNestedManyWithoutProfilesInput
+  referrer?: Prisma.profilesCreateNestedOneWithoutReferralsInput
+  referrals?: Prisma.profilesCreateNestedManyWithoutReferrerInput
 }
 
 export type profilesUncheckedCreateWithoutReviewsInput = {
@@ -1636,6 +2260,10 @@ export type profilesUncheckedCreateWithoutReviewsInput = {
   bio?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  referral_code?: string | null
+  referred_by?: string | null
+  referred_by_code?: string | null
+  referral_count?: number
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
@@ -1647,6 +2275,7 @@ export type profilesUncheckedCreateWithoutReviewsInput = {
   payments?: Prisma.paymentsUncheckedCreateNestedManyWithoutProfilesInput
   property_documents?: Prisma.property_documentsUncheckedCreateNestedManyWithoutProfilesInput
   saved_properties?: Prisma.saved_propertiesUncheckedCreateNestedManyWithoutProfilesInput
+  referrals?: Prisma.profilesUncheckedCreateNestedManyWithoutReferrerInput
 }
 
 export type profilesCreateOrConnectWithoutReviewsInput = {
@@ -1673,6 +2302,9 @@ export type profilesUpdateWithoutReviewsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referral_count?: Prisma.IntFieldUpdateOperationsInput | number
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
@@ -1685,6 +2317,8 @@ export type profilesUpdateWithoutReviewsInput = {
   users?: Prisma.usersUpdateOneRequiredWithoutProfilesNestedInput
   property_documents?: Prisma.property_documentsUpdateManyWithoutProfilesNestedInput
   saved_properties?: Prisma.saved_propertiesUpdateManyWithoutProfilesNestedInput
+  referrer?: Prisma.profilesUpdateOneWithoutReferralsNestedInput
+  referrals?: Prisma.profilesUpdateManyWithoutReferrerNestedInput
 }
 
 export type profilesUncheckedUpdateWithoutReviewsInput = {
@@ -1696,6 +2330,10 @@ export type profilesUncheckedUpdateWithoutReviewsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referral_count?: Prisma.IntFieldUpdateOperationsInput | number
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -1707,6 +2345,7 @@ export type profilesUncheckedUpdateWithoutReviewsInput = {
   payments?: Prisma.paymentsUncheckedUpdateManyWithoutProfilesNestedInput
   property_documents?: Prisma.property_documentsUncheckedUpdateManyWithoutProfilesNestedInput
   saved_properties?: Prisma.saved_propertiesUncheckedUpdateManyWithoutProfilesNestedInput
+  referrals?: Prisma.profilesUncheckedUpdateManyWithoutReferrerNestedInput
 }
 
 export type profilesCreateWithoutSaved_propertiesInput = {
@@ -1717,6 +2356,9 @@ export type profilesCreateWithoutSaved_propertiesInput = {
   bio?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  referral_code?: string | null
+  referred_by_code?: string | null
+  referral_count?: number
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
@@ -1729,6 +2371,8 @@ export type profilesCreateWithoutSaved_propertiesInput = {
   users: Prisma.usersCreateNestedOneWithoutProfilesInput
   property_documents?: Prisma.property_documentsCreateNestedManyWithoutProfilesInput
   reviews?: Prisma.reviewsCreateNestedManyWithoutProfilesInput
+  referrer?: Prisma.profilesCreateNestedOneWithoutReferralsInput
+  referrals?: Prisma.profilesCreateNestedManyWithoutReferrerInput
 }
 
 export type profilesUncheckedCreateWithoutSaved_propertiesInput = {
@@ -1740,6 +2384,10 @@ export type profilesUncheckedCreateWithoutSaved_propertiesInput = {
   bio?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  referral_code?: string | null
+  referred_by?: string | null
+  referred_by_code?: string | null
+  referral_count?: number
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
@@ -1751,6 +2399,7 @@ export type profilesUncheckedCreateWithoutSaved_propertiesInput = {
   payments?: Prisma.paymentsUncheckedCreateNestedManyWithoutProfilesInput
   property_documents?: Prisma.property_documentsUncheckedCreateNestedManyWithoutProfilesInput
   reviews?: Prisma.reviewsUncheckedCreateNestedManyWithoutProfilesInput
+  referrals?: Prisma.profilesUncheckedCreateNestedManyWithoutReferrerInput
 }
 
 export type profilesCreateOrConnectWithoutSaved_propertiesInput = {
@@ -1777,6 +2426,9 @@ export type profilesUpdateWithoutSaved_propertiesInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referral_count?: Prisma.IntFieldUpdateOperationsInput | number
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
@@ -1789,6 +2441,8 @@ export type profilesUpdateWithoutSaved_propertiesInput = {
   users?: Prisma.usersUpdateOneRequiredWithoutProfilesNestedInput
   property_documents?: Prisma.property_documentsUpdateManyWithoutProfilesNestedInput
   reviews?: Prisma.reviewsUpdateManyWithoutProfilesNestedInput
+  referrer?: Prisma.profilesUpdateOneWithoutReferralsNestedInput
+  referrals?: Prisma.profilesUpdateManyWithoutReferrerNestedInput
 }
 
 export type profilesUncheckedUpdateWithoutSaved_propertiesInput = {
@@ -1800,6 +2454,10 @@ export type profilesUncheckedUpdateWithoutSaved_propertiesInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referral_count?: Prisma.IntFieldUpdateOperationsInput | number
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -1811,6 +2469,7 @@ export type profilesUncheckedUpdateWithoutSaved_propertiesInput = {
   payments?: Prisma.paymentsUncheckedUpdateManyWithoutProfilesNestedInput
   property_documents?: Prisma.property_documentsUncheckedUpdateManyWithoutProfilesNestedInput
   reviews?: Prisma.reviewsUncheckedUpdateManyWithoutProfilesNestedInput
+  referrals?: Prisma.profilesUncheckedUpdateManyWithoutReferrerNestedInput
 }
 
 export type profilesCreateWithoutUsersInput = {
@@ -1821,6 +2480,9 @@ export type profilesCreateWithoutUsersInput = {
   bio?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  referral_code?: string | null
+  referred_by_code?: string | null
+  referral_count?: number
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
@@ -1833,6 +2495,8 @@ export type profilesCreateWithoutUsersInput = {
   property_documents?: Prisma.property_documentsCreateNestedManyWithoutProfilesInput
   reviews?: Prisma.reviewsCreateNestedManyWithoutProfilesInput
   saved_properties?: Prisma.saved_propertiesCreateNestedManyWithoutProfilesInput
+  referrer?: Prisma.profilesCreateNestedOneWithoutReferralsInput
+  referrals?: Prisma.profilesCreateNestedManyWithoutReferrerInput
 }
 
 export type profilesUncheckedCreateWithoutUsersInput = {
@@ -1843,6 +2507,10 @@ export type profilesUncheckedCreateWithoutUsersInput = {
   bio?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  referral_code?: string | null
+  referred_by?: string | null
+  referred_by_code?: string | null
+  referral_count?: number
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
@@ -1855,6 +2523,7 @@ export type profilesUncheckedCreateWithoutUsersInput = {
   property_documents?: Prisma.property_documentsUncheckedCreateNestedManyWithoutProfilesInput
   reviews?: Prisma.reviewsUncheckedCreateNestedManyWithoutProfilesInput
   saved_properties?: Prisma.saved_propertiesUncheckedCreateNestedManyWithoutProfilesInput
+  referrals?: Prisma.profilesUncheckedCreateNestedManyWithoutReferrerInput
 }
 
 export type profilesCreateOrConnectWithoutUsersInput = {
@@ -1881,6 +2550,9 @@ export type profilesUpdateWithoutUsersInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referral_count?: Prisma.IntFieldUpdateOperationsInput | number
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
@@ -1893,6 +2565,8 @@ export type profilesUpdateWithoutUsersInput = {
   property_documents?: Prisma.property_documentsUpdateManyWithoutProfilesNestedInput
   reviews?: Prisma.reviewsUpdateManyWithoutProfilesNestedInput
   saved_properties?: Prisma.saved_propertiesUpdateManyWithoutProfilesNestedInput
+  referrer?: Prisma.profilesUpdateOneWithoutReferralsNestedInput
+  referrals?: Prisma.profilesUpdateManyWithoutReferrerNestedInput
 }
 
 export type profilesUncheckedUpdateWithoutUsersInput = {
@@ -1903,6 +2577,10 @@ export type profilesUncheckedUpdateWithoutUsersInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referral_count?: Prisma.IntFieldUpdateOperationsInput | number
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -1915,6 +2593,7 @@ export type profilesUncheckedUpdateWithoutUsersInput = {
   property_documents?: Prisma.property_documentsUncheckedUpdateManyWithoutProfilesNestedInput
   reviews?: Prisma.reviewsUncheckedUpdateManyWithoutProfilesNestedInput
   saved_properties?: Prisma.saved_propertiesUncheckedUpdateManyWithoutProfilesNestedInput
+  referrals?: Prisma.profilesUncheckedUpdateManyWithoutReferrerNestedInput
 }
 
 export type profilesCreateWithoutEmail_campaignsInput = {
@@ -1925,6 +2604,9 @@ export type profilesCreateWithoutEmail_campaignsInput = {
   bio?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  referral_code?: string | null
+  referred_by_code?: string | null
+  referral_count?: number
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
@@ -1937,6 +2619,8 @@ export type profilesCreateWithoutEmail_campaignsInput = {
   property_documents?: Prisma.property_documentsCreateNestedManyWithoutProfilesInput
   reviews?: Prisma.reviewsCreateNestedManyWithoutProfilesInput
   saved_properties?: Prisma.saved_propertiesCreateNestedManyWithoutProfilesInput
+  referrer?: Prisma.profilesCreateNestedOneWithoutReferralsInput
+  referrals?: Prisma.profilesCreateNestedManyWithoutReferrerInput
 }
 
 export type profilesUncheckedCreateWithoutEmail_campaignsInput = {
@@ -1948,6 +2632,10 @@ export type profilesUncheckedCreateWithoutEmail_campaignsInput = {
   bio?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  referral_code?: string | null
+  referred_by?: string | null
+  referred_by_code?: string | null
+  referral_count?: number
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
@@ -1959,6 +2647,7 @@ export type profilesUncheckedCreateWithoutEmail_campaignsInput = {
   property_documents?: Prisma.property_documentsUncheckedCreateNestedManyWithoutProfilesInput
   reviews?: Prisma.reviewsUncheckedCreateNestedManyWithoutProfilesInput
   saved_properties?: Prisma.saved_propertiesUncheckedCreateNestedManyWithoutProfilesInput
+  referrals?: Prisma.profilesUncheckedCreateNestedManyWithoutReferrerInput
 }
 
 export type profilesCreateOrConnectWithoutEmail_campaignsInput = {
@@ -1985,6 +2674,9 @@ export type profilesUpdateWithoutEmail_campaignsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referral_count?: Prisma.IntFieldUpdateOperationsInput | number
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
@@ -1997,6 +2689,8 @@ export type profilesUpdateWithoutEmail_campaignsInput = {
   property_documents?: Prisma.property_documentsUpdateManyWithoutProfilesNestedInput
   reviews?: Prisma.reviewsUpdateManyWithoutProfilesNestedInput
   saved_properties?: Prisma.saved_propertiesUpdateManyWithoutProfilesNestedInput
+  referrer?: Prisma.profilesUpdateOneWithoutReferralsNestedInput
+  referrals?: Prisma.profilesUpdateManyWithoutReferrerNestedInput
 }
 
 export type profilesUncheckedUpdateWithoutEmail_campaignsInput = {
@@ -2008,6 +2702,10 @@ export type profilesUncheckedUpdateWithoutEmail_campaignsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referral_count?: Prisma.IntFieldUpdateOperationsInput | number
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
@@ -2019,6 +2717,89 @@ export type profilesUncheckedUpdateWithoutEmail_campaignsInput = {
   property_documents?: Prisma.property_documentsUncheckedUpdateManyWithoutProfilesNestedInput
   reviews?: Prisma.reviewsUncheckedUpdateManyWithoutProfilesNestedInput
   saved_properties?: Prisma.saved_propertiesUncheckedUpdateManyWithoutProfilesNestedInput
+  referrals?: Prisma.profilesUncheckedUpdateManyWithoutReferrerNestedInput
+}
+
+export type profilesCreateManyReferrerInput = {
+  id: string
+  email: string
+  full_name?: string | null
+  avatar_url?: string | null
+  phone?: string | null
+  bio?: string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  referral_code?: string | null
+  referred_by_code?: string | null
+  referral_count?: number
+}
+
+export type profilesUpdateWithoutReferrerInput = {
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  full_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
+  agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
+  email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
+  inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
+  inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_sender_idToprofilesNestedInput
+  kyc_requests?: Prisma.kyc_requestsUpdateManyWithoutProfilesNestedInput
+  notifications?: Prisma.notificationsUpdateManyWithoutProfilesNestedInput
+  owners?: Prisma.ownersUpdateOneWithoutProfilesNestedInput
+  payments?: Prisma.paymentsUpdateManyWithoutProfilesNestedInput
+  users?: Prisma.usersUpdateOneRequiredWithoutProfilesNestedInput
+  property_documents?: Prisma.property_documentsUpdateManyWithoutProfilesNestedInput
+  reviews?: Prisma.reviewsUpdateManyWithoutProfilesNestedInput
+  saved_properties?: Prisma.saved_propertiesUpdateManyWithoutProfilesNestedInput
+  referrals?: Prisma.profilesUpdateManyWithoutReferrerNestedInput
+}
+
+export type profilesUncheckedUpdateWithoutReferrerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  full_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
+  agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
+  email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
+  inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
+  inquiries_inquiries_sender_idToprofiles?: Prisma.inquiriesUncheckedUpdateManyWithoutProfiles_inquiries_sender_idToprofilesNestedInput
+  kyc_requests?: Prisma.kyc_requestsUncheckedUpdateManyWithoutProfilesNestedInput
+  notifications?: Prisma.notificationsUncheckedUpdateManyWithoutProfilesNestedInput
+  owners?: Prisma.ownersUncheckedUpdateOneWithoutProfilesNestedInput
+  payments?: Prisma.paymentsUncheckedUpdateManyWithoutProfilesNestedInput
+  property_documents?: Prisma.property_documentsUncheckedUpdateManyWithoutProfilesNestedInput
+  reviews?: Prisma.reviewsUncheckedUpdateManyWithoutProfilesNestedInput
+  saved_properties?: Prisma.saved_propertiesUncheckedUpdateManyWithoutProfilesNestedInput
+  referrals?: Prisma.profilesUncheckedUpdateManyWithoutReferrerNestedInput
+}
+
+export type profilesUncheckedUpdateManyWithoutReferrerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  full_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referral_count?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 
@@ -2037,6 +2818,7 @@ export type ProfilesCountOutputType = {
   property_documents: number
   reviews: number
   saved_properties: number
+  referrals: number
 }
 
 export type ProfilesCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2050,6 +2832,7 @@ export type ProfilesCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensio
   property_documents?: boolean | ProfilesCountOutputTypeCountProperty_documentsArgs
   reviews?: boolean | ProfilesCountOutputTypeCountReviewsArgs
   saved_properties?: boolean | ProfilesCountOutputTypeCountSaved_propertiesArgs
+  referrals?: boolean | ProfilesCountOutputTypeCountReferralsArgs
 }
 
 /**
@@ -2132,6 +2915,13 @@ export type ProfilesCountOutputTypeCountSaved_propertiesArgs<ExtArgs extends run
   where?: Prisma.saved_propertiesWhereInput
 }
 
+/**
+ * ProfilesCountOutputType without action
+ */
+export type ProfilesCountOutputTypeCountReferralsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.profilesWhereInput
+}
+
 
 export type profilesSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2142,6 +2932,10 @@ export type profilesSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   bio?: boolean
   created_at?: boolean
   updated_at?: boolean
+  referral_code?: boolean
+  referred_by?: boolean
+  referred_by_code?: boolean
+  referral_count?: boolean
   admin_audit_log?: boolean | Prisma.profiles$admin_audit_logArgs<ExtArgs>
   agents?: boolean | Prisma.profiles$agentsArgs<ExtArgs>
   email_campaigns?: boolean | Prisma.profiles$email_campaignsArgs<ExtArgs>
@@ -2155,6 +2949,8 @@ export type profilesSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   property_documents?: boolean | Prisma.profiles$property_documentsArgs<ExtArgs>
   reviews?: boolean | Prisma.profiles$reviewsArgs<ExtArgs>
   saved_properties?: boolean | Prisma.profiles$saved_propertiesArgs<ExtArgs>
+  referrer?: boolean | Prisma.profiles$referrerArgs<ExtArgs>
+  referrals?: boolean | Prisma.profiles$referralsArgs<ExtArgs>
   _count?: boolean | Prisma.ProfilesCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["profiles"]>
 
@@ -2167,7 +2963,12 @@ export type profilesSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   bio?: boolean
   created_at?: boolean
   updated_at?: boolean
+  referral_code?: boolean
+  referred_by?: boolean
+  referred_by_code?: boolean
+  referral_count?: boolean
   users?: boolean | Prisma.usersDefaultArgs<ExtArgs>
+  referrer?: boolean | Prisma.profiles$referrerArgs<ExtArgs>
 }, ExtArgs["result"]["profiles"]>
 
 export type profilesSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -2179,7 +2980,12 @@ export type profilesSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   bio?: boolean
   created_at?: boolean
   updated_at?: boolean
+  referral_code?: boolean
+  referred_by?: boolean
+  referred_by_code?: boolean
+  referral_count?: boolean
   users?: boolean | Prisma.usersDefaultArgs<ExtArgs>
+  referrer?: boolean | Prisma.profiles$referrerArgs<ExtArgs>
 }, ExtArgs["result"]["profiles"]>
 
 export type profilesSelectScalar = {
@@ -2191,9 +2997,13 @@ export type profilesSelectScalar = {
   bio?: boolean
   created_at?: boolean
   updated_at?: boolean
+  referral_code?: boolean
+  referred_by?: boolean
+  referred_by_code?: boolean
+  referral_count?: boolean
 }
 
-export type profilesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "full_name" | "avatar_url" | "phone" | "bio" | "created_at" | "updated_at", ExtArgs["result"]["profiles"]>
+export type profilesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "full_name" | "avatar_url" | "phone" | "bio" | "created_at" | "updated_at" | "referral_code" | "referred_by" | "referred_by_code" | "referral_count", ExtArgs["result"]["profiles"]>
 export type profilesInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   admin_audit_log?: boolean | Prisma.profiles$admin_audit_logArgs<ExtArgs>
   agents?: boolean | Prisma.profiles$agentsArgs<ExtArgs>
@@ -2208,13 +3018,17 @@ export type profilesInclude<ExtArgs extends runtime.Types.Extensions.InternalArg
   property_documents?: boolean | Prisma.profiles$property_documentsArgs<ExtArgs>
   reviews?: boolean | Prisma.profiles$reviewsArgs<ExtArgs>
   saved_properties?: boolean | Prisma.profiles$saved_propertiesArgs<ExtArgs>
+  referrer?: boolean | Prisma.profiles$referrerArgs<ExtArgs>
+  referrals?: boolean | Prisma.profiles$referralsArgs<ExtArgs>
   _count?: boolean | Prisma.ProfilesCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type profilesIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   users?: boolean | Prisma.usersDefaultArgs<ExtArgs>
+  referrer?: boolean | Prisma.profiles$referrerArgs<ExtArgs>
 }
 export type profilesIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   users?: boolean | Prisma.usersDefaultArgs<ExtArgs>
+  referrer?: boolean | Prisma.profiles$referrerArgs<ExtArgs>
 }
 
 export type $profilesPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2233,6 +3047,8 @@ export type $profilesPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     property_documents: Prisma.$property_documentsPayload<ExtArgs>[]
     reviews: Prisma.$reviewsPayload<ExtArgs>[]
     saved_properties: Prisma.$saved_propertiesPayload<ExtArgs>[]
+    referrer: Prisma.$profilesPayload<ExtArgs> | null
+    referrals: Prisma.$profilesPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2243,6 +3059,10 @@ export type $profilesPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     bio: string | null
     created_at: Date | null
     updated_at: Date | null
+    referral_code: string | null
+    referred_by: string | null
+    referred_by_code: string | null
+    referral_count: number
   }, ExtArgs["result"]["profiles"]>
   composites: {}
 }
@@ -2650,6 +3470,8 @@ export interface Prisma__profilesClient<T, Null = never, ExtArgs extends runtime
   property_documents<T extends Prisma.profiles$property_documentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.profiles$property_documentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$property_documentsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reviews<T extends Prisma.profiles$reviewsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.profiles$reviewsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$reviewsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   saved_properties<T extends Prisma.profiles$saved_propertiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.profiles$saved_propertiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$saved_propertiesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  referrer<T extends Prisma.profiles$referrerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.profiles$referrerArgs<ExtArgs>>): Prisma.Prisma__profilesClient<runtime.Types.Result.GetResult<Prisma.$profilesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  referrals<T extends Prisma.profiles$referralsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.profiles$referralsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$profilesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2687,6 +3509,10 @@ export interface profilesFieldRefs {
   readonly bio: Prisma.FieldRef<"profiles", 'String'>
   readonly created_at: Prisma.FieldRef<"profiles", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"profiles", 'DateTime'>
+  readonly referral_code: Prisma.FieldRef<"profiles", 'String'>
+  readonly referred_by: Prisma.FieldRef<"profiles", 'String'>
+  readonly referred_by_code: Prisma.FieldRef<"profiles", 'String'>
+  readonly referral_count: Prisma.FieldRef<"profiles", 'Int'>
 }
     
 
@@ -3358,6 +4184,49 @@ export type profiles$saved_propertiesArgs<ExtArgs extends runtime.Types.Extensio
   take?: number
   skip?: number
   distinct?: Prisma.Saved_propertiesScalarFieldEnum | Prisma.Saved_propertiesScalarFieldEnum[]
+}
+
+/**
+ * profiles.referrer
+ */
+export type profiles$referrerArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the profiles
+   */
+  select?: Prisma.profilesSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the profiles
+   */
+  omit?: Prisma.profilesOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.profilesInclude<ExtArgs> | null
+  where?: Prisma.profilesWhereInput
+}
+
+/**
+ * profiles.referrals
+ */
+export type profiles$referralsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the profiles
+   */
+  select?: Prisma.profilesSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the profiles
+   */
+  omit?: Prisma.profilesOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.profilesInclude<ExtArgs> | null
+  where?: Prisma.profilesWhereInput
+  orderBy?: Prisma.profilesOrderByWithRelationInput | Prisma.profilesOrderByWithRelationInput[]
+  cursor?: Prisma.profilesWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProfilesScalarFieldEnum | Prisma.ProfilesScalarFieldEnum[]
 }
 
 /**

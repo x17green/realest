@@ -1,5 +1,6 @@
+
 import { NextRequest, NextResponse } from 'next/server';
-import { createServiceClient } from '@/lib/supabase/service';
+import { prisma } from '@/lib/prisma';
 
 const DEFAULT_FORM_SLUG = 'realest-launch-intelligence-2026';
 
@@ -34,41 +35,44 @@ export async function GET(request: NextRequest) {
   const slug = request.nextUrl.searchParams.get('slug')?.trim() || DEFAULT_FORM_SLUG;
 
   try {
-    const supabase = createServiceClient() as any;
-
-    const { data: form, error: formError } = await supabase
-      .from('poll_forms')
-      .select('id, slug, title, description, is_active')
-      .eq('slug', slug)
-      .eq('is_active', true)
-      .maybeSingle();
-
-    if (formError || !form) {
+    // Find the poll form by slug
+    const form = await prisma.poll_forms.findFirst({
+      where: { slug, is_active: true },
+      select: { id: true, slug: true, title: true, description: true },
+    });
+    if (!form) {
       return NextResponse.json({ ok: false, error: 'Poll form not found.' }, { status: 404 });
     }
 
-    const { data: questions, error: questionError } = await supabase
-      .from('poll_questions')
-      .select('question_key, segment, prompt, question_type, options, is_required, display_order')
-      .eq('form_id', form.id)
-      .order('display_order', { ascending: true });
+    // Get all questions for the form, ordered by display_order
+    const questions = await prisma.poll_questions.findMany({
+      where: { form_id: form.id },
+      orderBy: { display_order: 'asc' },
+      select: {
+        question_key: true,
+        segment: true,
+        prompt: true,
+        question_type: true,
+        options: true,
+        is_required: true,
+        display_order: true,
+        show_if: true,
+      },
+    });
 
-    if (questionError) {
-      return NextResponse.json({ ok: false, error: questionError.message }, { status: 500 });
-    }
-
+    // Group questions by segment
     const bySegment = new Map<string, any[]>();
-
-    for (const row of questions ?? []) {
-      const key = row.segment as string;
+    for (const row of questions) {
+      const key = row.segment;
       if (!bySegment.has(key)) bySegment.set(key, []);
       bySegment.get(key)?.push({
         key: row.question_key,
         prompt: row.prompt,
         type: row.question_type,
         required: !!row.is_required,
-        options: Array.isArray(row.options) ? row.options : [],
+        options: Array.isArray(row.options) ? row.options : (row.options ? row.options : []),
         order: row.display_order,
+        show_if: row.show_if || null,
       });
     }
 

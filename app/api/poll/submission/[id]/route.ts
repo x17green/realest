@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServiceClient } from "@/lib/supabase/service";
+import { prisma } from "@/lib/prisma";
 
 export const runtime = "edge";
 
@@ -36,39 +36,55 @@ export async function GET(
     return NextResponse.json({ ok: false, error: "Invalid submission ID." }, { status: 400 });
   }
 
-  const supabase = createServiceClient();
 
-  // Fetch submission
-  const { data: sub, error: subErr } = await supabase
-    .from("poll_submissions")
-    .select("id, segment, full_name, email, opt_in_email_results, created_at, poll_forms(slug, title)")
-    .eq("id", id)
-    .single<SubmissionRow>();
-
-  if (subErr || !sub) {
+  // Fetch submission with form
+  let sub: SubmissionRow & { form: { slug: string; title: string } | null };
+  try {
+    sub = await prisma.poll_submissions.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        segment: true,
+        full_name: true,
+        email: true,
+        opt_in_email_results: true,
+        created_at: true,
+        form: { select: { slug: true, title: true } },
+      },
+    }) as any;
+    if (!sub) {
+      return NextResponse.json({ ok: false, error: "Submission not found." }, { status: 404 });
+    }
+  } catch {
     return NextResponse.json({ ok: false, error: "Submission not found." }, { status: 404 });
   }
 
   // Fetch answers
-  const { data: answerRows, error: ansErr } = await supabase
-    .from("poll_submission_answers")
-    .select("question_key, answer")
-    .eq("submission_id", id)
-    .returns<AnswerRow[]>();
-
-  if (ansErr) {
+  let answerRows: AnswerRow[] = [];
+  try {
+    answerRows = await prisma.poll_submission_answers.findMany({
+      where: { submission_id: id },
+      select: { question_key: true, answer: true },
+    }) as any;
+  } catch {
     return NextResponse.json({ ok: false, error: "Failed to load answers." }, { status: 500 });
   }
 
   // Fetch question prompts + options for this segment
-  const { data: questions, error: qErr } = await supabase
-    .from("poll_questions")
-    .select("question_key, prompt, options, display_order, segment")
-    .eq("segment", sub.segment)
-    .order("display_order", { ascending: true })
-    .returns<QuestionRow[]>();
-
-  if (qErr) {
+  let questions: QuestionRow[] = [];
+  try {
+    questions = await prisma.poll_questions.findMany({
+      where: { segment: sub.segment },
+      orderBy: { display_order: 'asc' },
+      select: {
+        question_key: true,
+        prompt: true,
+        options: true,
+        display_order: true,
+        segment: true,
+      },
+    }) as any;
+  } catch {
     return NextResponse.json({ ok: false, error: "Failed to load questions." }, { status: 500 });
   }
 
@@ -95,10 +111,6 @@ export async function GET(
       return { question: q.prompt, answer: displayAnswer, key: q.question_key };
     });
 
-  const formData = Array.isArray(sub.poll_forms)
-    ? sub.poll_forms[0]
-    : (sub.poll_forms ?? null);
-
   return NextResponse.json({
     ok: true,
     submission: {
@@ -108,7 +120,7 @@ export async function GET(
       email: sub.email,
       opt_in_email_results: sub.opt_in_email_results,
       created_at: sub.created_at,
-      form_title: formData?.title ?? "RealEST Launch Intelligence Poll",
+      form_title: sub.form?.title ?? "RealEST Launch Intelligence Poll",
     },
     answers: enrichedAnswers,
   });

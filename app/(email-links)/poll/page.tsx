@@ -11,9 +11,12 @@ import {
   ChevronRight,
   Loader2,
   Mail,
+  MapPin,
   RotateCcw,
+  Search,
   Sparkles,
 } from "lucide-react";
+import { formatLocationName, useLocationSearch } from "@/lib/hooks/useLocationSearch";
 
 type PollOption = { value: string; label: string };
 
@@ -56,6 +59,39 @@ const SEGMENT_ICONS: Record<string, string> = {
 // step === N   → overview / review screen
 type ModalState = "hidden" | "ask" | "collect";
 
+
+// More precise city/location detection (avoid false positives)
+const isCityOrLocationQuestion = (question: PollQuestion) => {
+  const key = question.key.toLowerCase();
+  const prompt = question.prompt.toLowerCase();
+  // Only match if the question is about a city, state, or location in the context of place, not e.g. 'location of CAC'
+  return (
+    ((key.includes("city") || prompt.includes("city")) && !key.includes("cac") && !prompt.includes("cac")) ||
+    ((key.includes("state") || prompt.includes("state")) && !key.includes("cac") && !prompt.includes("cac")) ||
+    ((key.includes("location") || prompt.includes("location")) && !key.includes("cac") && !prompt.includes("cac"))
+  );
+};
+
+// Detect agent license number question
+const isAgentLicenseQuestion = (question: PollQuestion) => {
+  const key = question.key.toLowerCase();
+  const prompt = question.prompt.toLowerCase();
+  return (
+    key.includes("agent") && (key.includes("license") || key.includes("esvarbon"))
+  ) || (
+    prompt.includes("agent license") || prompt.includes("esvarbon")
+  );
+};
+
+// Detect CAC number question
+const isCACNumberQuestion = (question: PollQuestion) => {
+  const key = question.key.toLowerCase();
+  const prompt = question.prompt.toLowerCase();
+  return (
+    key.includes("cac") && key.includes("number")) ||
+    prompt.includes("cac number") || prompt.includes("corporate affairs commission");
+};
+
 export default function PollPage() {
   // ── catalog ─────────────────────────────────────────────────────────────────
   const [loadingCatalog, setLoadingCatalog] = useState(true);
@@ -78,6 +114,15 @@ export default function PollPage() {
   const [submitting, setSubmitting] = useState(false);
   const [successId, setSuccessId] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false);
+
+  const locationSearch = useLocationSearch({
+    debounceMs: 150,
+    maxResults: 12,
+    includeStates: true,
+    includePopularCities: true,
+  });
 
   const topRef = useRef<HTMLDivElement>(null);
 
@@ -102,8 +147,35 @@ export default function PollPage() {
     [segments, segmentKey],
   );
 
-  const questions = selectedSegment?.questions ?? [];
-  const totalSteps = questions.length; // 0…N-1 are questions; N is overview
+
+  // Filter questions by show_if (conditional logic)
+  function isQuestionVisible(q: any, answers: Record<string, any>) {
+    if (!q.show_if) return true;
+    // Very basic parser: supports 'q21_agent_licensed=="yes"', '&&', etc.
+    try {
+      // Replace each key with its value from answers
+      let expr = q.show_if.replace(/([a-zA-Z0-9_]+)/g, (match: string) => {
+        if (match.startsWith('q')) {
+          const val = answers[match];
+          return typeof val === 'string' ? `"${val}"` : JSON.stringify(val);
+        }
+        return match;
+      });
+      // eslint-disable-next-line no-eval
+      return !!eval(expr);
+    } catch {
+      return false;
+    }
+  }
+
+  const visibleQuestions = useMemo(() => {
+    if (!selectedSegment) return [];
+    const qs = selectedSegment.questions;
+    // Only include questions whose show_if is satisfied
+    return qs.filter((q) => isQuestionVisible(q, answers));
+  }, [selectedSegment, answers]);
+
+  const totalSteps = visibleQuestions.length;
   const isOverview = step === totalSteps && totalSteps > 0;
 
   // ── answer helpers ────────────────────────────────────────────────────────────
@@ -124,7 +196,7 @@ export default function PollPage() {
 
   const canAdvance = () => {
     if (step < 0 || step >= totalSteps) return true;
-    const q = questions[step];
+    const q = visibleQuestions[step];
     if (!q.required) return true;
     const v = answers[q.key];
     if (Array.isArray(v)) return v.length > 0;
@@ -141,6 +213,11 @@ export default function PollPage() {
     setStep((s) => (s > 0 ? s - 1 : -1));
     scrollTop();
   };
+
+  useEffect(() => {
+    setIsLocationDropdownOpen(false);
+    locationSearch.clearQuery();
+  }, [step, segmentKey, locationSearch.clearQuery]);
 
   const selectSegment = (key: string) => {
     setSegmentKey(key);
@@ -261,7 +338,19 @@ export default function PollPage() {
     );
   }
 
-  const currentQuestion = step >= 0 && step < totalSteps ? questions[step] : null;
+  const currentQuestion = step >= 0 && step < totalSteps ? visibleQuestions[step] : null;
+  const showLocationPicker = !!currentQuestion && isCityOrLocationQuestion(currentQuestion);
+  const locationOptions =
+    locationSearch.query.trim().length > 0
+      ? locationSearch.results
+      : locationSearch.defaultSuggestions;
+
+  const selectLocationForCurrentQuestion = (label: string) => {
+    if (!currentQuestion) return;
+    setSingleAnswer(currentQuestion.key, label);
+    locationSearch.setQuery(label);
+    setIsLocationDropdownOpen(false);
+  };
 
   return (
     <div ref={topRef} className="min-h-screen bg-background px-4 py-10">
@@ -382,7 +471,7 @@ export default function PollPage() {
           </h1>
           <p className="text-sm text-muted-foreground">
             {step < 0
-              ? "Pick the role that best describes you — we'll ask you the right questions."
+              ? "Choose the group that fits you best — we'll ask you the right questions."
               : step < totalSteps
               ? `Question ${step + 1} of ${totalSteps}`
               : "Here's what you shared — review before submitting."}
@@ -438,8 +527,48 @@ export default function PollPage() {
               </h2>
             </div>
 
+            {/* ── agent license number (only for follow-up) ── */}
+            {currentQuestion.key === "q21b_agent_license_number" && (
+              <div className="space-y-2">
+                <label className="text-xs text-muted-foreground">Agent License Number (ESVARBON)</label>
+                <Input
+                  value={typeof answers[currentQuestion.key] === "string" ? (answers[currentQuestion.key] as string) : ""}
+                  onChange={e => {
+                    // Allow only numbers and uppercase letters, max 12 chars
+                    const val = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 12);
+                    setSingleAnswer(currentQuestion.key, val);
+                  }}
+                  placeholder="e.g. ESV123456"
+                  maxLength={12}
+                  required={currentQuestion.required}
+                  className="text-sm"
+                />
+                <p className="text-xs text-muted-foreground">Find this on your ESVARBON certificate.</p>
+              </div>
+            )}
+
+            {/* ── CAC number ── */}
+            {isCACNumberQuestion(currentQuestion) && (
+              <div className="space-y-2">
+                <label className="text-xs text-muted-foreground">CAC Registration Number</label>
+                <Input
+                  value={typeof answers[currentQuestion.key] === "string" ? (answers[currentQuestion.key] as string) : ""}
+                  onChange={e => {
+                    // Allow only numbers and uppercase letters, max 14 chars
+                    const val = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 14);
+                    setSingleAnswer(currentQuestion.key, val);
+                  }}
+                  placeholder="e.g. RC1234567"
+                  maxLength={14}
+                  required={currentQuestion.required}
+                  className="text-sm"
+                />
+                <p className="text-xs text-muted-foreground">Corporate Affairs Commission (CAC) number for your business.</p>
+              </div>
+            )}
+
             {/* ── single choice ── */}
-            {currentQuestion.type === "single_choice" && (
+            {currentQuestion.type === "single_choice" && !showLocationPicker && !isAgentLicenseQuestion(currentQuestion) && !isCACNumberQuestion(currentQuestion) && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {currentQuestion.options.map((opt) => {
                   const selected = answers[currentQuestion.key] === opt.value;
@@ -458,6 +587,58 @@ export default function PollPage() {
                     </button>
                   );
                 })}
+              </div>
+            )}
+
+            {showLocationPicker && (
+              <div className="space-y-2">
+                <label className="text-xs text-muted-foreground">
+                  Search or pick from popular cities and states
+                </label>
+                <div className="relative">
+                  <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                    <Search className="h-4 w-4" />
+                  </div>
+                  <Input
+                    value={
+                      locationSearch.query ||
+                      (typeof answers[currentQuestion.key] === "string"
+                        ? (answers[currentQuestion.key] as string)
+                        : "")
+                    }
+                    onFocus={() => setIsLocationDropdownOpen(true)}
+                    onChange={(event) => {
+                      locationSearch.setQuery(event.target.value);
+                      setSingleAnswer(currentQuestion.key, event.target.value);
+                      setIsLocationDropdownOpen(true);
+                    }}
+                    placeholder="Type a city or state"
+                    className="pl-9 text-sm"
+                  />
+                </div>
+
+                {isLocationDropdownOpen && (
+                  <div className="max-h-64 overflow-auto rounded-xl border border-border bg-card">
+                    {locationOptions.length === 0 ? (
+                      <p className="px-3 py-2 text-xs text-muted-foreground">No locations found.</p>
+                    ) : (
+                      locationOptions.map((loc) => (
+                        <button
+                          key={loc.id}
+                          type="button"
+                          onClick={() => selectLocationForCurrentQuestion(formatLocationName(loc))}
+                          className="flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-muted/50"
+                        >
+                          <span className="text-foreground">{formatLocationName(loc)}</span>
+                          <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
+                            <MapPin className="h-3 w-3" />
+                            {loc.type}
+                          </span>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                )}
               </div>
             )}
 
@@ -491,11 +672,12 @@ export default function PollPage() {
             )}
 
             {/* ── text / boolean ── */}
-            {(currentQuestion.type === "text" || currentQuestion.type === "boolean") && (
+            {(currentQuestion.type === "text" || currentQuestion.type === "boolean") && !isAgentLicenseQuestion(currentQuestion) && !isCACNumberQuestion(currentQuestion) && (
               <Input
                 value={typeof answers[currentQuestion.key] === "string" ? (answers[currentQuestion.key] as string) : ""}
                 onChange={(e) => setSingleAnswer(currentQuestion.key, e.target.value)}
-                placeholder="Type your answer…"
+                placeholder={currentQuestion.type === "boolean" ? "Yes or No" : "Type your answer…"}
+                required={currentQuestion.required}
                 className="text-sm"
               />
             )}
@@ -507,6 +689,7 @@ export default function PollPage() {
                 value={typeof answers[currentQuestion.key] === "string" ? (answers[currentQuestion.key] as string) : ""}
                 onChange={(e) => setSingleAnswer(currentQuestion.key, e.target.value)}
                 placeholder="Enter a number"
+                required={currentQuestion.required}
                 className="text-sm"
               />
             )}
@@ -552,7 +735,7 @@ export default function PollPage() {
             </div>
 
             <div className="rounded-2xl border border-border bg-card divide-y divide-border overflow-hidden">
-              {questions.map((q, idx) => {
+              {visibleQuestions.map((q, idx) => {
                 const raw = answers[q.key];
                 const answered = Array.isArray(raw) ? raw.length > 0 : !!raw?.toString().trim();
                 return (

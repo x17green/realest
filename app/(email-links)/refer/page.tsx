@@ -173,12 +173,14 @@ function ReferContent() {
                   ? "Verifying referral code..."
                   : inviter
                     ? `${inviter.firstName} invited you to join early.`
-                    : "You opened a referral link."}
+                    : resolveError
+                      ? "Invalid referral code. Please check your link."
+                      : "You opened a referral link."}
               </p>
               <p className="text-white/80 text-sm">
                 Referral code: <span className="font-mono font-bold">{inviter?.referralCode ?? ref}</span>
               </p>
-              {resolveError ? <p className="text-red-200 text-sm">{resolveError}</p> : null}
+              {resolveError ? <p className="text-red-200 text-sm font-semibold">{resolveError}</p> : null}
             </div>
           ) : (
             <p className="text-white/85 text-lg max-w-2xl mx-auto">
@@ -200,100 +202,105 @@ function ReferContent() {
         </div>
       </section>
 
-      <section className="py-14 px-4">
-        <div className="container mx-auto max-w-5xl grid lg:grid-cols-2 gap-8">
-          <div className="rounded-2xl border border-border bg-card p-6 space-y-5">
-            <div className="flex items-center gap-2">
-              <Share2 className="w-5 h-5 text-primary" />
-              <h2 className="text-xl font-semibold">Share your referral link</h2>
-            </div>
-
-            <div className="rounded-xl border border-border bg-muted/30 p-3 flex items-center gap-2">
-              <Link2 className="w-4 h-4 text-muted-foreground" />
-              <code className="text-xs sm:text-sm truncate flex-1">{shareUrl || "Join the waitlist to generate your referral link"}</code>
-              <Button size="sm" variant="outline" onClick={handleCopyLink} disabled={!shareUrl}>
-                <Copy className="w-4 h-4 mr-1" /> {copied ? "Copied" : "Copy"}
-              </Button>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              <a href={socialLinks.x} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-border py-2 text-sm hover:bg-muted/50">
-                <XIcon size={15} /> X (Twitter)
-              </a>
-              <a href={socialLinks.facebook} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-border py-2 text-sm hover:bg-muted/50">
-                <FacebookIcon size={15} /> Facebook
-              </a>
-              <a href={socialLinks.linkedin} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-border py-2 text-sm hover:bg-muted/50">
-                <LinkedInIcon size={15} /> LinkedIn
-              </a>
-              <a href={socialLinks.whatsapp} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-border py-2 text-sm hover:bg-muted/50">
-                <WhatsAppIcon size={15} /> WhatsApp
-              </a>
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-border bg-card p-6 space-y-5">
-            <div className="flex items-center gap-2">
-              <Send className="w-5 h-5 text-primary" />
-              <h2 className="text-xl font-semibold">Invite by email</h2>
-            </div>
-
-            <div className="space-y-3">
-              <div>
-                <label className="text-sm text-muted-foreground">Name</label>
-                <input
-                  value={inviteeName}
-                  onChange={(e) => setInviteeName(e.target.value)}
-                  placeholder="Adaeze"
-                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
-                />
-              </div>
-              <div>
-                <label className="text-sm text-muted-foreground">Email</label>
-                <input
-                  type="email"
-                  value={inviteeEmail}
-                  onChange={(e) => setInviteeEmail(e.target.value)}
-                  placeholder="friend@example.com"
-                  className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
-                />
-              </div>
-              <Button onClick={handleInvite} disabled={inviteSending || !(inviter?.referralCode ?? ref)} className="w-full">
-                <Mail className="w-4 h-4 mr-2" />
-                {inviteSending ? "Sending invite..." : "Send Invite"}
-              </Button>
-              {inviteFeedback ? (
-                <p className={`text-sm ${inviteFeedback.includes("success") ? "text-green-600" : "text-red-600"}`}>
-                  {inviteFeedback}
-                </p>
-              ) : null}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="pb-16 px-4">
-        <div className="container mx-auto max-w-5xl rounded-2xl border border-border bg-card p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Gift className="w-5 h-5 text-primary" />
-            <h3 className="text-xl font-semibold">Referral reward ladder</h3>
-          </div>
-          <div className="grid md:grid-cols-3 gap-3">
-            {SOCIAL_STEPS.map((step) => {
-              const reached = (inviter?.referralCount ?? 0) >= step.threshold;
-              return (
-                <div key={step.threshold} className={`rounded-xl border p-3 ${reached ? "border-primary bg-primary/10" : "border-border"}`}>
-                  <p className="text-xs text-muted-foreground">{step.threshold} referrals</p>
-                  <p className="font-medium">{step.label}</p>
+      {/* Only show share/invite/reward sections if inviter is valid and no resolveError */}
+      {inviter && !resolveError && (
+        <>
+          <section className="py-14 px-4">
+            <div className="container mx-auto max-w-5xl grid lg:grid-cols-2 gap-8">
+              <div className="rounded-2xl border border-border bg-card p-6 space-y-5">
+                <div className="flex items-center gap-2">
+                  <Share2 className="w-5 h-5 text-primary" />
+                  <h2 className="text-xl font-semibold">Share your referral link</h2>
                 </div>
-              );
-            })}
-          </div>
-          <p className="mt-4 text-sm text-muted-foreground">
-            Current referrals: <span className="font-semibold text-foreground">{inviter?.referralCount ?? 0}</span>
-          </p>
-        </div>
-      </section>
+
+                <div className="rounded-xl border border-border bg-muted/30 p-3 flex items-center gap-2">
+                  <Link2 className="w-4 h-4 text-muted-foreground" />
+                  <code className="text-xs sm:text-sm truncate flex-1">{shareUrl || "Join the waitlist to generate your referral link"}</code>
+                  <Button size="sm" variant="outline" onClick={handleCopyLink} disabled={!shareUrl}>
+                    <Copy className="w-4 h-4 mr-1" /> {copied ? "Copied" : "Copy"}
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  <a href={socialLinks.x} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-border py-2 text-sm hover:bg-muted/50">
+                    <XIcon size={15} /> X (Twitter)
+                  </a>
+                  <a href={socialLinks.facebook} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-border py-2 text-sm hover:bg-muted/50">
+                    <FacebookIcon size={15} /> Facebook
+                  </a>
+                  <a href={socialLinks.linkedin} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-border py-2 text-sm hover:bg-muted/50">
+                    <LinkedInIcon size={15} /> LinkedIn
+                  </a>
+                  <a href={socialLinks.whatsapp} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-border py-2 text-sm hover:bg-muted/50">
+                    <WhatsAppIcon size={15} /> WhatsApp
+                  </a>
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-border bg-card p-6 space-y-5">
+                <div className="flex items-center gap-2">
+                  <Send className="w-5 h-5 text-primary" />
+                  <h2 className="text-xl font-semibold">Invite by email</h2>
+                </div>
+
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-sm text-muted-foreground">Name</label>
+                    <input
+                      value={inviteeName}
+                      onChange={(e) => setInviteeName(e.target.value)}
+                      placeholder="Adaeze"
+                      className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm text-muted-foreground">Email</label>
+                    <input
+                      type="email"
+                      value={inviteeEmail}
+                      onChange={(e) => setInviteeEmail(e.target.value)}
+                      placeholder="friend@example.com"
+                      className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                    />
+                  </div>
+                  <Button onClick={handleInvite} disabled={inviteSending || !(inviter?.referralCode ?? ref)} className="w-full">
+                    <Mail className="w-4 h-4 mr-2" />
+                    {inviteSending ? "Sending invite..." : "Send Invite"}
+                  </Button>
+                  {inviteFeedback ? (
+                    <p className={`text-sm ${inviteFeedback.includes("success") ? "text-green-600" : "text-red-600"}`}>
+                      {inviteFeedback}
+                    </p>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="pb-16 px-4">
+            <div className="container mx-auto max-w-5xl rounded-2xl border border-border bg-card p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <Gift className="w-5 h-5 text-primary" />
+                <h3 className="text-xl font-semibold">Referral reward ladder</h3>
+              </div>
+              <div className="grid md:grid-cols-3 gap-3">
+                {SOCIAL_STEPS.map((step) => {
+                  const reached = (inviter?.referralCount ?? 0) >= step.threshold;
+                  return (
+                    <div key={step.threshold} className={`rounded-xl border p-3 ${reached ? "border-primary bg-primary/10" : "border-border"}`}>
+                      <p className="text-xs text-muted-foreground">{step.threshold} referrals</p>
+                      <p className="font-medium">{step.label}</p>
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="mt-4 text-sm text-muted-foreground">
+                Current referrals: <span className="font-semibold text-foreground">{inviter?.referralCount ?? 0}</span>
+              </p>
+            </div>
+          </section>
+        </>
+      )}
 
       <WaitlistModal
         isOpen={isModalOpen}

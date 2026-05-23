@@ -294,3 +294,10 @@ supabase gen types typescript         # Regenerate types
 - **Page Structure**: `docs/page-structure.md`
 - **Roadmap**: `docs/ROADMAP.md`
 - **Phase Summaries**: `docs/phase-{1,2}-completion-summary.md`
+
+### Database Access Architecture
+
+- Supabase is used SOLELY for authentication (user auth, JWT/session, RLS enforcement).
+- All application data access (API routes, server components, data fetching, mutations) MUST use Prisma.
+- Never use Supabase for DB reads/writes outside the authentication layer.
+- This is a hard architectural rule for all contributors and AI agents.
