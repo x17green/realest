@@ -10,6 +10,13 @@ export type CandidateRole = 'user' | 'owner' | 'agent';
 
 export type LaunchWindowAudience = 'general' | 'supply' | 'developer';
 
+export interface WaitlistIntentOption {
+  id: string;
+  label: string;
+  description: string;
+  persona: WaitlistPersona;
+}
+
 export interface ReferralMilestone {
   count: number;
   key:
@@ -64,6 +71,51 @@ export const WAITLIST_PERSONAS: Array<{
     label: 'Bank or mortgage partner',
     description: 'You want financing and partnership opportunities tied to verified supply.',
     audience: 'general',
+  },
+];
+
+export const WAITLIST_INTENT_OPTIONS: WaitlistIntentOption[] = [
+  {
+    id: 'buy_property',
+    label: 'I want to buy property',
+    description: 'I am searching for verified homes or investment-ready properties to buy.',
+    persona: 'buyer_renter',
+  },
+  {
+    id: 'rent_property',
+    label: 'I want to rent property',
+    description: 'I need safe, verified homes to rent without agent scams.',
+    persona: 'buyer_renter',
+  },
+  {
+    id: 'list_my_property',
+    label: 'I want to list my property',
+    description: 'I am a landlord or owner looking for qualified verified demand.',
+    persona: 'owner_landlord',
+  },
+  {
+    id: 'work_as_agent',
+    label: 'I am a real estate agent',
+    description: 'I want verified leads and a trusted marketplace for my listings.',
+    persona: 'agent',
+  },
+  {
+    id: 'invest_in_real_estate',
+    label: 'I invest in real estate',
+    description: 'I am tracking opportunities and market performance data.',
+    persona: 'investor',
+  },
+  {
+    id: 'develop_or_manage_projects',
+    label: 'I develop or manage projects',
+    description: 'I am a developer or agency managing supply at scale.',
+    persona: 'developer_agency',
+  },
+  {
+    id: 'mortgage_or_finance_partner',
+    label: 'I provide mortgage or financing',
+    description: 'I represent a bank or financing institution exploring partnerships.',
+    persona: 'bank_mortgage',
   },
 ];
 

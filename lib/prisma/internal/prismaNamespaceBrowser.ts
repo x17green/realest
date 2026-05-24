@@ -68,6 +68,11 @@ export const ModelName = {
   spatial_ref_sys: 'spatial_ref_sys',
   users: 'users',
   waitlist: 'waitlist',
+  poll_responses: 'poll_responses',
+  poll_forms: 'poll_forms',
+  poll_questions: 'poll_questions',
+  poll_submissions: 'poll_submissions',
+  poll_submission_answers: 'poll_submission_answers',
   email_campaigns: 'email_campaigns'
 } as const
 
@@ -214,7 +219,15 @@ export const ProfilesScalarFieldEnum = {
   phone: 'phone',
   bio: 'bio',
   created_at: 'created_at',
-  updated_at: 'updated_at'
+  updated_at: 'updated_at',
+  referral_code: 'referral_code',
+  referred_by: 'referred_by',
+  referred_by_code: 'referred_by_code',
+  referral_count: 'referral_count',
+  waitlist_persona: 'waitlist_persona',
+  candidate_role: 'candidate_role',
+  role_activated_at: 'role_activated_at',
+  launch_reward_window_ends_at: 'launch_reward_window_ends_at'
 } as const
 
 export type ProfilesScalarFieldEnum = (typeof ProfilesScalarFieldEnum)[keyof typeof ProfilesScalarFieldEnum]
@@ -378,11 +391,90 @@ export const WaitlistScalarFieldEnum = {
   utm_source: 'utm_source',
   utm_medium: 'utm_medium',
   utm_campaign: 'utm_campaign',
+  referral_code: 'referral_code',
+  referred_by: 'referred_by',
+  referral_count: 'referral_count',
+  persona: 'persona',
+  persona_details: 'persona_details',
+  queue_score: 'queue_score',
+  queue_rank: 'queue_rank',
+  candidate_role: 'candidate_role',
+  poll_completion_count: 'poll_completion_count',
+  waitlist_reward_eligible: 'waitlist_reward_eligible',
   created_at: 'created_at',
   updated_at: 'updated_at'
 } as const
 
 export type WaitlistScalarFieldEnum = (typeof WaitlistScalarFieldEnum)[keyof typeof WaitlistScalarFieldEnum]
+
+
+export const Poll_responsesScalarFieldEnum = {
+  id: 'id',
+  question_key: 'question_key',
+  answer: 'answer',
+  ref: 'ref',
+  ip_address: 'ip_address',
+  created_at: 'created_at'
+} as const
+
+export type Poll_responsesScalarFieldEnum = (typeof Poll_responsesScalarFieldEnum)[keyof typeof Poll_responsesScalarFieldEnum]
+
+
+export const Poll_formsScalarFieldEnum = {
+  id: 'id',
+  slug: 'slug',
+  title: 'title',
+  description: 'description',
+  is_active: 'is_active',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Poll_formsScalarFieldEnum = (typeof Poll_formsScalarFieldEnum)[keyof typeof Poll_formsScalarFieldEnum]
+
+
+export const Poll_questionsScalarFieldEnum = {
+  id: 'id',
+  form_id: 'form_id',
+  question_key: 'question_key',
+  segment: 'segment',
+  prompt: 'prompt',
+  question_type: 'question_type',
+  options: 'options',
+  is_required: 'is_required',
+  display_order: 'display_order',
+  show_if: 'show_if',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Poll_questionsScalarFieldEnum = (typeof Poll_questionsScalarFieldEnum)[keyof typeof Poll_questionsScalarFieldEnum]
+
+
+export const Poll_submissionsScalarFieldEnum = {
+  id: 'id',
+  form_id: 'form_id',
+  segment: 'segment',
+  full_name: 'full_name',
+  email: 'email',
+  opt_in_email_results: 'opt_in_email_results',
+  referral_code: 'referral_code',
+  source: 'source',
+  created_at: 'created_at'
+} as const
+
+export type Poll_submissionsScalarFieldEnum = (typeof Poll_submissionsScalarFieldEnum)[keyof typeof Poll_submissionsScalarFieldEnum]
+
+
+export const Poll_submission_answersScalarFieldEnum = {
+  id: 'id',
+  submission_id: 'submission_id',
+  question_key: 'question_key',
+  answer: 'answer',
+  created_at: 'created_at'
+} as const
+
+export type Poll_submission_answersScalarFieldEnum = (typeof Poll_submission_answersScalarFieldEnum)[keyof typeof Poll_submission_answersScalarFieldEnum]
 
 
 export const Email_campaignsScalarFieldEnum = {
@@ -424,6 +516,13 @@ export const NullableJsonNullValueInput = {
 } as const
 
 export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {

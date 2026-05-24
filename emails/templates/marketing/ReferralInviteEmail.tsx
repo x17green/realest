@@ -10,6 +10,7 @@ import { BASE_URL, colors, fonts, fontSize, spacing } from '../../styles/tokens'
 // ─── Types ────────────────────────────────────────────────────────────────────
 export interface ReferralInviteEmailData {
   firstName: string;
+  inviterName?: string;
   referralCode?: string;
   referralUrl?: string;
   rewardDescription?: string;
@@ -156,6 +157,7 @@ const s = {
 // ─── Component ────────────────────────────────────────────────────────────────
 export function ReferralInviteEmail({
   firstName = '',
+  inviterName = '',
   referralCode = '',
   referralUrl = '',
   rewardDescription = 'priority verification on your first listing',
@@ -194,6 +196,12 @@ export function ReferralInviteEmail({
 
       <EmailSection>
         <Text style={s.paragraph}>Hi {firstName},</Text>
+
+        {inviterName && (
+          <Text style={s.paragraph}>
+            <strong>{inviterName}</strong> invited you to join RealEST, the trusted property marketplace for Nigeria.
+          </Text>
+        )}
 
         <Text style={s.paragraph}>
           You joined RealEST's waitlist because you believe Nigeria deserves a better way

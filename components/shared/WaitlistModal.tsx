@@ -16,7 +16,7 @@
 import React, { useState } from 'react';
 import { useEmailValidation, formatWaitlistMessage } from '@/lib/hooks/useEmailValidation';
 import { useLocationSearch, formatLocationName } from '@/lib/hooks/useLocationSearch';
-import { WAITLIST_PERSONAS, type WaitlistPersona } from '@/lib/referral-system';
+import { WAITLIST_INTENT_OPTIONS, type WaitlistPersona } from '@/lib/referral-system';
 import {
   Mail,
   CheckCircle,
@@ -44,8 +44,15 @@ import { Button } from '@/components/ui/button'
 interface WaitlistModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess?: (data: { firstName: string; lastName?: string; position?: number; totalCount?: number }) => void;  /** Referral code to attribute this signup to a referrer. Passed as `ref` in the POST body. */
-  referralCode?: string;}
+  onSuccess?: (data: {
+    firstName: string;
+    lastName?: string;
+    position?: number;
+    totalCount?: number;
+    referralCode?: string | null;
+  }) => void;
+  referralCode?: string;
+}
 
 interface SubmittedData {
   firstName: string;
@@ -64,9 +71,9 @@ const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSucces
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
-  const [persona, setPersona] = useState<WaitlistPersona | "">("");
-  const [interests, setInterests] = useState<string[]>([]);
+  const [selectedIntent, setSelectedIntent] = useState("");
   const [location, setLocation] = useState("");
+  const [locationInputFocused, setLocationInputFocused] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedData, setSubmittedData] = useState<SubmittedData | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -93,13 +100,18 @@ const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSucces
     { id: 3, title: 'Success', icon: CheckCircle }
   ];
 
-  // Interest options
-  const interestOptions = [
-    { id: 'buying', label: 'Buying Property', icon: Home },
-    { id: 'renting', label: 'Renting Property', icon: MapPin },
-    { id: 'investing', label: 'Real Estate Investment', icon: TrendingUp },
-    { id: 'browsing', label: 'Just Browsing', icon: Sparkles }
-  ];
+  const selectedIntentMeta = WAITLIST_INTENT_OPTIONS.find((item) => item.id === selectedIntent);
+  const selectedPersona: WaitlistPersona | undefined = selectedIntentMeta?.persona;
+
+  const intentIcons: Record<string, React.ComponentType<{ className?: string }>> = {
+    buy_property: Home,
+    rent_property: MapPin,
+    list_my_property: Building2,
+    work_as_agent: Shield,
+    invest_in_real_estate: TrendingUp,
+    develop_or_manage_projects: Rocket,
+    mortgage_or_finance_partner: MailCheck,
+  };
 
   // Update form data and clear errors
   const updateFormData = (field: string, value: string | string[]) => {
@@ -116,11 +128,8 @@ const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSucces
       case 'phone':
         setPhone(value as string);
         break;
-      case 'persona':
-        setPersona(value as WaitlistPersona | '');
-        break;
-      case 'interests':
-        setInterests(value as string[]);
+      case 'selectedIntent':
+        setSelectedIntent(value as string);
         break;
       case 'location':
         setLocation(value as string);
@@ -141,12 +150,14 @@ const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSucces
       if (!email.trim()) newErrors.email = 'Email is required';
       else if (!emailValidation.isValid) newErrors.email = 'Invalid email address';
       else if (!emailValidation.isAvailable) newErrors.email = 'Email already in waitlist';
-      if (!persona) newErrors.persona = 'Please choose the option that best describes you';
     }
 
     if (stage === 2) {
-      if (interests.length === 0) {
-        newErrors.interests = 'Please select at least one interest';
+      if (!selectedIntentMeta) {
+        newErrors.selectedIntent = 'Please select one option to continue';
+      }
+      if (!location.trim()) {
+        newErrors.location = 'Location is required';
       }
     }
 
@@ -169,12 +180,8 @@ const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSucces
     }
   };
 
-  // Toggle interest selection
-  const toggleInterest = (interestId: string) => {
-    const newInterests = interests.includes(interestId)
-      ? interests.filter(id => id !== interestId)
-      : [...interests, interestId];
-    updateFormData('interests', newInterests);
+  const chooseIntent = (intentId: string) => {
+    updateFormData('selectedIntent', intentId);
   };
 
   // Get progress percentage
@@ -189,7 +196,7 @@ const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSucces
       e.preventDefault();
       if (currentStage === 1 && emailValidation.isValid && emailValidation.isAvailable && firstName.trim()) {
         handleNext();
-      } else if (currentStage === 2 && interests.length > 0) {
+      } else if (currentStage === 2 && !!selectedIntentMeta) {
         handleEmailSubmit();
       }
     }
@@ -212,8 +219,8 @@ const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSucces
           firstName: firstName.trim(),
           lastName: lastName.trim() || undefined,
           phone: phone.trim() || undefined,
-          persona: persona || undefined,
-          interests: interests,
+          persona: selectedPersona,
+          interests: selectedIntentMeta ? [selectedIntentMeta.id] : undefined,
           locationPreference: location || undefined,
           ref: referralCode ?? undefined,
         }),
@@ -262,8 +269,7 @@ const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSucces
       setFirstName("");
       setLastName("");
       setPhone("");
-      setPersona("");
-      setInterests([]);
+      setSelectedIntent("");
       setLocation("");
       locationSearch.clearQuery();
     }, 300);
@@ -365,37 +371,6 @@ const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSucces
               </div>
 
               <div className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-sm font-semibold text-foreground">
-                    I am joining as <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    value={persona}
-                    onChange={(e) => updateFormData('persona', e.target.value)}
-                    className={`w-full px-4 py-2.5 bg-surface border rounded-lg transition-all duration-200 focus:ring-2 focus:outline-none ${
-                      errors.persona
-                        ? 'border-red-500 focus:ring-red-200/50'
-                        : 'border-border/50 focus:border-primary/50 focus:ring-primary/20'
-                    }`}
-                  >
-                    <option value="">Select a persona</option>
-                    {WAITLIST_PERSONAS.map((item) => (
-                      <option key={item.value} value={item.value}>
-                        {item.label}
-                      </option>
-                    ))}
-                  </select>
-                  {persona ? (
-                    <p className="text-xs text-muted-foreground">{WAITLIST_PERSONAS.find((p) => p.value === persona)?.description}</p>
-                  ) : null}
-                  {errors.persona && (
-                    <p className="text-xs text-red-600 flex items-center gap-1 mt-1">
-                      <AlertCircle className="w-3.5 h-3.5" />
-                      {errors.persona}
-                    </p>
-                  )}
-                </div>
-
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label className="text-sm font-semibold text-foreground">
@@ -511,10 +486,10 @@ const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSucces
                   <Home className="w-7 h-7 text-accent/80" />
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-bold bg-linear-to-r from-accent to-primary bg-clip-text text-transparent mb-1">
-                  What interests you?
+                  What brings you to RealEST?
                 </h2>
                 <p className="text-muted-foreground text-sm sm:text-base">
-                  Help us personalize your experience
+                  Choose one option so we can tailor your experience
                 </p>
               </div>
 
@@ -523,14 +498,15 @@ const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSucces
                   I'm interested in: <span className="text-red-500">*</span>
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {interestOptions.map((interest) => {
-                    const Icon = interest.icon;
-                    const isSelected = interests.includes(interest.id);
+                  {WAITLIST_INTENT_OPTIONS.map((interest) => {
+                    const Icon = intentIcons[interest.id] ?? Sparkles;
+                    const isSelected = selectedIntent === interest.id;
 
                     return (
                       <button
                         key={interest.id}
-                        onClick={() => toggleInterest(interest.id)}
+                        type="button"
+                        onClick={() => chooseIntent(interest.id)}
                         className={`
                           p-4 rounded-xl hover:border-primary/30 hover:bg-primary/15 transition-all duration-200 text-left
                           ${isSelected
@@ -550,31 +526,34 @@ const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSucces
                             <Icon className={`w-5 h-5 ${isSelected ? 'text-accent' : 'text-muted-foreground'}`} />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between gap-2">
-                              <h3 className="text-sm font-semibold text-foreground truncate">
+                            <div className="flex items-center justify-between gap-2 mb-0.5">
+                              <h3 className="text-sm font-semibold text-foreground">
                                 {interest.label}
                               </h3>
                               {isSelected && (
                                 <CheckCircle className="w-4.5 h-4.5 text-accent shrink-0" />
                               )}
                             </div>
+                            <p className="text-xs text-muted-foreground leading-relaxed">
+                              {interest.description}
+                            </p>
                           </div>
                         </div>
                       </button>
                     );
                   })}
                 </div>
-                {errors.interests && (
+                {errors.selectedIntent && (
                   <p className="text-xs text-red-600 flex items-center gap-1">
                     <AlertCircle className="w-3.5 h-3.5" />
-                    {errors.interests}
+                    {errors.selectedIntent}
                   </p>
                 )}
               </div>
 
               <div className="space-y-1.5">
                 <label className="text-sm font-semibold text-foreground">
-                  Location <span className="text-muted-foreground text-xs font-normal">(Optional)</span>
+                  Where are you located? <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <input
@@ -584,21 +563,24 @@ const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSucces
                       locationSearch.setQuery(e.target.value);
                       updateFormData('location', e.target.value);
                     }}
+                    onFocus={() => setLocationInputFocused(true)}
+                    onBlur={() => setTimeout(() => setLocationInputFocused(false), 120)}
                     placeholder="e.g., Lagos, Abuja, Port Harcourt"
-                    className="w-full px-4 py-2.5 pr-10 bg-surface border border-border/50 rounded-lg focus:ring-2 focus:ring-accent/20 focus:border-accent/50 focus:outline-none transition-all duration-200"
+                    className={`w-full px-4 py-2.5 pr-10 bg-surface border rounded-lg focus:ring-2 focus:ring-accent/20 focus:border-accent/50 focus:outline-none transition-all duration-200 ${errors.location ? 'border-red-500 focus:ring-red-200/50' : 'border-border/50'}`}
                   />
                   <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
 
-                  {/* Location Search Results */}
-                  {(locationSearch.results.length > 0 || (locationSearch.query && locationSearch.query.length < 3 && locationSearch.popularLocations.length > 0)) && (
+                  {/* Location Search Results - show results or default suggestions when focused */}
+                  {locationInputFocused && (locationSearch.results.length > 0 || locationSearch.defaultSuggestions.length > 0) && (
                     <div className="absolute top-full left-0 right-0 bg-surface border border-border/50 rounded-lg shadow-lg z-10 mt-1 max-h-48 overflow-y-auto">
                       {locationSearch.results.length > 0 ? (
                         locationSearch.results.map((location) => (
                           <button
                             key={location.id}
-                            onClick={() => {
+                            onMouseDown={() => {
                               locationSearch.selectLocation(location);
                               updateFormData('location', location.name);
+                              setTimeout(() => setLocationInputFocused(false), 0);
                             }}
                             className="w-full text-left px-4 py-2.5 hover:bg-muted transition-colors duration-150 flex items-center gap-2.5"
                           >
@@ -615,12 +597,13 @@ const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSucces
                           <div className="px-4 py-2 text-xs font-medium text-muted-foreground border-b border-border/30">
                             Popular locations
                           </div>
-                          {locationSearch.popularLocations.map((location) => (
+                          {locationSearch.defaultSuggestions.map((location) => (
                             <button
                               key={location.id}
-                              onClick={() => {
+                              onMouseDown={() => {
                                 locationSearch.selectLocation(location);
                                 updateFormData('location', location.name);
+                                setTimeout(() => setLocationInputFocused(false), 0);
                               }}
                               className="w-full text-left px-4 py-2.5 hover:bg-muted transition-colors duration-150 flex items-center gap-2.5"
                             >
@@ -631,6 +614,12 @@ const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSucces
                         </>
                       )}
                     </div>
+                  )}
+                  {errors.location && (
+                    <p className="text-xs text-red-600 flex items-center gap-1 mt-1">
+                      <AlertCircle className="w-3.5 h-3.5" />
+                      {errors.location}
+                    </p>
                   )}
                 </div>
               </div>
@@ -674,11 +663,21 @@ const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSucces
                 </div>
               )}
 
-              {submittedData?.candidateRole ? (
-                <p className="text-xs text-muted-foreground">
-                  Candidate role detected: <span className="font-semibold text-foreground">{submittedData.candidateRole}</span>
-                </p>
-              ) : null}
+              {/* Refer CTA after joining */}
+              <div className="mt-8">
+                <div className="inline-flex flex-col items-center gap-2 w-full">
+                  <span className="text-sm text-muted-foreground">Want to help us grow?</span>
+                  <a
+                    href={submittedData?.referralCode ? `/refer?ref=${encodeURIComponent(submittedData.referralCode)}` : '/refer'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-accent/90 hover:bg-accent text-secondary font-semibold shadow transition-all duration-200"
+                  >
+                    <Gift className="w-4 h-4" />
+                    Refer a friend & get rewards
+                  </a>
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -711,7 +710,7 @@ const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSucces
                 {currentStage === 1 ? (
                   <Button 
                     onClick={handleNext} 
-                    disabled={!firstName.trim() || !email.trim() || !persona || !emailValidation.isValid || !emailValidation.isAvailable}
+                    disabled={!firstName.trim() || !email.trim() || !emailValidation.isValid || !emailValidation.isAvailable}
                     variant="neon" 
                     size="lg" 
                     className="flex w-full items-center justify-center gap-2 btn-glow-accent transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:bg-muted disabled:cursor-not-allowed"
@@ -722,7 +721,7 @@ const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSucces
                 ) : (
                   <Button 
                     onClick={handleEmailSubmit} 
-                    disabled={isSubmitting || interests.length === 0}
+                    disabled={isSubmitting || !selectedIntentMeta}
                     variant="neon" 
                     size="lg" 
                     className="flex-1 w-full items-center justify-center gap-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:bg-muted"

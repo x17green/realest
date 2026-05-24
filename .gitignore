@@ -46,3 +46,4 @@ next-env.d.ts
 .react-email/
 _build-log.txt
 _server-log.txt
+supabase/.temp/cli-latest

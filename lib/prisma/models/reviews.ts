@@ -492,14 +492,6 @@ export type reviewsUncheckedUpdateManyWithoutPropertiesNestedInput = {
   deleteMany?: Prisma.reviewsScalarWhereInput | Prisma.reviewsScalarWhereInput[]
 }
 
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type reviewsCreateWithoutProfilesInput = {
   id?: string
   target_type: string

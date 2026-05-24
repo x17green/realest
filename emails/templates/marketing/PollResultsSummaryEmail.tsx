@@ -82,6 +82,7 @@ const s = {
     fontSize: fontSize.xs,
     color: colors.textLight,
     margin: `${spacing['4']} 0 0`,
+    textAlign: 'center' as const,
   },
   moreNote: {
     fontFamily: fonts.body,
@@ -142,7 +143,7 @@ export function PollResultsSummaryEmail({
         </EmailButton>
 
         <Text style={s.meta}>Submission ID: {submissionId}</Text>
-        <Text style={s.meta}>RealEST: {BASE_URL}</Text>
+        {/* <Text style={s.meta}>RealEST: {BASE_URL}</Text> */}
       </EmailSection>
 
       <EmailFooter
