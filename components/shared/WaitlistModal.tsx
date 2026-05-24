@@ -570,8 +570,8 @@ const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSucces
                   />
                   <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
 
-                  {/* Location Search Results - only show if input is focused and query is non-empty */}
-                  {locationInputFocused && (locationSearch.query.trim().length > 0 || locationSearch.results.length > 0) && (locationSearch.results.length > 0 || locationSearch.defaultSuggestions.length > 0) && (
+                  {/* Location Search Results - show results or default suggestions when focused */}
+                  {locationInputFocused && (locationSearch.results.length > 0 || locationSearch.defaultSuggestions.length > 0) && (
                     <div className="absolute top-full left-0 right-0 bg-surface border border-border/50 rounded-lg shadow-lg z-10 mt-1 max-h-48 overflow-y-auto">
                       {locationSearch.results.length > 0 ? (
                         locationSearch.results.map((location) => (
@@ -592,7 +592,27 @@ const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSucces
                             <span className="text-sm text-foreground">{formatLocationName(location)}</span>
                           </button>
                         ))
-                      ) : null}
+                      ) : (
+                        <>
+                          <div className="px-4 py-2 text-xs font-medium text-muted-foreground border-b border-border/30">
+                            Popular locations
+                          </div>
+                          {locationSearch.defaultSuggestions.map((location) => (
+                            <button
+                              key={location.id}
+                              onMouseDown={() => {
+                                locationSearch.selectLocation(location);
+                                updateFormData('location', location.name);
+                                setTimeout(() => setLocationInputFocused(false), 0);
+                              }}
+                              className="w-full text-left px-4 py-2.5 hover:bg-muted transition-colors duration-150 flex items-center gap-2.5"
+                            >
+                              <Building2 className="w-4 h-4 text-muted-foreground" />
+                              <span className="text-sm text-foreground">{formatLocationName(location)}</span>
+                            </button>
+                          ))}
+                        </>
+                      )}
                     </div>
                   )}
                   {errors.location && (
@@ -648,7 +668,7 @@ const WaitlistModal: React.FC<WaitlistModalProps> = ({ isOpen, onClose, onSucces
                 <div className="inline-flex flex-col items-center gap-2 w-full">
                   <span className="text-sm text-muted-foreground">Want to help us grow?</span>
                   <a
-                    href={submittedData?.referralCode ? `/refer?ref=${submittedData.referralCode}` : '/refer'}
+                    href={submittedData?.referralCode ? `/refer?ref=${encodeURIComponent(submittedData.referralCode)}` : '/refer'}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-accent/90 hover:bg-accent text-secondary font-semibold shadow transition-all duration-200"

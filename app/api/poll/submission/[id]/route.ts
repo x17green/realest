@@ -5,12 +5,12 @@ export const runtime = "nodejs";
 
 interface SubmissionRow {
   id: string;
+  form_id: string;
   segment: string;
   full_name: string;
   email: string;
   opt_in_email_results: boolean;
   created_at: string;
-  poll_forms: { slug: string; title: string } | null;
 }
 
 interface AnswerRow {
@@ -44,6 +44,7 @@ export async function GET(
       where: { id },
       select: {
         id: true,
+        form_id: true,
         segment: true,
         full_name: true,
         email: true,
@@ -70,11 +71,11 @@ export async function GET(
     return NextResponse.json({ ok: false, error: "Failed to load answers." }, { status: 500 });
   }
 
-  // Fetch question prompts + options for this segment
+  // Fetch question prompts + options for this form and segment
   let questions: QuestionRow[] = [];
   try {
     questions = await prisma.poll_questions.findMany({
-      where: { segment: sub.segment },
+      where: { form_id: sub.form_id, segment: sub.segment },
       orderBy: { display_order: 'asc' },
       select: {
         question_key: true,

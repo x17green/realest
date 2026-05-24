@@ -1,9 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
   Shield,
@@ -14,9 +12,7 @@ import {
   TrendingUp,
   Eye,
   ArrowRight,
-  Loader2,
 } from "lucide-react";
-import { useEmailValidation } from "@/lib/hooks/useEmailValidation";
 
 const FEATURES = [
   {

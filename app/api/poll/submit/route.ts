@@ -104,14 +104,37 @@ export async function POST(request: NextRequest) {
         options: true,
         is_required: true,
         display_order: true,
+        show_if: true,
       },
     });
     if (!questions || questions.length === 0) {
       return NextResponse.json({ ok: false, error: 'No questions found for this segment.' }, { status: 400 });
     }
 
+    // Safe expression parser (matches client-side logic)
+    function isQuestionVisible(q: any, answers: Record<string, any>) {
+      if (!q.show_if) return true;
+      try {
+        let expr = q.show_if;
+        expr = expr.replace(/([a-zA-Z0-9_]+)(?===|!=)/g, (match: string) => {
+          if (match.startsWith('q')) {
+            const val = answers[match];
+            return typeof val === 'string' ? `"${val}"` : JSON.stringify(val);
+          }
+          return match;
+        });
+        const allowedOps = /^["'\w\s=!&|()]+$/;
+        if (!allowedOps.test(expr)) return false;
+        if (/[{}\[\]().;,`]/.test(expr)) return false;
+        const fn = new Function('return ' + expr);
+        return !!fn.call(null);
+      } catch {
+        return false;
+      }
+    }
+
     const missingRequired = questions
-      .filter((q: any) => q.is_required)
+      .filter((q: any) => q.is_required && isQuestionVisible(q, answers))
       .filter((q: any) => !isNonEmptyAnswer(answers[q.question_key]))
       .map((q: any) => q.prompt);
 

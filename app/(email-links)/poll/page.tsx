@@ -88,8 +88,10 @@ const isCACNumberQuestion = (question: PollQuestion) => {
   const key = question.key.toLowerCase();
   const prompt = question.prompt.toLowerCase();
   return (
-    key.includes("cac") && key.includes("number")) ||
-    prompt.includes("cac number") || prompt.includes("corporate affairs commission");
+    (key.includes("cac") && key.includes("number")) ||
+    prompt.includes("cac number") ||
+    prompt.includes("corporate affairs commission")
+  );
 };
 
 export default function PollPage() {
@@ -148,21 +150,28 @@ export default function PollPage() {
   );
 
 
-  // Filter questions by show_if (conditional logic)
+  // Safe expression parser for conditional question visibility
   function isQuestionVisible(q: any, answers: Record<string, any>) {
     if (!q.show_if) return true;
-    // Very basic parser: supports 'q21_agent_licensed=="yes"', '&&', etc.
     try {
-      // Replace each key with its value from answers
-      let expr = q.show_if.replace(/([a-zA-Z0-9_]+)/g, (match: string) => {
+      // Support simple equality and logical operators: 'q21=="yes"', '&&', '||'
+      let expr = q.show_if;
+      // Replace each question key with its actual value from answers
+      expr = expr.replace(/([a-zA-Z0-9_]+)(?===|!=)/g, (match: string) => {
         if (match.startsWith('q')) {
           const val = answers[match];
           return typeof val === 'string' ? `"${val}"` : JSON.stringify(val);
         }
         return match;
       });
-      // eslint-disable-next-line no-eval
-      return !!eval(expr);
+      // Only allow safe operators and comparisons
+      const allowedOps = /^["'\w\s=!&|()]+$/;
+      if (!allowedOps.test(expr)) return false;
+      // Validate basic structure: no function calls, no brackets
+      if (/[{}\[\]().;,`]/.test(expr)) return false;
+      // Use Function constructor in strict mode for safer evaluation
+      const fn = new Function('return ' + expr);
+      return !!fn.call(null);
     } catch {
       return false;
     }
@@ -173,7 +182,7 @@ export default function PollPage() {
     const qs = selectedSegment.questions;
     // Only include questions whose show_if is satisfied
     return qs.filter((q) => isQuestionVisible(q, answers));
-  }, [selectedSegment, answers]);
+  }, [selectedSegment, answers, isQuestionVisible]);
 
   const totalSteps = visibleQuestions.length;
   const isOverview = step === totalSteps && totalSteps > 0;

@@ -13,11 +13,11 @@ FROM selected_form
 CROSS JOIN (
   VALUES
     -- Agent License Number (only if licensed agent is yes)
-    ('q21b_agent_license_number','agent','What is your agent license number?','text',NULL,true,21.1,'q21_agent_licensed=="yes"'),
+    ('q21b_agent_license_number','agent','What is your agent license number?','text',NULL,true,211,'q21_agent_licensed=="yes"'),
     -- CAC Certificate (only if licensed agent is yes)
-    ('q21c_agent_has_cac','agent','Do you have a registered company with CAC certificates?','single_choice','[{"value":"yes","label":"Yes"},{"value":"no","label":"No"}]',true,21.2,'q21_agent_licensed=="yes"'),
+    ('q21c_agent_has_cac','agent','Do you have a registered company with CAC certificates?','single_choice','[{"value":"yes","label":"Yes"},{"value":"no","label":"No"}]',true,212,'q21_agent_licensed=="yes"'),
     -- License Certificate Name (only if CAC is no)
-    ('q21d_agent_license_cert_name','agent','Enter your license certificate name','text',NULL,true,21.3,'q21_agent_licensed=="yes"&&q21c_agent_has_cac=="no"')
+    ('q21d_agent_license_cert_name','agent','Enter your license certificate name','text',NULL,true,213,'q21_agent_licensed=="yes"&&q21c_agent_has_cac=="no"')
 ) AS q(question_key, segment, prompt, question_type, options, is_required, display_order, show_if)
 ON CONFLICT (form_id, question_key) DO UPDATE
 SET segment = EXCLUDED.segment,

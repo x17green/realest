@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
         prompt: row.prompt,
         type: row.question_type,
         required: !!row.is_required,
-        options: Array.isArray(row.options) ? row.options : (row.options ? row.options : []),
+        options: Array.isArray(row.options) ? row.options : [],
         order: row.display_order,
         show_if: row.show_if || null,
       });
