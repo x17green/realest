@@ -463,7 +463,7 @@ export default function PollPage() {
       <div className="mx-auto w-full max-w-2xl space-y-6">
         {/* ── HEADER ── */}
         <div className="space-y-2">
-          <Badge className="uppercase tracking-widest text-xs" style={{ backgroundColor: "#ADF43425", color: "#07402F", border: "none" }}>
+          <Badge className="uppercase tracking-widest text-xs bg-accent text-secondary" style={{ border: "none" }}>
             RealEST · Launch Intelligence
           </Badge>
           <h1 className="text-2xl md:text-3xl font-bold text-foreground">
@@ -498,14 +498,14 @@ export default function PollPage() {
                 key={seg.key}
                 type="button"
                 onClick={() => selectSegment(seg.key)}
-                className="group rounded-2xl border border-border bg-card p-5 text-left transition-all hover:border-[#ADF434] hover:shadow-md active:scale-[0.98]"
+                className="group rounded-2xl border border-border bg-card p-5 text-left transition-all hover:border-accent hover:shadow-md active:scale-[0.98]"
               >
                 <span className="text-3xl">{SEGMENT_ICONS[seg.key] ?? "🏠"}</span>
-                <p className="mt-3 text-sm font-semibold text-foreground group-hover:text-[#07402F]">
+                <p className="mt-3 text-sm font-semibold text-foreground group-hover:text-primary">
                   {seg.label}
                 </p>
                 <p className="mt-1 text-xs text-muted-foreground leading-relaxed">{seg.description}</p>
-                <div className="mt-3 flex items-center gap-1 text-xs font-medium text-[#07402F] opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="mt-3 flex items-center gap-1 text-xs font-medium text-accent opacity-0 group-hover:opacity-100 transition-opacity">
                   Start <ChevronRight className="h-3 w-3" />
                 </div>
               </button>
@@ -579,8 +579,8 @@ export default function PollPage() {
                       onClick={() => { setSingleAnswer(currentQuestion.key, opt.value); }}
                       className={`rounded-xl border px-4 py-3 text-sm text-left transition-all ${
                         selected
-                          ? "border-[#ADF434] bg-[#ADF43418] text-[#07402F] font-medium"
-                          : "border-border bg-background hover:border-[#ADF43480] text-foreground"
+                          ? "border-accent/70 bg-accent/20 text-primary font-medium"
+                          : "border-border bg-background hover:border-accent/20 text-foreground"
                       }`}
                     >
                       {opt.label}

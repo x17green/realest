@@ -223,7 +223,11 @@ export const ProfilesScalarFieldEnum = {
   referral_code: 'referral_code',
   referred_by: 'referred_by',
   referred_by_code: 'referred_by_code',
-  referral_count: 'referral_count'
+  referral_count: 'referral_count',
+  waitlist_persona: 'waitlist_persona',
+  candidate_role: 'candidate_role',
+  role_activated_at: 'role_activated_at',
+  launch_reward_window_ends_at: 'launch_reward_window_ends_at'
 } as const
 
 export type ProfilesScalarFieldEnum = (typeof ProfilesScalarFieldEnum)[keyof typeof ProfilesScalarFieldEnum]
@@ -390,6 +394,13 @@ export const WaitlistScalarFieldEnum = {
   referral_code: 'referral_code',
   referred_by: 'referred_by',
   referral_count: 'referral_count',
+  persona: 'persona',
+  persona_details: 'persona_details',
+  queue_score: 'queue_score',
+  queue_rank: 'queue_rank',
+  candidate_role: 'candidate_role',
+  poll_completion_count: 'poll_completion_count',
+  waitlist_reward_eligible: 'waitlist_reward_eligible',
   created_at: 'created_at',
   updated_at: 'updated_at'
 } as const

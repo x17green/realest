@@ -47,6 +47,10 @@ export type ProfilesMinAggregateOutputType = {
   referred_by: string | null
   referred_by_code: string | null
   referral_count: number | null
+  waitlist_persona: string | null
+  candidate_role: string | null
+  role_activated_at: Date | null
+  launch_reward_window_ends_at: Date | null
 }
 
 export type ProfilesMaxAggregateOutputType = {
@@ -62,6 +66,10 @@ export type ProfilesMaxAggregateOutputType = {
   referred_by: string | null
   referred_by_code: string | null
   referral_count: number | null
+  waitlist_persona: string | null
+  candidate_role: string | null
+  role_activated_at: Date | null
+  launch_reward_window_ends_at: Date | null
 }
 
 export type ProfilesCountAggregateOutputType = {
@@ -77,6 +85,10 @@ export type ProfilesCountAggregateOutputType = {
   referred_by: number
   referred_by_code: number
   referral_count: number
+  waitlist_persona: number
+  candidate_role: number
+  role_activated_at: number
+  launch_reward_window_ends_at: number
   _all: number
 }
 
@@ -102,6 +114,10 @@ export type ProfilesMinAggregateInputType = {
   referred_by?: true
   referred_by_code?: true
   referral_count?: true
+  waitlist_persona?: true
+  candidate_role?: true
+  role_activated_at?: true
+  launch_reward_window_ends_at?: true
 }
 
 export type ProfilesMaxAggregateInputType = {
@@ -117,6 +133,10 @@ export type ProfilesMaxAggregateInputType = {
   referred_by?: true
   referred_by_code?: true
   referral_count?: true
+  waitlist_persona?: true
+  candidate_role?: true
+  role_activated_at?: true
+  launch_reward_window_ends_at?: true
 }
 
 export type ProfilesCountAggregateInputType = {
@@ -132,6 +152,10 @@ export type ProfilesCountAggregateInputType = {
   referred_by?: true
   referred_by_code?: true
   referral_count?: true
+  waitlist_persona?: true
+  candidate_role?: true
+  role_activated_at?: true
+  launch_reward_window_ends_at?: true
   _all?: true
 }
 
@@ -234,6 +258,10 @@ export type ProfilesGroupByOutputType = {
   referred_by: string | null
   referred_by_code: string | null
   referral_count: number
+  waitlist_persona: string | null
+  candidate_role: string | null
+  role_activated_at: Date | null
+  launch_reward_window_ends_at: Date | null
   _count: ProfilesCountAggregateOutputType | null
   _avg: ProfilesAvgAggregateOutputType | null
   _sum: ProfilesSumAggregateOutputType | null
@@ -272,6 +300,10 @@ export type profilesWhereInput = {
   referred_by?: Prisma.UuidNullableFilter<"profiles"> | string | null
   referred_by_code?: Prisma.StringNullableFilter<"profiles"> | string | null
   referral_count?: Prisma.IntFilter<"profiles"> | number
+  waitlist_persona?: Prisma.StringNullableFilter<"profiles"> | string | null
+  candidate_role?: Prisma.StringNullableFilter<"profiles"> | string | null
+  role_activated_at?: Prisma.DateTimeNullableFilter<"profiles"> | Date | string | null
+  launch_reward_window_ends_at?: Prisma.DateTimeNullableFilter<"profiles"> | Date | string | null
   admin_audit_log?: Prisma.Admin_audit_logListRelationFilter
   agents?: Prisma.XOR<Prisma.AgentsNullableScalarRelationFilter, Prisma.agentsWhereInput> | null
   email_campaigns?: Prisma.Email_campaignsListRelationFilter
@@ -302,6 +334,10 @@ export type profilesOrderByWithRelationInput = {
   referred_by?: Prisma.SortOrderInput | Prisma.SortOrder
   referred_by_code?: Prisma.SortOrderInput | Prisma.SortOrder
   referral_count?: Prisma.SortOrder
+  waitlist_persona?: Prisma.SortOrderInput | Prisma.SortOrder
+  candidate_role?: Prisma.SortOrderInput | Prisma.SortOrder
+  role_activated_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  launch_reward_window_ends_at?: Prisma.SortOrderInput | Prisma.SortOrder
   admin_audit_log?: Prisma.admin_audit_logOrderByRelationAggregateInput
   agents?: Prisma.agentsOrderByWithRelationInput
   email_campaigns?: Prisma.email_campaignsOrderByRelationAggregateInput
@@ -335,6 +371,10 @@ export type profilesWhereUniqueInput = Prisma.AtLeast<{
   referred_by?: Prisma.UuidNullableFilter<"profiles"> | string | null
   referred_by_code?: Prisma.StringNullableFilter<"profiles"> | string | null
   referral_count?: Prisma.IntFilter<"profiles"> | number
+  waitlist_persona?: Prisma.StringNullableFilter<"profiles"> | string | null
+  candidate_role?: Prisma.StringNullableFilter<"profiles"> | string | null
+  role_activated_at?: Prisma.DateTimeNullableFilter<"profiles"> | Date | string | null
+  launch_reward_window_ends_at?: Prisma.DateTimeNullableFilter<"profiles"> | Date | string | null
   admin_audit_log?: Prisma.Admin_audit_logListRelationFilter
   agents?: Prisma.XOR<Prisma.AgentsNullableScalarRelationFilter, Prisma.agentsWhereInput> | null
   email_campaigns?: Prisma.Email_campaignsListRelationFilter
@@ -365,6 +405,10 @@ export type profilesOrderByWithAggregationInput = {
   referred_by?: Prisma.SortOrderInput | Prisma.SortOrder
   referred_by_code?: Prisma.SortOrderInput | Prisma.SortOrder
   referral_count?: Prisma.SortOrder
+  waitlist_persona?: Prisma.SortOrderInput | Prisma.SortOrder
+  candidate_role?: Prisma.SortOrderInput | Prisma.SortOrder
+  role_activated_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  launch_reward_window_ends_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.profilesCountOrderByAggregateInput
   _avg?: Prisma.profilesAvgOrderByAggregateInput
   _max?: Prisma.profilesMaxOrderByAggregateInput
@@ -388,6 +432,10 @@ export type profilesScalarWhereWithAggregatesInput = {
   referred_by?: Prisma.UuidNullableWithAggregatesFilter<"profiles"> | string | null
   referred_by_code?: Prisma.StringNullableWithAggregatesFilter<"profiles"> | string | null
   referral_count?: Prisma.IntWithAggregatesFilter<"profiles"> | number
+  waitlist_persona?: Prisma.StringNullableWithAggregatesFilter<"profiles"> | string | null
+  candidate_role?: Prisma.StringNullableWithAggregatesFilter<"profiles"> | string | null
+  role_activated_at?: Prisma.DateTimeNullableWithAggregatesFilter<"profiles"> | Date | string | null
+  launch_reward_window_ends_at?: Prisma.DateTimeNullableWithAggregatesFilter<"profiles"> | Date | string | null
 }
 
 export type profilesCreateInput = {
@@ -401,6 +449,10 @@ export type profilesCreateInput = {
   referral_code?: string | null
   referred_by_code?: string | null
   referral_count?: number
+  waitlist_persona?: string | null
+  candidate_role?: string | null
+  role_activated_at?: Date | string | null
+  launch_reward_window_ends_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
@@ -431,6 +483,10 @@ export type profilesUncheckedCreateInput = {
   referred_by?: string | null
   referred_by_code?: string | null
   referral_count?: number
+  waitlist_persona?: string | null
+  candidate_role?: string | null
+  role_activated_at?: Date | string | null
+  launch_reward_window_ends_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
@@ -457,6 +513,10 @@ export type profilesUpdateInput = {
   referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  waitlist_persona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidate_role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role_activated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  launch_reward_window_ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
@@ -487,6 +547,10 @@ export type profilesUncheckedUpdateInput = {
   referred_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  waitlist_persona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidate_role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role_activated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  launch_reward_window_ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -515,6 +579,10 @@ export type profilesCreateManyInput = {
   referred_by?: string | null
   referred_by_code?: string | null
   referral_count?: number
+  waitlist_persona?: string | null
+  candidate_role?: string | null
+  role_activated_at?: Date | string | null
+  launch_reward_window_ends_at?: Date | string | null
 }
 
 export type profilesUpdateManyMutationInput = {
@@ -528,6 +596,10 @@ export type profilesUpdateManyMutationInput = {
   referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  waitlist_persona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidate_role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role_activated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  launch_reward_window_ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type profilesUncheckedUpdateManyInput = {
@@ -543,6 +615,10 @@ export type profilesUncheckedUpdateManyInput = {
   referred_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  waitlist_persona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidate_role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role_activated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  launch_reward_window_ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ProfilesScalarRelationFilter = {
@@ -578,6 +654,10 @@ export type profilesCountOrderByAggregateInput = {
   referred_by?: Prisma.SortOrder
   referred_by_code?: Prisma.SortOrder
   referral_count?: Prisma.SortOrder
+  waitlist_persona?: Prisma.SortOrder
+  candidate_role?: Prisma.SortOrder
+  role_activated_at?: Prisma.SortOrder
+  launch_reward_window_ends_at?: Prisma.SortOrder
 }
 
 export type profilesAvgOrderByAggregateInput = {
@@ -597,6 +677,10 @@ export type profilesMaxOrderByAggregateInput = {
   referred_by?: Prisma.SortOrder
   referred_by_code?: Prisma.SortOrder
   referral_count?: Prisma.SortOrder
+  waitlist_persona?: Prisma.SortOrder
+  candidate_role?: Prisma.SortOrder
+  role_activated_at?: Prisma.SortOrder
+  launch_reward_window_ends_at?: Prisma.SortOrder
 }
 
 export type profilesMinOrderByAggregateInput = {
@@ -612,6 +696,10 @@ export type profilesMinOrderByAggregateInput = {
   referred_by?: Prisma.SortOrder
   referred_by_code?: Prisma.SortOrder
   referral_count?: Prisma.SortOrder
+  waitlist_persona?: Prisma.SortOrder
+  candidate_role?: Prisma.SortOrder
+  role_activated_at?: Prisma.SortOrder
+  launch_reward_window_ends_at?: Prisma.SortOrder
 }
 
 export type profilesSumOrderByAggregateInput = {
@@ -897,6 +985,10 @@ export type profilesCreateWithoutAdmin_audit_logInput = {
   referral_code?: string | null
   referred_by_code?: string | null
   referral_count?: number
+  waitlist_persona?: string | null
+  candidate_role?: string | null
+  role_activated_at?: Date | string | null
+  launch_reward_window_ends_at?: Date | string | null
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
@@ -926,6 +1018,10 @@ export type profilesUncheckedCreateWithoutAdmin_audit_logInput = {
   referred_by?: string | null
   referred_by_code?: string | null
   referral_count?: number
+  waitlist_persona?: string | null
+  candidate_role?: string | null
+  role_activated_at?: Date | string | null
+  launch_reward_window_ends_at?: Date | string | null
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
@@ -967,6 +1063,10 @@ export type profilesUpdateWithoutAdmin_audit_logInput = {
   referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  waitlist_persona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidate_role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role_activated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  launch_reward_window_ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
@@ -996,6 +1096,10 @@ export type profilesUncheckedUpdateWithoutAdmin_audit_logInput = {
   referred_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  waitlist_persona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidate_role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role_activated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  launch_reward_window_ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
@@ -1021,6 +1125,10 @@ export type profilesCreateWithoutAgentsInput = {
   referral_code?: string | null
   referred_by_code?: string | null
   referral_count?: number
+  waitlist_persona?: string | null
+  candidate_role?: string | null
+  role_activated_at?: Date | string | null
+  launch_reward_window_ends_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
@@ -1050,6 +1158,10 @@ export type profilesUncheckedCreateWithoutAgentsInput = {
   referred_by?: string | null
   referred_by_code?: string | null
   referral_count?: number
+  waitlist_persona?: string | null
+  candidate_role?: string | null
+  role_activated_at?: Date | string | null
+  launch_reward_window_ends_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
@@ -1091,6 +1203,10 @@ export type profilesUpdateWithoutAgentsInput = {
   referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  waitlist_persona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidate_role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role_activated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  launch_reward_window_ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
@@ -1120,6 +1236,10 @@ export type profilesUncheckedUpdateWithoutAgentsInput = {
   referred_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  waitlist_persona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidate_role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role_activated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  launch_reward_window_ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
@@ -1145,6 +1265,10 @@ export type profilesCreateWithoutInquiries_inquiries_owner_idToprofilesInput = {
   referral_code?: string | null
   referred_by_code?: string | null
   referral_count?: number
+  waitlist_persona?: string | null
+  candidate_role?: string | null
+  role_activated_at?: Date | string | null
+  launch_reward_window_ends_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
@@ -1174,6 +1298,10 @@ export type profilesUncheckedCreateWithoutInquiries_inquiries_owner_idToprofiles
   referred_by?: string | null
   referred_by_code?: string | null
   referral_count?: number
+  waitlist_persona?: string | null
+  candidate_role?: string | null
+  role_activated_at?: Date | string | null
+  launch_reward_window_ends_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
@@ -1204,6 +1332,10 @@ export type profilesCreateWithoutInquiries_inquiries_sender_idToprofilesInput = 
   referral_code?: string | null
   referred_by_code?: string | null
   referral_count?: number
+  waitlist_persona?: string | null
+  candidate_role?: string | null
+  role_activated_at?: Date | string | null
+  launch_reward_window_ends_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
@@ -1233,6 +1365,10 @@ export type profilesUncheckedCreateWithoutInquiries_inquiries_sender_idToprofile
   referred_by?: string | null
   referred_by_code?: string | null
   referral_count?: number
+  waitlist_persona?: string | null
+  candidate_role?: string | null
+  role_activated_at?: Date | string | null
+  launch_reward_window_ends_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
@@ -1274,6 +1410,10 @@ export type profilesUpdateWithoutInquiries_inquiries_owner_idToprofilesInput = {
   referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  waitlist_persona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidate_role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role_activated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  launch_reward_window_ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
@@ -1303,6 +1443,10 @@ export type profilesUncheckedUpdateWithoutInquiries_inquiries_owner_idToprofiles
   referred_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  waitlist_persona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidate_role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role_activated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  launch_reward_window_ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -1339,6 +1483,10 @@ export type profilesUpdateWithoutInquiries_inquiries_sender_idToprofilesInput = 
   referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  waitlist_persona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidate_role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role_activated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  launch_reward_window_ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
@@ -1368,6 +1516,10 @@ export type profilesUncheckedUpdateWithoutInquiries_inquiries_sender_idToprofile
   referred_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  waitlist_persona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidate_role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role_activated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  launch_reward_window_ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -1393,6 +1545,10 @@ export type profilesCreateWithoutKyc_requestsInput = {
   referral_code?: string | null
   referred_by_code?: string | null
   referral_count?: number
+  waitlist_persona?: string | null
+  candidate_role?: string | null
+  role_activated_at?: Date | string | null
+  launch_reward_window_ends_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
@@ -1422,6 +1578,10 @@ export type profilesUncheckedCreateWithoutKyc_requestsInput = {
   referred_by?: string | null
   referred_by_code?: string | null
   referral_count?: number
+  waitlist_persona?: string | null
+  candidate_role?: string | null
+  role_activated_at?: Date | string | null
+  launch_reward_window_ends_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
@@ -1463,6 +1623,10 @@ export type profilesUpdateWithoutKyc_requestsInput = {
   referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  waitlist_persona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidate_role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role_activated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  launch_reward_window_ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
@@ -1492,6 +1656,10 @@ export type profilesUncheckedUpdateWithoutKyc_requestsInput = {
   referred_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  waitlist_persona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidate_role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role_activated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  launch_reward_window_ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -1517,6 +1685,10 @@ export type profilesCreateWithoutNotificationsInput = {
   referral_code?: string | null
   referred_by_code?: string | null
   referral_count?: number
+  waitlist_persona?: string | null
+  candidate_role?: string | null
+  role_activated_at?: Date | string | null
+  launch_reward_window_ends_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
@@ -1546,6 +1718,10 @@ export type profilesUncheckedCreateWithoutNotificationsInput = {
   referred_by?: string | null
   referred_by_code?: string | null
   referral_count?: number
+  waitlist_persona?: string | null
+  candidate_role?: string | null
+  role_activated_at?: Date | string | null
+  launch_reward_window_ends_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
@@ -1587,6 +1763,10 @@ export type profilesUpdateWithoutNotificationsInput = {
   referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  waitlist_persona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidate_role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role_activated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  launch_reward_window_ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
@@ -1616,6 +1796,10 @@ export type profilesUncheckedUpdateWithoutNotificationsInput = {
   referred_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  waitlist_persona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidate_role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role_activated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  launch_reward_window_ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -1641,6 +1825,10 @@ export type profilesCreateWithoutOwnersInput = {
   referral_code?: string | null
   referred_by_code?: string | null
   referral_count?: number
+  waitlist_persona?: string | null
+  candidate_role?: string | null
+  role_activated_at?: Date | string | null
+  launch_reward_window_ends_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
@@ -1670,6 +1858,10 @@ export type profilesUncheckedCreateWithoutOwnersInput = {
   referred_by?: string | null
   referred_by_code?: string | null
   referral_count?: number
+  waitlist_persona?: string | null
+  candidate_role?: string | null
+  role_activated_at?: Date | string | null
+  launch_reward_window_ends_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
@@ -1711,6 +1903,10 @@ export type profilesUpdateWithoutOwnersInput = {
   referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  waitlist_persona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidate_role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role_activated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  launch_reward_window_ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
@@ -1740,6 +1936,10 @@ export type profilesUncheckedUpdateWithoutOwnersInput = {
   referred_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  waitlist_persona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidate_role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role_activated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  launch_reward_window_ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -1765,6 +1965,10 @@ export type profilesCreateWithoutPaymentsInput = {
   referral_code?: string | null
   referred_by_code?: string | null
   referral_count?: number
+  waitlist_persona?: string | null
+  candidate_role?: string | null
+  role_activated_at?: Date | string | null
+  launch_reward_window_ends_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
@@ -1794,6 +1998,10 @@ export type profilesUncheckedCreateWithoutPaymentsInput = {
   referred_by?: string | null
   referred_by_code?: string | null
   referral_count?: number
+  waitlist_persona?: string | null
+  candidate_role?: string | null
+  role_activated_at?: Date | string | null
+  launch_reward_window_ends_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
@@ -1835,6 +2043,10 @@ export type profilesUpdateWithoutPaymentsInput = {
   referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  waitlist_persona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidate_role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role_activated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  launch_reward_window_ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
@@ -1864,6 +2076,10 @@ export type profilesUncheckedUpdateWithoutPaymentsInput = {
   referred_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  waitlist_persona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidate_role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role_activated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  launch_reward_window_ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -1889,6 +2105,10 @@ export type profilesCreateWithoutReferralsInput = {
   referral_code?: string | null
   referred_by_code?: string | null
   referral_count?: number
+  waitlist_persona?: string | null
+  candidate_role?: string | null
+  role_activated_at?: Date | string | null
+  launch_reward_window_ends_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
@@ -1918,6 +2138,10 @@ export type profilesUncheckedCreateWithoutReferralsInput = {
   referred_by?: string | null
   referred_by_code?: string | null
   referral_count?: number
+  waitlist_persona?: string | null
+  candidate_role?: string | null
+  role_activated_at?: Date | string | null
+  launch_reward_window_ends_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
@@ -1948,6 +2172,10 @@ export type profilesCreateWithoutReferrerInput = {
   referral_code?: string | null
   referred_by_code?: string | null
   referral_count?: number
+  waitlist_persona?: string | null
+  candidate_role?: string | null
+  role_activated_at?: Date | string | null
+  launch_reward_window_ends_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
@@ -1976,6 +2204,10 @@ export type profilesUncheckedCreateWithoutReferrerInput = {
   referral_code?: string | null
   referred_by_code?: string | null
   referral_count?: number
+  waitlist_persona?: string | null
+  candidate_role?: string | null
+  role_activated_at?: Date | string | null
+  launch_reward_window_ends_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
@@ -2023,6 +2255,10 @@ export type profilesUpdateWithoutReferralsInput = {
   referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  waitlist_persona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidate_role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role_activated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  launch_reward_window_ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
@@ -2052,6 +2288,10 @@ export type profilesUncheckedUpdateWithoutReferralsInput = {
   referred_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  waitlist_persona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidate_role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role_activated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  launch_reward_window_ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -2098,6 +2338,10 @@ export type profilesScalarWhereInput = {
   referred_by?: Prisma.UuidNullableFilter<"profiles"> | string | null
   referred_by_code?: Prisma.StringNullableFilter<"profiles"> | string | null
   referral_count?: Prisma.IntFilter<"profiles"> | number
+  waitlist_persona?: Prisma.StringNullableFilter<"profiles"> | string | null
+  candidate_role?: Prisma.StringNullableFilter<"profiles"> | string | null
+  role_activated_at?: Prisma.DateTimeNullableFilter<"profiles"> | Date | string | null
+  launch_reward_window_ends_at?: Prisma.DateTimeNullableFilter<"profiles"> | Date | string | null
 }
 
 export type profilesCreateWithoutProperty_documentsInput = {
@@ -2111,6 +2355,10 @@ export type profilesCreateWithoutProperty_documentsInput = {
   referral_code?: string | null
   referred_by_code?: string | null
   referral_count?: number
+  waitlist_persona?: string | null
+  candidate_role?: string | null
+  role_activated_at?: Date | string | null
+  launch_reward_window_ends_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
@@ -2140,6 +2388,10 @@ export type profilesUncheckedCreateWithoutProperty_documentsInput = {
   referred_by?: string | null
   referred_by_code?: string | null
   referral_count?: number
+  waitlist_persona?: string | null
+  candidate_role?: string | null
+  role_activated_at?: Date | string | null
+  launch_reward_window_ends_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
@@ -2181,6 +2433,10 @@ export type profilesUpdateWithoutProperty_documentsInput = {
   referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  waitlist_persona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidate_role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role_activated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  launch_reward_window_ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
@@ -2210,6 +2466,10 @@ export type profilesUncheckedUpdateWithoutProperty_documentsInput = {
   referred_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  waitlist_persona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidate_role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role_activated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  launch_reward_window_ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -2235,6 +2495,10 @@ export type profilesCreateWithoutReviewsInput = {
   referral_code?: string | null
   referred_by_code?: string | null
   referral_count?: number
+  waitlist_persona?: string | null
+  candidate_role?: string | null
+  role_activated_at?: Date | string | null
+  launch_reward_window_ends_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
@@ -2264,6 +2528,10 @@ export type profilesUncheckedCreateWithoutReviewsInput = {
   referred_by?: string | null
   referred_by_code?: string | null
   referral_count?: number
+  waitlist_persona?: string | null
+  candidate_role?: string | null
+  role_activated_at?: Date | string | null
+  launch_reward_window_ends_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
@@ -2305,6 +2573,10 @@ export type profilesUpdateWithoutReviewsInput = {
   referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  waitlist_persona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidate_role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role_activated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  launch_reward_window_ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
@@ -2334,6 +2606,10 @@ export type profilesUncheckedUpdateWithoutReviewsInput = {
   referred_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  waitlist_persona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidate_role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role_activated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  launch_reward_window_ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -2359,6 +2635,10 @@ export type profilesCreateWithoutSaved_propertiesInput = {
   referral_code?: string | null
   referred_by_code?: string | null
   referral_count?: number
+  waitlist_persona?: string | null
+  candidate_role?: string | null
+  role_activated_at?: Date | string | null
+  launch_reward_window_ends_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
@@ -2388,6 +2668,10 @@ export type profilesUncheckedCreateWithoutSaved_propertiesInput = {
   referred_by?: string | null
   referred_by_code?: string | null
   referral_count?: number
+  waitlist_persona?: string | null
+  candidate_role?: string | null
+  role_activated_at?: Date | string | null
+  launch_reward_window_ends_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
@@ -2429,6 +2713,10 @@ export type profilesUpdateWithoutSaved_propertiesInput = {
   referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  waitlist_persona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidate_role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role_activated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  launch_reward_window_ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
@@ -2458,6 +2746,10 @@ export type profilesUncheckedUpdateWithoutSaved_propertiesInput = {
   referred_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  waitlist_persona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidate_role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role_activated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  launch_reward_window_ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -2483,6 +2775,10 @@ export type profilesCreateWithoutUsersInput = {
   referral_code?: string | null
   referred_by_code?: string | null
   referral_count?: number
+  waitlist_persona?: string | null
+  candidate_role?: string | null
+  role_activated_at?: Date | string | null
+  launch_reward_window_ends_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsCreateNestedManyWithoutProfilesInput
@@ -2511,6 +2807,10 @@ export type profilesUncheckedCreateWithoutUsersInput = {
   referred_by?: string | null
   referred_by_code?: string | null
   referral_count?: number
+  waitlist_persona?: string | null
+  candidate_role?: string | null
+  role_activated_at?: Date | string | null
+  launch_reward_window_ends_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
   email_campaigns?: Prisma.email_campaignsUncheckedCreateNestedManyWithoutProfilesInput
@@ -2553,6 +2853,10 @@ export type profilesUpdateWithoutUsersInput = {
   referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  waitlist_persona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidate_role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role_activated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  launch_reward_window_ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
@@ -2581,6 +2885,10 @@ export type profilesUncheckedUpdateWithoutUsersInput = {
   referred_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  waitlist_persona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidate_role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role_activated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  launch_reward_window_ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -2607,6 +2915,10 @@ export type profilesCreateWithoutEmail_campaignsInput = {
   referral_code?: string | null
   referred_by_code?: string | null
   referral_count?: number
+  waitlist_persona?: string | null
+  candidate_role?: string | null
+  role_activated_at?: Date | string | null
+  launch_reward_window_ends_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsCreateNestedOneWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
@@ -2636,6 +2948,10 @@ export type profilesUncheckedCreateWithoutEmail_campaignsInput = {
   referred_by?: string | null
   referred_by_code?: string | null
   referral_count?: number
+  waitlist_persona?: string | null
+  candidate_role?: string | null
+  role_activated_at?: Date | string | null
+  launch_reward_window_ends_at?: Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedCreateNestedManyWithoutProfilesInput
   agents?: Prisma.agentsUncheckedCreateNestedOneWithoutProfilesInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedCreateNestedManyWithoutProfiles_inquiries_owner_idToprofilesInput
@@ -2677,6 +2993,10 @@ export type profilesUpdateWithoutEmail_campaignsInput = {
   referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  waitlist_persona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidate_role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role_activated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  launch_reward_window_ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
@@ -2706,6 +3026,10 @@ export type profilesUncheckedUpdateWithoutEmail_campaignsInput = {
   referred_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  waitlist_persona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidate_role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role_activated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  launch_reward_window_ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
   inquiries_inquiries_owner_idToprofiles?: Prisma.inquiriesUncheckedUpdateManyWithoutProfiles_inquiries_owner_idToprofilesNestedInput
@@ -2732,6 +3056,10 @@ export type profilesCreateManyReferrerInput = {
   referral_code?: string | null
   referred_by_code?: string | null
   referral_count?: number
+  waitlist_persona?: string | null
+  candidate_role?: string | null
+  role_activated_at?: Date | string | null
+  launch_reward_window_ends_at?: Date | string | null
 }
 
 export type profilesUpdateWithoutReferrerInput = {
@@ -2745,6 +3073,10 @@ export type profilesUpdateWithoutReferrerInput = {
   referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  waitlist_persona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidate_role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role_activated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  launch_reward_window_ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUpdateManyWithoutProfilesNestedInput
@@ -2773,6 +3105,10 @@ export type profilesUncheckedUpdateWithoutReferrerInput = {
   referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  waitlist_persona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidate_role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role_activated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  launch_reward_window_ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin_audit_log?: Prisma.admin_audit_logUncheckedUpdateManyWithoutProfilesNestedInput
   agents?: Prisma.agentsUncheckedUpdateOneWithoutProfilesNestedInput
   email_campaigns?: Prisma.email_campaignsUncheckedUpdateManyWithoutProfilesNestedInput
@@ -2800,6 +3136,10 @@ export type profilesUncheckedUpdateManyWithoutReferrerInput = {
   referral_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referred_by_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   referral_count?: Prisma.IntFieldUpdateOperationsInput | number
+  waitlist_persona?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  candidate_role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role_activated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  launch_reward_window_ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -2936,6 +3276,10 @@ export type profilesSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   referred_by?: boolean
   referred_by_code?: boolean
   referral_count?: boolean
+  waitlist_persona?: boolean
+  candidate_role?: boolean
+  role_activated_at?: boolean
+  launch_reward_window_ends_at?: boolean
   admin_audit_log?: boolean | Prisma.profiles$admin_audit_logArgs<ExtArgs>
   agents?: boolean | Prisma.profiles$agentsArgs<ExtArgs>
   email_campaigns?: boolean | Prisma.profiles$email_campaignsArgs<ExtArgs>
@@ -2967,6 +3311,10 @@ export type profilesSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   referred_by?: boolean
   referred_by_code?: boolean
   referral_count?: boolean
+  waitlist_persona?: boolean
+  candidate_role?: boolean
+  role_activated_at?: boolean
+  launch_reward_window_ends_at?: boolean
   users?: boolean | Prisma.usersDefaultArgs<ExtArgs>
   referrer?: boolean | Prisma.profiles$referrerArgs<ExtArgs>
 }, ExtArgs["result"]["profiles"]>
@@ -2984,6 +3332,10 @@ export type profilesSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   referred_by?: boolean
   referred_by_code?: boolean
   referral_count?: boolean
+  waitlist_persona?: boolean
+  candidate_role?: boolean
+  role_activated_at?: boolean
+  launch_reward_window_ends_at?: boolean
   users?: boolean | Prisma.usersDefaultArgs<ExtArgs>
   referrer?: boolean | Prisma.profiles$referrerArgs<ExtArgs>
 }, ExtArgs["result"]["profiles"]>
@@ -3001,9 +3353,13 @@ export type profilesSelectScalar = {
   referred_by?: boolean
   referred_by_code?: boolean
   referral_count?: boolean
+  waitlist_persona?: boolean
+  candidate_role?: boolean
+  role_activated_at?: boolean
+  launch_reward_window_ends_at?: boolean
 }
 
-export type profilesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "full_name" | "avatar_url" | "phone" | "bio" | "created_at" | "updated_at" | "referral_code" | "referred_by" | "referred_by_code" | "referral_count", ExtArgs["result"]["profiles"]>
+export type profilesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "full_name" | "avatar_url" | "phone" | "bio" | "created_at" | "updated_at" | "referral_code" | "referred_by" | "referred_by_code" | "referral_count" | "waitlist_persona" | "candidate_role" | "role_activated_at" | "launch_reward_window_ends_at", ExtArgs["result"]["profiles"]>
 export type profilesInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   admin_audit_log?: boolean | Prisma.profiles$admin_audit_logArgs<ExtArgs>
   agents?: boolean | Prisma.profiles$agentsArgs<ExtArgs>
@@ -3063,6 +3419,10 @@ export type $profilesPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     referred_by: string | null
     referred_by_code: string | null
     referral_count: number
+    waitlist_persona: string | null
+    candidate_role: string | null
+    role_activated_at: Date | null
+    launch_reward_window_ends_at: Date | null
   }, ExtArgs["result"]["profiles"]>
   composites: {}
 }
@@ -3513,6 +3873,10 @@ export interface profilesFieldRefs {
   readonly referred_by: Prisma.FieldRef<"profiles", 'String'>
   readonly referred_by_code: Prisma.FieldRef<"profiles", 'String'>
   readonly referral_count: Prisma.FieldRef<"profiles", 'Int'>
+  readonly waitlist_persona: Prisma.FieldRef<"profiles", 'String'>
+  readonly candidate_role: Prisma.FieldRef<"profiles", 'String'>
+  readonly role_activated_at: Prisma.FieldRef<"profiles", 'DateTime'>
+  readonly launch_reward_window_ends_at: Prisma.FieldRef<"profiles", 'DateTime'>
 }
     
 
