@@ -20,6 +20,18 @@ async function requireAdminUser() {
   return { error: null, status: 200 };
 }
 
+export const openApiGET = {
+  method: 'get',
+  summary: 'Referral analytics',
+  description: 'Referral program summary: top referrers and referred entries (admin-only).',
+  tags: ['admin','analytics'],
+  responses: {
+    200: { description: 'Referral analytics payload' },
+    401: { description: 'Unauthorized' },
+    403: { description: 'Forbidden' },
+  },
+} as const;
+
 export async function GET() {
   const { error, status } = await requireAdminUser();
   if (error) return NextResponse.json({ error }, { status });

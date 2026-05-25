@@ -20,6 +20,32 @@ async function requireAdminUser() {
   return { error: null, status: 200 };
 }
 
+export const openApiGET = {
+  method: 'get',
+  summary: 'Admin poll responses overview',
+  description: 'Aggregated poll responses with totals and breakdowns by campaign ref tag. Admin-only.',
+  tags: ['admin', 'analytics'],
+  responses: {
+    200: {
+      description: 'Aggregated poll responses',
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            properties: {
+              total: { type: 'number' },
+              questions: { type: 'object' },
+              refTags: { type: 'array', items: { type: 'string' } },
+            },
+          },
+        },
+      },
+    },
+    401: { description: 'Unauthorized' },
+    403: { description: 'Forbidden' },
+  },
+} as const;
+
 export async function GET() {
   const { error, status } = await requireAdminUser();
   if (error) return NextResponse.json({ error }, { status });

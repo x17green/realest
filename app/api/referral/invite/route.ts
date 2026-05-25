@@ -3,6 +3,36 @@ import { sendReferralInviteEmail } from '@/lib/emailService';
 import { recordReferralEvent } from '@/lib/reward-engine';
 import { buildReferralShareUrl, getCurrentMilestone, getNextMilestone } from '@/lib/referral-system';
 import { createServiceClient } from '@/lib/supabase/service';
+import type { OpenApiMetadata } from '@/lib/openapi/route-metadata';
+
+export const openApiPOST: OpenApiMetadata = {
+  method: 'post',
+  summary: 'Send referral invite',
+  description: 'Send a referral invite email using the inviter\'s referral code.',
+  tags: ['Utility'],
+  requestBody: {
+    required: true,
+    content: {
+      'application/json': {
+        schema: {
+          type: 'object',
+          required: ['inviteeEmail', 'referralCode'],
+          properties: {
+            inviteeEmail: { type: 'string', format: 'email' },
+            inviteeName: { type: 'string' },
+            referralCode: { type: 'string' },
+          },
+        },
+      },
+    },
+  },
+  responses: {
+    '200': { description: 'Invite email sent' },
+    '400': { description: 'Invalid JSON body or missing fields' },
+    '404': { description: 'Referral code not found' },
+    '429': { description: 'Too many invites' },
+  },
+}
 
 const inviteRateLimitStore = new Map<string, { count: number; resetTime: number }>();
 

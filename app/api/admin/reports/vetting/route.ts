@@ -1,6 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
+import type { OpenApiMetadata } from '@/lib/openapi/route-metadata'
+
+export const openApiGET: OpenApiMetadata = {
+  method: 'get',
+  summary: 'Get vetting report',
+  description: 'Generate admin vetting summary statistics for a chosen time period and status filter.',
+  tags: ['Admin'],
+  security: [{ bearerAuth: [] }],
+  parameters: [
+    { name: 'period', in: 'query', schema: { type: 'string', enum: ['7d', '30d', '90d'] } },
+    { name: 'status', in: 'query', schema: { type: 'string' } },
+  ],
+  responses: {
+    '200': { description: 'Vetting report generated' },
+    '401': { description: 'Authentication required' },
+    '403': { description: 'Admin access required' },
+  },
+}
 
 // GET /api/admin/reports/vetting - Admin vetting reports
 export async function GET(request: NextRequest) {

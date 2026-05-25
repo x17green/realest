@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { prisma, Prisma } from '@/lib/prisma'
 import { z } from 'zod'
+import type { OpenApiMetadata } from '@/lib/openapi/route-metadata'
 
 // Query parameters schema
 const userQuerySchema = z.object({
@@ -12,6 +13,28 @@ const userQuerySchema = z.object({
   search: z.string().optional(),
   status: z.enum(['active', 'suspended', 'banned']).optional(),
 })
+
+export const openApiGET: OpenApiMetadata = {
+  method: 'get',
+  summary: 'List admin users',
+  description: 'Return a searchable, paginated list of platform users for admin management.',
+  tags: ['Admin'],
+  security: [{ bearerAuth: [] }],
+  parameters: [
+    { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+    { name: 'per_page', in: 'query', schema: { type: 'integer', default: 20 } },
+    { name: 'sort', in: 'query', schema: { type: 'string', enum: ['newest', 'oldest', 'name', 'type'] } },
+    { name: 'user_type', in: 'query', schema: { type: 'string', enum: ['user', 'owner', 'agent', 'admin'] } },
+    { name: 'search', in: 'query', schema: { type: 'string' } },
+    { name: 'status', in: 'query', schema: { type: 'string', enum: ['active', 'suspended', 'banned'] } },
+  ],
+  responses: {
+    '200': { description: 'Users loaded successfully' },
+    '400': { description: 'Invalid query parameters' },
+    '401': { description: 'Unauthorized' },
+    '403': { description: 'Admin access required' },
+  },
+}
 
 export async function GET(request: NextRequest) {
   try {

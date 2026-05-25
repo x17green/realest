@@ -7,6 +7,20 @@ import {
   getWaitlistRewardCopy,
   isWaitlistPersona,
 } from '@/lib/referral-system';
+import type { OpenApiMetadata } from '@/lib/openapi/route-metadata';
+
+export const openApiGET: OpenApiMetadata = {
+  method: 'get',
+  summary: 'Resolve referral code',
+  description: 'Resolve a referral code to inviter details and milestone context.',
+  tags: ['Utility'],
+  parameters: [{ name: 'code', in: 'query', required: true, schema: { type: 'string' } }],
+  responses: {
+    '200': { description: 'Referral code resolved' },
+    '400': { description: 'Referral code is required' },
+    '404': { description: 'Referral code not found' },
+  },
+}
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);

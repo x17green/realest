@@ -175,3 +175,16 @@ export async function PUT(
     )
   }
 }
+export const openApiPUT = {
+  method: 'put',
+  summary: 'Resolve duplicate property',
+  description: 'Admin endpoint to resolve a suspected duplicate property listing (keep both, keep master, reject duplicate).',
+  tags: ['admin','duplicates'],
+  responses: {
+    200: { description: 'Duplicate resolved' },
+    400: { description: 'Invalid request' },
+    401: { description: 'Unauthorized' },
+    403: { description: 'Forbidden' },
+    404: { description: 'Property not found' },
+  },
+} as const;

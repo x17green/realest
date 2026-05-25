@@ -16,6 +16,39 @@ import {
   isWaitlistPersona,
 } from '@/lib/referral-system';
 import { createServiceClient } from '@/lib/supabase/service';
+import type { OpenApiMetadata } from '@/lib/openapi/route-metadata';
+
+export const openApiPOST: OpenApiMetadata = {
+  method: 'post',
+  summary: 'Join waitlist',
+  description: 'Subscribe a user to the waitlist and trigger referral/cohort workflows.',
+  tags: ['Utility'],
+  requestBody: {
+    required: true,
+    content: {
+      'application/json': {
+        schema: {
+          type: 'object',
+          required: ['email', 'firstName', 'persona'],
+          properties: {
+            email: { type: 'string', format: 'email' },
+            firstName: { type: 'string' },
+            lastName: { type: 'string' },
+            phone: { type: 'string' },
+            source: { type: 'string' },
+            ref: { type: 'string' },
+            persona: { type: 'string' },
+          },
+        },
+      },
+    },
+  },
+  responses: {
+    '200': { description: 'Waitlist subscription accepted' },
+    '400': { description: 'Validation error' },
+    '429': { description: 'Rate limited' },
+  },
+}
 
 
 // Rate limiting store (in production, use Redis or database)

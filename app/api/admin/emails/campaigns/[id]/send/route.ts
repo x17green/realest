@@ -14,6 +14,24 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import prisma from '@/lib/prisma';
 import { renderCampaignTemplate, executeBulkSend, CampaignRecipient } from '@/lib/emailBulkSender';
+import type { OpenApiMetadata } from '@/lib/openapi/route-metadata';
+
+export const openApiPOST: OpenApiMetadata = {
+  method: 'post',
+  summary: 'Send email campaign',
+  description: 'Execute a draft or scheduled campaign send using Resend broadcast or batch delivery.',
+  tags: ['Admin', 'Emails'],
+  security: [{ bearerAuth: [] }],
+  parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+  responses: {
+    '200': { description: 'Campaign sent successfully' },
+    '401': { description: 'Unauthorized' },
+    '403': { description: 'Admin access required' },
+    '404': { description: 'Campaign not found' },
+    '409': { description: 'Campaign cannot be sent in its current status' },
+    '500': { description: 'Campaign send failed' },
+  },
+};
 
 const FROM_EMAIL = process.env.FROM_EMAIL ?? 'RealEST Connect <info@connect.realest.ng>';
 const FROM_EMAIL_AUTH = process.env.FROM_EMAIL_AUTH ?? FROM_EMAIL;

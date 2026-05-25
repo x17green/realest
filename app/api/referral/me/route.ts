@@ -1,6 +1,19 @@
 import { NextResponse } from 'next/server';
 import { getReferralSummaryForEmail } from '@/lib/reward-engine';
 import { createClient } from '@/lib/supabase/server';
+import type { OpenApiMetadata } from '@/lib/openapi/route-metadata';
+
+export const openApiGET: OpenApiMetadata = {
+  method: 'get',
+  summary: 'Get my referral summary',
+  description: 'Return the authenticated user\'s referral summary and progress.',
+  tags: ['Utility'],
+  security: [{ bearerAuth: [] }],
+  responses: {
+    '200': { description: 'Referral summary loaded' },
+    '401': { description: 'Unauthorized' },
+  },
+}
 
 export async function GET() {
   const supabase = await createClient();

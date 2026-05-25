@@ -12,19 +12,23 @@ export async function updateSession(request: NextRequest) {
   });
 
   const pathname = request.nextUrl.pathname;
+  const authorization = request.headers.get('authorization')
+  const isBearerAuth = typeof authorization === 'string' && authorization.startsWith('Bearer ')
   const appMode = getAppMode();
 
   // Check if route is accessible in current app mode
   if (!isRouteAccessible(pathname)) {
-    // In coming-soon mode, show 404 instead of redirecting to home for better security
-    if (appMode === "coming-soon") {
+    // Allow bearer-authenticated API requests to pass through during coming-soon
+    if (appMode === 'coming-soon' && isBearerAuth && pathname.startsWith('/api/')) {
+      // proceed — authorized API consumers (e.g. admin token) may access APIs
+    } else if (appMode === 'coming-soon') {
       const url = request.nextUrl.clone();
-      url.pathname = "/not-found";
+      url.pathname = '/not-found';
       return NextResponse.rewrite(url);
     } else {
       // For other modes, redirect to home
       const url = request.nextUrl.clone();
-      url.pathname = "/";
+      url.pathname = '/';
       return NextResponse.redirect(url);
     }
   }
