@@ -458,7 +458,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         property,
-        message: "Property created successfully. Add photos and documents to complete your listing.",
         message: isDraft
           ? "Draft saved successfully. Add photos and documents to complete your listing."
           : "Property created successfully and queued for ML validation before human vetting.",
