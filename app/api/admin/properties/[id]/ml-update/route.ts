@@ -142,3 +142,13 @@ export async function PUT(
     )
   }
 }
+
+export const openApiPUT = {
+  method: 'put',
+  summary: 'Admin ML validation update for property',
+  description: 'Admin endpoint to apply ML validation results and update property status.',
+  tags: ['admin','properties','ml'],
+  parameters: [ { name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } } ],
+  requestBody: { required: true, content: { 'application/json': { schema: { type: 'object' } } } },
+  responses: { '200': { description: 'ML update applied' }, '400': { description: 'Invalid request' }, '401': { description: 'Unauthorized' }, '403': { description: 'Forbidden' }, '404': { description: 'Property not found' } },
+} as const;

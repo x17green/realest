@@ -2,6 +2,36 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
+import type { OpenApiMetadata } from "@/lib/openapi/route-metadata";
+
+export const openApiGET: OpenApiMetadata = {
+  method: 'get',
+  summary: 'List notifications',
+  description: 'Retrieve the authenticated user\'s notifications and unread count.',
+  tags: ['Utility'],
+  security: [{ bearerAuth: [] }],
+  parameters: [
+    { name: 'limit', in: 'query', schema: { type: 'integer', default: 20 } },
+    { name: 'offset', in: 'query', schema: { type: 'integer', default: 0 } },
+    { name: 'unread_only', in: 'query', schema: { type: 'boolean' } },
+  ],
+  responses: {
+    '200': { description: 'Notifications loaded successfully' },
+    '401': { description: 'Unauthorized' },
+  },
+}
+
+export const openApiPOST: OpenApiMetadata = {
+  method: 'post',
+  summary: 'Mark notifications read',
+  description: 'Mark all notifications as read for the authenticated user.',
+  tags: ['Utility'],
+  security: [{ bearerAuth: [] }],
+  responses: {
+    '200': { description: 'All notifications marked as read' },
+    '401': { description: 'Unauthorized' },
+  },
+}
 
 // Note: This assumes we add a 'notifications' table to the database
 // Table structure:

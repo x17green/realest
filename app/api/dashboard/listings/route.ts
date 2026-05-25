@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { propertyListingSchema } from '@/lib/validations/property'
 import { redeemFirstListingWaiver } from '@/lib/reward-engine'
+import type { OpenApiMetadata } from '@/lib/openapi/route-metadata'
 
 const querySchema = z.object({
   page: z.string().optional().transform(val => val ? parseInt(val) : 1),
@@ -11,6 +12,48 @@ const querySchema = z.object({
   status: z.enum(['draft', 'pending_ml_validation', 'pending_vetting', 'live', 'rejected', 'unlisted']).optional(),
   sort: z.enum(['newest', 'oldest', 'price_high', 'price_low', 'views']).optional().default('newest')
 })
+
+export const openApiGET: OpenApiMetadata = {
+  method: 'get',
+  summary: 'List dashboard properties',
+  description: 'Return the authenticated owner or admin properties with pagination, status filtering, and sorting.',
+  tags: ['Dashboard'],
+  security: [{ bearerAuth: [] }],
+  parameters: [
+    { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+    { name: 'limit', in: 'query', schema: { type: 'integer', default: 10 } },
+    { name: 'status', in: 'query', schema: { type: 'string' } },
+    { name: 'sort', in: 'query', schema: { type: 'string', enum: ['newest', 'oldest', 'price_high', 'price_low', 'views'] } },
+  ],
+  responses: {
+    '200': { description: 'Paginated property list' },
+    '400': { description: 'Invalid query parameters' },
+    '401': { description: 'Unauthorized' },
+    '403': { description: 'Forbidden - Property owners only' },
+  },
+}
+
+export const openApiPOST: OpenApiMetadata = {
+  method: 'post',
+  summary: 'Create dashboard property',
+  description: 'Create a new property listing from the owner dashboard and queue it for validation.',
+  tags: ['Dashboard'],
+  security: [{ bearerAuth: [] }],
+  requestBody: {
+    required: true,
+    content: {
+      'application/json': {
+        schema: { $ref: '#/components/schemas/PropertyListing' },
+      },
+    },
+  },
+  responses: {
+    '201': { description: 'Property created successfully' },
+    '400': { description: 'Invalid property data' },
+    '401': { description: 'Unauthorized' },
+    '403': { description: 'Forbidden - Property owners only' },
+  },
+}
 
 export async function GET(request: Request) {
   try {

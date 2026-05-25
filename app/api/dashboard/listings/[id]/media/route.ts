@@ -2,16 +2,72 @@ import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { generateSignedUrl } from "@/lib/utils/upload-utils";
+import { z } from "zod";
+import type { OpenApiMetadata } from "@/lib/openapi/route-metadata";
+
+const propertyIdSchema = z.string().uuid("Invalid property ID");
 
 interface RouteParams {
   params: Promise<{ id: string }>;
+}
+
+export const openApiGET: OpenApiMetadata = {
+  method: 'get',
+  summary: 'List dashboard property media',
+  description: 'Retrieve all media files associated with a property in the dashboard.',
+  tags: ['Dashboard'],
+  security: [{ bearerAuth: [] }],
+  parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' }, description: 'Property ID' }],
+  responses: {
+    '200': { description: 'Media list retrieved successfully' },
+    '401': { description: 'Unauthorized' },
+    '403': { description: 'Forbidden' },
+    '404': { description: 'Property not found or access denied' },
+  },
+}
+
+export const openApiPOST: OpenApiMetadata = {
+  method: 'post',
+  summary: 'Upload dashboard property media',
+  description: 'Upload a media file for a property and store the signed upload result.',
+  tags: ['Dashboard'],
+  security: [{ bearerAuth: [] }],
+  parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' }, description: 'Property ID' }],
+  requestBody: {
+    required: true,
+    content: {
+      'multipart/form-data': {
+        schema: {
+          type: 'object',
+          required: ['file', 'media_type'],
+          properties: {
+            file: { type: 'string', format: 'binary' },
+            media_type: { type: 'string', enum: ['image', 'video', 'virtual_tour'] },
+            alt_text: { type: 'string' },
+            is_featured: { type: 'boolean' },
+          },
+        },
+      },
+    },
+  },
+  responses: {
+    '201': { description: 'Media uploaded successfully' },
+    '400': { description: 'Invalid file type, size, or missing file' },
+    '401': { description: 'Unauthorized' },
+    '403': { description: 'Forbidden' },
+    '404': { description: 'Property not found or access denied' },
+  },
 }
 
 export async function GET(request: Request, { params }: RouteParams) {
   try {
     const supabase = await createClient();
     const { id } = await params;
-    const propertyId = id;
+    const propertyIdResult = propertyIdSchema.safeParse(id);
+    if (!propertyIdResult.success) {
+      return NextResponse.json({ error: "Property not found or access denied" }, { status: 404 });
+    }
+    const propertyId = propertyIdResult.data;
 
     // Verify authentication
     const {
@@ -65,7 +121,11 @@ export async function POST(request: Request, { params }: RouteParams) {
   try {
     const supabase = await createClient();
     const { id } = await params;
-    const propertyId = id;
+    const propertyIdResult = propertyIdSchema.safeParse(id);
+    if (!propertyIdResult.success) {
+      return NextResponse.json({ error: "Property not found or access denied" }, { status: 404 });
+    }
+    const propertyId = propertyIdResult.data;
 
     // Verify authentication
     const {

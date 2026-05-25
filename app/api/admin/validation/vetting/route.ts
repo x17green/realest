@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
+import type { OpenApiMetadata } from '@/lib/openapi/route-metadata'
 
 // Query parameters schema
 const vettingQuerySchema = z.object({
@@ -11,6 +12,27 @@ const vettingQuerySchema = z.object({
   state: z.string().optional(), // Filter by state
   priority: z.enum(['low', 'medium', 'high', 'urgent']).optional(),
 })
+
+export const openApiGET: OpenApiMetadata = {
+  method: 'get',
+  summary: 'Get vetting queue',
+  description: 'List properties in the vetting queue with paging and urgency filters.',
+  tags: ['Admin'],
+  security: [{ bearerAuth: [] }],
+  parameters: [
+    { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+    { name: 'per_page', in: 'query', schema: { type: 'integer', default: 20 } },
+    { name: 'sort', in: 'query', schema: { type: 'string', enum: ['newest', 'oldest', 'urgent', 'location'] } },
+    { name: 'state', in: 'query', schema: { type: 'string' } },
+    { name: 'priority', in: 'query', schema: { type: 'string', enum: ['low', 'medium', 'high', 'urgent'] } },
+  ],
+  responses: {
+    '200': { description: 'Vetting queue loaded successfully' },
+    '400': { description: 'Invalid query parameters' },
+    '401': { description: 'Unauthorized' },
+    '403': { description: 'Admin access required' },
+  },
+}
 
 type RouteParams = {
   params: Promise<{}>

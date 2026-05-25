@@ -129,3 +129,13 @@ export async function PUT(
     );
   }
 }
+
+export const openApiPUT = {
+  method: 'put',
+  summary: 'Vetting decision for property',
+  description: 'Admin endpoint to approve (live) or reject a property during physical vetting.',
+  tags: ['admin','properties','vetting'],
+  parameters: [ { name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } } ],
+  requestBody: { required: true, content: { 'application/json': { schema: { type: 'object' } } } },
+  responses: { '200': { description: 'Vetting applied' }, '400': { description: 'Invalid request' }, '401': { description: 'Unauthorized' }, '403': { description: 'Forbidden' }, '404': { description: 'Property not found' } },
+} as const;

@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { prisma, Prisma } from '@/lib/prisma'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
+import type { OpenApiMetadata } from '@/lib/openapi/route-metadata'
 
 const querySchema = z.object({
   page: z.string().optional().transform(val => val ? parseInt(val) : 1),
@@ -9,6 +10,26 @@ const querySchema = z.object({
   status: z.enum(['new', 'read', 'responded', 'closed']).optional(),
   sort: z.enum(['newest', 'oldest', 'property']).optional().default('newest')
 })
+
+export const openApiGET: OpenApiMetadata = {
+  method: 'get',
+  summary: 'List owner inquiries',
+  description: 'Return inquiries received on properties owned by the authenticated owner.',
+  tags: ['Dashboard'],
+  security: [{ bearerAuth: [] }],
+  parameters: [
+    { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+    { name: 'limit', in: 'query', schema: { type: 'integer', default: 10 } },
+    { name: 'status', in: 'query', schema: { type: 'string' } },
+    { name: 'sort', in: 'query', schema: { type: 'string', enum: ['newest', 'oldest', 'property'] } },
+  ],
+  responses: {
+    '200': { description: 'Paginated inquiry list' },
+    '400': { description: 'Invalid query parameters' },
+    '401': { description: 'Unauthorized' },
+    '403': { description: 'Forbidden - Property owners only' },
+  },
+}
 
 export async function GET(request: Request) {
   try {

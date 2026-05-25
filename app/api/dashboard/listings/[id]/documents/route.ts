@@ -2,16 +2,70 @@ import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { generateSignedUrl } from "@/lib/utils/upload-utils";
+import { z } from "zod";
+import type { OpenApiMetadata } from "@/lib/openapi/route-metadata";
+
+const propertyIdSchema = z.string().uuid("Invalid property ID");
 
 interface RouteParams {
   params: Promise<{ id: string }>;
+}
+
+export const openApiGET: OpenApiMetadata = {
+  method: 'get',
+  summary: 'List dashboard property documents',
+  description: 'Retrieve all legal documents associated with a property.',
+  tags: ['Dashboard'],
+  security: [{ bearerAuth: [] }],
+  parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' }, description: 'Property ID' }],
+  responses: {
+    '200': { description: 'Document list retrieved successfully' },
+    '401': { description: 'Unauthorized' },
+    '403': { description: 'Forbidden' },
+    '404': { description: 'Property not found or access denied' },
+  },
+}
+
+export const openApiPOST: OpenApiMetadata = {
+  method: 'post',
+  summary: 'Upload dashboard property document',
+  description: 'Upload a legal or compliance document for a property.',
+  tags: ['Dashboard'],
+  security: [{ bearerAuth: [] }],
+  parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' }, description: 'Property ID' }],
+  requestBody: {
+    required: true,
+    content: {
+      'multipart/form-data': {
+        schema: {
+          type: 'object',
+          required: ['file', 'document_type'],
+          properties: {
+            file: { type: 'string', format: 'binary' },
+            document_type: { type: 'string' },
+          },
+        },
+      },
+    },
+  },
+  responses: {
+    '201': { description: 'Document uploaded successfully' },
+    '400': { description: 'Invalid file or document type' },
+    '401': { description: 'Unauthorized' },
+    '403': { description: 'Forbidden' },
+    '404': { description: 'Property not found or access denied' },
+  },
 }
 
 export async function GET(request: Request, { params }: RouteParams) {
   try {
     const supabase = await createClient();
     const { id } = await params;
-    const propertyId = id;
+    const propertyIdResult = propertyIdSchema.safeParse(id);
+    if (!propertyIdResult.success) {
+      return NextResponse.json({ error: "Property not found or access denied" }, { status: 404 });
+    }
+    const propertyId = propertyIdResult.data;
 
     // Verify authentication
     const {
@@ -65,7 +119,11 @@ export async function POST(request: Request, { params }: RouteParams) {
   try {
     const supabase = await createClient();
     const { id } = await params;
-    const propertyId = id;
+    const propertyIdResult = propertyIdSchema.safeParse(id);
+    if (!propertyIdResult.success) {
+      return NextResponse.json({ error: "Property not found or access denied" }, { status: 404 });
+    }
+    const propertyId = propertyIdResult.data;
 
     // Verify authentication
     const {

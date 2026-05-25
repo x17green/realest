@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
+import type { OpenApiMetadata } from '@/lib/openapi/route-metadata'
 
 // Query parameters schema
 const mlValidationQuerySchema = z.object({
@@ -10,6 +11,26 @@ const mlValidationQuerySchema = z.object({
   sort: z.enum(['newest', 'oldest', 'priority']).optional().default('newest'),
   status: z.enum(['pending', 'processing', 'completed']).optional(),
 })
+
+export const openApiGET: OpenApiMetadata = {
+  method: 'get',
+  summary: 'Get ML validation queue',
+  description: 'List properties awaiting ML validation with paging and status filters.',
+  tags: ['Admin'],
+  security: [{ bearerAuth: [] }],
+  parameters: [
+    { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+    { name: 'per_page', in: 'query', schema: { type: 'integer', default: 20 } },
+    { name: 'sort', in: 'query', schema: { type: 'string', enum: ['newest', 'oldest', 'priority'] } },
+    { name: 'status', in: 'query', schema: { type: 'string', enum: ['pending', 'processing', 'completed'] } },
+  ],
+  responses: {
+    '200': { description: 'ML queue loaded successfully' },
+    '400': { description: 'Invalid query parameters' },
+    '401': { description: 'Unauthorized' },
+    '403': { description: 'Admin access required' },
+  },
+}
 
 type RouteParams = {
   params: Promise<{}>
@@ -40,10 +61,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     // Parse query parameters
     const { searchParams } = new URL(request.url)
     const queryValidation = mlValidationQuerySchema.safeParse({
-      page: searchParams.get('page'),
-      per_page: searchParams.get('per_page'),
-      sort: searchParams.get('sort'),
-      status: searchParams.get('status'),
+      page: searchParams.get('page') ?? undefined,
+      per_page: searchParams.get('per_page') ?? undefined,
+      sort: searchParams.get('sort') ?? undefined,
+      status: searchParams.get('status') ?? undefined,
     })
 
     if (!queryValidation.success) {

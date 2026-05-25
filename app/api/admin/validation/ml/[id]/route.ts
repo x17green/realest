@@ -109,3 +109,13 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     )
   }
 }
+
+export const openApiPOST = {
+  method: 'post',
+  summary: 'Update ML validation status for a property',
+  description: 'Admin endpoint to approve/reject/flag a property after ML validation.',
+  tags: ['admin','validation','ml'],
+  parameters: [ { name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } } ],
+  requestBody: { required: true, content: { 'application/json': { schema: { type: 'object' } } } },
+  responses: { '200': { description: 'ML update applied' }, '400': { description: 'Invalid request' }, '401': { description: 'Unauthorized' }, '403': { description: 'Forbidden' }, '404': { description: 'Property not found' } },
+} as const;
